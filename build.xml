@@ -70,4 +70,14 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <target name="-post-jar">
+	<copy todir="${dist.dir}/bin">
+	    <fileset dir="bin"/>
+	</copy>
+	<copy todir="${dist.dir}" file="init.js"/>
+    </target>
+
+    <target name="bundle" depends="jar">
+	<zip destfile="../${application.title}.zip" basedir="${dist.dir}" excludes="ivy.xml"/>
+    </target>
 </project>
