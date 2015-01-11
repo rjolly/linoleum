@@ -31,12 +31,12 @@ public class Notepad extends JPanel {
         try {
             properties = new Properties();
             properties.load(Notepad.class.getResourceAsStream(
-                    "resources/NotepadSystem.properties"));
-            resources = ResourceBundle.getBundle("linoleum.notepad.resources.Notepad",
+                    "NotepadSystem.properties"));
+            resources = ResourceBundle.getBundle("linoleum.notepad.Notepad",
                     Locale.getDefault());
         } catch (MissingResourceException | IOException  e) {
-            System.err.println("resources/Notepad.properties "
-                    + "or resources/NotepadSystem.properties not found");
+            System.err.println("Notepad.properties "
+                    + "or NotepadSystem.properties not found");
             System.exit(1);
         }
     }
