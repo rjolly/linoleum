@@ -5,6 +5,10 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class Desktop extends javax.swing.JFrame {
 	private final GraphicsDevice devices[];
@@ -52,6 +56,16 @@ public class Desktop extends javax.swing.JFrame {
 		setVisible(true);
 	}
 
+	private void screenshot() {
+		final BufferedImage bi = new BufferedImage(getRootPane().getWidth(), getRootPane().getHeight(), BufferedImage.TYPE_INT_ARGB);
+		getRootPane().print(bi.createGraphics());
+		try {
+			ImageIO.write(bi, "png", new File(new File(System.getProperty("user.home")), "screenshot.png"));
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
 	@SuppressWarnings("unchecked")
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
@@ -72,6 +86,7 @@ public class Desktop extends javax.swing.JFrame {
                 viewMenu = new javax.swing.JMenu();
                 consoleMenuItem = new javax.swing.JMenuItem();
                 fullScreenMenuItem = new javax.swing.JCheckBoxMenuItem();
+                screenshotMenuItem = new javax.swing.JMenuItem();
                 helpMenu = new javax.swing.JMenu();
                 contentMenuItem = new javax.swing.JMenuItem();
                 aboutMenuItem = new javax.swing.JMenuItem();
@@ -175,6 +190,15 @@ public class Desktop extends javax.swing.JFrame {
                 });
                 viewMenu.add(fullScreenMenuItem);
 
+                screenshotMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_MASK));
+                screenshotMenuItem.setText("Screenshot");
+                screenshotMenuItem.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                screenshotMenuItemActionPerformed(evt);
+                        }
+                });
+                viewMenu.add(screenshotMenuItem);
+
                 menuBar.add(viewMenu);
 
                 helpMenu.setMnemonic('h');
@@ -231,6 +255,10 @@ public class Desktop extends javax.swing.JFrame {
 		console.setVisible(true);
         }//GEN-LAST:event_consoleMenuItemActionPerformed
 
+        private void screenshotMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_screenshotMenuItemActionPerformed
+		screenshot();
+        }//GEN-LAST:event_screenshotMenuItemActionPerformed
+
 	public static void main(String args[]) {
 		/* Create and display the form */
 		java.awt.EventQueue.invokeLater(new Runnable() {
@@ -259,6 +287,7 @@ public class Desktop extends javax.swing.JFrame {
         private javax.swing.JMenuItem pasteMenuItem;
         private javax.swing.JMenuItem saveAsMenuItem;
         private javax.swing.JMenuItem saveMenuItem;
+        private javax.swing.JMenuItem screenshotMenuItem;
         private javax.swing.JMenu viewMenu;
         // End of variables declaration//GEN-END:variables
 }

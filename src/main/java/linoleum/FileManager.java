@@ -19,7 +19,7 @@ public class FileManager extends javax.swing.JInternalFrame {
 		}
 
 		public JInternalFrame open(final URI uri) {
-			return new FileManager(uri==null?null:Paths.get(uri).toFile());
+			return new FileManager(uri == null?null:Paths.get(uri).toFile());
 		}
 	}
 

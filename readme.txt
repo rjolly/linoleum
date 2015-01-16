@@ -1,20 +1,14 @@
 
-Prerequisites:
+Software needed:
 
-  sudo apt-get install ant ant-contrib ivy
-  mkdir -p ~/.ant/lib
-  ln -s /usr/share/java/ant-contrib.jar ~/.ant/lib/
-  ln -s /usr/share/java/ivy.jar ~/.ant/lib/
+- netbeans 7.4 ( https://netbeans.org/ )
+- ivybeans 1.2-nb71 ( https://code.google.com/p/ivybeans/ )
 
 
-To build linoleum:
-  cd application
-  ant jar
-  cd ..
-  ant jar
+To build linoleum, first build "application", then "linoleum"
 
 
-To run linoleum, add the bin directory to your path, give bin/linoleum execution privilege (unix), then:
+To run linoleum, add dist/bin to your path, give dist/bin/linoleum execution privilege (unix), then:
   linoleum
 
 
