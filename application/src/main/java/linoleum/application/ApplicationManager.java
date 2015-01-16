@@ -14,10 +14,11 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 	private final Map<String, Application> map = new HashMap<String, Application>();
 	private final DefaultListModel model = new DefaultListModel();
 	private static final String text[] = {"txt", "log", "properties", "js", "scala", "java"};
+	private static final String image[] = {"gif", "jpg", "png"};
 
-	private boolean isText(final File file) {
-		for (final String ext : text) {
-			if (file.getName().endsWith("." + ext)) {
+	private static boolean hasExt(final File file, final String ext[]) {
+		for (final String s : ext) {
+			if (file.getName().endsWith("." + s)) {
 				return true;
 			}
 		}
@@ -31,15 +32,18 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 
 	public void open(final URI uri) {
 		final File file = Paths.get(uri).toFile();
-		if (isText(file)) {
+		if (hasExt(file, text)) {
 			open("Notepad", file);
+		} else if (hasExt(file, image)) {
+			open("ImageViewer", file);
 		} else if (file.isDirectory()) {
 			open("FileManager", file);
 		}
 	}
 
 	private void open(final String name, final File file) {
-		open(map.get(name), file == null?null:file.toURI());
+		final Application app = map.get(name);
+		if (app != null) open(app, file == null?null:file.toURI());
 	}
 
 	private void open(final Application app, final URI uri) {

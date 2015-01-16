@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.swing.filechooser.FileSystemView;
 
 public class Desktop extends javax.swing.JFrame {
 	private final GraphicsDevice devices[];
@@ -60,7 +61,8 @@ public class Desktop extends javax.swing.JFrame {
 		final BufferedImage bi = new BufferedImage(getRootPane().getWidth(), getRootPane().getHeight(), BufferedImage.TYPE_INT_ARGB);
 		getRootPane().print(bi.createGraphics());
 		try {
-			ImageIO.write(bi, "png", new File(new File(System.getProperty("user.home")), "screenshot.png"));
+			final File dir = FileSystemView.getFileSystemView().getDefaultDirectory();
+			ImageIO.write(bi, "png", new File(dir, "screenshot.png"));
 		} catch (IOException ex) {
 			throw new RuntimeException(ex);
 		}
