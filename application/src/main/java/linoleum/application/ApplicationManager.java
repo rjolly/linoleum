@@ -12,44 +12,46 @@ import javax.swing.JInternalFrame;
 public class ApplicationManager extends javax.swing.JInternalFrame {
 	public static final ApplicationManager instance = new ApplicationManager();
 	private final Map<String, Application> map = new HashMap<String, Application>();
+	private final Map<String, String[]> exts = new HashMap<String, String[]>();
 	private final DefaultListModel model = new DefaultListModel();
-	private static final String text[] = {"txt", "log", "properties", "js", "scala", "java"};
-	private static final String image[] = {"gif", "jpg", "png"};
 
-	private static boolean hasExt(final File file, final String ext[]) {
-		for (final String s : ext) {
-			if (file.getName().toLowerCase().endsWith("." + s)) {
-				return true;
+	private ApplicationManager() {
+		initComponents();
+		exts.put("Notepad", new String[] {"txt", "log", "properties", "js", "scala", "java", "mf", "conf"});
+		exts.put("ImageViewer", new String[] {"gif", "jpg", "png"});
+		refresh();
+	}
+
+	public boolean canOpen(final String name, final URI uri) {
+		if (exts.containsKey(name)) {
+			final File file = Paths.get(uri).toFile();
+			for (final String e : exts.get(name)) {
+				if (file.getName().toLowerCase().endsWith("." + e)) {
+					return true;
+				}
 			}
 		}
 		return false;
 	}
 
-	private ApplicationManager() {
-		initComponents();
-		refresh();
-	}
-
 	public void open(final URI uri) {
-		final File file = Paths.get(uri).toFile();
-		if (hasExt(file, text)) {
-			open("Notepad", file);
-		} else if (hasExt(file, image)) {
-			open("ImageViewer", file);
-		} else if (file.isDirectory()) {
-			open("FileManager", file);
+		for (final String name : exts.keySet()) {
+			if (canOpen(name, uri)) {
+				open(name, uri);
+				return;
+			}
+		}
+		if (Paths.get(uri).toFile().isDirectory()) {
+			open("FileManager", uri);
 		}
 	}
 
-	private void open(final String name, final File file) {
-		final Application app = map.get(name);
-		if (app != null) open(app, file == null?null:file.toURI());
-	}
-
-	private void open(final Application app, final URI uri) {
-		JInternalFrame frame = app.open(uri);
-		getDesktopPane().add(frame);
-		frame.setVisible(true);
+	private void open(final String name, final URI uri) {
+		if (map.containsKey(name)) {
+			final JInternalFrame frame = map.get(name).open(uri);
+			getDesktopPane().add(frame);
+			frame.setVisible(true);
+		}
 	}
 
 	private void open(final int index) {
@@ -57,10 +59,10 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 	}
 
 	public final void refresh() {
-		ServiceLoader<Application> loader = ServiceLoader.load(Application.class);
+		final ServiceLoader<Application> loader = ServiceLoader.load(Application.class);
 		map.clear();
 		model.clear();
-		for (final Application app: loader) {
+		for (final Application app : loader) {
 			map.put(app.getName(), app);
 			model.addElement(app.getName());
 		}

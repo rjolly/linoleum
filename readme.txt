@@ -5,7 +5,7 @@ Software needed:
 - ivybeans 1.2-nb71 ( https://code.google.com/p/ivybeans/ )
 
 
-To build linoleum, first build "application", then "linoleum"
+To build linoleum, first build "application" and "jlfgr", then "linoleum"
 
 
 To run linoleum, add dist/bin to your path, give dist/bin/linoleum execution privilege (unix), then:
