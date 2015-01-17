@@ -18,7 +18,7 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 
 	private static boolean hasExt(final File file, final String ext[]) {
 		for (final String s : ext) {
-			if (file.getName().endsWith("." + s)) {
+			if (file.getName().toLowerCase().endsWith("." + s)) {
 				return true;
 			}
 		}

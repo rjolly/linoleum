@@ -34,7 +34,9 @@ public class ImagePanel extends JPanel implements MouseMotionListener {
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.drawImage(image, 0, 0, null);
+		final int x = Math.max(getWidth() - image.getWidth(), 0) / 2;
+		final int y = Math.max(getHeight() - image.getHeight(), 0) / 2;
+		g.drawImage(image, x, y, null);
 	}
 
 	@Override
