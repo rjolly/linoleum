@@ -49,7 +49,7 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 	private void open(final String name, final URI uri) {
 		if (map.containsKey(name)) {
 			final JInternalFrame frame = map.get(name).open(uri);
-			getDesktopPane().add(frame);
+			if (frame.getDesktopPane() == null) getDesktopPane().add(frame);
 			frame.setVisible(true);
 		}
 	}
@@ -60,11 +60,12 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 
 	public final void refresh() {
 		final ServiceLoader<Application> loader = ServiceLoader.load(Application.class);
-		map.clear();
-		model.clear();
 		for (final Application app : loader) {
-			map.put(app.getName(), app);
-			model.addElement(app.getName());
+			final String name = app.getName();
+			if (!map.containsKey(name)) {
+				map.put(name, app);
+				model.addElement(name);
+			}
 		}
 	}
 

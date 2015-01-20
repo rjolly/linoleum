@@ -2,3 +2,4 @@ linoleum.FileManager$Application
 linoleum.ScriptShell$Application
 linoleum.notepad.Notepad$Application
 linoleum.ImageViewer$Application
+linoleum.Clock
