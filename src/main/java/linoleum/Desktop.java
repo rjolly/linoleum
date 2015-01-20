@@ -23,7 +23,6 @@ public class Desktop extends javax.swing.JFrame {
 			throw new RuntimeException(ex);
 		}
 		desktopPane.add(ApplicationManager.instance);
-		console.setContentPane(new Console());
 		devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 		bounds = getBounds();
 	}
@@ -73,7 +72,6 @@ public class Desktop extends javax.swing.JFrame {
         private void initComponents() {
 
                 desktopPane = new javax.swing.JDesktopPane();
-                console = new javax.swing.JInternalFrame();
                 menuBar = new javax.swing.JMenuBar();
                 fileMenu = new javax.swing.JMenu();
                 openMenuItem = new javax.swing.JMenuItem();
@@ -86,7 +84,6 @@ public class Desktop extends javax.swing.JFrame {
                 pasteMenuItem = new javax.swing.JMenuItem();
                 deleteMenuItem = new javax.swing.JMenuItem();
                 viewMenu = new javax.swing.JMenu();
-                consoleMenuItem = new javax.swing.JMenuItem();
                 fullScreenMenuItem = new javax.swing.JCheckBoxMenuItem();
                 screenshotMenuItem = new javax.swing.JMenuItem();
                 helpMenu = new javax.swing.JMenu();
@@ -94,27 +91,6 @@ public class Desktop extends javax.swing.JFrame {
                 aboutMenuItem = new javax.swing.JMenuItem();
 
                 setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-                console.setClosable(true);
-                console.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
-                console.setIconifiable(true);
-                console.setMaximizable(true);
-                console.setResizable(true);
-                console.setTitle("Console");
-
-                javax.swing.GroupLayout consoleLayout = new javax.swing.GroupLayout(console.getContentPane());
-                console.getContentPane().setLayout(consoleLayout);
-                consoleLayout.setHorizontalGroup(
-                        consoleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 388, Short.MAX_VALUE)
-                );
-                consoleLayout.setVerticalGroup(
-                        consoleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 277, Short.MAX_VALUE)
-                );
-
-                desktopPane.add(console);
-                console.setBounds(0, 0, 404, 310);
 
                 fileMenu.setMnemonic('f');
                 fileMenu.setText("File");
@@ -171,15 +147,6 @@ public class Desktop extends javax.swing.JFrame {
 
                 viewMenu.setMnemonic('v');
                 viewMenu.setText("View");
-
-                consoleMenuItem.setMnemonic('c');
-                consoleMenuItem.setText("Console");
-                consoleMenuItem.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                consoleMenuItemActionPerformed(evt);
-                        }
-                });
-                viewMenu.add(consoleMenuItem);
 
                 fullScreenMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.CTRL_MASK));
                 fullScreenMenuItem.setMnemonic('f');
@@ -253,10 +220,6 @@ public class Desktop extends javax.swing.JFrame {
 		fullScreen();
         }//GEN-LAST:event_fullScreenMenuItemActionPerformed
 
-        private void consoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_consoleMenuItemActionPerformed
-		console.setVisible(true);
-        }//GEN-LAST:event_consoleMenuItemActionPerformed
-
         private void screenshotMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_screenshotMenuItemActionPerformed
 		screenshot();
         }//GEN-LAST:event_screenshotMenuItemActionPerformed
@@ -272,8 +235,6 @@ public class Desktop extends javax.swing.JFrame {
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JMenuItem aboutMenuItem;
-        private javax.swing.JInternalFrame console;
-        private javax.swing.JMenuItem consoleMenuItem;
         private javax.swing.JMenuItem contentMenuItem;
         private javax.swing.JMenuItem copyMenuItem;
         private javax.swing.JMenuItem cutMenuItem;
