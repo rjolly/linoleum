@@ -3,12 +3,12 @@ package linoleum;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Panel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import javax.swing.JPanel;
 
-public class ClockPanel extends Panel implements Runnable {
+public class ClockPanel extends JPanel implements Runnable {
 
     private volatile Thread timer;       // The thread that displays clock
     private int lastxs, lastys, lastxm,
@@ -56,10 +56,22 @@ public class ClockPanel extends Panel implements Runnable {
      * Paint is the main part of the program
      */
     @Override
-    public void update(Graphics g) {
+    public void paintComponent(Graphics g) {
         int xh, yh, xm, ym, xs, ys;
         int s = 0, m = 10, h = 10;
         String today;
+
+	super.paintComponent(g);
+
+	g.setFont(clockFaceFont);
+        // Draw the circle and numbers
+        g.setColor(handColor);
+        g.drawArc(xcenter - 50, ycenter - 50, 100, 100, 0, 360);
+        g.setColor(numberColor);
+        g.drawString("9", xcenter - 45, ycenter + 3);
+        g.drawString("3", xcenter + 40, ycenter + 3);
+        g.drawString("12", xcenter - 5, ycenter - 37);
+        g.drawString("6", xcenter - 3, ycenter + 45);
 
         currentDate = new Date();
 
@@ -131,29 +143,6 @@ public class ClockPanel extends Panel implements Runnable {
         lastyh = yh;
         lastdate = today;
         currentDate = null;
-    }
-
-    @Override
-    public void paint(Graphics g) {
-        g.setFont(clockFaceFont);
-        // Draw the circle and numbers
-        g.setColor(handColor);
-        g.drawArc(xcenter - 50, ycenter - 50, 100, 100, 0, 360);
-        g.setColor(numberColor);
-        g.drawString("9", xcenter - 45, ycenter + 3);
-        g.drawString("3", xcenter + 40, ycenter + 3);
-        g.drawString("12", xcenter - 5, ycenter - 37);
-        g.drawString("6", xcenter - 3, ycenter + 45);
-
-        // Draw date and hands
-        g.setColor(numberColor);
-        g.drawString(lastdate, 5, 125);
-        g.drawLine(xcenter, ycenter, lastxs, lastys);
-        g.setColor(handColor);
-        g.drawLine(xcenter, ycenter - 1, lastxm, lastym);
-        g.drawLine(xcenter - 1, ycenter, lastxm, lastym);
-        g.drawLine(xcenter, ycenter - 1, lastxh, lastyh);
-        g.drawLine(xcenter - 1, ycenter, lastxh, lastyh);
     }
 
     public void start() {
