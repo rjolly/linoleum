@@ -1,6 +1,7 @@
 package linoleum;
 
 import java.net.URI;
+import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import linoleum.application.Application;
 
@@ -41,7 +42,10 @@ public class Console extends javax.swing.JInternalFrame implements Application {
         // Variables declaration - do not modify//GEN-BEGIN:variables
         // End of variables declaration//GEN-END:variables
 
-	@Override
+	public ImageIcon getIcon() {
+		return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif"));
+	}
+
 	public JInternalFrame open(final URI uri) {
 		return this;
 	}

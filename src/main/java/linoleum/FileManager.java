@@ -4,6 +4,7 @@ import linoleum.application.ApplicationManager;
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Paths;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 
@@ -16,6 +17,10 @@ public class FileManager extends javax.swing.JInternalFrame {
 	public static class Application implements linoleum.application.Application {
 		public String getName() {
 			return FileManager.class.getSimpleName();
+		}
+
+		public ImageIcon getIcon() {
+			return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif"));
 		}
 
 		public JInternalFrame open(final URI uri) {

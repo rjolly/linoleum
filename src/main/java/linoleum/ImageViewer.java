@@ -5,6 +5,7 @@ import java.io.FileFilter;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import linoleum.application.ApplicationManager;
 
@@ -15,6 +16,10 @@ public class ImageViewer extends javax.swing.JInternalFrame {
 	public static class Application implements linoleum.application.Application {
 		public String getName() {
 			return ImageViewer.class.getSimpleName();
+		}
+
+		public ImageIcon getIcon() {
+			return null;
 		}
 
 		public JInternalFrame open(final URI uri) {

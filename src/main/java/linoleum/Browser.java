@@ -3,6 +3,7 @@ package linoleum;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
 public class Browser extends javax.swing.JInternalFrame {
@@ -10,6 +11,10 @@ public class Browser extends javax.swing.JInternalFrame {
 	public static class Application implements linoleum.application.Application {
 		public String getName() {
 			return Browser.class.getSimpleName();
+		}
+
+		public ImageIcon getIcon() {
+			return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif"));
 		}
 
 		public JInternalFrame open(final URI uri) {

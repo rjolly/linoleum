@@ -16,6 +16,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
+import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
 public class ScriptShell extends JInternalFrame implements ScriptShellPanel.CommandProcessor {
@@ -40,6 +41,10 @@ public class ScriptShell extends JInternalFrame implements ScriptShellPanel.Comm
 	public static class Application implements linoleum.application.Application {
 		public String getName() {
 			return ScriptShell.class.getSimpleName();
+		}
+
+		public ImageIcon getIcon() {
+			return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif"));
 		}
 
 		public JInternalFrame open(final URI uri) {

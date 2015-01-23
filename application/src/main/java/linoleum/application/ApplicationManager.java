@@ -1,5 +1,6 @@
 package linoleum.application;
 
+import java.awt.Component;
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Paths;
@@ -7,17 +8,53 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 
 public class ApplicationManager extends javax.swing.JInternalFrame {
 	public static final ApplicationManager instance = new ApplicationManager();
+	private final ImageIcon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
 	private final Map<String, Application> map = new HashMap<String, Application>();
 	private final Map<String, String[]> exts = new HashMap<String, String[]>();
 	private final DefaultListModel model = new DefaultListModel();
+	private final ListCellRenderer renderer = new Renderer();
+	
+	private class Renderer extends JLabel implements ListCellRenderer {
+
+		public Renderer() {
+			setOpaque(true);
+			setHorizontalAlignment(CENTER);
+			setVerticalAlignment(CENTER);
+			setVerticalTextPosition(BOTTOM);
+			setHorizontalTextPosition(CENTER);
+		}
+
+		@Override
+		public Component getListCellRendererComponent(final JList list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+			if (isSelected) {
+				setBackground(list.getSelectionBackground());
+				setForeground(list.getSelectionForeground());
+			} else {
+				setBackground(list.getBackground());
+				setForeground(list.getForeground());
+			}
+
+			final String name = (String)value;
+			final ImageIcon icon = map.get(name).getIcon();
+			setIcon(icon == null?defaultIcon:icon);
+			setText(name);
+			setFont(list.getFont());
+
+			return this;
+		}
+	};
 
 	private ApplicationManager() {
 		initComponents();
-		exts.put("Notepad", new String[] {"txt", "log", "properties", "js", "scala", "java", "mf", "conf"});
+		exts.put("Notepad", new String[] {"txt", "log", "properties", "js", "scala", "java", "mf", "conf", "form"});
 		exts.put("ImageViewer", new String[] {"gif", "jpg", "png"});
 		refresh();
 	}
@@ -90,6 +127,9 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 
                 jList1.setModel(model);
                 jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+                jList1.setCellRenderer(renderer);
+                jList1.setLayoutOrientation(javax.swing.JList.VERTICAL_WRAP);
+                jList1.setVisibleRowCount(-1);
                 jList1.addMouseListener(new java.awt.event.MouseAdapter() {
                         public void mouseClicked(java.awt.event.MouseEvent evt) {
                                 jList1MouseClicked(evt);

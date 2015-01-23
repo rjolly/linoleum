@@ -1,6 +1,7 @@
 package linoleum;
 
 import java.net.URI;
+import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import linoleum.application.Application;
 
@@ -58,7 +59,10 @@ public class Clock extends javax.swing.JInternalFrame implements Application {
         private linoleum.ClockPanel clockPanel1;
         // End of variables declaration//GEN-END:variables
 
-	@Override
+	public ImageIcon getIcon() {
+		return null;
+	}
+
 	public JInternalFrame open(final URI uri) {
 		return this;
 	}
