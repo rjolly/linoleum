@@ -24,8 +24,8 @@ public class Browser extends javax.swing.JInternalFrame {
 
 	public Browser(final URI uri) {
 		initComponents();
-		if (uri != null) try {
-			htmlPane1.linkActivated(uri.toURL());
+		try {
+			if (uri != null) htmlPane1.linkActivated(uri.toURL());
 		} catch (MalformedURLException ex) {
 			throw new RuntimeException(ex);
 		}
