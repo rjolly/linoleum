@@ -74,6 +74,8 @@
 	<copy todir="${dist.dir}/bin">
 	    <fileset dir="bin"/>
 	</copy>
+	<chmod file="${dist.dir}/bin/linoleum" perm="+x"/>
+	<delete file="${dist.dir}/lib/jmf-2.1.1e.jar"/>
 	<copy todir="${dist.dir}" file="init.js"/>
     </target>
 
