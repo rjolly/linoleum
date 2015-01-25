@@ -7,12 +7,15 @@ import javax.media.Player;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
-public class MoviePlayer extends javax.swing.JInternalFrame {
+public class MediaPlayer extends javax.swing.JInternalFrame {
 	private final Player player;
+	private final ImageIcon playIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"));
+	private final ImageIcon pauseIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Pause16.gif"));
+	private boolean state;
 
 	public static class Application implements linoleum.application.Application {
 		public String getName() {
-			return MoviePlayer.class.getSimpleName();
+			return MediaPlayer.class.getSimpleName();
 		}
 
 		public ImageIcon getIcon() {
@@ -20,23 +23,36 @@ public class MoviePlayer extends javax.swing.JInternalFrame {
 		}
 
 		public JInternalFrame open(final URI uri) {
-			return new MoviePlayer(uri);
+			return new MediaPlayer(uri);
 		}
 	}
 
-	public MoviePlayer(final URI uri) {
+	public MediaPlayer(final URI uri) {
 		initComponents();
 		try {
 			if (uri != null) {
 				player = Manager.createRealizedPlayer(uri.toURL());
 				final Component component = player.getVisualComponent();
-				jPanel1.add(component);
-				player.start();
+				if (component != null) jPanel1.add(component);
+				start();
 			} else {
+				jButton1.setEnabled(false);
 				player = null;
 			}
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
+		}
+	}
+
+	private void start() {
+		if (state) {
+			state = false;
+			player.stop();
+			jButton1.setIcon(playIcon);
+		} else {
+			state = true;
+			player.start();
+			jButton1.setIcon(pauseIcon);
 		}
 	}
 
@@ -46,14 +62,13 @@ public class MoviePlayer extends javax.swing.JInternalFrame {
 
                 jPanel1 = new javax.swing.JPanel();
                 jPanel2 = new javax.swing.JPanel();
-                playButton = new javax.swing.JButton();
-                stopButton = new javax.swing.JButton();
+                jButton1 = new javax.swing.JButton();
 
                 setClosable(true);
                 setIconifiable(true);
                 setMaximizable(true);
                 setResizable(true);
-                setTitle("Movie Player");
+                setTitle("Media Player");
 
                 javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
                 jPanel1.setLayout(jPanel1Layout);
@@ -63,24 +78,16 @@ public class MoviePlayer extends javax.swing.JInternalFrame {
                 );
                 jPanel1Layout.setVerticalGroup(
                         jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 236, Short.MAX_VALUE)
+                        .addGap(0, 235, Short.MAX_VALUE)
                 );
 
-                playButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"))); // NOI18N
-                playButton.addActionListener(new java.awt.event.ActionListener() {
+                jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"))); // NOI18N
+                jButton1.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                playButtonActionPerformed(evt);
+                                jButton1ActionPerformed(evt);
                         }
                 });
-                jPanel2.add(playButton);
-
-                stopButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Stop16.gif"))); // NOI18N
-                stopButton.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                stopButtonActionPerformed(evt);
-                        }
-                });
-                jPanel2.add(stopButton);
+                jPanel2.add(jButton1);
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);
@@ -100,18 +107,13 @@ public class MoviePlayer extends javax.swing.JInternalFrame {
                 pack();
         }// </editor-fold>//GEN-END:initComponents
 
-        private void playButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playButtonActionPerformed
-		if (player != null) player.start();
-        }//GEN-LAST:event_playButtonActionPerformed
-
-        private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
-		if (player != null) player.stop();
-        }//GEN-LAST:event_stopButtonActionPerformed
+        private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+		start();
+        }//GEN-LAST:event_jButton1ActionPerformed
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
+        private javax.swing.JButton jButton1;
         private javax.swing.JPanel jPanel1;
         private javax.swing.JPanel jPanel2;
-        private javax.swing.JButton playButton;
-        private javax.swing.JButton stopButton;
         // End of variables declaration//GEN-END:variables
 }

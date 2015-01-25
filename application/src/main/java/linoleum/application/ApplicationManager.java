@@ -56,7 +56,8 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 		initComponents();
 		exts.put("Notepad", new String[] {"txt", "log", "properties", "js", "scala", "java", "mf", "conf", "form"});
 		exts.put("ImageViewer", new String[] {"gif", "jpg", "png"});
-		exts.put("MoviePlayer", new String[] {"avi"});
+		exts.put("Browser", new String[] {"htm", "html"});
+		exts.put("MediaPlayer", new String[] {"aiff", "avi", "gsm", "mvr", "mid", "mpg", "mp2", "mov", "au", "wav"});
 		refresh();
 	}
 
