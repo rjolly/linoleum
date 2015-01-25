@@ -3,6 +3,7 @@ linoleum.ScriptShell$Application
 linoleum.notepad.Notepad$Application
 linoleum.ImageViewer$Application
 linoleum.MediaPlayer$Application
+linoleum.ObjLoad$Application
 linoleum.Browser$Application
 linoleum.Console
 linoleum.Clock

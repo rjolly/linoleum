@@ -75,7 +75,9 @@
 	    <fileset dir="bin"/>
 	</copy>
 	<chmod file="${dist.dir}/bin/linoleum" perm="+x"/>
-	<delete file="${dist.dir}/lib/jmf-2.1.1e.jar"/>
+	<delete>
+	    <fileset dir="${dist.dir}" includes="lib/jmf-2.1.1e.jar, lib/j3d-core-1.3.1.jar, lib/j3d-core-utils-1.3.1.jar"/>
+	</delete>
 	<copy todir="${dist.dir}" file="init.js"/>
     </target>
 
