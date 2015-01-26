@@ -23,5 +23,5 @@ To install any Ivy module, in the script shell:
 
 
 (This requires to first clone/build the project at https://github.com/rjolly/jcterm for the moment). A "JCTerm" item should show up in the Applications. If not, you can troubleshoot with:
-  View->Console
+  Console
 
