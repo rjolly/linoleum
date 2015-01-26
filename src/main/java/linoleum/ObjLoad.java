@@ -14,6 +14,7 @@ import com.sun.j3d.utils.behaviors.vp.*;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.nio.file.Paths;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
@@ -173,6 +174,7 @@ public class ObjLoad extends javax.swing.JInternalFrame {
 		try {
 			if (uri != null) {
 				filename = uri.toURL();
+				setTitle(Paths.get(uri).toFile().getName());
 
 				// Create Canvas3D and SimpleUniverse; add canvas to drawing panel
 				Canvas3D c = createUniverse();
@@ -197,9 +199,9 @@ public class ObjLoad extends javax.swing.JInternalFrame {
                 setIconifiable(true);
                 setMaximizable(true);
                 setResizable(true);
-                setTitle("ObjLoad");
+                setTitle("Obj Load");
 
-                drawingPanel.setPreferredSize(new java.awt.Dimension(400, 300));
+                drawingPanel.setPreferredSize(new java.awt.Dimension(394, 296));
                 drawingPanel.setLayout(new java.awt.BorderLayout());
                 getContentPane().add(drawingPanel, java.awt.BorderLayout.CENTER);
 

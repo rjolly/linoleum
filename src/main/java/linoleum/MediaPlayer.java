@@ -2,6 +2,7 @@ package linoleum;
 
 import java.awt.Component;
 import java.net.URI;
+import java.nio.file.Paths;
 import javax.media.Manager;
 import javax.media.Player;
 import javax.swing.ImageIcon;
@@ -33,7 +34,11 @@ public class MediaPlayer extends javax.swing.JInternalFrame {
 			if (uri != null) {
 				player = Manager.createRealizedPlayer(uri.toURL());
 				final Component component = player.getVisualComponent();
-				if (component != null) jPanel1.add(component);
+				if (component != null) {
+					jPanel1.add(component);
+					pack();
+				}
+				setTitle(Paths.get(uri).toFile().getName());
 				start();
 			} else {
 				jButton1.setEnabled(false);
@@ -70,16 +75,8 @@ public class MediaPlayer extends javax.swing.JInternalFrame {
                 setResizable(true);
                 setTitle("Media Player");
 
-                javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-                jPanel1.setLayout(jPanel1Layout);
-                jPanel1Layout.setHorizontalGroup(
-                        jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 0, Short.MAX_VALUE)
-                );
-                jPanel1Layout.setVerticalGroup(
-                        jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 235, Short.MAX_VALUE)
-                );
+                jPanel1.setLayout(new java.awt.BorderLayout());
+                getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
                 jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"))); // NOI18N
                 jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -89,20 +86,7 @@ public class MediaPlayer extends javax.swing.JInternalFrame {
                 });
                 jPanel2.add(jButton1);
 
-                javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-                getContentPane().setLayout(layout);
-                layout.setHorizontalGroup(
-                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                );
-                layout.setVerticalGroup(
-                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                );
+                getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
                 pack();
         }// </editor-fold>//GEN-END:initComponents
