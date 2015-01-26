@@ -3,13 +3,16 @@ package linoleum;
 import java.awt.Component;
 import java.net.URI;
 import java.nio.file.Paths;
+import javax.media.ControllerEvent;
+import javax.media.ControllerListener;
+import javax.media.EndOfMediaEvent;
 import javax.media.Manager;
 import javax.media.Player;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
 public class MediaPlayer extends javax.swing.JInternalFrame {
-	private final Player player;
+	private Player player;
 	private final ImageIcon playIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"));
 	private final ImageIcon pauseIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Pause16.gif"));
 	private boolean state;
@@ -32,24 +35,36 @@ public class MediaPlayer extends javax.swing.JInternalFrame {
 		initComponents();
 		try {
 			if (uri != null) {
-				player = Manager.createRealizedPlayer(uri.toURL());
-				final Component component = player.getVisualComponent();
-				if (component != null) {
-					jPanel1.add(component);
-					pack();
-				}
-				setTitle(Paths.get(uri).toFile().getName());
-				start();
+				open(uri);
+				push();
 			} else {
 				jButton1.setEnabled(false);
-				player = null;
 			}
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
-	private void start() {
+	private void open(final URI uri) throws Exception {
+		setTitle(Paths.get(uri).toFile().getName());
+		player = Manager.createRealizedPlayer(uri.toURL());
+		final Component component = player.getVisualComponent();
+		if (component != null) {
+			jPanel1.add(component);
+			pack();
+		}
+		player.addControllerListener(new ControllerListener() {
+
+			@Override
+			public void controllerUpdate(ControllerEvent ce) {
+				if (ce instanceof EndOfMediaEvent) {
+					push();
+				}
+			}
+		});
+	}
+
+	private void push() {
 		if (state) {
 			state = false;
 			player.stop();
@@ -74,6 +89,23 @@ public class MediaPlayer extends javax.swing.JInternalFrame {
                 setMaximizable(true);
                 setResizable(true);
                 setTitle("Media Player");
+                addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
+                        public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+                                formInternalFrameClosing(evt);
+                        }
+                        public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                });
 
                 jPanel1.setLayout(new java.awt.BorderLayout());
                 getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -92,8 +124,12 @@ public class MediaPlayer extends javax.swing.JInternalFrame {
         }// </editor-fold>//GEN-END:initComponents
 
         private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-		start();
+		push();
         }//GEN-LAST:event_jButton1ActionPerformed
+
+        private void formInternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosing
+		if (player != null) player.close();
+        }//GEN-LAST:event_formInternalFrameClosing
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
