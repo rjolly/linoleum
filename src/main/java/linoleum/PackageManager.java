@@ -42,7 +42,7 @@ public class PackageManager {
 		final Ivy ivy = Ivy.newInstance(ivySettings);
 		final ModuleRevisionId mRID = ModuleRevisionId.parse(name);
 		final ResolveOptions resolveOptions = new ResolveOptions();
-		resolveOptions.setConfs(new String[]{"runtime"});
+		resolveOptions.setConfs(new String[]{"default"});
 		final ResolveReport resolveReport = ivy.resolve(mRID, resolveOptions, true);
 		final ModuleDescriptor md = resolveReport.getModuleDescriptor();
 		final RetrieveOptions retrieveOptions = new RetrieveOptions();
