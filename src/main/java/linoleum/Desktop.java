@@ -17,11 +17,7 @@ public class Desktop extends javax.swing.JFrame {
 
 	private Desktop() {
 		initComponents();
-		try {
-			PackageManager.instance.init();
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
+		PackageManager.instance.init();
 		desktopPane.add(ApplicationManager.instance);
 		devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 		bounds = getBounds();

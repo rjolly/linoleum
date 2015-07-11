@@ -21,7 +21,7 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 	private final Map<String, String[]> exts = new HashMap<String, String[]>();
 	private final DefaultListModel model = new DefaultListModel();
 	private final ListCellRenderer renderer = new Renderer();
-	
+
 	private class Renderer extends JLabel implements ListCellRenderer {
 
 		public Renderer() {

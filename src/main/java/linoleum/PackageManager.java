@@ -2,9 +2,6 @@ package linoleum;
 
 import linoleum.application.ApplicationManager;
 import java.io.File;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import org.apache.ivy.Ivy;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
@@ -22,7 +19,7 @@ public class PackageManager {
 		lib = new File(dir);
 	}
 
-	public void init() throws Exception {
+	public void init() {
 		add(new File(new File(System.getProperty("java.home")), "../lib/tools.jar"));
 		for (final File file: lib.listFiles()) {
 			add(file);
@@ -49,13 +46,11 @@ public class PackageManager {
 		retrieveOptions.setDestArtifactPattern(lib.getPath() + "/[artifact]-[revision].[ext]");
 		final RetrieveReport retrieveReport = ivy.retrieve(md.getModuleRevisionId(), retrieveOptions);
 		for (final Object obj : retrieveReport.getCopiedFiles()) {
-			add((File) obj);
+			add((File)obj);
 		}
 	}
 
-	private static void add(final File file) throws Exception {
-		final Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class});
-		method.setAccessible(true);
-		method.invoke(ClassLoader.getSystemClassLoader(), new Object[]{file.toURI().toURL()});
+	private static void add(final File file) {
+		((ClassLoader)ClassLoader.getSystemClassLoader()).add(file);
 	}
 }

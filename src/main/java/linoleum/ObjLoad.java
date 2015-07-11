@@ -82,7 +82,7 @@ public class ObjLoad extends javax.swing.JInternalFrame {
 	catch (IncorrectFormatException e) {
 	  throw new RuntimeException(e);
 	}
-	  
+
 	objTrans.addChild(s.getSceneGroup());
 
 	BoundingSphere bounds = new BoundingSphere(new Point3d(0.0,0.0,0.0), 100.0);
@@ -109,7 +109,7 @@ public class ObjLoad extends javax.swing.JInternalFrame {
 
 	return objRoot;
     }
-    
+
     private Canvas3D createUniverse() {
 	// Get the preferred graphics configuration for the default screen
 	GraphicsConfiguration config =
@@ -150,7 +150,7 @@ public class ObjLoad extends javax.swing.JInternalFrame {
 	pg.addChild(light2);
 
 	viewingPlatform.setPlatformGeometry( pg );
-      
+
 	// This will move the ViewPlatform back a bit so the
 	// objects in the scene can be viewed.
 	viewingPlatform.setNominalViewingTransform();
@@ -161,7 +161,7 @@ public class ObjLoad extends javax.swing.JInternalFrame {
             orbit.setSchedulingBounds(bounds);
             viewingPlatform.setViewPlatformBehavior(orbit);	    
 	}        
-        
+
         // Ensure at least 5 msec per frame (i.e., < 200Hz)
 	univ.getViewer().getView().setMinimumFrameCycleTime(5);
 
@@ -188,7 +188,7 @@ public class ObjLoad extends javax.swing.JInternalFrame {
 			throw new RuntimeException(ex);
 		}
 	}
-    
+
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
