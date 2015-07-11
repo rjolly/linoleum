@@ -152,7 +152,7 @@ public class ScriptShell extends JInternalFrame implements ScriptShellPanel.Comm
 		String oldFilename = (String) engine.get(ScriptEngine.FILENAME);
 		engine.put(ScriptEngine.FILENAME, "<built-in init." + extension + ">");
 		try {
-			InputStream stream = ScriptShell.class.getResourceAsStream("/com/sun/tools/script/shell/init."
+			InputStream stream = ClassLoader.getSystemResourceAsStream("com/sun/tools/script/shell/init."
 				+ extension);
 			if (stream != null) {
 				engine.eval(new InputStreamReader(new BufferedInputStream(stream)));

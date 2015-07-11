@@ -8,9 +8,10 @@ public class ClassLoader extends URLClassLoader {
 
 	public ClassLoader(final java.lang.ClassLoader parent) {
 		super(((URLClassLoader)parent).getURLs(), parent);
+		add(new File(new File(System.getProperty("java.home")), "../lib/tools.jar"));
 	}
 
-	public void add(final File file) {
+	public final void add(final File file) {
 		try {
 			addURL(file.toURI().toURL());
 		} catch (final MalformedURLException ex) {

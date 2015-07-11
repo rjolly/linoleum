@@ -20,7 +20,6 @@ public class PackageManager {
 	}
 
 	public void init() {
-		add(new File(new File(System.getProperty("java.home")), "../lib/tools.jar"));
 		for (final File file: lib.listFiles()) {
 			add(file);
 		}
