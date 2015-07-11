@@ -8,6 +8,7 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 
 public class ConsolePanel extends JPanel {
+	private static boolean initialized;
 	private JTextArea editor;
 	private boolean updating;
 	private DocumentListener listener;
@@ -21,9 +22,12 @@ public class ConsolePanel extends JPanel {
 			is = new PipedInputStream(src, 128);
 		} catch (IOException e) {}
 
-		System.setIn(new BufferedInputStream(getInputStream()));
-		System.setOut(new PrintStream(new BufferedOutputStream(getOutputStream(), 128), true));
-		System.setErr(new PrintStream(new BufferedOutputStream(getOutputStream(), 128), true));
+		if (!initialized) {
+			System.setIn(new BufferedInputStream(getInputStream()));
+			System.setOut(new PrintStream(new BufferedOutputStream(getOutputStream(), 128), true));
+			System.setErr(new PrintStream(new BufferedOutputStream(getOutputStream(), 128), true));
+			initialized = true;
+		}
 
 		setLayout(new BorderLayout());
 		this.editor = new JTextArea();
