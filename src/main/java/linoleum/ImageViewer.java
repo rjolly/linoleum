@@ -22,6 +22,10 @@ public class ImageViewer extends javax.swing.JInternalFrame {
 			return null;
 		}
 
+		public String[] getExtensions() {
+			return new String[] {"gif", "jpg", "png"};
+		}
+
 		public JInternalFrame open(final URI uri) {
 			return new ImageViewer(uri == null?null:Paths.get(uri).toFile());
 		}

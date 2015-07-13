@@ -19,6 +19,7 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 	private final ImageIcon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
 	private final Map<String, Application> map = new HashMap<String, Application>();
 	private final Map<String, String[]> exts = new HashMap<String, String[]>();
+	private final Map<String, ImageIcon> icons = new HashMap<String, ImageIcon>();
 	private final DefaultListModel model = new DefaultListModel();
 	private final ListCellRenderer renderer = new Renderer();
 
@@ -43,8 +44,7 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 			}
 
 			final String name = (String)value;
-			final ImageIcon icon = map.get(name).getIcon();
-			setIcon(icon == null?defaultIcon:icon);
+			setIcon(icons.get(name));
 			setText(name);
 			setFont(list.getFont());
 
@@ -54,11 +54,6 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 
 	private ApplicationManager() {
 		initComponents();
-		exts.put("Notepad", new String[] {"txt", "log", "properties", "js", "scala", "java", "mf", "conf", "form"});
-		exts.put("ImageViewer", new String[] {"gif", "jpg", "png"});
-		exts.put("Browser", new String[] {"htm", "html"});
-		exts.put("MediaPlayer", new String[] {"aiff", "avi", "gsm", "mvr", "mid", "mpg", "mp2", "mov", "au", "wav"});
-		exts.put("ObjLoad", new String[] {"obj"});
 		refresh();
 	}
 
@@ -104,6 +99,10 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 			final String name = app.getName();
 			if (!map.containsKey(name)) {
 				map.put(name, app);
+				final ImageIcon icon = app.getIcon();
+				icons.put(name, icon == null?defaultIcon:icon);
+				final String s[] = app.getExtensions();
+				if (s != null) exts.put(name, s);
 				model.addElement(name);
 			}
 		}

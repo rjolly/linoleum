@@ -63,6 +63,10 @@ public class Clock extends javax.swing.JInternalFrame implements Application {
 		return null;
 	}
 
+	public String[] getExtensions() {
+		return null;
+	}
+
 	public JInternalFrame open(final URI uri) {
 		return this;
 	}

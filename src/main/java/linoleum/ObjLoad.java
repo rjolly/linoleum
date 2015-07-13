@@ -38,6 +38,10 @@ public class ObjLoad extends javax.swing.JInternalFrame {
 			return null;
 		}
 
+		public String[] getExtensions() {
+			return new String[] {"obj"};
+		}
+
 		public JInternalFrame open(final URI uri) {
 			return new ObjLoad(uri);
 		}

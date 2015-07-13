@@ -46,6 +46,10 @@ public class Console extends javax.swing.JInternalFrame implements Application {
 		return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif"));
 	}
 
+	public String[] getExtensions() {
+		return null;
+	}
+
 	public JInternalFrame open(final URI uri) {
 		return this;
 	}

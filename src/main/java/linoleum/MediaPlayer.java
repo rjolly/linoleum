@@ -26,6 +26,10 @@ public class MediaPlayer extends javax.swing.JInternalFrame {
 			return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Movie24.gif"));
 		}
 
+		public String[] getExtensions() {
+			return new String[] {"aiff", "avi", "gsm", "mvr", "mid", "mpg", "mp2", "mov", "au", "wav"};
+		}
+
 		public JInternalFrame open(final URI uri) {
 			return new MediaPlayer(uri);
 		}

@@ -17,6 +17,10 @@ public class Browser extends javax.swing.JInternalFrame {
 			return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif"));
 		}
 
+		public String[] getExtensions() {
+			return new String[] {"htm", "html"};
+		}
+
 		public JInternalFrame open(final URI uri) {
 			return new Browser(uri);
 		}

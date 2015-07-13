@@ -97,6 +97,10 @@ public class Notepad extends JPanel {
 			return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Edit24.gif"));
 		}
 
+		public String[] getExtensions() {
+			return new String[] {"txt", "log", "properties", "js", "scala", "java", "mf", "conf", "form"};
+		}
+
 		public JInternalFrame open(final URI uri) {
 			final JInternalFrame frame = new JInternalFrame(resources.getString("Title"), true, true, true, true);
 			final Notepad notepad = new Notepad();

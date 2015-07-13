@@ -23,6 +23,10 @@ public class FileManager extends javax.swing.JInternalFrame {
 			return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif"));
 		}
 
+		public String[] getExtensions() {
+			return null;
+		}
+
 		public JInternalFrame open(final URI uri) {
 			return new FileManager(uri == null?null:Paths.get(uri).toFile());
 		}
