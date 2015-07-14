@@ -23,7 +23,7 @@ public class Clock extends javax.swing.JInternalFrame implements Application {
                 setMaximizable(true);
                 setResizable(true);
                 setTitle("Clock");
-                setName(Clock.class.getSimpleName());
+                setName(getClass().getSimpleName());
                 addComponentListener(new java.awt.event.ComponentAdapter() {
                         public void componentShown(java.awt.event.ComponentEvent evt) {
                                 formComponentShown(evt);

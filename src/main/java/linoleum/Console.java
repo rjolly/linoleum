@@ -22,7 +22,7 @@ public class Console extends javax.swing.JInternalFrame implements Application {
                 setMaximizable(true);
                 setResizable(true);
                 setTitle("Console");
-                setName(Console.class.getSimpleName());
+                setName(getClass().getSimpleName());
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);

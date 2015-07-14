@@ -9,7 +9,7 @@
     <Property name="resizable" type="boolean" value="true"/>
     <Property name="title" type="java.lang.String" value="Clock"/>
     <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-      <Connection code="Clock.class.getSimpleName()" type="code"/>
+      <Connection code="getClass().getSimpleName()" type="code"/>
     </Property>
   </Properties>
   <SyntheticProperties>

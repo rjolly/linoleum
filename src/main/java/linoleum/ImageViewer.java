@@ -7,9 +7,9 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
-import linoleum.application.ApplicationManager;
 
 public class ImageViewer extends javax.swing.JInternalFrame {
+	private static final String exts[] = new String[] {"gif", "jpg", "png"};
 	private final File files[];
 	private int index;
 
@@ -23,7 +23,7 @@ public class ImageViewer extends javax.swing.JInternalFrame {
 		}
 
 		public String[] getExtensions() {
-			return new String[] {"gif", "jpg", "png"};
+			return exts;
 		}
 
 		public JInternalFrame open(final URI uri) {
@@ -36,7 +36,7 @@ public class ImageViewer extends javax.swing.JInternalFrame {
 		if (file != null) {
 			files = file.getParentFile().listFiles(new FileFilter() {
 				public boolean accept(final File file) {
-					return ApplicationManager.instance.canOpen(ImageViewer.class.getSimpleName(), file.toURI());
+					return canOpen(file);
 				}
 			});
 			Arrays.sort(files);
@@ -45,6 +45,15 @@ public class ImageViewer extends javax.swing.JInternalFrame {
 		} else {
 			files = new File[] {};
 		}
+	}
+
+	private static boolean canOpen(final File file) {
+		for (final String s : exts) {
+			if (file.getName().toLowerCase().endsWith("." + s)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void open() {

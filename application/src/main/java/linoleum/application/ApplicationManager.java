@@ -18,7 +18,7 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 	public static final ApplicationManager instance = new ApplicationManager();
 	private final ImageIcon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
 	private final Map<String, Application> map = new HashMap<String, Application>();
-	private final Map<String, String[]> exts = new HashMap<String, String[]>();
+	private final Map<String, String> apps = new HashMap<String, String>();
 	private final Map<String, ImageIcon> icons = new HashMap<String, ImageIcon>();
 	private final DefaultListModel model = new DefaultListModel();
 	private final ListCellRenderer renderer = new Renderer();
@@ -57,26 +57,17 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 		refresh();
 	}
 
-	public boolean canOpen(final String name, final URI uri) {
-		if (exts.containsKey(name)) {
-			final File file = Paths.get(uri).toFile();
-			for (final String e : exts.get(name)) {
-				if (file.getName().toLowerCase().endsWith("." + e)) {
-					return true;
-				}
-			}
-		}
-		return false;
+	private static String extension(final File file) {
+		final String s = file.getName();
+		return s.substring(s.lastIndexOf(".") + 1);
 	}
 
 	public void open(final URI uri) {
-		for (final String name : exts.keySet()) {
-			if (canOpen(name, uri)) {
-				open(name, uri);
-				return;
-			}
-		}
-		if (Paths.get(uri).toFile().isDirectory()) {
+		final File file = Paths.get(uri).toFile();
+		final String s = extension(file).toLowerCase();
+		if (apps.containsKey(s)) {
+			open(apps.get(s), uri);
+		} else if (file.isDirectory()) {
 			open("FileManager", uri);
 		}
 	}
@@ -101,8 +92,8 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 				map.put(name, app);
 				final ImageIcon icon = app.getIcon();
 				icons.put(name, icon == null?defaultIcon:icon);
-				final String s[] = app.getExtensions();
-				if (s != null) exts.put(name, s);
+				final String exts[] = app.getExtensions();
+				if (exts != null) for (final String s : exts) apps.put(s.toLowerCase(), name);
 				model.addElement(name);
 			}
 		}
