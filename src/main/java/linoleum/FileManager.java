@@ -1,6 +1,5 @@
 package linoleum;
 
-import linoleum.application.ApplicationManager;
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Paths;
@@ -70,7 +69,7 @@ public class FileManager extends javax.swing.JInternalFrame {
 		final String command = evt.getActionCommand();
 		if (JFileChooser.APPROVE_SELECTION.equals(command)) {
 			final File file = chooser.getSelectedFile();
-			ApplicationManager.instance.open(file.toURI());
+			((Desktop)getDesktopPane().getParent().getParent().getParent().getParent()).getApplicationManager().open(file.toURI());
 		} else if (JFileChooser.CANCEL_SELECTION.equals(command)) {
 			dispose();
 		}

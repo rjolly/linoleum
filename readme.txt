@@ -25,3 +25,9 @@ To install any Ivy module, in the script shell:
 (This requires to first clone/build the project at https://github.com/rjolly/jcterm for the moment). A "JCTerm" item should show up in the Applications. If not, you can troubleshoot with:
   Console
 
+
+To build linoleum from itself, first clone the repository by external means (for now), then in the script shell:
+  cd("/path/to/linoleum");
+  mkdirs("build/classes");
+  javac("src/main/java", "build/classes");
+

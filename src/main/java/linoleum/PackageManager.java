@@ -1,6 +1,5 @@
 package linoleum;
 
-import linoleum.application.ApplicationManager;
 import java.io.File;
 import org.apache.ivy.Ivy;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
@@ -12,24 +11,26 @@ import org.apache.ivy.core.retrieve.RetrieveReport;
 import org.apache.ivy.core.settings.IvySettings;
 
 public class PackageManager {
-	public static final PackageManager instance = new PackageManager("lib");
 	private final File lib;
+	private final Desktop desktop;
 
-	private PackageManager(final String dir) {
-		lib = new File(dir);
-	}
-
-	public void init() {
-		for (final File file: lib.listFiles()) {
+	public PackageManager(final Desktop desktop, final String dir) {
+		this.desktop = desktop;
+		this.lib = new File(dir);
+		for (final File file: listFiles()) {
 			add(file);
 		}
+	}
+
+	public final File[] listFiles() {
+		return lib.listFiles();
 	}
 
 	public void install(final String names[]) throws Exception {
 		for (final String name : names) {
 			install(name);
 		}
-		ApplicationManager.instance.refresh();
+		desktop.getApplicationManager().refresh();
 	}
 
 	private void install(final String name) throws Exception {

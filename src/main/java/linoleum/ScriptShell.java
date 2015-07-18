@@ -1,5 +1,6 @@
 package linoleum;
 
+import java.awt.Frame;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileReader;
@@ -149,6 +150,7 @@ public class ScriptShell extends JInternalFrame implements ScriptShellPanel.Comm
 	// set pre-defined global variables for script
 	private void setGlobals() {
 		engine.put("engine", engine);
+		engine.put("frames", Frame.getFrames());
 		engine.put("frame", this);
 	}
 

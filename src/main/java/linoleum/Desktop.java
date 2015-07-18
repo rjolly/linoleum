@@ -12,19 +12,28 @@ import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
 
 public class Desktop extends javax.swing.JFrame {
+	private final PackageManager pkgs = new PackageManager(this, "lib");
+	private final ApplicationManager apps = new ApplicationManager();
 	private final GraphicsDevice devices[];
 	private Rectangle bounds;
 
 	private Desktop() {
 		initComponents();
-		PackageManager.instance.init();
-		desktopPane.add(ApplicationManager.instance);
+		desktopPane.add(apps);
 		devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 		bounds = getBounds();
 	}
 
+	public ApplicationManager getApplicationManager() {
+		return apps;
+	}
+
+	public PackageManager getPackageManager() {
+		return pkgs;
+	}
+
 	private void open() {
-		ApplicationManager.instance.setVisible(true);
+		apps.setVisible(true);
 	}
 
 	private void about() {

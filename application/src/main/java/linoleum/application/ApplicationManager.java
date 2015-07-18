@@ -15,7 +15,6 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 public class ApplicationManager extends javax.swing.JInternalFrame {
-	public static final ApplicationManager instance = new ApplicationManager();
 	private final ImageIcon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
 	private final Map<String, Application> map = new HashMap<String, Application>();
 	private final Map<String, String> apps = new HashMap<String, String>();
@@ -52,7 +51,7 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 		}
 	};
 
-	private ApplicationManager() {
+	public ApplicationManager() {
 		initComponents();
 		refresh();
 	}
