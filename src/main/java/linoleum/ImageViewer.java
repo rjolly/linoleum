@@ -8,7 +8,7 @@ import java.util.Arrays;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
-public class ImageViewer extends javax.swing.JInternalFrame {
+public class ImageViewer extends JInternalFrame {
 	private static final String exts[] = new String[] {"gif", "jpg", "png"};
 	private final File files[];
 	private int index;

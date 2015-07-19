@@ -1,13 +1,25 @@
 package linoleum;
 
+import com.sun.pdfview.PDFFile;
+import com.sun.pdfview.PDFPage;
+import java.awt.Dimension;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.net.URI;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Paths;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
-public class PDFViewer extends javax.swing.JInternalFrame {
-	private int index;
+public class PDFViewer extends JInternalFrame {
+	public final static String TITLE = "SwingLabs PDF Viewer";
+	private int curpage = -1;
+	private PDFFile curFile;
+	private String docName;
+	private PagePreparer pagePrep;
 
 	public static class Application implements linoleum.application.Application {
 		public String getName() {
@@ -29,9 +41,114 @@ public class PDFViewer extends javax.swing.JInternalFrame {
 
 	public PDFViewer(final File file) {
 		initComponents();
+		try {
+			if (file != null) {
+				openFile(file);
+			} else {
+				setEnabling();
+			}
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
-	private void open() {
+	public final void openFile(final File file) throws IOException {
+		// first open the file for random access
+		RandomAccessFile raf = new RandomAccessFile(file, "r");
+
+		// extract a file channel
+		FileChannel channel = raf.getChannel();
+
+		// now memory-map a byte-buffer
+		ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+		openPDFByteBuffer(buf, file.getPath(), file.getName());
+	}
+
+	private void openPDFByteBuffer(final ByteBuffer buf, final String path, final String name) throws IOException {
+		final PDFFile newfile = new PDFFile(buf);
+
+		// set up our document
+		this.curFile = newfile;
+		docName = name;
+		setTitle(TITLE + ": " + docName);
+
+		setEnabling();
+
+		// display page 1.
+		gotoPage(0);
+	}
+
+	class PagePreparer extends Thread {
+		int waitforPage;
+		int prepPage;
+
+		public PagePreparer(int waitforPage) {
+			setDaemon(true);
+			setName(getClass().getName());
+
+			this.waitforPage = waitforPage;
+			this.prepPage = waitforPage + 1;
+		}
+
+		public void quit() {
+			waitforPage = -1;
+		}
+
+		public void run() {
+			Dimension size = null;
+			Rectangle2D clip = null;
+
+			if (page != null) {
+				page.waitForCurrentPage();
+				size = page.getCurSize();
+				clip = page.getCurClip();
+			}
+
+			if (waitforPage == curpage) {
+				PDFPage pdfPage = curFile.getPage(prepPage + 1, true);
+				if (pdfPage != null && waitforPage == curpage) {
+					pdfPage.getImage(size.width, size.height, clip, null, true, true);
+				}
+			}
+		}
+	}
+
+	public void setEnabling() {
+		boolean fileavailable = curFile != null;
+		boolean pageshown = page.getPage() != null;
+
+		pageField.setEnabled(fileavailable);
+		prevButton.setEnabled(pageshown);
+		nextButton.setEnabled(pageshown);
+		firstButton.setEnabled(fileavailable);
+		lastButton.setEnabled(fileavailable);
+	}
+
+	public void gotoPage(int pagenum) {
+		if (pagenum <= 0) {
+			pagenum = 0;
+		} else if (pagenum >= curFile.getNumPages()) {
+			pagenum = curFile.getNumPages() - 1;
+		}
+
+		curpage = pagenum;
+
+		// update the page text field
+		pageField.setText(String.valueOf(curpage + 1));
+
+		// fetch the page and show it in the appropriate place
+		PDFPage pg = curFile.getPage(pagenum + 1);
+		page.showPage(pg);
+		page.requestFocus();
+
+		// stop any previous page prepper, and start a new one
+		if (pagePrep != null) {
+			pagePrep.quit();
+		}
+		pagePrep = new PagePreparer(pagenum);
+		pagePrep.start();
+
+		setEnabling();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -39,10 +156,13 @@ public class PDFViewer extends javax.swing.JInternalFrame {
         private void initComponents() {
 
                 jScrollPane1 = new javax.swing.JScrollPane();
-                pagePanel1 = new linoleum.PagePanel();
+                page = new linoleum.PagePanel();
                 jPanel1 = new javax.swing.JPanel();
-                backButton = new javax.swing.JButton();
-                forwardButton = new javax.swing.JButton();
+                firstButton = new javax.swing.JButton();
+                prevButton = new javax.swing.JButton();
+                pageField = new javax.swing.JTextField();
+                nextButton = new javax.swing.JButton();
+                lastButton = new javax.swing.JButton();
 
                 setClosable(true);
                 setIconifiable(true);
@@ -50,34 +170,47 @@ public class PDFViewer extends javax.swing.JInternalFrame {
                 setResizable(true);
                 setTitle("PDF Viewer");
 
-                javax.swing.GroupLayout pagePanel1Layout = new javax.swing.GroupLayout(pagePanel1);
-                pagePanel1.setLayout(pagePanel1Layout);
-                pagePanel1Layout.setHorizontalGroup(
-                        pagePanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 392, Short.MAX_VALUE)
-                );
-                pagePanel1Layout.setVerticalGroup(
-                        pagePanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 255, Short.MAX_VALUE)
-                );
+                jScrollPane1.setViewportView(page);
 
-                jScrollPane1.setViewportView(pagePanel1);
-
-                backButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/navigation/Back16.gif"))); // NOI18N
-                backButton.addActionListener(new java.awt.event.ActionListener() {
+                firstButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/sun/pdfview/gfx/first.gif"))); // NOI18N
+                firstButton.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                backButtonActionPerformed(evt);
+                                firstButtonActionPerformed(evt);
                         }
                 });
-                jPanel1.add(backButton);
+                jPanel1.add(firstButton);
 
-                forwardButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/navigation/Forward16.gif"))); // NOI18N
-                forwardButton.addActionListener(new java.awt.event.ActionListener() {
+                prevButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/sun/pdfview/gfx/prev.gif"))); // NOI18N
+                prevButton.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                forwardButtonActionPerformed(evt);
+                                prevButtonActionPerformed(evt);
                         }
                 });
-                jPanel1.add(forwardButton);
+                jPanel1.add(prevButton);
+
+                pageField.setText("0");
+                pageField.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                pageFieldActionPerformed(evt);
+                        }
+                });
+                jPanel1.add(pageField);
+
+                nextButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/sun/pdfview/gfx/next.gif"))); // NOI18N
+                nextButton.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                nextButtonActionPerformed(evt);
+                        }
+                });
+                jPanel1.add(nextButton);
+
+                lastButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/sun/pdfview/gfx/last.gif"))); // NOI18N
+                lastButton.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                lastButtonActionPerformed(evt);
+                        }
+                });
+                jPanel1.add(lastButton);
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);
@@ -97,22 +230,35 @@ public class PDFViewer extends javax.swing.JInternalFrame {
                 pack();
         }// </editor-fold>//GEN-END:initComponents
 
-        private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
-                index -= 1;
-                open();
-        }//GEN-LAST:event_backButtonActionPerformed
+        private void prevButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prevButtonActionPerformed
+                gotoPage(curpage - 1);
+        }//GEN-LAST:event_prevButtonActionPerformed
 
-        private void forwardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_forwardButtonActionPerformed
-                index += 1;
-                open();
-        }//GEN-LAST:event_forwardButtonActionPerformed
+        private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
+                gotoPage(curpage + 1);
+        }//GEN-LAST:event_nextButtonActionPerformed
+
+        private void firstButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_firstButtonActionPerformed
+                gotoPage(0);
+        }//GEN-LAST:event_firstButtonActionPerformed
+
+        private void lastButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lastButtonActionPerformed
+                gotoPage(curFile.getNumPages() - 1);
+        }//GEN-LAST:event_lastButtonActionPerformed
+
+        private void pageFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pageFieldActionPerformed
+                gotoPage(Integer.parseInt(evt.getActionCommand()) - 1);
+        }//GEN-LAST:event_pageFieldActionPerformed
 
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
-        private javax.swing.JButton backButton;
-        private javax.swing.JButton forwardButton;
+        private javax.swing.JButton firstButton;
         private javax.swing.JPanel jPanel1;
         private javax.swing.JScrollPane jScrollPane1;
-        private linoleum.PagePanel pagePanel1;
+        private javax.swing.JButton lastButton;
+        private javax.swing.JButton nextButton;
+        private linoleum.PagePanel page;
+        private javax.swing.JTextField pageField;
+        private javax.swing.JButton prevButton;
         // End of variables declaration//GEN-END:variables
 }

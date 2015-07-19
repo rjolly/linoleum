@@ -5,7 +5,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import linoleum.application.Application;
 
-public class Clock extends javax.swing.JInternalFrame implements Application {
+public class Clock extends JInternalFrame implements Application {
 
 	public Clock() {
 		initComponents();

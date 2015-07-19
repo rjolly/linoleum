@@ -1,6 +1,8 @@
 package linoleum;
 
-public class AboutFrame extends javax.swing.JInternalFrame {
+import javax.swing.JInternalFrame;
+
+public class AboutFrame extends JInternalFrame {
 
 	public AboutFrame() {
 		initComponents();

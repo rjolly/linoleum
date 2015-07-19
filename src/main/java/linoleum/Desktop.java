@@ -10,8 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.JFrame;
 
-public class Desktop extends javax.swing.JFrame {
+public class Desktop extends JFrame {
 	private final PackageManager pkgs = new PackageManager(this, "lib");
 	private final ApplicationManager apps = new ApplicationManager();
 	private final GraphicsDevice devices[];

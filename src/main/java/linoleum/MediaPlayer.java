@@ -11,7 +11,7 @@ import javax.media.Player;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
-public class MediaPlayer extends javax.swing.JInternalFrame {
+public class MediaPlayer extends JInternalFrame {
 	private Player player;
 	private final ImageIcon playIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"));
 	private final ImageIcon pauseIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Pause16.gif"));

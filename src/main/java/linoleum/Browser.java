@@ -6,7 +6,7 @@ import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
-public class Browser extends javax.swing.JInternalFrame {
+public class Browser extends JInternalFrame {
 
 	public static class Application implements linoleum.application.Application {
 		public String getName() {

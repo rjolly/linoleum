@@ -16,9 +16,9 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.ImageObserver;
 
 import javax.swing.JPanel;
+import javax.swing.Scrollable;
 
-public class PagePanel extends JPanel
-	implements ImageObserver, MouseListener, MouseMotionListener {
+public class PagePanel extends JPanel implements Scrollable, ImageObserver, MouseListener, MouseMotionListener {
 
 	/**
 	 * The image of the rendered PDF page being displayed
@@ -71,11 +71,35 @@ public class PagePanel extends JPanel
 	 * Create a new PagePanel, with a default size of 800 by 600 pixels.
 	 */
 	public PagePanel() {
-		super();
 		setPreferredSize(new Dimension(800, 600));
 		setFocusable(true);
 		addMouseListener(this);
 		addMouseMotionListener(this);
+	}
+
+	@Override
+	public Dimension getPreferredScrollableViewportSize() {
+		return getPreferredSize();
+	}
+
+	@Override
+	public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+		return 10;
+	}
+
+	@Override
+	public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+		return visibleRect.height - 10;
+	}
+
+	@Override
+	public boolean getScrollableTracksViewportWidth() {
+		return true;
+	}
+
+	@Override
+	public boolean getScrollableTracksViewportHeight() {
+		return false;
 	}
 
 	/**

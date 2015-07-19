@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
-public class ObjLoad extends javax.swing.JInternalFrame {
+public class ObjLoad extends JInternalFrame {
 
     private boolean spin = false;
     private boolean noTriangulate = false;

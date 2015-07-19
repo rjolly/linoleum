@@ -7,7 +7,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 
-public class FileManager extends javax.swing.JInternalFrame {
+public class FileManager extends JInternalFrame {
 	public FileManager(final File file) {
 		initComponents();
 		chooser.setCurrentDirectory(file);
