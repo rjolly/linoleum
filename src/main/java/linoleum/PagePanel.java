@@ -71,10 +71,15 @@ public class PagePanel extends JPanel implements Scrollable, ImageObserver, Mous
 	 * Create a new PagePanel, with a default size of 800 by 600 pixels.
 	 */
 	public PagePanel() {
-		setPreferredSize(new Dimension(800, 600));
+		setSize(getPreferredSize());
 		setFocusable(true);
 		addMouseListener(this);
 		addMouseMotionListener(this);
+	}
+
+	@Override
+	public Dimension getPreferredSize() {
+		return prevSize == null?super.getPreferredSize():prevSize;
 	}
 
 	@Override
@@ -125,24 +130,21 @@ public class PagePanel extends JPanel implements Scrollable, ImageObserver, Mous
 		} else {
 			// start drawing -- clear the flag to indicate we're in progress.
 			flag.clear();
-			//	    System.out.println("   flag cleared");
 
 			Dimension sz = getSize();
 			if (sz.width + sz.height == 0) {
 				// no image to draw.
 				return;
 			}
-            //	    System.out.println("Ratios: scrn="+((float)sz.width/sz.height)+
-			//			       ", clip="+(clip==null ? 0 : clip.getWidth()/clip.getHeight()));
 
-            // calculate the clipping rectangle in page space from the
+			// calculate the clipping rectangle in page space from the
 			// desired clip in screen space.
 			Rectangle2D useClip = clip;
 			if (clip != null && currentXform != null) {
 				useClip = currentXform.createTransformedShape(clip).getBounds2D();
 			}
 
-			Dimension pageSize = page.getUnstretchedSize(sz.width, sz.height,
+			Dimension pageSize = getUnstretchedSize(sz.width, sz.height,
 				useClip);
 
 			// get the new image
@@ -167,29 +169,31 @@ public class PagePanel extends JPanel implements Scrollable, ImageObserver, Mous
 		}
 	}
 
-	/**
-	 * @deprecated
-	 */
-	public synchronized void flush() {
-        //	images.clear();
-		//	lruPages.clear();
-		//	nextPage= null;
-		//	nextImage= null;
+	public Dimension getUnstretchedSize(int width, int height,
+		Rectangle2D clip) {
+		if (clip == null) {
+			clip = currentPage.getBBox();
+		} else {
+			if (currentPage.getRotation() == 90
+				|| currentPage.getRotation() == 270) {
+				clip = new Rectangle2D.Double(clip.getX(), clip.getY(),
+					clip.getHeight(), clip.getWidth());
+			}
+		}
+
+		double ratio = clip.getHeight() / clip.getWidth();
+		double askratio = (double) height / (double) width;
+		height = (int) (width * ratio + 0.5);
+
+		return new Dimension(width, height);
 	}
 
-	/**
-	 * Draw the image.
-	 */
 	public void paint(Graphics g) {
 		Dimension sz = getSize();
 		g.setColor(getBackground());
 		g.fillRect(0, 0, getWidth(), getHeight());
 		if (currentImage == null) {
-            // No image -- draw an empty box
-			// [[MW: remove the scary red X]]
-			//	    g.setColor(Color.red);
-			//	    g.drawLine(0, 0, getWidth(), getHeight());
-			//	    g.drawLine(0, getHeight(), getWidth(), 0);
+			// No image -- draw an empty box
 			g.setColor(Color.black);
 			g.drawString("No page selected", getWidth() / 2 - 30, getHeight() / 2);
 		} else {
@@ -201,20 +205,12 @@ public class PagePanel extends JPanel implements Scrollable, ImageObserver, Mous
 			offx = (sz.width - imwid) / 2;
 			offy = (sz.height - imhgt) / 2;
 
-			if ((imwid == sz.width && imhgt <= sz.height)
-				|| (imhgt == sz.height && imwid <= sz.width)) {
-
+			if (imwid == sz.width && imhgt == sz.height) {
 				g.drawImage(currentImage, offx, offy, this);
-
 			} else {
-				// the image is bogus.  try again, or give up.
-				flush();
 				if (currentPage != null) {
 					showPage(currentPage);
 				}
-				g.setColor(Color.red);
-				g.drawLine(0, 0, getWidth(), getHeight());
-				g.drawLine(0, getHeight(), getWidth(), 0);
 			}
 		}
 		// draw the zoomrect if there is one.
@@ -223,7 +219,7 @@ public class PagePanel extends JPanel implements Scrollable, ImageObserver, Mous
 			g.drawRect(zoomRect.x, zoomRect.y,
 				zoomRect.width, zoomRect.height);
 		}
-    // debugging: draw a rectangle around the portion that just changed.
+		// debugging: draw a rectangle around the portion that just changed.
 		//	g.setColor(boxColor);
 		//	Rectangle r= g.getClipBounds();
 		//	g.drawRect(r.x, r.y, r.width-1, r.height-1);
