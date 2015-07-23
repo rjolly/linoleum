@@ -1,6 +1,9 @@
 
 Software needed:
 
+- jdk 1.7 ( http://www.oracle.com/technetwork/java/index.html )
+- jmf 2.1.1e ( http://www.oracle.com/technetwork/java/javasebusiness/downloads/java-archive-downloads-java-client-419417.html )
+- java3d 1.5.1 ( same as above )
 - netbeans 7.4 ( https://netbeans.org/ )
 - ivybeans 1.2-nb71 ( https://code.google.com/p/ivybeans/ )
 

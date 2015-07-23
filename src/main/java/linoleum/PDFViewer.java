@@ -169,6 +169,11 @@ public class PDFViewer extends JInternalFrame {
                 setMaximizable(true);
                 setResizable(true);
                 setTitle("PDF Viewer");
+                addComponentListener(new java.awt.event.ComponentAdapter() {
+                        public void componentResized(java.awt.event.ComponentEvent evt) {
+                                formComponentResized(evt);
+                        }
+                });
 
                 jScrollPane1.setViewportView(page);
 
@@ -245,6 +250,10 @@ public class PDFViewer extends JInternalFrame {
         private void lastButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lastButtonActionPerformed
                 gotoPage(curFile.getNumPages() - 1);
         }//GEN-LAST:event_lastButtonActionPerformed
+
+        private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
+                page.showPage();
+        }//GEN-LAST:event_formComponentResized
 
         private void pageFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pageFieldActionPerformed
                 gotoPage(Integer.parseInt(evt.getActionCommand()) - 1);

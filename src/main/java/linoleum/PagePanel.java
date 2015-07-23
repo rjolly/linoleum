@@ -107,11 +107,10 @@ public class PagePanel extends JPanel implements Scrollable, ImageObserver, Mous
 		return false;
 	}
 
-	/**
-	 * Stop the generation of any previous page, and draw the new one.
-	 *
-	 * @param page the PDFPage to draw.
-	 */
+	public void showPage() {
+		showPage(currentPage);
+	}
+
 	public synchronized void showPage(PDFPage page) {
 		// stop drawing the previous page
 		if (currentPage != null && prevSize != null) {
@@ -205,13 +204,7 @@ public class PagePanel extends JPanel implements Scrollable, ImageObserver, Mous
 			offx = (sz.width - imwid) / 2;
 			offy = (sz.height - imhgt) / 2;
 
-			if (imwid == sz.width && imhgt == sz.height) {
-				g.drawImage(currentImage, offx, offy, this);
-			} else {
-				if (currentPage != null) {
-					showPage(currentPage);
-				}
-			}
+			g.drawImage(currentImage, offx, offy, this);
 		}
 		// draw the zoomrect if there is one.
 		if (zoomRect != null) {
