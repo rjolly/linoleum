@@ -58,18 +58,13 @@ public class PagePanel extends JPanel implements Scrollable, ImageObserver, Mous
 	 * whether the zoom tool is enabled
 	 */
 	boolean useZoom = false;
-
-    //    /** a listener for page changes */
-	//    PageChangeListener listener;
 	/**
 	 * a flag indicating whether the current page is done or not.
 	 */
 	Flag flag = new Flag();
 
-	// Color boxcolor= new Color(255,200,200);
-	/**
-	 * Create a new PagePanel, with a default size of 800 by 600 pixels.
-	 */
+	private static final int n = 20;
+
 	public PagePanel() {
 		setSize(getPreferredSize());
 		setFocusable(true);
@@ -89,12 +84,12 @@ public class PagePanel extends JPanel implements Scrollable, ImageObserver, Mous
 
 	@Override
 	public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-		return 10;
+		return visibleRect.height / n;
 	}
 
 	@Override
 	public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-		return visibleRect.height - 10;
+		return (visibleRect.height * (n - 1)) / n;
 	}
 
 	@Override

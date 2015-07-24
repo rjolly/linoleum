@@ -193,7 +193,8 @@ public class PDFViewer extends JInternalFrame {
                 });
                 jPanel1.add(prevButton);
 
-                pageField.setText("0");
+                pageField.setColumns(3);
+                pageField.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
                 pageField.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                                 pageFieldActionPerformed(evt);
