@@ -693,6 +693,7 @@ public class Notepad extends JPanel {
                             null);
                     progress.setValue(progress.getValue() + nch);
                 }
+                in.close();
             } catch (IOException e) {
                 final String msg = e.getMessage();
                 SwingUtilities.invokeLater(new Runnable() {
