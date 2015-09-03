@@ -40,13 +40,24 @@ function fileset(path, pattern) {
     return set
 }
 
-function open(name) {
+function run(name, args) {
+    if (args == undefined) {
+	args = [];
+    }
     Class = java.lang.Class;
     URLClassLoader = java.net.URLClassLoader;
+    String = java.lang.String;
 
-    f = Class.forName(name, true, URLClassLoader([pathToFile(".").toURI().toURL()])).newInstance().open(null)
-    frame.getDesktopPane().add(f)
-    f.setVisible(true);
+    a = convertArray(String, args)
+    Class.forName(name, true, URLClassLoader([pathToFile(".").toURI().toURL()])).getMethod("main", [a.getClass()]).invoke(null, [a])
+}
+
+function convertArray(type, arr) {
+    var jArr = java.lang.reflect.Array.newInstance(type, arr.length)
+    for (var i = 0; i < arr.length; i++) {
+        jArr[i] = arr[i]
+    }
+    return jArr
 }
 
 function pwd() {
