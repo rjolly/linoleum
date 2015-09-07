@@ -57,11 +57,12 @@ public class PDFViewer extends JInternalFrame {
 		RandomAccessFile raf = new RandomAccessFile(file, "r");
 
 		// extract a file channel
-		FileChannel channel = raf.getChannel();
+		try (final FileChannel channel = raf.getChannel()) {
 
-		// now memory-map a byte-buffer
-		ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-		openPDFByteBuffer(buf, file.getPath(), file.getName());
+			// now memory-map a byte-buffer
+			ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+			openPDFByteBuffer(buf, file.getPath(), file.getName());
+		}
 	}
 
 	private void openPDFByteBuffer(final ByteBuffer buf, final String path, final String name) throws IOException {
@@ -113,7 +114,7 @@ public class PDFViewer extends JInternalFrame {
 		}
 	}
 
-	public void setEnabling() {
+	public final void setEnabling() {
 		boolean fileavailable = curFile != null;
 		boolean pageshown = page.getPage() != null;
 
@@ -259,7 +260,6 @@ public class PDFViewer extends JInternalFrame {
         private void pageFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pageFieldActionPerformed
                 gotoPage(Integer.parseInt(evt.getActionCommand()) - 1);
         }//GEN-LAST:event_pageFieldActionPerformed
-
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton firstButton;
