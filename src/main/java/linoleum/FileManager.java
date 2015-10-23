@@ -6,8 +6,11 @@ import java.nio.file.Paths;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
+import linoleum.application.ApplicationManager;
 
 public class FileManager extends JInternalFrame {
+	private ApplicationManager manager;
+
 	public FileManager(final File file) {
 		initComponents();
 		chooser.setCurrentDirectory(file);
@@ -22,7 +25,7 @@ public class FileManager extends JInternalFrame {
 			return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif"));
 		}
 
-		public String[] getExtensions() {
+		public String getMimeType() {
 			return null;
 		}
 
@@ -69,11 +72,18 @@ public class FileManager extends JInternalFrame {
 		final String command = evt.getActionCommand();
 		if (JFileChooser.APPROVE_SELECTION.equals(command)) {
 			final File file = chooser.getSelectedFile();
-			((Desktop)getDesktopPane().getParent().getParent().getParent().getParent()).getApplicationManager().open(file.toURI());
+			getApplicationManager().open(file.toURI());
 		} else if (JFileChooser.CANCEL_SELECTION.equals(command)) {
 			dispose();
 		}
         }//GEN-LAST:event_chooserActionPerformed
+
+	private ApplicationManager getApplicationManager() {
+		if (manager == null) for (final JInternalFrame frame : getDesktopPane().getAllFrames()) {
+			if (frame instanceof ApplicationManager) manager = (ApplicationManager)frame;
+		}
+		return manager;
+	}
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JFileChooser chooser;

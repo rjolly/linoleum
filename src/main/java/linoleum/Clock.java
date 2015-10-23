@@ -63,7 +63,7 @@ public class Clock extends JInternalFrame implements Application {
 		return null;
 	}
 
-	public String[] getExtensions() {
+	public String getMimeType() {
 		return null;
 	}
 

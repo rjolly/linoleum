@@ -7,6 +7,9 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
+import javax.activation.FileTypeMap;
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
@@ -56,17 +59,25 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 		refresh();
 	}
 
-	private static String extension(final File file) {
-		final String s = file.getName();
-		return s.substring(s.lastIndexOf(".") + 1);
-	}
-
 	public void open(final URI uri) {
 		final File file = Paths.get(uri).toFile();
-		final String s = extension(file).toLowerCase();
-		if (apps.containsKey(s)) {
-			open(apps.get(s), uri);
-		} else if (file.isDirectory()) {
+		final String str = FileTypeMap.getDefaultFileTypeMap().getContentType(file);
+		if (apps.containsKey(str)) {
+			open(apps.get(str), uri);
+			return;
+		}
+		try {
+			final MimeType type = new MimeType(str);
+			for (final Map.Entry<String, String> entry : apps.entrySet()) {
+				final String key = entry.getKey();
+				final String value = entry.getValue();
+				if (type.match(key)) {
+					open(value, uri);
+					return;
+				}
+			}
+		} catch (final MimeTypeParseException ex) {}
+		if (file.isDirectory()) {
 			open("FileManager", uri);
 		}
 	}
@@ -91,8 +102,8 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 				map.put(name, app);
 				final ImageIcon icon = app.getIcon();
 				icons.put(name, icon == null?defaultIcon:icon);
-				final String exts[] = app.getExtensions();
-				if (exts != null) for (final String s : exts) apps.put(s.toLowerCase(), name);
+				final String type = app.getMimeType();
+				if (type != null) for (final String s : type.split(":")) apps.put(s, name);
 				model.addElement(name);
 			}
 		}

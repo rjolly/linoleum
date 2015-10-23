@@ -38,8 +38,8 @@ public class ObjLoad extends JInternalFrame {
 			return null;
 		}
 
-		public String[] getExtensions() {
-			return new String[] {"obj"};
+		public String getMimeType() {
+			return "application/wavefront-obj";
 		}
 
 		public JInternalFrame open(final URI uri) {

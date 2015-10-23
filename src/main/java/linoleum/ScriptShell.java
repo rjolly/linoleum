@@ -48,7 +48,7 @@ public class ScriptShell extends JInternalFrame implements ScriptShellPanel.Comm
 			return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif"));
 		}
 
-		public String[] getExtensions() {
+		public String getMimeType() {
 			return null;
 		}
 

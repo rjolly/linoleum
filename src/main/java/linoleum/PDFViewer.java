@@ -30,8 +30,8 @@ public class PDFViewer extends JInternalFrame {
 			return null;
 		}
 
-		public String[] getExtensions() {
-			return new String[] {"pdf"};
+		public String getMimeType() {
+			return "application/pdf";
 		}
 
 		public JInternalFrame open(final URI uri) {

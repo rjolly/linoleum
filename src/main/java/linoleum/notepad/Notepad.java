@@ -97,8 +97,8 @@ public class Notepad extends JPanel {
 			return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Edit24.gif"));
 		}
 
-		public String[] getExtensions() {
-			return new String[] {"txt", "log", "properties", "js", "scala", "java", "mf", "conf", "form"};
+		public String getMimeType() {
+			return "text/*";
 		}
 
 		public JInternalFrame open(final URI uri) {

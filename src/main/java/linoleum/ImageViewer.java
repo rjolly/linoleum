@@ -5,11 +5,14 @@ import java.io.FileFilter;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import javax.activation.FileTypeMap;
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
 public class ImageViewer extends JInternalFrame {
-	private static final String exts[] = new String[] {"gif", "jpg", "png"};
+	private static final String type = "image/*";
 	private final File files[];
 	private int index;
 
@@ -22,8 +25,8 @@ public class ImageViewer extends JInternalFrame {
 			return null;
 		}
 
-		public String[] getExtensions() {
-			return exts;
+		public String getMimeType() {
+			return type;
 		}
 
 		public JInternalFrame open(final URI uri) {
@@ -48,11 +51,10 @@ public class ImageViewer extends JInternalFrame {
 	}
 
 	private static boolean canOpen(final File file) {
-		for (final String s : exts) {
-			if (file.getName().toLowerCase().endsWith("." + s)) {
-				return true;
-			}
-		}
+		final String str = FileTypeMap.getDefaultFileTypeMap().getContentType(file);
+		try {
+			return new MimeType(str).match(type);
+		} catch (final MimeTypeParseException ex) {}
 		return false;
 	}
 
