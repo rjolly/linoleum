@@ -102,7 +102,7 @@ public class Notepad extends JPanel {
 		}
 
 		public JInternalFrame open(final URI uri) {
-			final JInternalFrame frame = new JInternalFrame(resources.getString("Title"), true, true, true, true);
+			final JInternalFrame frame = new linoleum.application.Frame(resources.getString("Title"));
 			final Notepad notepad = new Notepad();
 			frame.getContentPane().add("Center", notepad);
 			if (uri != null) notepad.open(Paths.get(uri).toFile(), frame);

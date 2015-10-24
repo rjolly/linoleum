@@ -6,10 +6,9 @@ import java.nio.file.Paths;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
-import linoleum.application.ApplicationManager;
+import linoleum.application.Frame;
 
-public class FileManager extends JInternalFrame {
-	private ApplicationManager manager;
+public class FileManager extends Frame {
 
 	public FileManager(final File file) {
 		initComponents();
@@ -77,13 +76,6 @@ public class FileManager extends JInternalFrame {
 			dispose();
 		}
         }//GEN-LAST:event_chooserActionPerformed
-
-	private ApplicationManager getApplicationManager() {
-		if (manager == null) for (final JInternalFrame frame : getDesktopPane().getAllFrames()) {
-			if (frame instanceof ApplicationManager) manager = (ApplicationManager)frame;
-		}
-		return manager;
-	}
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JFileChooser chooser;
