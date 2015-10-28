@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
-    <info module="linoleum" organisation="linoleum" revision="1.0"/>
+    <info module="linoleum" organisation="net.java.linoleum" revision="1.0"/>
     <configurations>
         <conf name="default" extends="runtime,master"/>
         <conf name="master"/>
@@ -10,12 +10,12 @@
         <conf name="runtime-test"/>
     </configurations>
     <dependencies>
-        <dependency org="org.apache.ivy" name="ivy" rev="2.4.0" conf="*->master" />
+        <dependency org="org.apache.ivy" name="ivy" rev="2.4.0" conf="compile->master" />
         <dependency org="org.swinglabs" name="pdf-renderer" rev="1.0.5" conf="compile->master" />
         <dependency org="javax.media" name="jmf" rev="2.1.1e" conf="compile->master" />
         <dependency org="java3d" name="j3d-core" rev="1.3.1" conf="compile->compile,master" />
         <dependency org="java3d" name="j3d-core-utils" rev="1.3.1" conf="compile->master" />
-        <dependency org="linoleum" name="application" rev="1.0" conf="*->@" />
-        <dependency org="linoleum" name="jlfgr" rev="1_0" conf="" />
+        <dependency org="net.java.linoleum" name="application" rev="1.0" conf="compile->master" />
+        <dependency org="net.java.linoleum" name="jlfgr" rev="1_0" conf="compile->master" />
     </dependencies>
 </ivy-module>

@@ -25,21 +25,14 @@ public class PackageManager {
 	public final File[] listFiles() {
 		return lib.listFiles();
 	}
-
-	public void install(final String names[]) throws Exception {
-		for (final String name : names) {
-			install(name);
-		}
-		desktop.getApplicationManager().refresh();
-	}
-
-	private void install(final String name) throws Exception {
+
+	public void install(final String name, final String conf) throws Exception {
 		final IvySettings ivySettings = new IvySettings();
 		ivySettings.loadDefault();
 		final Ivy ivy = Ivy.newInstance(ivySettings);
 		final ModuleRevisionId mRID = ModuleRevisionId.parse(name);
 		final ResolveOptions resolveOptions = new ResolveOptions();
-		resolveOptions.setConfs(new String[]{"default"});
+		resolveOptions.setConfs(new String[]{conf});
 		final ResolveReport resolveReport = ivy.resolve(mRID, resolveOptions, true);
 		final ModuleDescriptor md = resolveReport.getModuleDescriptor();
 		final RetrieveOptions retrieveOptions = new RetrieveOptions();
@@ -48,6 +41,7 @@ public class PackageManager {
 		for (final Object obj : retrieveReport.getCopiedFiles()) {
 			add((File)obj);
 		}
+		desktop.getApplicationManager().refresh();
 	}
 
 	private static void add(final File file) {

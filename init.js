@@ -1,5 +1,8 @@
-function install(pkg) {
-    frames[0].getPackageManager().install([pkg]);
+function install(pkg, conf) {
+    if (conf == undefined) {
+        conf = "default";
+    }
+    frames[0].getPackageManager().install(pkg, conf);
 }
 
 function installed() {

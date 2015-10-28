@@ -26,7 +26,7 @@ The Desktop comes together with the following bundled applications:
 * 3d model loader (requires Java 3D)
 * pdf viewer
 
-The basic operation is that a file is opened through the file manager by the suited application, based on its extension. The package manager is operated from the (Rhino-based) script shell with the install() command, see [https://github.com/rjolly/linoleum/blob/master/readme.txt readme.txt] for instructions to run (and build) the software.
+The basic operation is that a file is opened through the file manager by the suited application, based on its extension. New applications can be installed through the package manager, which is operated from the (Rhino-based) script shell, with the install() command. See [https://github.com/rjolly/linoleum/] for instructions to run (and build) the software.
 
 == Screenshot ==
 
