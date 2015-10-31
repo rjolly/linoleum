@@ -27,8 +27,9 @@ function javac(srcDir, destDir) {
     fileManager.setLocation(StandardLocation.CLASS_PATH, Arrays.asList(installed()))
     fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList([pathToFile(destDir)]))
 
-    compilationUnit = fileManager.getJavaFileObjectsFromFiles(Arrays.asList(fileset(srcDir, ".*\.java")))
-    task = compiler.getTask(null, fileManager, null, null, null, compilationUnit)
+    compilationUnits = fileManager.getJavaFileObjectsFromFiles(Arrays.asList(fileset(srcDir, ".*\.java")))
+    options = ["-source", "1.7", "-target", "1.7"]
+    task = compiler.getTask(null, fileManager, null, options, null, compilationUnits)
     task.call()
 
     fileManager.close()
