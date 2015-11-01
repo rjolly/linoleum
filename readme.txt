@@ -33,7 +33,11 @@ To publish an application:
 - implement linoleum.application.Application
 - make it available to the service loader in META-INF/services
 - publish your artifact in maven central
-- let me know so that I add it to the list
+- let me know so that I put it in the list (below)
+
+
+To use linoleum as your desktop environment in Linux:
+  sudo cp linoleum.desktop /usr/share/xsessions/
 
 
 List of applications
