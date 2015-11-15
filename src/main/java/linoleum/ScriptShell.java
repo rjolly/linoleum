@@ -1,6 +1,6 @@
 package linoleum;
 
-import java.awt.Frame;
+import java.awt.Container;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileReader;
@@ -19,12 +19,15 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
+import linoleum.application.ApplicationManager;
+import linoleum.application.Frame;
 
-public class ScriptShell extends JInternalFrame implements ScriptShellPanel.CommandProcessor {
+public class ScriptShell extends Frame implements ScriptShellPanel.CommandProcessor {
 	private volatile ScriptEngine engine;
 	private CountDownLatch engineReady = new CountDownLatch(1);
 	private String extension;
 	private volatile String prompt;
+	private Desktop desktop;
 
 	public ScriptShell() {
 		initComponents();
@@ -75,6 +78,18 @@ public class ScriptShell extends JInternalFrame implements ScriptShellPanel.Comm
 			res = se.getMessage();
 		}
 		return res;
+	}
+
+	@Override
+	public ApplicationManager getApplicationManager() {
+		return super.getApplicationManager();
+	}
+
+	public Desktop getDesktop() {
+		if (desktop == null) for (Container parent = getDesktopPane(); parent != null; parent = parent.getParent()) {
+			if (parent instanceof Desktop) desktop = (Desktop) parent;
+		}
+		return desktop;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -150,7 +165,6 @@ public class ScriptShell extends JInternalFrame implements ScriptShellPanel.Comm
 	// set pre-defined global variables for script
 	private void setGlobals() {
 		engine.put("engine", engine);
-		engine.put("frames", Frame.getFrames());
 		engine.put("frame", this);
 	}
 
@@ -171,18 +185,18 @@ public class ScriptShell extends JInternalFrame implements ScriptShellPanel.Comm
 	}
 
 	private void loadUserInitFile() {
-		String oldFilename = (String) engine.get(ScriptEngine.FILENAME);
-		String dir = System.getProperty("user.dir");
+		final String oldFilename = (String) engine.get(ScriptEngine.FILENAME);
+		final String dir = System.getProperty("linoleum.home", System.getProperty("user.dir"));
 		if (dir == null) {
 			return;
 		}
-		String fileName = dir + File.separator + "init." + extension;
-		if (!(new File(fileName).exists())) {
+		final File file = new File(dir, "init." + extension);
+		if (!file.exists()) {
 			return;
 		}
-		engine.put(ScriptEngine.FILENAME, fileName);
+		engine.put(ScriptEngine.FILENAME, file.getName());
 		try {
-			engine.eval(new FileReader(fileName));
+			engine.eval(new FileReader(file));
 		} catch (Exception exp) {
 			exp.printStackTrace();
 		} finally {

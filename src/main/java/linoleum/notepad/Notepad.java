@@ -541,8 +541,7 @@ public class Notepad extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JInternalFrame frame = getFrame();
-            if (file != null) open(file, frame);
+            if (file != null) open(file, getFrame());
         }
     }
 
@@ -557,7 +556,7 @@ public class Notepad extends JPanel {
 		getEditor().setDocument(new PlainDocument());
 		this.file = file;
 		frame.setTitle(file.getName());
-		Thread loader = new FileLoader(file, editor.getDocument());
+		Thread loader = new FileLoader(file, editor.getDocument(), frame);
 		loader.start();
 	}
 
@@ -568,14 +567,13 @@ public class Notepad extends JPanel {
         }
 
         public void actionPerformed(ActionEvent e) {
-            JInternalFrame frame = getFrame();
-	    if (file != null) save(file, frame);
+	    if (file != null) save(file, getFrame());
         }
     }
 
 	void save(final File file, final JInternalFrame frame) {
 		frame.setTitle(file.getName());
-		Thread saver = new FileSaver(file, editor.getDocument());
+		Thread saver = new FileSaver(file, editor.getDocument(), frame);
 		saver.start();
 	}
 
@@ -667,10 +665,11 @@ public class Notepad extends JPanel {
      */
     class FileLoader extends Thread {
 
-        FileLoader(File f, Document doc) {
+        FileLoader(File f, Document doc, JInternalFrame frame) {
             setPriority(4);
             this.f = f;
             this.doc = doc;
+            this.frame = frame;
         }
 
         @Override
@@ -699,7 +698,7 @@ public class Notepad extends JPanel {
                 SwingUtilities.invokeLater(new Runnable() {
 
                     public void run() {
-                        JOptionPane.showInternalMessageDialog(getFrame(),
+                        JOptionPane.showInternalMessageDialog(frame,
                                 "Could not open file: " + msg,
                                 "Error opening file",
                                 JOptionPane.ERROR_MESSAGE);
@@ -724,6 +723,7 @@ public class Notepad extends JPanel {
                 });
             }
         }
+        final JInternalFrame frame;
         Document doc;
         File f;
     }
@@ -734,13 +734,15 @@ public class Notepad extends JPanel {
      */
     class FileSaver extends Thread {
 
+        final JInternalFrame frame;
         Document doc;
         File f;
 
-        FileSaver(File f, Document doc) {
+        FileSaver(File f, Document doc, JInternalFrame frame) {
             setPriority(4);
             this.f = f;
             this.doc = doc;
+            this.frame = frame;
         }
 
         @Override
@@ -782,7 +784,7 @@ public class Notepad extends JPanel {
                 SwingUtilities.invokeLater(new Runnable() {
 
                     public void run() {
-                        JOptionPane.showInternalMessageDialog(getFrame(),
+                        JOptionPane.showInternalMessageDialog(frame,
                                 "Could not save file: " + msg,
                                 "Error saving file",
                                 JOptionPane.ERROR_MESSAGE);

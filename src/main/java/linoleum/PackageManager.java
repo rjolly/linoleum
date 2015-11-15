@@ -13,19 +13,20 @@ import org.apache.ivy.core.settings.IvySettings;
 public class PackageManager {
 	private final File lib;
 	private final Desktop desktop;
+	private final ClassLoader loader = (ClassLoader)ClassLoader.getSystemClassLoader();
 
-	public PackageManager(final Desktop desktop, final String dir) {
+	public PackageManager(final Desktop desktop, final File lib) {
 		this.desktop = desktop;
-		this.lib = new File(dir);
-		for (final File file: listFiles()) {
-			add(file);
+		this.lib = lib;
+		for (final File file: lib.listFiles()) {
+			loader.add(file);
 		}
 	}
 
-	public final File[] listFiles() {
-		return lib.listFiles();
+	public File getLib() {
+		return lib;
 	}
-
+
 	public void install(final String name, final String conf) throws Exception {
 		final IvySettings ivySettings = new IvySettings();
 		ivySettings.loadDefault();
@@ -39,12 +40,8 @@ public class PackageManager {
 		retrieveOptions.setDestArtifactPattern(lib.getPath() + "/[artifact]-[revision].[ext]");
 		final RetrieveReport retrieveReport = ivy.retrieve(md.getModuleRevisionId(), retrieveOptions);
 		for (final Object obj : retrieveReport.getCopiedFiles()) {
-			add((File)obj);
+			loader.add((File)obj);
 		}
 		desktop.getApplicationManager().refresh();
-	}
-
-	private static void add(final File file) {
-		((ClassLoader)ClassLoader.getSystemClassLoader()).add(file);
 	}
 }

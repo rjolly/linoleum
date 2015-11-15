@@ -2,11 +2,11 @@ function install(pkg, conf) {
     if (conf == undefined) {
         conf = "default";
     }
-    frames[0].getPackageManager().install(pkg, conf);
+    frame.getDesktop().getPackageManager().install(pkg, conf);
 }
 
 function installed() {
-    return frames[0].getPackageManager().listFiles();
+    return frame.getDesktop().getPackageManager().getLib().listFiles();
 }
 
 // adapted from https://weblogs.java.net/blog/forax/archive/2006/09/using_jrunscrip.html
@@ -18,21 +18,7 @@ function javac(srcDir, destDir) {
     if (destDir == undefined) {
 	destDir = srcDir;
     }
-    ToolProvider = javax.tools.ToolProvider;
-    StandardLocation = javax.tools.StandardLocation;
-    Arrays = java.util.Arrays;
-
-    compiler = ToolProvider.getSystemJavaCompiler()
-    fileManager = compiler.getStandardFileManager(null, null, null)
-    fileManager.setLocation(StandardLocation.CLASS_PATH, Arrays.asList(installed()))
-    fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList([pathToFile(destDir)]))
-
-    compilationUnits = fileManager.getJavaFileObjectsFromFiles(Arrays.asList(fileset(srcDir, ".*\.java")))
-    options = ["-source", "1.7", "-target", "1.7"]
-    task = compiler.getTask(null, fileManager, null, options, null, compilationUnits)
-    task.call()
-
-    fileManager.close()
+    Packages.linoleum.Tools.instance.compile(fileset(srcDir, ".*\.java"), installed(), pathToFile(destDir), ["-source", "1.7", "-target", "1.7"]);
 }
 
 function fileset(path, pattern) {
@@ -48,20 +34,7 @@ function run(name, args) {
     if (args == undefined) {
 	args = [];
     }
-    Class = java.lang.Class;
-    URLClassLoader = java.net.URLClassLoader;
-    String = java.lang.String;
-
-    a = convertArray(String, args)
-    Class.forName(name, true, URLClassLoader([pathToFile(".").toURI().toURL()])).getMethod("main", [a.getClass()]).invoke(null, [a])
-}
-
-function convertArray(type, arr) {
-    var jArr = java.lang.reflect.Array.newInstance(type, arr.length)
-    for (var i = 0; i < arr.length; i++) {
-        jArr[i] = arr[i]
-    }
-    return jArr
+    Packages.linoleum.Tools.instance.run(name, curDir, args);
 }
 
 function pwd() {
@@ -80,4 +53,8 @@ function cd(target) {
     } else {
 	println(target + " is not a directory");
     }
+}
+
+function open(name) {
+    frame.getApplicationManager().open(pathToFile(name).toURI());
 }
