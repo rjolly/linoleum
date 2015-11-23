@@ -1,6 +1,6 @@
 function install(pkg, conf) {
     if (conf == undefined) {
-        conf = "default";
+	conf = "default";
     }
     frame.getDesktop().getPackageManager().install(pkg, conf);
 }
@@ -21,6 +21,20 @@ function javac(srcDir, destDir) {
     Packages.linoleum.Tools.instance.compile(fileset(srcDir, ".*\.java"), installed(), pathToFile(destDir), ["-source", "1.7", "-target", "1.7"]);
 }
 
+function jar(dest, dir, pattern) {
+    if (dir == undefined) {
+	dir = ".";
+    }
+    Packages.linoleum.Tools.instance.jar(pathToFile(dir), fileset(dir, pattern), pathToFile(dest));
+}
+
+function clean(dir) {
+    if (dir == undefined) {
+	dir = ".";
+    }
+    fileset(dir, ".*\.class").forEach(rm);
+}
+
 function fileset(path, pattern) {
     var set = new Array()
     function callback(file) {
@@ -30,11 +44,12 @@ function fileset(path, pattern) {
     return set
 }
 
-function run(name, args) {
-    if (args == undefined) {
-	args = [];
+function run(name) {
+    var array = new Array(arguments.length - 1);
+    for (var i = 0; i < array.length; i++) {
+	array[i] = arguments[i+1];
     }
-    Packages.linoleum.Tools.instance.run(name, curDir, args);
+    Packages.linoleum.Tools.instance.run(name, curDir, array);
 }
 
 function pwd() {
