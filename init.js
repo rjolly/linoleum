@@ -21,18 +21,35 @@ function javac(srcDir, destDir) {
     Packages.linoleum.Tools.instance.compile(fileset(srcDir, ".*\.java"), installed(), pathToFile(destDir), ["-source", "1.7", "-target", "1.7"]);
 }
 
+function copy(src, dest, pattern) {
+    Packages.linoleum.Tools.instance.copy(pathToFile(src), fileset(src, pattern), pathToFile(dest));
+}
+
 function jar(dest, dir, pattern) {
     if (dir == undefined) {
 	dir = ".";
     }
-    Packages.linoleum.Tools.instance.jar(pathToFile(dir), fileset(dir, pattern), pathToFile(dest));
+    Packages.linoleum.Tools.instance.jar(pathToFile("manifest.mf"), pathToFile(dir), fileset(dir, pattern), pathToFile(dest));
 }
 
 function clean(dir) {
     if (dir == undefined) {
 	dir = ".";
     }
-    fileset(dir, ".*\.class").forEach(rm);
+    find(dir, ".*\.class", rm);
+    finddir(dir, rmdir);
+    rmdir(dir);
+}
+
+function grep(pattern, dir, files) {
+    if (dir == undefined) {
+	dir = ".";
+    }
+    function callback(file) {
+	println(file + ":");
+	cat(file, pattern);
+    }
+    find(dir, files, callback);
 }
 
 function fileset(path, pattern) {
@@ -42,6 +59,39 @@ function fileset(path, pattern) {
     }
     find(path, pattern, callback)
     return set
+}
+
+function find(dir, pattern, callback) {
+    dir = pathToFile(dir);
+    if (!callback) callback = println;
+    var files = dir.listFiles();
+    for (var f in files) {
+	var file = files[f];
+	if (file.isDirectory()) {
+	    find(file, pattern, callback);
+	} else {
+	    if (pattern) {
+		if (file.getName().matches(pattern)) {
+		    callback(file);
+		}
+	    } else {
+		callback(file);
+	    }
+	}
+    }
+}
+
+function finddir(dir, callback) {
+    dir = pathToFile(dir);
+    if (!callback) callback = println;
+    var files = dir.listFiles();
+    for (var f in files) {
+	var file = files[f];
+	if (file.isDirectory()) {
+	    finddir(file, callback);
+	    callback(file);
+	}
+    }
 }
 
 function run(name) {

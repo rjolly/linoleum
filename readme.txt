@@ -25,6 +25,9 @@ To build linoleum from itself, first clone the repository by external means (for
   cd("/path/to/linoleum");
   mkdirs("build/classes");
   javac("src/main/java", "build/classes");
+  copy("src/main/resources", "build/classes");
+  mkdir("dist");
+  jar("dist/linoleum.jar", "build/classes");
 
 
 To publish an application:
