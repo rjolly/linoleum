@@ -13,7 +13,7 @@ import javax.swing.filechooser.FileSystemView;
 import javax.swing.JFrame;
 
 public class Desktop extends JFrame {
-	private final PackageManager pkgs = new PackageManager(this, new File(System.getProperty("linoleum.home", System.getProperty("user.dir")), "lib"));
+	private final PackageManager pkgs = new PackageManager(this);
 	private final ApplicationManager apps = new ApplicationManager();
 	private final GraphicsDevice devices[];
 	private Rectangle bounds;

@@ -1,21 +1,15 @@
 package linoleum;
 
-import java.io.File;
-import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLClassLoader;
 
 public class ClassLoader extends URLClassLoader {
 
 	public ClassLoader(final java.lang.ClassLoader parent) {
-		super(((URLClassLoader)parent).getURLs(), parent);
-		add(new File(new File(System.getProperty("java.home")), "../lib/tools.jar"));
+		super(new URL[] {}, parent);
 	}
 
-	public final void add(final File file) {
-		try {
-			addURL(file.toURI().toURL());
-		} catch (final MalformedURLException ex) {
-			throw new RuntimeException(ex);
-		}
+	public void addURL(final URL url) {
+		super.addURL(url);
 	}
 }
