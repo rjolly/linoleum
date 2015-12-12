@@ -3,7 +3,6 @@ package linoleum;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import javax.swing.JEditorPane;
 import javax.swing.JScrollPane;
@@ -12,6 +11,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
+import linoleum.html.EditorKit;
 
 public class HtmlPane extends JScrollPane implements HyperlinkListener {
 
@@ -19,20 +19,13 @@ public class HtmlPane extends JScrollPane implements HyperlinkListener {
 
     @SuppressWarnings("LeakingThisInConstructor")
     public HtmlPane() {
-        try {
-            URL url = getClass().getResource("blank.html");
-            html = new JEditorPane(url);
-            html.setEditable(false);
-            html.addHyperlinkListener(this);
-            html.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
-                    Boolean.TRUE);
-            JViewport vp = getViewport();
-            vp.add(html);
-        } catch (MalformedURLException e) {
-            System.out.println("Malformed URL: " + e);
-        } catch (IOException e) {
-            System.out.println("IOException: " + e);
-        }
+        html = new JEditorPane();
+        html.setEditorKitForContentType("text/html", new EditorKit());
+        html.setEditable(false);
+        html.addHyperlinkListener(this);
+        html.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        JViewport vp = getViewport();
+        vp.add(html);
     }
 
     /**
