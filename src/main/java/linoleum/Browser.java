@@ -1,10 +1,18 @@
 package linoleum;
 
+import java.awt.Container;
+import java.awt.Cursor;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import javax.swing.ImageIcon;
+import javax.swing.JEditorPane;
 import javax.swing.JInternalFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.text.Document;
+import linoleum.html.EditorKit;
 
 public class Browser extends JInternalFrame {
 
@@ -28,18 +36,62 @@ public class Browser extends JInternalFrame {
 
 	public Browser(final URI uri) {
 		initComponents();
+		jEditorPane1.setEditorKitForContentType("text/html", new EditorKit());
+		jEditorPane1.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 		try {
-			if (uri != null) htmlPane1.linkActivated(uri.toURL());
-		} catch (MalformedURLException ex) {
+			if (uri != null) linkActivated(uri.toURL());
+		} catch (final MalformedURLException ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
 	private void open(final String str) {
 		try {
-			htmlPane1.linkActivated(new URL(str));
-		} catch (MalformedURLException ex) {
+			linkActivated(new URL(str));
+		} catch (final MalformedURLException ex) {
 			throw new RuntimeException(ex);
+		}
+	}
+
+	protected void linkActivated(final URL u) {
+		final Cursor c = jEditorPane1.getCursor();
+		final Cursor waitCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
+		jEditorPane1.setCursor(waitCursor);
+		SwingUtilities.invokeLater(new PageLoader(u, c));
+	}
+
+	class PageLoader implements Runnable {
+		private URL url;
+		private final Cursor cursor;
+
+		PageLoader(final URL u, final Cursor c) {
+			url = u;
+			cursor = c;
+		}
+
+		public void run() {
+			if (url == null) {
+				// restore the original cursor
+				jEditorPane1.setCursor(cursor);
+
+				// PENDING(prinz) remove this hack when
+				// automatic validation is activated.
+				final Container parent = jEditorPane1.getParent();
+				parent.repaint();
+			} else {
+				final Document doc = jEditorPane1.getDocument();
+				try {
+					jEditorPane1.setPage(url);
+				} catch (IOException ioe) {
+					jEditorPane1.setDocument(doc);
+					getToolkit().beep();
+				} finally {
+					// schedule the cursor to revert after
+					// the paint has happended.
+					url = null;
+					SwingUtilities.invokeLater(this);
+				}
+			}
 		}
 	}
 
@@ -47,10 +99,11 @@ public class Browser extends JInternalFrame {
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
-                htmlPane1 = new linoleum.HtmlPane();
                 jPanel1 = new javax.swing.JPanel();
                 jTextField1 = new javax.swing.JTextField();
                 jButton1 = new javax.swing.JButton();
+                jScrollPane1 = new javax.swing.JScrollPane();
+                jEditorPane1 = new javax.swing.JEditorPane();
 
                 setClosable(true);
                 setIconifiable(true);
@@ -91,19 +144,27 @@ public class Browser extends JInternalFrame {
                                         .addComponent(jButton1)))
                 );
 
+                jEditorPane1.setEditable(false);
+                jEditorPane1.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
+                        public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
+                                jEditorPane1HyperlinkUpdate(evt);
+                        }
+                });
+                jScrollPane1.setViewportView(jEditorPane1);
+
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);
                 layout.setHorizontalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(htmlPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
                         .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
                 );
                 layout.setVerticalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(htmlPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 241, Short.MAX_VALUE))
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE))
                 );
 
                 pack();
@@ -117,10 +178,17 @@ public class Browser extends JInternalFrame {
 		open(evt.getActionCommand());
         }//GEN-LAST:event_jTextField1ActionPerformed
 
+        private void jEditorPane1HyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEditorPane1HyperlinkUpdate
+		if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+			linkActivated(evt.getURL());
+		}
+        }//GEN-LAST:event_jEditorPane1HyperlinkUpdate
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
-        private linoleum.HtmlPane htmlPane1;
         private javax.swing.JButton jButton1;
+        private javax.swing.JEditorPane jEditorPane1;
         private javax.swing.JPanel jPanel1;
+        private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JTextField jTextField1;
         // End of variables declaration//GEN-END:variables
 }
