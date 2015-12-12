@@ -1,5 +1,6 @@
 package linoleum;
 
+import java.awt.Dimension;
 import linoleum.application.ApplicationManager;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -11,8 +12,12 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 public class Desktop extends JFrame {
+	private static final String ABOUTMSG = "Linoleum \n \nJava desktop environment "
+		+ "and software distribution. \n \nWritten by \n  "
+		+ "Raphael Jolly";
 	private final PackageManager pkgs = new PackageManager(this);
 	private final ApplicationManager apps = new ApplicationManager();
 	private final GraphicsDevice devices[];
@@ -39,9 +44,7 @@ public class Desktop extends JFrame {
 	}
 
 	private void about() {
-		final AboutFrame frame = new AboutFrame();
-		desktopPane.add(frame);
-		frame.setVisible(true);
+		JOptionPane.showInternalMessageDialog(desktopPane, ABOUTMSG);
 	}
 
 	private void fullScreen() {
@@ -63,6 +66,12 @@ public class Desktop extends JFrame {
 		setVisible(true);
 	}
 
+	private void resize() {
+		final Dimension s = label.getSize();
+		final Dimension size = desktopPane.getSize();
+		label.setLocation((size.width - s.width) / 2, (size.height - s.height) / 2);
+	}
+
 	private void screenshot() {
 		final BufferedImage bi = new BufferedImage(getRootPane().getWidth(), getRootPane().getHeight(), BufferedImage.TYPE_INT_ARGB);
 		getRootPane().print(bi.createGraphics());
@@ -79,6 +88,7 @@ public class Desktop extends JFrame {
         private void initComponents() {
 
                 desktopPane = new javax.swing.JDesktopPane();
+                label = new javax.swing.JLabel();
                 menuBar = new javax.swing.JMenuBar();
                 fileMenu = new javax.swing.JMenu();
                 openMenuItem = new javax.swing.JMenuItem();
@@ -98,6 +108,15 @@ public class Desktop extends JFrame {
                 aboutMenuItem = new javax.swing.JMenuItem();
 
                 setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+                addComponentListener(new java.awt.event.ComponentAdapter() {
+                        public void componentResized(java.awt.event.ComponentEvent evt) {
+                                formComponentResized(evt);
+                        }
+                });
+
+                label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/linoleum/Linoleum_2.jpg"))); // NOI18N
+                desktopPane.add(label);
+                label.setBounds(100, 50, 409, 307);
 
                 fileMenu.setMnemonic('f');
                 fileMenu.setText("File");
@@ -231,6 +250,10 @@ public class Desktop extends JFrame {
 		screenshot();
         }//GEN-LAST:event_screenshotMenuItemActionPerformed
 
+        private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
+		resize();
+        }//GEN-LAST:event_formComponentResized
+
 	public static void main(String args[]) {
 		/* Create and display the form */
 		java.awt.EventQueue.invokeLater(new Runnable() {
@@ -252,6 +275,7 @@ public class Desktop extends JFrame {
         private javax.swing.JMenu fileMenu;
         private javax.swing.JCheckBoxMenuItem fullScreenMenuItem;
         private javax.swing.JMenu helpMenu;
+        private javax.swing.JLabel label;
         private javax.swing.JMenuBar menuBar;
         private javax.swing.JMenuItem openMenuItem;
         private javax.swing.JMenuItem pasteMenuItem;
