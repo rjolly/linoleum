@@ -1,5 +1,6 @@
 package linoleum;
 
+import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import javax.swing.text.Document;
 import linoleum.html.EditorKit;
 
 public class Browser extends JInternalFrame {
+	private final CardLayout layout;
 
 	public static class Application implements linoleum.application.Application {
 		public String getName() {
@@ -36,6 +38,7 @@ public class Browser extends JInternalFrame {
 
 	public Browser(final URI uri) {
 		initComponents();
+		layout = (CardLayout)jPanel2.getLayout();
 		jEditorPane1.setEditorKitForContentType("text/html", new EditorKit());
 		jEditorPane1.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 		try {
@@ -54,6 +57,7 @@ public class Browser extends JInternalFrame {
 	}
 
 	protected void linkActivated(final URL u) {
+		layout.show(jPanel2, "progressBar");
 		final Cursor c = jEditorPane1.getCursor();
 		final Cursor waitCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 		jEditorPane1.setCursor(waitCursor);
@@ -73,7 +77,7 @@ public class Browser extends JInternalFrame {
 			if (url == null) {
 				// restore the original cursor
 				jEditorPane1.setCursor(cursor);
-
+				layout.show(jPanel2, "label");
 				// PENDING(prinz) remove this hack when
 				// automatic validation is activated.
 				final Container parent = jEditorPane1.getParent();
@@ -104,6 +108,9 @@ public class Browser extends JInternalFrame {
                 jButton1 = new javax.swing.JButton();
                 jScrollPane1 = new javax.swing.JScrollPane();
                 jEditorPane1 = new javax.swing.JEditorPane();
+                jPanel2 = new javax.swing.JPanel();
+                jLabel1 = new javax.swing.JLabel();
+                jProgressBar1 = new javax.swing.JProgressBar();
 
                 setClosable(true);
                 setIconifiable(true);
@@ -124,26 +131,6 @@ public class Browser extends JInternalFrame {
                         }
                 });
 
-                javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-                jPanel1.setLayout(jPanel1Layout);
-                jPanel1Layout.setHorizontalGroup(
-                        jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jTextField1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton1)
-                                .addContainerGap())
-                );
-                jPanel1Layout.setVerticalGroup(
-                        jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jButton1)))
-                );
-
                 jEditorPane1.setEditable(false);
                 jEditorPane1.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
                         public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
@@ -152,20 +139,36 @@ public class Browser extends JInternalFrame {
                 });
                 jScrollPane1.setViewportView(jEditorPane1);
 
-                javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-                getContentPane().setLayout(layout);
-                layout.setHorizontalGroup(
-                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
-                );
-                layout.setVerticalGroup(
-                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+                jPanel1.setLayout(jPanel1Layout);
+                jPanel1Layout.setHorizontalGroup(
+                        jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE))
+                                .addComponent(jButton1)
+                                .addContainerGap())
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 );
+                jPanel1Layout.setVerticalGroup(
+                        jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jButton1))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE))
+                );
+
+                getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+
+                jPanel2.setLayout(new java.awt.CardLayout());
+                jPanel2.add(jLabel1, "label");
+                jPanel2.add(jProgressBar1, "progressBar");
+
+                getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
                 pack();
         }// </editor-fold>//GEN-END:initComponents
@@ -187,7 +190,10 @@ public class Browser extends JInternalFrame {
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
         private javax.swing.JEditorPane jEditorPane1;
+        private javax.swing.JLabel jLabel1;
         private javax.swing.JPanel jPanel1;
+        private javax.swing.JPanel jPanel2;
+        private javax.swing.JProgressBar jProgressBar1;
         private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JTextField jTextField1;
         // End of variables declaration//GEN-END:variables
