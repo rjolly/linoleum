@@ -86,7 +86,10 @@ public class MediaPlayer extends JInternalFrame {
 
                 jPanel1 = new javax.swing.JPanel();
                 jPanel2 = new javax.swing.JPanel();
+                jButton2 = new javax.swing.JButton();
+                jButton4 = new javax.swing.JButton();
                 jButton1 = new javax.swing.JButton();
+                jButton3 = new javax.swing.JButton();
 
                 setClosable(true);
                 setIconifiable(true);
@@ -94,25 +97,31 @@ public class MediaPlayer extends JInternalFrame {
                 setResizable(true);
                 setTitle("Media Player");
                 addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-                        public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
-                        }
-                        public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
+                        public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
                         }
                         public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
                                 formInternalFrameClosing(evt);
                         }
-                        public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
-                        }
-                        public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
+                        public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                         }
                         public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
                         }
-                        public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+                        public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
                         }
                 });
 
                 jPanel1.setLayout(new java.awt.BorderLayout());
                 getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+
+                jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/StepBack16.gif"))); // NOI18N
+                jPanel2.add(jButton2);
+
+                jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Stop16.gif"))); // NOI18N
+                jPanel2.add(jButton4);
 
                 jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"))); // NOI18N
                 jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -121,6 +130,9 @@ public class MediaPlayer extends JInternalFrame {
                         }
                 });
                 jPanel2.add(jButton1);
+
+                jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/StepForward16.gif"))); // NOI18N
+                jPanel2.add(jButton3);
 
                 getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
@@ -137,6 +149,9 @@ public class MediaPlayer extends JInternalFrame {
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
+        private javax.swing.JButton jButton2;
+        private javax.swing.JButton jButton3;
+        private javax.swing.JButton jButton4;
         private javax.swing.JPanel jPanel1;
         private javax.swing.JPanel jPanel2;
         // End of variables declaration//GEN-END:variables
