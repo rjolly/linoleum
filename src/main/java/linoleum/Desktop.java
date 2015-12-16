@@ -201,6 +201,11 @@ public class Desktop extends JFrame {
 
                 contentMenuItem.setMnemonic('c');
                 contentMenuItem.setText("Contents");
+                contentMenuItem.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                contentMenuItemActionPerformed(evt);
+                        }
+                });
                 helpMenu.add(contentMenuItem);
 
                 aboutMenuItem.setMnemonic('a');
@@ -253,6 +258,11 @@ public class Desktop extends JFrame {
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
 		resize();
         }//GEN-LAST:event_formComponentResized
+
+        private void contentMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contentMenuItemActionPerformed
+		final File file = new File(new File(System.getProperty("java.home")), "../docs/api/index.html");
+		if (file.exists()) apps.open(file.toURI());
+        }//GEN-LAST:event_contentMenuItemActionPerformed
 
 	public static void main(String args[]) {
 		/* Create and display the form */
