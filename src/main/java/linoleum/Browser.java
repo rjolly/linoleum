@@ -8,20 +8,25 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
+import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 import javax.swing.JInternalFrame;
-import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.text.Document;
 import javax.swing.SwingWorker;
 import linoleum.html.EditorKit;
+import linoleum.html.Document;
+import linoleum.html.FrameURL;
 
 public class Browser extends JInternalFrame {
 	private final ImageIcon playIcon = new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"));
 	private final ImageIcon stopIcon = new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
+	private List<FrameURL> history = new ArrayList<>();
 	private final CardLayout layout;
 	private PageLoader loader;
+	private FrameURL current;
+	private int index;
 	private URL url;
 
 	public static class Application implements linoleum.application.Application {
@@ -44,11 +49,12 @@ public class Browser extends JInternalFrame {
 
 	public Browser(final URI uri) {
 		initComponents();
+		update();
 		layout = (CardLayout)jPanel2.getLayout();
 		jEditorPane1.setEditorKitForContentType("text/html", new EditorKit());
 		jEditorPane1.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 		try {
-			if (uri != null) linkActivated(uri.toURL());
+			if (uri != null) open(uri.toURL());
 		} catch (final MalformedURLException ex) {
 			throw new RuntimeException(ex);
 		}
@@ -56,13 +62,33 @@ public class Browser extends JInternalFrame {
 
 	private void open(final String str) {
 		try {
-			linkActivated(new URL(str));
+			open(new URL(str));
 		} catch (final MalformedURLException ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
-	protected void linkActivated(final URL url) {
+	private void open(final URL url) {
+		if (current != null) {
+			record(current);
+			index++;
+		}
+		open(new FrameURL(url));
+	}
+
+	private void linkActivated(final HyperlinkEvent evt) {
+		record(current);
+		index++;
+		open(FrameURL.create(current, evt));
+	}
+
+	private void open(final int delta) {
+		record(current);
+		index += delta;
+		open(history.get(index));
+	}
+
+	private void open(final FrameURL url) {
 		if (loader != null) {
 			if (loader.cancel(true)) {
 				loader.done();
@@ -74,27 +100,40 @@ public class Browser extends JInternalFrame {
 		}
 	}
 
-	private class PageLoader extends SwingWorker<Object, Object> {
+	private class PageLoader extends SwingWorker<URL, Object> {
 		private final Cursor cursor = jEditorPane1.getCursor();
-		private final URL url;
+		private final FrameURL dest;
 
-		PageLoader(final URL url) {
-			this.url = url;
+		PageLoader(final FrameURL dest) {
+			this.dest = dest;
 			jButton1.setIcon(stopIcon);
 			layout.show(jPanel2, "progressBar");
 			jEditorPane1.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		}
 
-		public Object doInBackground() {
+		public URL doInBackground() {
 			try {
-				jEditorPane1.setPage(url);
+				jEditorPane1.setPage(dest.getURL());
+				jEditorPane1.getDocument().putProperty(Document.StreamDescriptionProperty, dest.getURL());
 			} catch (final IOException ioe) {
 				getToolkit().beep();
 			}
-			return null;
+			return jEditorPane1.getPage();
 		}
 
 		public void done() {
+			if (dest.getURL().equals(jEditorPane1.getPage())) {
+				jTextField1.setText(dest.getURL().toString());
+				dest.open(jEditorPane1);
+				if (index > 0 && dest.equals(history.get(index - 1))) {
+					index--;
+				}
+				if (index < history.size() && !dest.equals(history.get(index))) {
+					history = new ArrayList<>(history.subList(0, index));
+				}
+				current = dest;
+				update();
+			}
 			// restore the original cursor
 			jEditorPane1.setCursor(cursor);
 			layout.show(jPanel2, "label");
@@ -105,6 +144,17 @@ public class Browser extends JInternalFrame {
 			parent.repaint();
 			loader = null;
 		}
+	}
+
+	private void record(final FrameURL url) {
+		if (index == history.size()) {
+			history.add(url);
+		}
+	}
+
+	private void update() {
+		jButton2.setEnabled(index > 0);
+		jButton3.setEnabled(index < history.size() - 1);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -260,21 +310,23 @@ public class Browser extends JInternalFrame {
 
         private void jEditorPane1HyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEditorPane1HyperlinkUpdate
 		if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-			linkActivated(evt.getURL());
+			linkActivated(evt);
 		} else if (evt.getEventType() == HyperlinkEvent.EventType.ENTERED) {
 			url = evt.getURL();
 			jLabel1.setText(url.toString());
-			jEditorPane1.setComponentPopupMenu(jPopupMenu1);
+			((JEditorPane)evt.getSource()).setComponentPopupMenu(jPopupMenu1);
 		} else if (evt.getEventType() == HyperlinkEvent.EventType.EXITED) {
-			jEditorPane1.setComponentPopupMenu(null);
+			((JEditorPane)evt.getSource()).setComponentPopupMenu(null);
 			jLabel1.setText("");
 		}
         }//GEN-LAST:event_jEditorPane1HyperlinkUpdate
 
         private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+		open(-1);
         }//GEN-LAST:event_jButton2ActionPerformed
 
         private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+		open(1);
         }//GEN-LAST:event_jButton3ActionPerformed
 
         private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
