@@ -14,6 +14,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.Document;
+import javax.swing.SwingWorker;
 import linoleum.html.EditorKit;
 
 public class Browser extends JInternalFrame {
@@ -58,46 +59,39 @@ public class Browser extends JInternalFrame {
 		}
 	}
 
-	protected void linkActivated(final URL u) {
-		layout.show(jPanel2, "progressBar");
-		final Cursor c = jEditorPane1.getCursor();
-		final Cursor waitCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
-		jEditorPane1.setCursor(waitCursor);
-		SwingUtilities.invokeLater(new PageLoader(u, c));
+	protected void linkActivated(final URL url) {
+		new PageLoader(url).execute();
 	}
 
-	class PageLoader implements Runnable {
-		private URL url;
-		private final Cursor cursor;
+	private class PageLoader extends SwingWorker<Object, Object> {
+		private final Cursor cursor = jEditorPane1.getCursor();
+		private final URL url;
 
-		PageLoader(final URL u, final Cursor c) {
-			url = u;
-			cursor = c;
+		PageLoader(final URL url) {
+			this.url = url;
+			layout.show(jPanel2, "progressBar");
+			jEditorPane1.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		}
 
-		public void run() {
-			if (url == null) {
-				// restore the original cursor
-				jEditorPane1.setCursor(cursor);
-				layout.show(jPanel2, "label");
-				// PENDING(prinz) remove this hack when
-				// automatic validation is activated.
-				final Container parent = jEditorPane1.getParent();
-				parent.repaint();
-			} else {
-				final Document doc = jEditorPane1.getDocument();
-				try {
-					jEditorPane1.setPage(url);
-				} catch (IOException ioe) {
-					jEditorPane1.setDocument(doc);
-					getToolkit().beep();
-				} finally {
-					// schedule the cursor to revert after
-					// the paint has happended.
-					url = null;
-					SwingUtilities.invokeLater(this);
-				}
+		public Object doInBackground() {
+			final Document doc = jEditorPane1.getDocument();
+			try {
+				jEditorPane1.setPage(url);
+			} catch (final IOException ioe) {
+				jEditorPane1.setDocument(doc);
+				getToolkit().beep();
 			}
+			return doc;
+		}
+
+		public void done() {
+			// restore the original cursor
+			jEditorPane1.setCursor(cursor);
+			layout.show(jPanel2, "label");
+			// PENDING(prinz) remove this hack when
+			// automatic validation is activated.
+			final Container parent = jEditorPane1.getParent();
+			parent.repaint();
 		}
 	}
 
