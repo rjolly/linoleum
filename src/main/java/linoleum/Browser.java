@@ -18,7 +18,10 @@ import javax.swing.SwingWorker;
 import linoleum.html.EditorKit;
 
 public class Browser extends JInternalFrame {
+	private final ImageIcon playIcon = new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"));
+	private final ImageIcon stopIcon = new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
 	private final CardLayout layout;
+	private PageLoader loader;
 	private URL url;
 
 	public static class Application implements linoleum.application.Application {
@@ -60,7 +63,15 @@ public class Browser extends JInternalFrame {
 	}
 
 	protected void linkActivated(final URL url) {
-		new PageLoader(url).execute();
+		if (loader != null) {
+			if (loader.cancel(true)) {
+				loader.done();
+			}
+		}
+		if (loader == null) {
+			loader = new PageLoader(url);
+			loader.execute();
+		}
 	}
 
 	private class PageLoader extends SwingWorker<Object, Object> {
@@ -69,29 +80,30 @@ public class Browser extends JInternalFrame {
 
 		PageLoader(final URL url) {
 			this.url = url;
+			jButton1.setIcon(stopIcon);
 			layout.show(jPanel2, "progressBar");
 			jEditorPane1.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		}
 
 		public Object doInBackground() {
-			final Document doc = jEditorPane1.getDocument();
 			try {
 				jEditorPane1.setPage(url);
 			} catch (final IOException ioe) {
-				jEditorPane1.setDocument(doc);
 				getToolkit().beep();
 			}
-			return doc;
+			return null;
 		}
 
 		public void done() {
 			// restore the original cursor
 			jEditorPane1.setCursor(cursor);
 			layout.show(jPanel2, "label");
+			jButton1.setIcon(playIcon);
 			// PENDING(prinz) remove this hack when
 			// automatic validation is activated.
 			final Container parent = jEditorPane1.getParent();
 			parent.repaint();
+			loader = null;
 		}
 	}
 
@@ -233,7 +245,13 @@ public class Browser extends JInternalFrame {
         }// </editor-fold>//GEN-END:initComponents
 
         private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-		open(jTextField1.getText());
+		if (loader == null) {
+			open(jTextField1.getText());
+		} else {
+			if (loader.cancel(true)) {
+				loader.done();
+			}
+		}
         }//GEN-LAST:event_jButton1ActionPerformed
 
         private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
