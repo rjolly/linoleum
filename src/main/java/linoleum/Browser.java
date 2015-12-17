@@ -3,6 +3,7 @@ package linoleum;
 import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.Cursor;
+import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -17,6 +18,7 @@ import linoleum.html.EditorKit;
 
 public class Browser extends JInternalFrame {
 	private final CardLayout layout;
+	private URL url;
 
 	public static class Application implements linoleum.application.Application {
 		public String getName() {
@@ -119,6 +121,11 @@ public class Browser extends JInternalFrame {
                 jProgressBar1 = new javax.swing.JProgressBar();
 
                 jMenuItem1.setText("Copy link location");
+                jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jMenuItem1ActionPerformed(evt);
+                        }
+                });
                 jPopupMenu1.add(jMenuItem1);
 
                 setClosable(true);
@@ -242,6 +249,13 @@ public class Browser extends JInternalFrame {
         private void jEditorPane1HyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEditorPane1HyperlinkUpdate
 		if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 			linkActivated(evt.getURL());
+		} else if (evt.getEventType() == HyperlinkEvent.EventType.ENTERED) {
+			url = evt.getURL();
+			jLabel1.setText(url.toString());
+			jEditorPane1.setComponentPopupMenu(jPopupMenu1);
+		} else if (evt.getEventType() == HyperlinkEvent.EventType.EXITED) {
+			jEditorPane1.setComponentPopupMenu(null);
+			jLabel1.setText("");
 		}
         }//GEN-LAST:event_jEditorPane1HyperlinkUpdate
 
@@ -250,6 +264,11 @@ public class Browser extends JInternalFrame {
 
         private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         }//GEN-LAST:event_jButton3ActionPerformed
+
+        private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+		final StringSelection selection = new StringSelection(url.toString());
+		getToolkit().getSystemClipboard().setContents(selection, selection);
+        }//GEN-LAST:event_jMenuItem1ActionPerformed
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
