@@ -46,10 +46,15 @@ function grep(pattern, dir, files) {
 	dir = ".";
     }
     function callback(file) {
-	println(file + ":");
+	println(java.util.regex.Pattern.compile("\\\\").matcher(file.getCanonicalPath()).replaceAll("/") + ":");
 	cat(file, pattern);
     }
-    find(dir, files, callback);
+    dir = pathToFile(dir);
+    if (dir.isDirectory()) {
+	find(dir, files, callback);
+    } else {
+	callback(dir);
+    }
 }
 
 function fileset(path, pattern) {
