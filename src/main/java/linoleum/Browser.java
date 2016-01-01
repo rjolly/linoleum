@@ -14,9 +14,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 import javax.swing.JInternalFrame;
 import javax.swing.event.HyperlinkEvent;
+import javax.swing.text.Document;
 import javax.swing.SwingWorker;
 import linoleum.html.EditorKit;
-import linoleum.html.Document;
 import linoleum.html.FrameURL;
 
 public class Browser extends JInternalFrame {
@@ -69,33 +69,23 @@ public class Browser extends JInternalFrame {
 	}
 
 	private void open(final URL url) {
-		if (current != null) {
-			record(current);
-			index++;
-		}
-		open(new FrameURL(url));
+		open(new FrameURL(url), 1);
 	}
 
 	private void linkActivated(final HyperlinkEvent evt) {
-		record(current);
-		index++;
-		open(FrameURL.create(current, evt));
+		open(FrameURL.create(current, evt), 1);
 	}
 
 	private void open(final int delta) {
-		record(current);
-		index += delta;
-		open(history.get(index));
+		open(history.get(index + delta), delta);
 	}
 
-	private void open(final FrameURL url) {
+	private void open(final FrameURL url, final int delta) {
 		if (loader != null) {
-			if (loader.cancel(true)) {
-				loader.done();
-			}
+			loader.cancel(true);
 		}
 		if (loader == null) {
-			loader = new PageLoader(url);
+			loader = new PageLoader(url, delta);
 			loader.execute();
 		}
 	}
@@ -103,18 +93,22 @@ public class Browser extends JInternalFrame {
 	private class PageLoader extends SwingWorker<URL, Object> {
 		private final Cursor cursor = jEditorPane1.getCursor();
 		private final FrameURL dest;
+		private final int delta;
+		private boolean success;
 
-		PageLoader(final FrameURL dest) {
+		PageLoader(final FrameURL dest, final int delta) {
 			this.dest = dest;
+			this.delta = delta;
 			jButton1.setIcon(stopIcon);
 			layout.show(jPanel2, "progressBar");
 			jEditorPane1.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		}
 
 		public URL doInBackground() {
+			success = false;
 			try {
 				jEditorPane1.setPage(dest.getURL());
-				jEditorPane1.getDocument().putProperty(Document.StreamDescriptionProperty, dest.getURL());
+				success = true;
 			} catch (final IOException ioe) {
 				getToolkit().beep();
 			}
@@ -122,17 +116,14 @@ public class Browser extends JInternalFrame {
 		}
 
 		public void done() {
-			if (dest.getURL().equals(jEditorPane1.getPage())) {
-				jTextField1.setText(dest.getURL().toString());
+			if (success) {
 				dest.open(jEditorPane1);
-				if (index > 0 && dest.equals(history.get(index - 1))) {
-					index--;
-				}
-				if (index < history.size() && !dest.equals(history.get(index))) {
-					history = new ArrayList<>(history.subList(0, index));
+				jTextField1.setText(dest.getURL().toString());
+				setTitle((String)jEditorPane1.getDocument().getProperty(Document.TitleProperty));
+				if (current != null) {
+					record(dest, delta);
 				}
 				current = dest;
-				update();
 			}
 			// restore the original cursor
 			jEditorPane1.setCursor(cursor);
@@ -146,10 +137,17 @@ public class Browser extends JInternalFrame {
 		}
 	}
 
-	private void record(final FrameURL url) {
+	private void record(final FrameURL dest, final int delta) {
 		if (index == history.size()) {
-			history.add(url);
+			history.add(current);
 		}
+		if (!dest.equals(history.get(index))) {
+			index += delta;
+		}
+		if (index < history.size() && !dest.equals(history.get(index))) {
+			history = new ArrayList<>(history.subList(0, index));
+		}
+		update();
 	}
 
 	private void update() {
@@ -268,9 +266,7 @@ public class Browser extends JInternalFrame {
 		if (loader == null) {
 			open(jTextField1.getText());
 		} else {
-			if (loader.cancel(true)) {
-				loader.done();
-			}
+			loader.cancel(true);
 		}
         }//GEN-LAST:event_jButton1ActionPerformed
 

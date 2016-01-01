@@ -10,7 +10,7 @@ import javax.swing.text.html.HTMLFrameHyperlinkEvent;
 import javax.swing.text.Element;
 
 public class FrameURL {
-	private final URL url;
+	private URL url;
 	private final Map<String, URL> map = new HashMap<>();
 
 	public FrameURL(final FrameURL dest, final HTMLFrameHyperlinkEvent evt) {
@@ -41,13 +41,10 @@ public class FrameURL {
 	}
 
 	public void open(final JEditorPane panel) {
-		final javax.swing.text.Document d = panel.getDocument();
-		if (d instanceof Document) {
-			final Document doc = (Document)d;
-			for (final Map.Entry<String, URL> entry : map.entrySet()) {
-				doc.processHTMLFrameHyperlinkEvent(new HTMLFrameHyperlinkEvent(panel, HyperlinkEvent.EventType.ACTIVATED, entry.getValue(), entry.getKey()));
-			}
-			map.putAll(doc.getFrames());
+		url = panel.getPage();
+		final javax.swing.text.Document doc = panel.getDocument();
+		if (doc instanceof Document) {
+			((Document)doc).setFrames(map, panel);
 		}
 	}
 
