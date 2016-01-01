@@ -128,7 +128,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
-        <Component class="javax.swing.JEditorPane" name="jEditorPane1">
+        <Component class="linoleum.html.EditorPane" name="jEditorPane1">
           <Properties>
             <Property name="editable" type="boolean" value="false"/>
           </Properties>

@@ -167,7 +167,7 @@ public class Browser extends JInternalFrame {
                 jTextField1 = new javax.swing.JTextField();
                 jButton1 = new javax.swing.JButton();
                 jScrollPane1 = new javax.swing.JScrollPane();
-                jEditorPane1 = new javax.swing.JEditorPane();
+                jEditorPane1 = new linoleum.html.EditorPane();
                 jPanel2 = new javax.swing.JPanel();
                 jLabel1 = new javax.swing.JLabel();
                 jProgressBar1 = new javax.swing.JProgressBar();
@@ -304,7 +304,7 @@ public class Browser extends JInternalFrame {
         private javax.swing.JButton jButton1;
         private javax.swing.JButton jButton2;
         private javax.swing.JButton jButton3;
-        private javax.swing.JEditorPane jEditorPane1;
+        private linoleum.html.EditorPane jEditorPane1;
         private javax.swing.JLabel jLabel1;
         private javax.swing.JMenuItem jMenuItem1;
         private javax.swing.JPanel jPanel2;
