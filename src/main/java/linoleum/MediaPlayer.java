@@ -1,8 +1,14 @@
 package linoleum;
 
 import java.awt.Component;
+import java.io.File;
+import java.io.FileFilter;
 import java.net.URI;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import javax.activation.FileTypeMap;
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 import javax.media.ControllerEvent;
 import javax.media.ControllerListener;
 import javax.media.EndOfMediaEvent;
@@ -13,9 +19,13 @@ import javax.swing.JInternalFrame;
 
 public class MediaPlayer extends JInternalFrame {
 	private Player player;
+	private static final String audio = "audio/*";
+	private static final String video = "video/*";
 	private final ImageIcon playIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"));
 	private final ImageIcon pauseIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Pause16.gif"));
+	private final File files[];
 	private boolean state;
+	private int index;
 
 	public static class Application implements linoleum.application.Application {
 		public String getName() {
@@ -27,48 +37,86 @@ public class MediaPlayer extends JInternalFrame {
 		}
 
 		public String getMimeType() {
-			return "audio/*:video/*";
+			return audio + ":" + video;
 		}
 
 		public JInternalFrame open(final URI uri) {
-			return new MediaPlayer(uri);
+			return new MediaPlayer(uri == null?null:Paths.get(uri).toFile());
 		}
 	}
 
-	public MediaPlayer(final URI uri) {
+	public MediaPlayer(final File file) {
 		initComponents();
-		try {
-			if (uri != null) {
-				open(uri);
-				push();
-			} else {
-				jButton1.setEnabled(false);
-			}
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
-	}
-
-	private void open(final URI uri) throws Exception {
-		setTitle(Paths.get(uri).toFile().getName());
-		player = Manager.createRealizedPlayer(uri.toURL());
-		final Component component = player.getVisualComponent();
-		if (component != null) {
-			jPanel1.add(component);
-			pack();
-		}
-		player.addControllerListener(new ControllerListener() {
-
-			@Override
-			public void controllerUpdate(ControllerEvent ce) {
-				if (ce instanceof EndOfMediaEvent) {
-					push();
+		if (file != null) {
+			files = file.getParentFile().listFiles(new FileFilter() {
+				public boolean accept(final File file) {
+					return canOpen(file);
 				}
-			}
-		});
+			});
+			Arrays.sort(files);
+			index = Arrays.binarySearch(files, file);
+		} else {
+			files = new File[] {};
+		}
+		play();
 	}
 
-	private void push() {
+	private static boolean canOpen(final File file) {
+		final String str = FileTypeMap.getDefaultFileTypeMap().getContentType(file);
+		try {
+			final MimeType type = new MimeType(str);
+			return type.match(audio) || type.match(video);
+		} catch (final MimeTypeParseException ex) {}
+		return false;
+	}
+
+	private void play() {
+		open();
+		if (player != null) {
+			pause();
+		}
+	}
+
+	private void open() {
+		if (index < files.length) {
+			final File file = files[index];
+			setTitle(file.getName());
+			try {
+				player = Manager.createRealizedPlayer(file.toURI().toURL());
+				final Component component = player.getVisualComponent();
+				if (component != null) {
+					jPanel1.removeAll();
+					jPanel1.add(component);
+					pack();
+				}
+				player.addControllerListener(new ControllerListener() {
+					
+					@Override
+					public void controllerUpdate(ControllerEvent ce) {
+						if (ce instanceof EndOfMediaEvent) {
+							stop();
+							index++;
+							if (index < files.length) play();
+							else index = 0;
+						}
+					}
+				});
+			} catch (final Exception ex) {
+				player = null;
+			}
+		}
+	}
+
+	private void stop() {
+		if (player != null) {
+			player.close();
+			state = false;
+			jButton1.setIcon(playIcon);
+			player = null;
+		}
+	}
+
+	private void pause() {
 		if (state) {
 			state = false;
 			player.stop();
@@ -118,9 +166,19 @@ public class MediaPlayer extends JInternalFrame {
                 getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
                 jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/StepBack16.gif"))); // NOI18N
+                jButton2.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jButton2ActionPerformed(evt);
+                        }
+                });
                 jPanel2.add(jButton2);
 
                 jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Stop16.gif"))); // NOI18N
+                jButton4.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jButton4ActionPerformed(evt);
+                        }
+                });
                 jPanel2.add(jButton4);
 
                 jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"))); // NOI18N
@@ -132,6 +190,11 @@ public class MediaPlayer extends JInternalFrame {
                 jPanel2.add(jButton1);
 
                 jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/StepForward16.gif"))); // NOI18N
+                jButton3.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jButton3ActionPerformed(evt);
+                        }
+                });
                 jPanel2.add(jButton3);
 
                 getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
@@ -140,12 +203,32 @@ public class MediaPlayer extends JInternalFrame {
         }// </editor-fold>//GEN-END:initComponents
 
         private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-		push();
+		if (player == null) {
+			play();
+		} else {
+			pause();
+		}
         }//GEN-LAST:event_jButton1ActionPerformed
 
         private void formInternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosing
 		if (player != null) player.close();
         }//GEN-LAST:event_formInternalFrameClosing
+
+        private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+		stop();
+		if (files.length > 0) index = (index + 1) % files.length;
+		play();
+        }//GEN-LAST:event_jButton3ActionPerformed
+
+        private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+		stop();
+		if (files.length > 0) index = (index - 1 + files.length) % files.length;
+		play();
+        }//GEN-LAST:event_jButton2ActionPerformed
+
+        private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+		stop();
+        }//GEN-LAST:event_jButton4ActionPerformed
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;

@@ -17,12 +17,8 @@ public class ImagePanel extends JPanel implements MouseMotionListener {
 	private int x0;
 	private int y0;
 
-	public ImagePanel(final File file) {
-		try {
-			image = ImageIO.read(file);
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		}
+	public ImagePanel(final File file) throws IOException {
+		image = ImageIO.read(file);
 		addMouseMotionListener(this);
 	}
 

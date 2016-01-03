@@ -2,6 +2,7 @@ package linoleum;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -10,6 +11,7 @@ import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
+import javax.swing.JPanel;
 
 public class ImageViewer extends JInternalFrame {
 	private static final String type = "image/*";
@@ -59,10 +61,13 @@ public class ImageViewer extends JInternalFrame {
 	}
 
 	private void open() {
-		final int n = files.length;
-		if (n > 0) {
-			final File file = files[(index + n) % n];
-			jScrollPane1.setViewportView(new ImagePanel(file));
+		if (index < files.length) {
+			final File file = files[index];
+			JPanel panel = null;
+			try {
+				panel = new ImagePanel(file);
+			} catch (final IOException ex) {}
+			jScrollPane1.setViewportView(panel);
 			setTitle(file.getName());
 		}
 	}
@@ -117,13 +122,13 @@ public class ImageViewer extends JInternalFrame {
         }// </editor-fold>//GEN-END:initComponents
 
         private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
-                index -= 1;
-                open();
+		if (files.length > 0) index = (index - 1 + files.length) % files.length;
+		open();
         }//GEN-LAST:event_backButtonActionPerformed
 
         private void forwardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_forwardButtonActionPerformed
-                index += 1;
-                open();
+		if (files.length > 0) index = (index + 1) % files.length;
+		open();
         }//GEN-LAST:event_forwardButtonActionPerformed
 
 
