@@ -4,6 +4,8 @@ import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.datatransfer.StringSelection;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -15,7 +17,6 @@ import javax.swing.JEditorPane;
 import javax.swing.JInternalFrame;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.Document;
-import javax.swing.SwingWorker;
 import linoleum.html.EditorKit;
 import linoleum.html.FrameURL;
 
@@ -90,7 +91,7 @@ public class Browser extends JInternalFrame {
 		}
 	}
 
-	private class PageLoader extends SwingWorker<URL, Object> {
+	private class PageLoader extends linoleum.html.PageLoader {
 		private final Cursor cursor = jEditorPane1.getCursor();
 		private final FrameURL dest;
 		private final int delta;
@@ -99,6 +100,13 @@ public class Browser extends JInternalFrame {
 		PageLoader(final FrameURL dest, final int delta) {
 			this.dest = dest;
 			this.delta = delta;
+			addPropertyChangeListener(new PropertyChangeListener() {
+				public  void propertyChange(final PropertyChangeEvent evt) {
+					if ("progress".equals(evt.getPropertyName())) {
+						jProgressBar1.setValue((Integer)evt.getNewValue());
+					}
+				}
+			});
 			jButton1.setIcon(stopIcon);
 			layout.show(jPanel2, "progressBar");
 			jEditorPane1.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -107,7 +115,7 @@ public class Browser extends JInternalFrame {
 		public URL doInBackground() {
 			success = false;
 			try {
-				jEditorPane1.setPage(dest.getURL());
+				jEditorPane1.setPage(dest, this);
 				success = true;
 			} catch (final IOException ioe) {
 				getToolkit().beep();
@@ -117,7 +125,6 @@ public class Browser extends JInternalFrame {
 
 		public void done() {
 			if (success) {
-				dest.open(jEditorPane1);
 				jTextField1.setText(dest.getURL().toString());
 				setTitle((String)jEditorPane1.getDocument().getProperty(Document.TitleProperty));
 				if (current != null) {
@@ -128,6 +135,7 @@ public class Browser extends JInternalFrame {
 			// restore the original cursor
 			jEditorPane1.setCursor(cursor);
 			layout.show(jPanel2, "label");
+			jProgressBar1.setValue(0);
 			jButton1.setIcon(goIcon);
 			// PENDING(prinz) remove this hack when
 			// automatic validation is activated.
