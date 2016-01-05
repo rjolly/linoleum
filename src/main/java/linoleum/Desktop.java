@@ -1,7 +1,6 @@
 package linoleum;
 
 import java.awt.Dimension;
-import linoleum.application.ApplicationManager;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -13,6 +12,7 @@ import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import linoleum.application.ApplicationManager;
 
 public class Desktop extends JFrame {
 	private static final String ABOUTMSG = "Linoleum \n \nJava desktop environment "
@@ -25,7 +25,6 @@ public class Desktop extends JFrame {
 
 	private Desktop() {
 		initComponents();
-		desktopPane.setDesktopManager(new DesktopManager());
 		desktopPane.add(apps);
 		devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 		bounds = getBounds();
@@ -87,7 +86,7 @@ public class Desktop extends JFrame {
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
-                desktopPane = new javax.swing.JDesktopPane();
+                desktopPane = new linoleum.DesktopPane();
                 label = new javax.swing.JLabel();
                 menuBar = new javax.swing.JMenuBar();
                 fileMenu = new javax.swing.JMenu();
@@ -260,8 +259,10 @@ public class Desktop extends JFrame {
         }//GEN-LAST:event_formComponentResized
 
         private void contentMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contentMenuItemActionPerformed
-		final File file = new File(new File(System.getProperty("java.home")), "../docs/api/index.html");
-		if (file.exists()) apps.open(file.toURI());
+		try {
+			final File file = new File(new File(System.getProperty("java.home")), "../docs/api/index.html").getCanonicalFile();
+			if (file.exists()) apps.open(file.toURI());
+		} catch (final IOException ex) {}
         }//GEN-LAST:event_contentMenuItemActionPerformed
 
 	public static void main(String args[]) {
@@ -279,7 +280,7 @@ public class Desktop extends JFrame {
         private javax.swing.JMenuItem copyMenuItem;
         private javax.swing.JMenuItem cutMenuItem;
         private javax.swing.JMenuItem deleteMenuItem;
-        private javax.swing.JDesktopPane desktopPane;
+        private linoleum.DesktopPane desktopPane;
         private javax.swing.JMenu editMenu;
         private javax.swing.JMenuItem exitMenuItem;
         private javax.swing.JMenu fileMenu;
