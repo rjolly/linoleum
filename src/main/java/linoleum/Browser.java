@@ -20,7 +20,7 @@ import linoleum.html.EditorKit;
 import linoleum.html.FrameURL;
 
 public class Browser extends JInternalFrame {
-	private final ImageIcon playIcon = new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"));
+	private final ImageIcon goIcon = new javax.swing.ImageIcon(getClass().getResource("Go16.png"));
 	private final ImageIcon stopIcon = new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
 	private List<FrameURL> history = new ArrayList<>();
 	private final CardLayout layout;
@@ -128,7 +128,7 @@ public class Browser extends JInternalFrame {
 			// restore the original cursor
 			jEditorPane1.setCursor(cursor);
 			layout.show(jPanel2, "label");
-			jButton1.setIcon(playIcon);
+			jButton1.setIcon(goIcon);
 			// PENDING(prinz) remove this hack when
 			// automatic validation is activated.
 			final Container parent = jEditorPane1.getParent();
@@ -188,7 +188,7 @@ public class Browser extends JInternalFrame {
 
                 jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 0));
 
-                jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/navigation/Back16.gif"))); // NOI18N
+                jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/linoleum/Back16.png"))); // NOI18N
                 jButton2.setPreferredSize(new java.awt.Dimension(28, 28));
                 jButton2.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -197,7 +197,7 @@ public class Browser extends JInternalFrame {
                 });
                 jPanel3.add(jButton2);
 
-                jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/navigation/Forward16.gif"))); // NOI18N
+                jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/linoleum/Forward16.png"))); // NOI18N
                 jButton3.setPreferredSize(new java.awt.Dimension(28, 28));
                 jButton3.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -212,7 +212,7 @@ public class Browser extends JInternalFrame {
                         }
                 });
 
-                jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"))); // NOI18N
+                jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/linoleum/Go16.png"))); // NOI18N
                 jButton1.setPreferredSize(new java.awt.Dimension(28, 28));
                 jButton1.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
