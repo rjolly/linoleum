@@ -16,6 +16,7 @@ import javax.media.Manager;
 import javax.media.Player;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
+import javax.swing.JSlider;
 
 public class MediaPlayer extends JInternalFrame {
 	private Player player;
@@ -128,12 +129,16 @@ public class MediaPlayer extends JInternalFrame {
 		}
 	}
 
+	private void skip(final int value) {
+	}
+
 	@SuppressWarnings("unchecked")
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
                 jPanel1 = new javax.swing.JPanel();
                 jPanel2 = new javax.swing.JPanel();
+                jSlider1 = new javax.swing.JSlider();
                 jButton2 = new javax.swing.JButton();
                 jButton4 = new javax.swing.JButton();
                 jButton1 = new javax.swing.JButton();
@@ -165,7 +170,15 @@ public class MediaPlayer extends JInternalFrame {
                 jPanel1.setLayout(new java.awt.BorderLayout());
                 getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
+                jSlider1.addChangeListener(new javax.swing.event.ChangeListener() {
+                        public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                                jSlider1StateChanged(evt);
+                        }
+                });
+                jPanel2.add(jSlider1);
+
                 jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/StepBack16.gif"))); // NOI18N
+                jButton2.setPreferredSize(new java.awt.Dimension(28, 28));
                 jButton2.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                                 jButton2ActionPerformed(evt);
@@ -174,6 +187,7 @@ public class MediaPlayer extends JInternalFrame {
                 jPanel2.add(jButton2);
 
                 jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Stop16.gif"))); // NOI18N
+                jButton4.setPreferredSize(new java.awt.Dimension(28, 28));
                 jButton4.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                                 jButton4ActionPerformed(evt);
@@ -182,6 +196,7 @@ public class MediaPlayer extends JInternalFrame {
                 jPanel2.add(jButton4);
 
                 jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"))); // NOI18N
+                jButton1.setPreferredSize(new java.awt.Dimension(28, 28));
                 jButton1.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                                 jButton1ActionPerformed(evt);
@@ -190,6 +205,7 @@ public class MediaPlayer extends JInternalFrame {
                 jPanel2.add(jButton1);
 
                 jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/StepForward16.gif"))); // NOI18N
+                jButton3.setPreferredSize(new java.awt.Dimension(28, 28));
                 jButton3.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                                 jButton3ActionPerformed(evt);
@@ -230,6 +246,13 @@ public class MediaPlayer extends JInternalFrame {
 		stop();
         }//GEN-LAST:event_jButton4ActionPerformed
 
+        private void jSlider1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlider1StateChanged
+		final JSlider source = (JSlider)evt.getSource();
+		if (!source.getValueIsAdjusting()) {
+			skip(source.getValue());
+		}
+        }//GEN-LAST:event_jSlider1StateChanged
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
         private javax.swing.JButton jButton2;
@@ -237,5 +260,6 @@ public class MediaPlayer extends JInternalFrame {
         private javax.swing.JButton jButton4;
         private javax.swing.JPanel jPanel1;
         private javax.swing.JPanel jPanel2;
+        private javax.swing.JSlider jSlider1;
         // End of variables declaration//GEN-END:variables
 }
