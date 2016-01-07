@@ -6,6 +6,8 @@ import java.io.FileFilter;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.activation.FileTypeMap;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
@@ -14,6 +16,7 @@ import javax.media.ControllerListener;
 import javax.media.EndOfMediaEvent;
 import javax.media.Manager;
 import javax.media.Player;
+import javax.media.Time;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.JSlider;
@@ -26,6 +29,8 @@ public class MediaPlayer extends JInternalFrame {
 	private final ImageIcon pauseIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Pause16.gif"));
 	private final File files[];
 	private boolean state;
+	private Time duration;
+	private Timer timer;
 	private int index;
 
 	public static class Application implements linoleum.application.Application {
@@ -107,6 +112,16 @@ public class MediaPlayer extends JInternalFrame {
 					pack();
 				}
 				player.addControllerListener(listener);
+				duration = player.getDuration();
+				timer = new Timer();
+				timer.schedule(new TimerTask() {
+					public void run() {
+						if (player != null) {
+							final Time time = player.getMediaTime();
+							jSlider1.setValue((int)(100 * time.getSeconds() / duration.getSeconds()));
+						}
+					}
+				}, 0, 1000);
 			} catch (final Exception ex) {
 				player = null;
 			}
@@ -115,6 +130,8 @@ public class MediaPlayer extends JInternalFrame {
 
 	private void stop() {
 		if (player != null) {
+			timer.cancel();
+			jSlider1.setValue(0);
 			player.stop();
 			player.removeControllerListener(listener);
 			player.close();
@@ -137,6 +154,13 @@ public class MediaPlayer extends JInternalFrame {
 	}
 
 	private void skip(final int value) {
+		if (player == null) {
+			open();
+		}
+		if (player != null) {
+			final Time time = new Time(duration.getNanoseconds() * value / 100);
+			player.setMediaTime(time);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -234,7 +258,7 @@ public class MediaPlayer extends JInternalFrame {
         }//GEN-LAST:event_jButton1ActionPerformed
 
         private void formInternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosing
-		if (player != null) player.close();
+		stop();
         }//GEN-LAST:event_formInternalFrameClosing
 
         private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
