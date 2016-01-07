@@ -78,6 +78,22 @@ public class MediaPlayer extends JInternalFrame {
 		}
 	}
 
+	private ControllerListener listener = new ControllerListener() {
+
+		@Override
+		public void controllerUpdate(ControllerEvent ce) {
+			if (ce instanceof EndOfMediaEvent) {
+				stop();
+				if (files.length > 0) index = (index + 1) % files.length;
+				if (index == 0) {
+					open();
+				} else {
+					play();
+				}
+			}
+		}
+	};
+
 	private void open() {
 		if (index < files.length) {
 			final File file = files[index];
@@ -90,18 +106,7 @@ public class MediaPlayer extends JInternalFrame {
 					jPanel1.add(component);
 					pack();
 				}
-				player.addControllerListener(new ControllerListener() {
-					
-					@Override
-					public void controllerUpdate(ControllerEvent ce) {
-						if (ce instanceof EndOfMediaEvent) {
-							stop();
-							index++;
-							if (index < files.length) play();
-							else index = 0;
-						}
-					}
-				});
+				player.addControllerListener(listener);
 			} catch (final Exception ex) {
 				player = null;
 			}
@@ -110,6 +115,8 @@ public class MediaPlayer extends JInternalFrame {
 
 	private void stop() {
 		if (player != null) {
+			player.stop();
+			player.removeControllerListener(listener);
 			player.close();
 			state = false;
 			jButton1.setIcon(playIcon);
@@ -233,13 +240,13 @@ public class MediaPlayer extends JInternalFrame {
         private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
 		stop();
 		if (files.length > 0) index = (index + 1) % files.length;
-		play();
+		open();
         }//GEN-LAST:event_jButton3ActionPerformed
 
         private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
 		stop();
 		if (files.length > 0) index = (index - 1 + files.length) % files.length;
-		play();
+		open();
         }//GEN-LAST:event_jButton2ActionPerformed
 
         private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
