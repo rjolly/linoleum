@@ -20,50 +20,46 @@ import javax.media.Time;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.JSlider;
+import linoleum.application.Application;
 
-public class MediaPlayer extends JInternalFrame {
+public class MediaPlayer extends JInternalFrame implements Application {
 	private Player player;
 	private static final String audio = "audio/*";
 	private static final String video = "video/*";
 	private final ImageIcon playIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"));
 	private final ImageIcon pauseIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Pause16.gif"));
-	private final File files[];
+	private File files[] = new File[] {};
 	private boolean state;
 	private Time duration;
 	private Timer timer;
 	private int index;
 
-	public static class Application implements linoleum.application.Application {
-		public String getName() {
-			return MediaPlayer.class.getSimpleName();
-		}
-
-		public ImageIcon getIcon() {
-			return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Movie24.gif"));
-		}
-
-		public String getMimeType() {
-			return audio + ":" + video;
-		}
-
-		public JInternalFrame open(final URI uri) {
-			return new MediaPlayer(uri == null?null:Paths.get(uri).toFile());
-		}
+	public MediaPlayer() {
+		initComponents();
 	}
 
-	public MediaPlayer(final File file) {
-		initComponents();
-		if (file != null) {
-			files = file.getParentFile().listFiles(new FileFilter() {
-				public boolean accept(final File file) {
-					return canOpen(file);
-				}
-			});
-			Arrays.sort(files);
-			index = Arrays.binarySearch(files, file);
-		} else {
-			files = new File[] {};
-		}
+	public ImageIcon getIcon() {
+		return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Movie24.gif"));
+	}
+
+	public String getMimeType() {
+		return audio + ":" + video;
+	}
+
+	public JInternalFrame open(final URI uri) {
+		if (uri != null) init(Paths.get(uri).toFile());
+		return this;
+	}
+
+	public void init(final File file) {
+		stop();
+		files = file.getParentFile().listFiles(new FileFilter() {
+			public boolean accept(final File file) {
+				return canOpen(file);
+			}
+		});
+		Arrays.sort(files);
+		index = Arrays.binarySearch(files, file);
 		play();
 	}
 
@@ -180,6 +176,7 @@ public class MediaPlayer extends JInternalFrame {
                 setMaximizable(true);
                 setResizable(true);
                 setTitle("Media Player");
+                setName("MediaPlayer");
                 addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
                         public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
                         }
