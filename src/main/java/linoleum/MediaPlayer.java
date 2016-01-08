@@ -20,6 +20,7 @@ import javax.media.Time;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.JSlider;
+import javax.swing.SwingUtilities;
 import linoleum.application.Application;
 
 public class MediaPlayer extends JInternalFrame implements Application {
@@ -29,7 +30,6 @@ public class MediaPlayer extends JInternalFrame implements Application {
 	private final ImageIcon playIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"));
 	private final ImageIcon pauseIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Pause16.gif"));
 	private File files[] = new File[] {};
-	private boolean state;
 	private Time duration;
 	private Timer timer;
 	private int index;
@@ -60,6 +60,7 @@ public class MediaPlayer extends JInternalFrame implements Application {
 		});
 		Arrays.sort(files);
 		index = Arrays.binarySearch(files, file);
+		preopen();
 		play();
 	}
 
@@ -72,33 +73,35 @@ public class MediaPlayer extends JInternalFrame implements Application {
 		return false;
 	}
 
-	private void play() {
-		open();
-		if (player != null) {
-			pause();
-		}
-	}
-
 	private ControllerListener listener = new ControllerListener() {
 
 		@Override
 		public void controllerUpdate(ControllerEvent ce) {
 			if (ce instanceof EndOfMediaEvent) {
-				stop();
-				if (files.length > 0) index = (index + 1) % files.length;
-				if (index == 0) {
-					open();
-				} else {
-					play();
-				}
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						stop();
+						if (files.length > 0) index = (index + 1) % files.length;
+						preopen();
+						if (index > 0) {
+							play();
+						}
+					}
+				});
 			}
 		}
 	};
 
-	private void open() {
+	private void preopen() {
 		if (index < files.length) {
 			final File file = files[index];
 			setTitle(file.getName());
+		}
+	}
+
+	private void open() {
+		if (index < files.length) {
+			final File file = files[index];
 			try {
 				player = Manager.createRealizedPlayer(file.toURI().toURL());
 				final Component component = player.getVisualComponent();
@@ -112,15 +115,44 @@ public class MediaPlayer extends JInternalFrame implements Application {
 				timer = new Timer();
 				timer.schedule(new TimerTask() {
 					public void run() {
-						if (player != null) {
-							final Time time = player.getMediaTime();
-							jSlider1.setValue((int)(100 * time.getSeconds() / duration.getSeconds()));
+						if (SwingUtilities.isEventDispatchThread()) {
+							if (player != null && player.getState() == Player.Started) {
+								final Time time = player.getMediaTime();
+								jSlider1.setValue((int)(100 * time.getSeconds() / duration.getSeconds()));
+							}
+						} else {
+							SwingUtilities.invokeLater(this);
 						}
 					}
 				}, 0, 1000);
 			} catch (final Exception ex) {
 				player = null;
 			}
+		}
+	}
+
+	private void play() {
+		if (player == null) {
+			open();
+		}
+		if (player != null) {
+			if (player.getState() == Player.Started) {
+				player.stop();
+				jButton1.setIcon(playIcon);
+			} else {
+				player.start();
+				jButton1.setIcon(pauseIcon);
+			}
+		}
+	}
+
+	private void skip(final int value) {
+		if (player == null) {
+			open();
+		}
+		if (player != null && player.getState() != Player.Started) {
+			final Time time = new Time(duration.getNanoseconds() * value / 100);
+			player.setMediaTime(time);
 		}
 	}
 
@@ -131,31 +163,8 @@ public class MediaPlayer extends JInternalFrame implements Application {
 			player.stop();
 			player.removeControllerListener(listener);
 			player.close();
-			state = false;
 			jButton1.setIcon(playIcon);
 			player = null;
-		}
-	}
-
-	private void pause() {
-		if (state) {
-			state = false;
-			player.stop();
-			jButton1.setIcon(playIcon);
-		} else {
-			state = true;
-			player.start();
-			jButton1.setIcon(pauseIcon);
-		}
-	}
-
-	private void skip(final int value) {
-		if (player == null) {
-			open();
-		}
-		if (player != null) {
-			final Time time = new Time(duration.getNanoseconds() * value / 100);
-			player.setMediaTime(time);
 		}
 	}
 
@@ -246,11 +255,7 @@ public class MediaPlayer extends JInternalFrame implements Application {
         }// </editor-fold>//GEN-END:initComponents
 
         private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-		if (player == null) {
-			play();
-		} else {
-			pause();
-		}
+		play();
         }//GEN-LAST:event_jButton1ActionPerformed
 
         private void formInternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosing
@@ -260,13 +265,13 @@ public class MediaPlayer extends JInternalFrame implements Application {
         private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
 		stop();
 		if (files.length > 0) index = (index + 1) % files.length;
-		open();
+		preopen();
         }//GEN-LAST:event_jButton3ActionPerformed
 
         private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
 		stop();
 		if (files.length > 0) index = (index - 1 + files.length) % files.length;
-		open();
+		preopen();
         }//GEN-LAST:event_jButton2ActionPerformed
 
         private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
