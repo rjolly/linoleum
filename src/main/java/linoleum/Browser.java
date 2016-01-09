@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 import javax.swing.JInternalFrame;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.Document;
 import linoleum.html.EditorKit;
@@ -23,10 +25,12 @@ import linoleum.html.FrameURL;
 public class Browser extends JInternalFrame {
 	private final ImageIcon goIcon = new javax.swing.ImageIcon(getClass().getResource("Go16.png"));
 	private final ImageIcon stopIcon = new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
+	private final ImageIcon reloadIcon = new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Refresh16.gif"));
 	private List<FrameURL> history = new ArrayList<>();
 	private final CardLayout layout;
 	private PageLoader loader;
 	private FrameURL current;
+	private boolean reload;
 	private int index;
 	private URL url;
 
@@ -54,6 +58,30 @@ public class Browser extends JInternalFrame {
 		layout = (CardLayout)jPanel2.getLayout();
 		jEditorPane1.setEditorKitForContentType("text/html", new EditorKit());
 		jEditorPane1.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+		jTextField1.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void insertUpdate(final DocumentEvent e) {
+				update();
+			}
+
+			@Override
+			public void removeUpdate(final DocumentEvent e) {
+				update();
+			}
+
+			@Override
+			public void changedUpdate(final DocumentEvent e) {
+				update();
+			}
+
+			private void update() {
+				if (loader == null) {
+					reload = false;
+					jButton1.setIcon(goIcon);
+				}
+			}
+		});
 		try {
 			if (uri != null) open(uri.toURL());
 		} catch (final MalformedURLException ex) {
@@ -70,23 +98,23 @@ public class Browser extends JInternalFrame {
 	}
 
 	private void open(final URL url) {
-		open(new FrameURL(url), 1);
+		open(reload?current:new FrameURL(url), 1, reload);
 	}
 
 	private void linkActivated(final HyperlinkEvent evt) {
-		open(FrameURL.create(current, evt), 1);
+		open(FrameURL.create(current, evt), 1, false);
 	}
 
 	private void open(final int delta) {
-		open(history.get(index + delta), delta);
+		open(history.get(index + delta), delta, false);
 	}
 
-	private void open(final FrameURL url, final int delta) {
+	private void open(final FrameURL url, final int delta, final boolean force) {
 		if (loader != null) {
 			loader.cancel(true);
 		}
 		if (loader == null) {
-			loader = new PageLoader(url, delta);
+			loader = new PageLoader(url, delta, force);
 			loader.execute();
 		}
 	}
@@ -94,12 +122,14 @@ public class Browser extends JInternalFrame {
 	private class PageLoader extends linoleum.html.PageLoader {
 		private final Cursor cursor = jEditorPane1.getCursor();
 		private final FrameURL dest;
+		private final boolean force;
 		private final int delta;
 		private boolean success;
 
-		PageLoader(final FrameURL dest, final int delta) {
+		PageLoader(final FrameURL dest, final int delta, final boolean force) {
 			this.dest = dest;
 			this.delta = delta;
+			this.force = force;
 			addPropertyChangeListener(new PropertyChangeListener() {
 				public  void propertyChange(final PropertyChangeEvent evt) {
 					if ("progress".equals(evt.getPropertyName())) {
@@ -115,7 +145,7 @@ public class Browser extends JInternalFrame {
 		public URL doInBackground() {
 			success = false;
 			try {
-				jEditorPane1.setPage(dest, this);
+				jEditorPane1.setPage(dest, this, force);
 				success = true;
 			} catch (final IOException ioe) {
 				getToolkit().beep();
@@ -131,12 +161,13 @@ public class Browser extends JInternalFrame {
 					record(dest, delta);
 				}
 				current = dest;
+				reload = true;
 			}
 			// restore the original cursor
 			jEditorPane1.setCursor(cursor);
 			layout.show(jPanel2, "label");
 			jProgressBar1.setValue(0);
-			jButton1.setIcon(goIcon);
+			jButton1.setIcon(reload?reloadIcon:goIcon);
 			// PENDING(prinz) remove this hack when
 			// automatic validation is activated.
 			final Container parent = jEditorPane1.getParent();

@@ -26,7 +26,7 @@ import javax.swing.text.html.HTMLDocument;
 
 public class EditorPane extends JEditorPane {
 
-	public void setPage(final FrameURL dest, final PageLoader loader) throws IOException {
+	public void setPage(final FrameURL dest, final PageLoader loader, final boolean force) throws IOException {
 		final URL page = dest.getURL();
 		final String reference = page.getRef();
 		final URL loaded = getPage();
@@ -34,7 +34,7 @@ public class EditorPane extends JEditorPane {
 			scrollRectToVisible(new Rectangle(0, 0, 1, 1));
 		}
 		final Object postData = getPostData();
-		if ((loaded == null) || !loaded.sameFile(page) || (postData != null)) {
+		if ((loaded == null) || !loaded.sameFile(page) || force || (postData != null)) {
 			final InputStream in = getStream(page, loader);
 			final EditorKit kit = getEditorKit();
 			if (kit != null) {
