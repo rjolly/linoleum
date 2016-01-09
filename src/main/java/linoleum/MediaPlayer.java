@@ -173,8 +173,6 @@ public class MediaPlayer extends JInternalFrame implements Application {
 
                 setClosable(true);
                 setIconifiable(true);
-                setMaximizable(true);
-                setResizable(true);
                 setTitle("Media Player");
                 setName("MediaPlayer");
                 addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
@@ -198,6 +196,7 @@ public class MediaPlayer extends JInternalFrame implements Application {
                 jPanel1.setLayout(new java.awt.BorderLayout());
                 getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
+                jSlider1.setValue(0);
                 jSlider1.addChangeListener(new javax.swing.event.ChangeListener() {
                         public void stateChanged(javax.swing.event.ChangeEvent evt) {
                                 jSlider1StateChanged(evt);
