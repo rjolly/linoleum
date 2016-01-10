@@ -30,7 +30,7 @@ public class MediaPlayer extends JInternalFrame implements Application {
 	private final ImageIcon playIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"));
 	private final ImageIcon pauseIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Pause16.gif"));
 	private File files[] = new File[] {};
-	private Time duration;
+	private boolean slide;
 	private Timer timer;
 	private int index;
 
@@ -106,29 +106,33 @@ public class MediaPlayer extends JInternalFrame implements Application {
 				player = Manager.createRealizedPlayer(file.toURI().toURL());
 				final Component component = player.getVisualComponent();
 				if (component != null) {
-					jPanel1.removeAll();
 					jPanel1.add(component);
 					pack();
 				}
 				player.addControllerListener(listener);
-				duration = player.getDuration();
 				timer = new Timer();
 				timer.schedule(new TimerTask() {
 					public void run() {
 						if (SwingUtilities.isEventDispatchThread()) {
 							if (player != null && player.getState() == Player.Started) {
 								final Time time = player.getMediaTime();
+								final Time duration = player.getDuration();
+								slide = true;
 								jSlider1.setValue((int)(100 * time.getSeconds() / duration.getSeconds()));
+								jSlider1.setToolTipText(format(time) + "/" + format(duration));
+								slide = false;
 							}
 						} else {
 							SwingUtilities.invokeLater(this);
 						}
 					}
 				}, 0, 1000);
-			} catch (final Exception ex) {
-				player = null;
-			}
+			} catch (final Exception ex) {}
 		}
+	}
+
+	private static String format(final Time time) {
+		return String.format("%tT", 82800000+(time.getNanoseconds()/1000000));
 	}
 
 	private void play() {
@@ -147,11 +151,10 @@ public class MediaPlayer extends JInternalFrame implements Application {
 	}
 
 	private void skip(final int value) {
-		if (player == null) {
-			open();
-		}
-		if (player != null && player.getState() != Player.Started) {
+		if (player != null) {
+			final Time duration = player.getDuration();
 			final Time time = new Time(duration.getNanoseconds() * value / 100);
+			jSlider1.setToolTipText(format(time) + "/" + format(duration));
 			player.setMediaTime(time);
 		}
 	}
@@ -160,11 +163,14 @@ public class MediaPlayer extends JInternalFrame implements Application {
 		if (player != null) {
 			timer.cancel();
 			jSlider1.setValue(0);
+			jSlider1.setToolTipText(null);
 			player.stop();
 			player.removeControllerListener(listener);
 			player.close();
-			jButton1.setIcon(playIcon);
 			player = null;
+			jButton1.setIcon(playIcon);
+			jPanel1.removeAll();
+			pack();
 		}
 	}
 
@@ -280,7 +286,7 @@ public class MediaPlayer extends JInternalFrame implements Application {
 
         private void jSlider1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlider1StateChanged
 		final JSlider source = (JSlider)evt.getSource();
-		if (!source.getValueIsAdjusting()) {
+		if (!source.getValueIsAdjusting() && !slide) {
 			skip(source.getValue());
 		}
         }//GEN-LAST:event_jSlider1StateChanged
