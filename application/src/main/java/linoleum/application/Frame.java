@@ -19,14 +19,18 @@
 
 package linoleum.application;
 
+import java.net.URI;
+import javax.swing.Icon;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JRootPane;
 
-public class Frame extends JInternalFrame {
+public class Frame extends JInternalFrame implements App {
 	private ApplicationManager manager;
 	private JMenuBar savedMenuBar;
 	protected JMenuBar menuBar;
+	private String type;
+	private Icon icon;
 
 	public Frame() {
 		initComponents();
@@ -54,6 +58,33 @@ public class Frame extends JInternalFrame {
 		return menuBar;
 	}
 
+	public void setIcon(final Icon icon) {
+		this.icon = icon;
+	}
+
+	@Override
+	public Icon getIcon() {
+		return icon;
+	}
+
+	public void setMimeType(final String type) {
+		this.type = type;
+	}
+
+	@Override
+	public String getMimeType() {
+		return type;
+	}
+
+	@Override
+	public final JInternalFrame getFrame(final URI uri) {
+		if (uri != null) open(uri);
+		return this;
+	}
+
+	protected void open(final URI uri) {
+	}
+
 	/**
 	 * This method is called from within the constructor to initialize the
 	 * form. WARNING: Do NOT modify this code. The content of this method is
@@ -63,6 +94,7 @@ public class Frame extends JInternalFrame {
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
+                setName(getClass().getSimpleName());
                 addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
                         public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
                         }
