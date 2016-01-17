@@ -17,6 +17,7 @@ import javax.media.EndOfMediaEvent;
 import javax.media.Manager;
 import javax.media.Player;
 import javax.media.Time;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.JSlider;
@@ -27,8 +28,8 @@ public class MediaPlayer extends JInternalFrame implements Application {
 	private Player player;
 	private static final String audio = "audio/*";
 	private static final String video = "video/*";
-	private final ImageIcon playIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"));
-	private final ImageIcon pauseIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Pause16.gif"));
+	private final Icon playIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"));
+	private final Icon pauseIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Pause16.gif"));
 	private File files[] = new File[] {};
 	private boolean slide;
 	private Timer timer;

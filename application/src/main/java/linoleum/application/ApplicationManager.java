@@ -30,6 +30,7 @@ import javax.activation.FileTypeMap;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 import javax.swing.DefaultListModel;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
@@ -37,10 +38,10 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 public class ApplicationManager extends JInternalFrame {
-	private final ImageIcon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
-	private final Map<String, Application> map = new HashMap<>();
+	private final Icon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
+	private final Map<String, App> map = new HashMap<>();
 	private final Map<String, String> apps = new HashMap<>();
-	private final Map<String, ImageIcon> icons = new HashMap<>();
+	private final Map<String, Icon> icons = new HashMap<>();
 	private final DefaultListModel<String> model = new DefaultListModel<>();
 	private final ListCellRenderer renderer = new Renderer();
 
@@ -103,7 +104,7 @@ public class ApplicationManager extends JInternalFrame {
 
 	public void open(final String name, final URI uri) {
 		if (map.containsKey(name)) {
-			final JInternalFrame frame = map.get(name).open(uri);
+			final JInternalFrame frame = map.get(name).getFrame(uri);
 			if (frame.getDesktopPane() == null) getDesktopPane().add(frame);
 			frame.setVisible(true);
 		}
@@ -114,16 +115,40 @@ public class ApplicationManager extends JInternalFrame {
 	}
 
 	public final void refresh() {
-		for (final Application app : ServiceLoader.load(Application.class)) {
+		for (final App app : ServiceLoader.load(App.class)) {
 			process(app);
+		}
+		for (final Application app : ServiceLoader.load(Application.class)) {
+			process(new App() {
+
+				@Override
+				public String getName() {
+					return app.getName();
+				}
+
+				@Override
+				public Icon getIcon() {
+					return app.getIcon();
+				}
+
+				@Override
+				public String getMimeType() {
+					return app.getMimeType();
+				}
+
+				@Override
+				public JInternalFrame getFrame(URI uri) {
+					return app.open(uri);
+				}
+			});
 		}
 	}
 
-	private final void process(final Application app) {
+	private final void process(final App app) {
 		final String name = app.getName();
 		if (!map.containsKey(name)) {
 			map.put(name, app);
-			final ImageIcon icon = app.getIcon();
+			final Icon icon = app.getIcon();
 			icons.put(name, icon == null?defaultIcon:icon);
 			final String type = app.getMimeType();
 			if (type != null) for (final String s : type.split(":")) apps.put(s, name);

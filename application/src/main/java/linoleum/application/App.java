@@ -1,4 +1,4 @@
-/* Application.java
+/* App.java
  *
  * Copyright (C) 2015 Raphael Jolly
  *
@@ -20,12 +20,12 @@
 package linoleum.application;
 
 import java.net.URI;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JInternalFrame;
 
-public interface Application {
+public interface App {
 	public String getName();
-	public ImageIcon getIcon();
+	public Icon getIcon();
 	public String getMimeType();
-	public JInternalFrame open(URI uri);
+	public JInternalFrame getFrame(URI uri);
 }

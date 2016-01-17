@@ -12,6 +12,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 import javax.swing.JInternalFrame;
@@ -23,9 +24,9 @@ import linoleum.html.EditorKit;
 import linoleum.html.FrameURL;
 
 public class Browser extends JInternalFrame {
-	private final ImageIcon goIcon = new javax.swing.ImageIcon(getClass().getResource("Go16.png"));
-	private final ImageIcon stopIcon = new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
-	private final ImageIcon reloadIcon = new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Refresh16.gif"));
+	private final Icon goIcon = new javax.swing.ImageIcon(getClass().getResource("Go16.png"));
+	private final Icon stopIcon = new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
+	private final Icon reloadIcon = new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Refresh16.gif"));
 	private List<FrameURL> history = new ArrayList<>();
 	private final CardLayout layout;
 	private PageLoader loader;
