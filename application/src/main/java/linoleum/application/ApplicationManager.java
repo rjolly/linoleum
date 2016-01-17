@@ -36,12 +36,12 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-public class ApplicationManager extends javax.swing.JInternalFrame {
+public class ApplicationManager extends JInternalFrame {
 	private final ImageIcon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
-	private final Map<String, Application> map = new HashMap<String, Application>();
-	private final Map<String, String> apps = new HashMap<String, String>();
-	private final Map<String, ImageIcon> icons = new HashMap<String, ImageIcon>();
-	private final DefaultListModel model = new DefaultListModel();
+	private final Map<String, Application> map = new HashMap<>();
+	private final Map<String, String> apps = new HashMap<>();
+	private final Map<String, ImageIcon> icons = new HashMap<>();
+	private final DefaultListModel<String> model = new DefaultListModel<>();
 	private final ListCellRenderer renderer = new Renderer();
 
 	private class Renderer extends JLabel implements ListCellRenderer {
@@ -79,11 +79,14 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 	}
 
 	public void open(final URI uri) {
+		open(getApplication(uri), uri);
+	}
+
+	private String getApplication(final URI uri) {
 		final File file = Paths.get(uri).toFile();
 		final String str = FileTypeMap.getDefaultFileTypeMap().getContentType(file);
 		if (apps.containsKey(str)) {
-			open(apps.get(str), uri);
-			return;
+			return apps.get(str);
 		}
 		try {
 			final MimeType type = new MimeType(str);
@@ -91,17 +94,14 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 				final String key = entry.getKey();
 				final String value = entry.getValue();
 				if (type.match(key)) {
-					open(value, uri);
-					return;
+					return value;
 				}
 			}
 		} catch (final MimeTypeParseException ex) {}
-		if (file.isDirectory()) {
-			open("FileManager", uri);
-		}
+		return path.toFile().isDirectory()?"FileManager":null;
 	}
 
-	private void open(final String name, final URI uri) {
+	public void open(final String name, final URI uri) {
 		if (map.containsKey(name)) {
 			final JInternalFrame frame = map.get(name).open(uri);
 			if (frame.getDesktopPane() == null) getDesktopPane().add(frame);
@@ -110,21 +110,24 @@ public class ApplicationManager extends javax.swing.JInternalFrame {
 	}
 
 	private void open(final int index) {
-		open((String)model.getElementAt(index), null);
+		open(model.getElementAt(index), null);
 	}
 
 	public final void refresh() {
-		final ServiceLoader<Application> loader = ServiceLoader.load(Application.class);
-		for (final Application app : loader) {
-			final String name = app.getName();
-			if (!map.containsKey(name)) {
-				map.put(name, app);
-				final ImageIcon icon = app.getIcon();
-				icons.put(name, icon == null?defaultIcon:icon);
-				final String type = app.getMimeType();
-				if (type != null) for (final String s : type.split(":")) apps.put(s, name);
-				model.addElement(name);
-			}
+		for (final Application app : ServiceLoader.load(Application.class)) {
+			process(app);
+		}
+	}
+
+	private final void process(final Application app) {
+		final String name = app.getName();
+		if (!map.containsKey(name)) {
+			map.put(name, app);
+			final ImageIcon icon = app.getIcon();
+			icons.put(name, icon == null?defaultIcon:icon);
+			final String type = app.getMimeType();
+			if (type != null) for (final String s : type.split(":")) apps.put(s, name);
+			model.addElement(name);
 		}
 	}
 

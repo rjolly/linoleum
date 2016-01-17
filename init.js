@@ -41,6 +41,34 @@ function clean(dir) {
     rmdir(dir);
 }
 
+function cat(obj, pattern) {
+    if (obj instanceof File && obj.isDirectory()) {
+        ls(obj);
+        return;
+    }
+
+    var inp = null;
+    if (!(obj instanceof Reader)) {
+        inp = inStream(obj);
+        obj = new BufferedReader(new InputStreamReader(inp));
+    }
+    var line;
+    if (pattern) {
+        var count = 1;
+        while ((line=obj.readLine()) != null) {
+            if (line.match(pattern)) {
+                println(count + "\t: " + line);
+            }
+            count++;
+        }
+    } else {
+        while ((line=obj.readLine()) != null) {
+            println(line);
+        }
+    }
+    obj.close();
+}
+
 function grep(pattern, dir, files) {
     if (dir == undefined) {
 	dir = ".";
@@ -125,6 +153,11 @@ function cd(target) {
     }
 }
 
-function open(name) {
-    frame.getApplicationManager().open(pathToFile(name).toURI());
+function open(name, app) {
+    uri = pathToFile(name).toURI();
+    if (app == undefined) {
+	frame.getApplicationManager().open(uri);
+    } else {
+	frame.getApplicationManager().open(app, uri);
+    }
 }
