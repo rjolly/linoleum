@@ -1,11 +1,8 @@
 package linoleum;
 
-import java.net.URI;
-import javax.swing.ImageIcon;
-import javax.swing.JInternalFrame;
-import linoleum.application.Application;
+import linoleum.application.Frame;
 
-public class Clock extends JInternalFrame implements Application {
+public class Clock extends Frame {
 
 	public Clock() {
 		initComponents();
@@ -23,7 +20,6 @@ public class Clock extends JInternalFrame implements Application {
                 setMaximizable(true);
                 setResizable(true);
                 setTitle("Clock");
-                setName(getClass().getSimpleName());
                 addComponentListener(new java.awt.event.ComponentAdapter() {
                         public void componentShown(java.awt.event.ComponentEvent evt) {
                                 formComponentShown(evt);
@@ -37,11 +33,11 @@ public class Clock extends JInternalFrame implements Application {
                 getContentPane().setLayout(layout);
                 layout.setHorizontalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(clockPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
+                        .addComponent(clockPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
                 );
                 layout.setVerticalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(clockPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                        .addComponent(clockPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 133, Short.MAX_VALUE)
                 );
 
                 pack();
@@ -58,16 +54,4 @@ public class Clock extends JInternalFrame implements Application {
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private linoleum.ClockPanel clockPanel1;
         // End of variables declaration//GEN-END:variables
-
-	public ImageIcon getIcon() {
-		return null;
-	}
-
-	public String getMimeType() {
-		return null;
-	}
-
-	public JInternalFrame open(final URI uri) {
-		return this;
-	}
 }
