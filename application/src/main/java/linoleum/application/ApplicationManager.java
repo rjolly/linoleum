@@ -20,15 +20,14 @@
 package linoleum.application;
 
 import java.awt.Component;
-import java.io.File;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
-import javax.activation.FileTypeMap;
 import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -84,12 +83,12 @@ public class ApplicationManager extends JInternalFrame {
 	}
 
 	private String getApplication(final URI uri) {
-		final File file = Paths.get(uri).toFile();
-		final String str = FileTypeMap.getDefaultFileTypeMap().getContentType(file);
-		if (apps.containsKey(str)) {
-			return apps.get(str);
-		}
+		final Path path = Paths.get(uri);
 		try {
+			final String str = Files.probeContentType(path);
+			if (apps.containsKey(str)) {
+				return apps.get(str);
+			}
 			final MimeType type = new MimeType(str);
 			for (final Map.Entry<String, String> entry : apps.entrySet()) {
 				final String key = entry.getKey();
@@ -98,7 +97,7 @@ public class ApplicationManager extends JInternalFrame {
 					return value;
 				}
 			}
-		} catch (final MimeTypeParseException ex) {}
+		} catch (final Exception ex) {}
 		return path.toFile().isDirectory()?"FileManager":null;
 	}
 

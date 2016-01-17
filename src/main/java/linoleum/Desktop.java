@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
 import linoleum.application.ApplicationManager;
 
 public class Desktop extends JFrame {
-	private static final String ABOUTMSG = "Linoleum \n \nJava desktop environment "
+	private static final String ABOUTMSG = "Linoleum 1.1 \n \nJava desktop environment "
 		+ "and software distribution. \n \nWritten by \n  "
 		+ "Raphael Jolly";
 	private final PackageManager pkgs = new PackageManager(this);

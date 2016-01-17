@@ -4,11 +4,10 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import javax.activation.FileTypeMap;
 import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
@@ -53,10 +52,10 @@ public class ImageViewer extends JInternalFrame {
 	}
 
 	private static boolean canOpen(final File file) {
-		final String str = FileTypeMap.getDefaultFileTypeMap().getContentType(file);
 		try {
+			final String str = Files.probeContentType(file.toPath());
 			return new MimeType(str).match(type);
-		} catch (final MimeTypeParseException ex) {}
+		} catch (final Exception ex) {}
 		return false;
 	}
 

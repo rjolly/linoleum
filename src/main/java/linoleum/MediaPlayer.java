@@ -4,13 +4,12 @@ import java.awt.Component;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.activation.FileTypeMap;
 import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
 import javax.media.ControllerEvent;
 import javax.media.ControllerListener;
 import javax.media.EndOfMediaEvent;
@@ -66,11 +65,11 @@ public class MediaPlayer extends JInternalFrame implements Application {
 	}
 
 	private static boolean canOpen(final File file) {
-		final String str = FileTypeMap.getDefaultFileTypeMap().getContentType(file);
 		try {
+			final String str = Files.probeContentType(file.toPath());
 			final MimeType type = new MimeType(str);
 			return type.match(audio) || type.match(video);
-		} catch (final MimeTypeParseException ex) {}
+		} catch (final Exception ex) {}
 		return false;
 	}
 
