@@ -30,7 +30,7 @@ pomExtra :=
     </developer>
   </developers>
 
-version := "1.0"
+version := "1.1"
 
 autoScalaLibrary := false
 
