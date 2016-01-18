@@ -20,6 +20,7 @@
 package linoleum.application;
 
 import java.awt.Component;
+import java.beans.PropertyVetoException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -106,6 +107,13 @@ public class ApplicationManager extends JInternalFrame {
 			final JInternalFrame frame = map.get(name).getFrame(uri);
 			if (frame.getDesktopPane() == null) getDesktopPane().add(frame);
 			frame.setVisible(true);
+			try {
+				if (frame.isIcon()) {
+					frame.setIcon(false);
+				} else {
+					frame.setSelected(true);
+				}
+			} catch (final PropertyVetoException ex) {}
 		}
 	}
 
