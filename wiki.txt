@@ -38,4 +38,4 @@ Linoleum running on Windows with a JMF video
 
 == Download ==
 
-[https://java.net/projects/linoleum/downloads/download/linoleum.zip]
+[https://java.net/downloads/linoleum/linoleum.zip]
