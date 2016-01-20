@@ -29,7 +29,8 @@ import javax.swing.JRootPane;
 public class Frame extends JInternalFrame implements App {
 	private ApplicationManager manager;
 	private JMenuBar savedMenuBar;
-	protected JMenuBar menuBar;
+	private JMenuBar menuBar;
+	private boolean single;
 	private String type;
 	private Icon icon;
 
@@ -77,14 +78,36 @@ public class Frame extends JInternalFrame implements App {
 		return type;
 	}
 
+	public void setSingle(final boolean single) {
+		this.single = single;
+	}
+
+	public boolean isSingle() {
+		return single;
+	}
+
 	@Override
 	public final JInternalFrame open(final JDesktopPane desktop, final URI uri) {
-		if (getDesktopPane() == null) desktop.add(this);
-		if (uri != null) open(uri);
-		return this;
+		final Frame frame = single?this:newInstance();
+		if (frame.getDesktopPane() == null) desktop.add(frame);
+		if (uri != null) {
+			frame.open(uri);
+		}
+		return frame;
+	}
+
+	private Frame newInstance() {
+		try {
+			return getClass().newInstance();
+		} catch (final ReflectiveOperationException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 	protected void open(final URI uri) {
+	}
+
+	protected void close() {
 	}
 
 	/**
@@ -101,6 +124,7 @@ public class Frame extends JInternalFrame implements App {
                         public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
                         }
                         public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+                                formInternalFrameClosing(evt);
                         }
                         public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                         }
@@ -126,6 +150,10 @@ public class Frame extends JInternalFrame implements App {
 
                 pack();
         }// </editor-fold>//GEN-END:initComponents
+
+        private void formInternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosing
+		close();
+        }//GEN-LAST:event_formInternalFrameClosing
 
         private void formInternalFrameActivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameActivated
 		final JRootPane panel = getDesktopPane().getRootPane();
