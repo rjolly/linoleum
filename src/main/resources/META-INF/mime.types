@@ -23,6 +23,8 @@ text/x-manifest mf MF
 text/x-yaml conf
 text/x-form form
 text/x-types types
+text/x-policy policy
+text/x-log log
 video/mpeg mpeg mpg mpe mpv vbs mpegv
 video/quicktime qt mov moov
 video/x-mpeg2 mpv2 mp2v
