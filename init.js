@@ -2,11 +2,11 @@ function install(pkg, conf) {
     if (conf == undefined) {
 	conf = "default";
     }
-    frame.getDesktop().getPackageManager().install(pkg, conf);
+    Packages.linoleum.PackageManager.instance.install(pkg, conf);
 }
 
 function installed() {
-    return frame.getDesktop().getPackageManager().getLib().listFiles();
+    return Packages.linoleum.PackageManager.instance.getLib().listFiles();
 }
 
 // adapted from https://weblogs.java.net/blog/forax/archive/2006/09/using_jrunscrip.html

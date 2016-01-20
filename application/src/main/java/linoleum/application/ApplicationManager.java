@@ -34,11 +34,14 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
+import linoleum.application.event.ClassPathListener;
+import linoleum.application.event.ClassPathChangeEvent;
 
-public class ApplicationManager extends JInternalFrame {
+public class ApplicationManager extends JInternalFrame implements ClassPathListener {
 	private final Icon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
 	private final Map<String, App> map = new HashMap<>();
 	private final Map<String, String> apps = new HashMap<>();
@@ -121,7 +124,16 @@ public class ApplicationManager extends JInternalFrame {
 		open(model.getElementAt(index), null);
 	}
 
-	public final void refresh() {
+	public void classPathChanged(final ClassPathChangeEvent e) {
+		refresh();
+		for (final App app : map.values()) {
+			if (app instanceof ClassPathListener) {
+				((ClassPathListener)app).classPathChanged(e);
+			}
+		}
+	}
+
+	private void refresh() {
 		for (final JInternalFrame frame : ServiceLoader.load(JInternalFrame.class)) {
 			if (frame instanceof App) {
 				process((App)frame);
@@ -188,7 +200,11 @@ public class ApplicationManager extends JInternalFrame {
 			icons.put(name, icon == null?defaultIcon:icon);
 			final String type = app.getMimeType();
 			if (type != null) for (final String s : type.split(":")) apps.put(s, name);
-			model.addElement(name);
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					model.addElement(name);
+				}
+			});
 		}
 	}
 

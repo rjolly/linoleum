@@ -22,6 +22,8 @@ import javax.tools.ToolProvider;
 public class Tools {
 	public static final Tools instance = new Tools();
 
+	private Tools() {}
+
 	public void compile(final File files[], final File classpath[], final File destDir, final String options[]) throws IOException {
 		final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 		try (final StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null)) {

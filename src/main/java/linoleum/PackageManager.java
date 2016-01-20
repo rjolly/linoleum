@@ -3,11 +3,15 @@ package linoleum;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.jar.Manifest;
 import java.util.jar.Attributes;
 import java.net.URL;
+import linoleum.application.event.ClassPathListener;
+import linoleum.application.event.ClassPathChangeEvent;
 import org.apache.ivy.Ivy;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
@@ -18,17 +22,25 @@ import org.apache.ivy.core.retrieve.RetrieveReport;
 import org.apache.ivy.core.settings.IvySettings;
 
 public class PackageManager {
+	public static final PackageManager instance = new PackageManager();
 	private final File lib = new File(System.getProperty("linoleum.home", System.getProperty("user.dir")), "lib");
+	private final List<ClassPathListener> listeners = new ArrayList<>();
 	private final Map<String, File> map = new HashMap<>();
-	private final Desktop desktop;
 
-	public PackageManager(final Desktop desktop) {
-		this.desktop = desktop;
+	private PackageManager() {
 		populate();
 		add(new File(new File(System.getProperty("java.home")), "../lib/tools.jar"));
 		for (final File file: lib.listFiles()) {
 			add(file);
 		}
+	}
+
+	public void addClassPathListener(final ClassPathListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeClassPathListener(final ClassPathListener listener) {
+		listeners.remove(listener);
 	}
 
 	public File getLib() {
@@ -87,7 +99,13 @@ public class PackageManager {
 		for (final Object obj : retrieveReport.getCopiedFiles()) {
 			add((File)obj);
 		}
-		desktop.getApplicationManager().refresh();
+		fireClassPathChange(new ClassPathChangeEvent(this));
+	}
+
+	private void fireClassPathChange(final ClassPathChangeEvent evt) {
+		for (final ClassPathListener listener : listeners) {
+			listener.classPathChanged(evt);
+		}
 	}
 
 	private void add(final File file) {

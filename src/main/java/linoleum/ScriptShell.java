@@ -27,7 +27,6 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	private CountDownLatch engineReady = new CountDownLatch(1);
 	private String extension;
 	private volatile String prompt;
-	private Desktop desktop;
 
 	public ScriptShell() {
 		initComponents();
@@ -83,13 +82,6 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	@Override
 	public ApplicationManager getApplicationManager() {
 		return super.getApplicationManager();
-	}
-
-	public Desktop getDesktop() {
-		if (desktop == null) for (Container parent = getDesktopPane(); parent != null; parent = parent.getParent()) {
-			if (parent instanceof Desktop) desktop = (Desktop) parent;
-		}
-		return desktop;
 	}
 
 	@SuppressWarnings("unchecked")
