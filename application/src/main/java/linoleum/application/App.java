@@ -21,11 +21,12 @@ package linoleum.application;
 
 import java.net.URI;
 import javax.swing.Icon;
+import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 
 public interface App {
 	public String getName();
 	public Icon getIcon();
 	public String getMimeType();
-	public JInternalFrame getFrame(URI uri);
+	public JInternalFrame open(JDesktopPane desktop, URI uri);
 }

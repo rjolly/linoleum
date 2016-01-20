@@ -21,6 +21,7 @@ package linoleum.application;
 
 import java.net.URI;
 import javax.swing.Icon;
+import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JRootPane;
@@ -77,7 +78,8 @@ public class Frame extends JInternalFrame implements App {
 	}
 
 	@Override
-	public final JInternalFrame getFrame(final URI uri) {
+	public final JInternalFrame open(final JDesktopPane desktop, final URI uri) {
+		if (getDesktopPane() == null) desktop.add(this);
 		if (uri != null) open(uri);
 		return this;
 	}

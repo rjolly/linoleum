@@ -32,6 +32,7 @@ import javax.activation.MimeType;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -104,8 +105,7 @@ public class ApplicationManager extends JInternalFrame {
 
 	public void open(final String name, final URI uri) {
 		if (map.containsKey(name)) {
-			final JInternalFrame frame = map.get(name).getFrame(uri);
-			if (frame.getDesktopPane() == null) getDesktopPane().add(frame);
+			final JInternalFrame frame = map.get(name).open(getDesktopPane(), uri);
 			frame.setVisible(true);
 			try {
 				if (frame.isIcon()) {
@@ -144,8 +144,10 @@ public class ApplicationManager extends JInternalFrame {
 				}
 
 				@Override
-				public JInternalFrame getFrame(URI uri) {
-					return app.open(uri);
+				public JInternalFrame open(final JDesktopPane desktop, URI uri) {
+					final JInternalFrame frame = app.open(uri);
+					if (frame.getDesktopPane() == null) desktop.add(frame);
+					return frame;
 				}
 			});
 		}
