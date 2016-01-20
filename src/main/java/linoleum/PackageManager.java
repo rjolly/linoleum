@@ -1,6 +1,7 @@
 package linoleum;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
@@ -35,10 +36,23 @@ public class PackageManager {
 	}
 
 	private void populate() {
+		final String extdirs[] = System.getProperty("java.ext.dirs").split(File.pathSeparator);
+		for (final String str : extdirs) {
+			final File dir = new File(str);
+			if (dir.isDirectory()) {
+				for (final File file : dir.listFiles(new FileFilter() {
+					public boolean accept(final File file) {
+						return file.isFile() && file.getName().endsWith(".jar");
+					}
+				})) {
+					map.put(new Package(file).getName(), file);
+				}
+			}
+		}
 		final String classpath[] = System.getProperty("java.class.path").split(File.pathSeparator);
 		for (final String str : classpath) {
 			final File file = new File(str);
-			if (file.isFile()) {
+			if (file.isFile() && file.getName().endsWith(".jar")) {
 				map.put(new Package(file).getName(), file);
 			}
 		}
@@ -50,7 +64,9 @@ public class PackageManager {
 				final String cp = (String)manifest.getMainAttributes().get(Attributes.Name.CLASS_PATH);
 				if (cp != null) for (final String str : cp.split(" ")) {
 					final File file = new File(jar.getParentFile(), str);
-					map.put(new Package(file).getName(), file);
+					if (file.isFile() && file.getName().endsWith(".jar")) {
+						map.put(new Package(file).getName(), file);
+					}
 				}
 			} catch (final IOException e) {}
 		}
