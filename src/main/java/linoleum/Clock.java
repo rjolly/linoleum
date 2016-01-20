@@ -1,8 +1,8 @@
 package linoleum;
 
-import linoleum.application.Frame;
+import javax.swing.JInternalFrame;
 
-public class Clock extends Frame {
+public class Clock extends JInternalFrame {
 
 	public Clock() {
 		initComponents();

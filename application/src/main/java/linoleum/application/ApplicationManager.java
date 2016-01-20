@@ -122,8 +122,35 @@ public class ApplicationManager extends JInternalFrame {
 	}
 
 	public final void refresh() {
-		for (final App app : ServiceLoader.load(App.class)) {
-			process(app);
+		for (final JInternalFrame frame : ServiceLoader.load(JInternalFrame.class)) {
+			if (frame instanceof App) {
+				process((App)frame);
+			} else {
+				process(new App() {
+
+					@Override
+					public String getName() {
+						final String name = frame.getName();
+						return name == null?frame.getClass().getSimpleName():name;
+					}
+
+					@Override
+					public Icon getIcon() {
+						return null;
+					}
+
+					@Override
+					public String getMimeType() {
+						return null;
+					}
+
+					@Override
+					public JInternalFrame open(final JDesktopPane desktop, URI uri) {
+						if (frame.getDesktopPane() == null) desktop.add(frame);
+						return frame;
+					}
+				});
+			}
 		}
 		for (final Application app : ServiceLoader.load(Application.class)) {
 			process(new App() {
