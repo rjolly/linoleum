@@ -113,6 +113,14 @@ public class Frame extends JInternalFrame implements App {
                                 formInternalFrameDeactivated(evt);
                         }
                 });
+                addComponentListener(new java.awt.event.ComponentAdapter() {
+                        public void componentResized(java.awt.event.ComponentEvent evt) {
+                                formComponentResized(evt);
+                        }
+                        public void componentMoved(java.awt.event.ComponentEvent evt) {
+                                formComponentMoved(evt);
+                        }
+                });
 
                 pack();
         }// </editor-fold>//GEN-END:initComponents
@@ -127,6 +135,12 @@ public class Frame extends JInternalFrame implements App {
 		final JRootPane panel = getDesktopPane().getRootPane();
 		if (menuBar != null) panel.setJMenuBar(savedMenuBar);
         }//GEN-LAST:event_formInternalFrameDeactivated
+
+        private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
+        }//GEN-LAST:event_formComponentMoved
+
+        private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
+        }//GEN-LAST:event_formComponentResized
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         // End of variables declaration//GEN-END:variables
