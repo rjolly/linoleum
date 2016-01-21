@@ -1,11 +1,12 @@
 package linoleum;
 
-import javax.swing.JInternalFrame;
+import linoleum.application.Frame;
 
-public class Clock extends JInternalFrame {
+public class Clock extends Frame {
 
 	public Clock() {
 		initComponents();
+		setSingle(true);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -27,6 +27,7 @@ public class Desktop extends JFrame {
 		final PackageManager pkgs = PackageManager.instance;
 		apps = new ApplicationManager();
 		pkgs.addClassPathListener(apps);
+		apps.loadBounds();
 		desktopPane.add(apps);
 		devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 		bounds = getBounds();
@@ -38,6 +39,13 @@ public class Desktop extends JFrame {
 
 	private void about() {
 		JOptionPane.showInternalMessageDialog(desktopPane, ABOUTMSG);
+	}
+
+	private void content() {
+		try {
+			final File file = new File(new File(System.getProperty("java.home")), "../docs/api/index.html").getCanonicalFile();
+			if (file.exists()) apps.open(file.toURI());
+		} catch (final IOException ex) {}
 	}
 
 	private void fullScreen() {
@@ -253,10 +261,7 @@ public class Desktop extends JFrame {
         }//GEN-LAST:event_formComponentResized
 
         private void contentMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contentMenuItemActionPerformed
-		try {
-			final File file = new File(new File(System.getProperty("java.home")), "../docs/api/index.html").getCanonicalFile();
-			if (file.exists()) apps.open(file.toURI());
-		} catch (final IOException ex) {}
+		content();
         }//GEN-LAST:event_contentMenuItemActionPerformed
 
 	public static void main(String args[]) {

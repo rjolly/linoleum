@@ -19,7 +19,9 @@
 
 package linoleum.application;
 
+import java.awt.Component;
 import java.net.URI;
+import java.util.prefs.Preferences;
 import javax.swing.Icon;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
@@ -89,11 +91,23 @@ public class Frame extends JInternalFrame implements App {
 	@Override
 	public final JInternalFrame open(final JDesktopPane desktop, final URI uri) {
 		final Frame frame = single?this:newInstance();
-		if (frame.getDesktopPane() == null) desktop.add(frame);
+		if (frame.getDesktopPane() == null) {
+			frame.loadBounds();
+			desktop.add(frame);
+		}
 		if (uri != null) {
 			frame.open(uri);
 		}
 		return frame;
+	}
+
+	public void loadBounds() {
+		final Preferences prefs = Preferences.userNodeForPackage(getClass());
+		final int x = prefs.getInt(getName() + ".x", getX());
+		final int y = prefs.getInt(getName() + ".y", getY());
+		final int width = prefs.getInt(getName() + ".width", getWidth());
+		final int height = prefs.getInt(getName() + ".height", getHeight());
+		setBounds(x, y, width, height);
 	}
 
 	private Frame newInstance() {
@@ -167,9 +181,23 @@ public class Frame extends JInternalFrame implements App {
         }//GEN-LAST:event_formInternalFrameDeactivated
 
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
+		final JDesktopPane desktop = getDesktopPane();
+		if (desktop != null) {
+			final Preferences prefs = Preferences.userNodeForPackage(getClass());
+			final Component c = evt.getComponent();
+			prefs.putInt(getName() + ".x", c.getX());
+			prefs.putInt(getName() + ".y", c.getY());
+		}
         }//GEN-LAST:event_formComponentMoved
 
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
+		final JDesktopPane desktop = getDesktopPane();
+		if (desktop != null) {
+			final Preferences prefs = Preferences.userNodeForPackage(getClass());
+			final Component c = evt.getComponent();
+			prefs.putInt(getName() + ".width", c.getWidth());
+			prefs.putInt(getName() + ".height", c.getHeight());
+		}
         }//GEN-LAST:event_formComponentResized
 
         // Variables declaration - do not modify//GEN-BEGIN:variables

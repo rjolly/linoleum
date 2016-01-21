@@ -1,15 +1,15 @@
 package linoleum;
 
-import java.net.URI;
 import javax.swing.ImageIcon;
-import javax.swing.JInternalFrame;
-import linoleum.application.Application;
+import linoleum.application.Frame;
 
-public class Console extends JInternalFrame implements Application {
+public class Console extends Frame {
 
 	public Console() {
 		initComponents();
 		setContentPane(new ConsolePanel());
+		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
+		setSingle(true);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -41,16 +41,4 @@ public class Console extends JInternalFrame implements Application {
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         // End of variables declaration//GEN-END:variables
-
-	public ImageIcon getIcon() {
-		return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif"));
-	}
-
-	public String getMimeType() {
-		return null;
-	}
-
-	public JInternalFrame open(final URI uri) {
-		return this;
-	}
 }

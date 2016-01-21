@@ -41,7 +41,7 @@ import javax.swing.ListCellRenderer;
 import linoleum.application.event.ClassPathListener;
 import linoleum.application.event.ClassPathChangeEvent;
 
-public class ApplicationManager extends JInternalFrame implements ClassPathListener {
+public class ApplicationManager extends Frame implements ClassPathListener {
 	private final Icon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
 	private final Map<String, App> map = new HashMap<>();
 	private final Map<String, String> apps = new HashMap<>();
