@@ -18,7 +18,6 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import javax.swing.ImageIcon;
-import javax.swing.JInternalFrame;
 import linoleum.application.ApplicationManager;
 import linoleum.application.Frame;
 
@@ -30,6 +29,7 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 
 	public ScriptShell() {
 		initComponents();
+		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
 		createScriptEngine();
 		setContentPane(new ScriptShellPanel(this));
 		new Thread(new Runnable() {
@@ -39,24 +39,6 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 				engineReady.countDown();
 			}
 		}).start();
-	}
-
-	public static class Application implements linoleum.application.Application {
-		public String getName() {
-			return ScriptShell.class.getSimpleName();
-		}
-
-		public ImageIcon getIcon() {
-			return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif"));
-		}
-
-		public String getMimeType() {
-			return null;
-		}
-
-		public JInternalFrame open(final URI uri) {
-			return new ScriptShell();
-		}
 	}
 
 	@Override

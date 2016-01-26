@@ -1,8 +1,6 @@
 linoleum.FileManager$Application
-linoleum.ScriptShell$Application
 linoleum.notepad.Notepad$Application
 linoleum.ImageViewer$Application
 linoleum.PDFViewer$Application
 linoleum.ObjLoad$Application
 linoleum.Browser$Application
-linoleum.MediaPlayer

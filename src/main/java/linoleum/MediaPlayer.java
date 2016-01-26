@@ -21,9 +21,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
-import linoleum.application.Application;
+import linoleum.application.Frame;
 
-public class MediaPlayer extends JInternalFrame implements Application {
+public class MediaPlayer extends Frame {
 	private Player player;
 	private static final String audio = "audio/*";
 	private static final String video = "video/*";
@@ -36,22 +36,13 @@ public class MediaPlayer extends JInternalFrame implements Application {
 
 	public MediaPlayer() {
 		initComponents();
+		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Movie24.gif")));
+		setMimeType(audio + ":" + video);
+		setSingle(true);
 	}
 
-	public ImageIcon getIcon() {
-		return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Movie24.gif"));
-	}
-
-	public String getMimeType() {
-		return audio + ":" + video;
-	}
-
-	public JInternalFrame open(final URI uri) {
-		if (uri != null) init(Paths.get(uri).toFile());
-		return this;
-	}
-
-	public void init(final File file) {
+	protected void open(final URI uri) {
+		final File file = Paths.get(uri).toFile();
 		stop();
 		files = file.getParentFile().listFiles(new FileFilter() {
 			public boolean accept(final File file) {
@@ -71,6 +62,10 @@ public class MediaPlayer extends JInternalFrame implements Application {
 			return type.match(audio) || type.match(video);
 		} catch (final Exception ex) {}
 		return false;
+	}
+
+	protected void close() {
+		stop();
 	}
 
 	private ControllerListener listener = new ControllerListener() {
@@ -189,24 +184,6 @@ public class MediaPlayer extends JInternalFrame implements Application {
                 setClosable(true);
                 setIconifiable(true);
                 setTitle("Media Player");
-                setName("MediaPlayer");
-                addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-                        public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
-                        }
-                        public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
-                                formInternalFrameClosing(evt);
-                        }
-                        public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
-                        }
-                        public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
-                        }
-                        public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
-                        }
-                        public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
-                        }
-                        public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
-                        }
-                });
 
                 jPanel1.setLayout(new java.awt.BorderLayout());
                 getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -263,10 +240,6 @@ public class MediaPlayer extends JInternalFrame implements Application {
         private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 		play();
         }//GEN-LAST:event_jButton1ActionPerformed
-
-        private void formInternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosing
-		stop();
-        }//GEN-LAST:event_formInternalFrameClosing
 
         private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
 		stop();
