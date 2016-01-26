@@ -20,6 +20,7 @@
 package linoleum.application;
 
 import java.awt.Component;
+import java.beans.PropertyVetoException;
 import java.net.URI;
 import java.util.prefs.Preferences;
 import javax.swing.Icon;
@@ -89,16 +90,27 @@ public class Frame extends JInternalFrame implements App {
 	}
 
 	@Override
-	public final JInternalFrame open(final JDesktopPane desktop, final URI uri) {
+	public final void open(final JDesktopPane desktop, final URI uri) {
 		final Frame frame = single?this:newInstance();
 		if (frame.getDesktopPane() == null) {
 			frame.loadBounds();
 			desktop.add(frame);
 		}
+		frame.select();
 		if (uri != null) {
 			frame.open(uri);
 		}
-		return frame;
+	}
+
+	public void select() {
+		setVisible(true);
+		try {
+			if (isIcon()) {
+				setIcon(false);
+			} else {
+				setSelected(true);
+			}
+		} catch (final PropertyVetoException ex) {}
 	}
 
 	public void loadBounds() {

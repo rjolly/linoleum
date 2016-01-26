@@ -108,15 +108,7 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 
 	public void open(final String name, final URI uri) {
 		if (map.containsKey(name)) {
-			final JInternalFrame frame = map.get(name).open(getDesktopPane(), uri);
-			frame.setVisible(true);
-			try {
-				if (frame.isIcon()) {
-					frame.setIcon(false);
-				} else {
-					frame.setSelected(true);
-				}
-			} catch (final PropertyVetoException ex) {}
+			map.get(name).open(getDesktopPane(), uri);
 		}
 	}
 
@@ -157,9 +149,9 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 					}
 
 					@Override
-					public JInternalFrame open(final JDesktopPane desktop, URI uri) {
+					public void open(final JDesktopPane desktop, URI uri) {
 						if (frame.getDesktopPane() == null) desktop.add(frame);
-						return frame;
+						select(frame);
 					}
 				});
 			}
@@ -183,13 +175,27 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 				}
 
 				@Override
-				public JInternalFrame open(final JDesktopPane desktop, URI uri) {
+				public void open(final JDesktopPane desktop, URI uri) {
 					final JInternalFrame frame = app.open(uri);
-					if (frame.getDesktopPane() == null) desktop.add(frame);
-					return frame;
+					if (frame.getDesktopPane() == null) {
+						if (frame instanceof Frame) ((Frame)frame).loadBounds();
+						desktop.add(frame);
+					}
+					select(frame);
 				}
 			});
 		}
+	}
+
+	void select(final JInternalFrame frame) {
+		frame.setVisible(true);
+		try {
+			if (frame.isIcon()) {
+				frame.setIcon(false);
+			} else {
+				frame.setSelected(true);
+			}
+		} catch (final PropertyVetoException ex) {}
 	}
 
 	private final void process(final App app) {

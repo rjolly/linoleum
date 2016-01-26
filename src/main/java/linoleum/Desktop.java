@@ -34,7 +34,7 @@ public class Desktop extends JFrame {
 	}
 
 	private void open() {
-		apps.setVisible(true);
+		apps.select();
 	}
 
 	private void about() {
