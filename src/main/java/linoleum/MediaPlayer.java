@@ -41,8 +41,8 @@ public class MediaPlayer extends Frame {
 		setSingle(true);
 	}
 
-	protected void open(final URI uri) {
-		final File file = Paths.get(uri).toFile();
+	protected void open() {
+		final File file = Paths.get(getURI()).toFile();
 		stop();
 		files = file.getParentFile().listFiles(new FileFilter() {
 			public boolean accept(final File file) {
@@ -51,7 +51,7 @@ public class MediaPlayer extends Frame {
 		});
 		Arrays.sort(files);
 		index = Arrays.binarySearch(files, file);
-		preopen();
+		prepare();
 		play();
 	}
 
@@ -77,7 +77,7 @@ public class MediaPlayer extends Frame {
 					public void run() {
 						stop();
 						if (files.length > 0) index = (index + 1) % files.length;
-						preopen();
+						prepare();
 						if (index > 0) {
 							play();
 						}
@@ -87,14 +87,14 @@ public class MediaPlayer extends Frame {
 		}
 	};
 
-	private void preopen() {
+	private void prepare() {
 		if (index < files.length) {
 			final File file = files[index];
 			setTitle(file.getName());
 		}
 	}
 
-	private void open() {
+	private void init() {
 		if (index < files.length) {
 			final File file = files[index];
 			try {
@@ -132,7 +132,7 @@ public class MediaPlayer extends Frame {
 
 	private void play() {
 		if (player == null) {
-			open();
+			init();
 		}
 		if (player != null) {
 			if (player.getState() == Player.Started) {
@@ -244,13 +244,13 @@ public class MediaPlayer extends Frame {
         private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
 		stop();
 		if (files.length > 0) index = (index + 1) % files.length;
-		preopen();
+		prepare();
         }//GEN-LAST:event_jButton3ActionPerformed
 
         private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
 		stop();
 		if (files.length > 0) index = (index - 1 + files.length) % files.length;
-		preopen();
+		prepare();
         }//GEN-LAST:event_jButton2ActionPerformed
 
         private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed

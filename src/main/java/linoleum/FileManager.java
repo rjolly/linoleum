@@ -16,21 +16,17 @@ import javax.swing.SwingUtilities;
 import linoleum.application.Frame;
 
 public class FileManager extends Frame {
-	private boolean closing=false;
+	private boolean closing;
 	private final Thread thread;
 
-	public FileManager(final File file) {
+	public FileManager() {
 		initComponents();
+		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
 		thread = new Thread() {
 
 			@Override
 			public void run() {
 				try (final WatchService service = FileSystems.getDefault().newWatchService()) {
-					SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							chooser.setCurrentDirectory(file);
-						}
-					});
 					WatchKey key = register(service);
 					for (;;) {
 						try {
@@ -60,25 +56,28 @@ public class FileManager extends Frame {
 				return Paths.get(chooser.getCurrentDirectory().toURI()).register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
 			}
 		};
+	}
+
+	@Override
+	public void setURI(final URI uri) {
+		open();
+		if (uri != null) {
+			chooser.setCurrentDirectory(Paths.get(uri).toFile());
+		}
+	}
+
+	@Override
+	public URI getURI() {
+		return chooser.getCurrentDirectory().toURI();
+	}
+
+	protected void open() {
 		thread.start();
 	}
 
-	public static class Application implements linoleum.application.Application {
-		public String getName() {
-			return FileManager.class.getSimpleName();
-		}
-
-		public ImageIcon getIcon() {
-			return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif"));
-		}
-
-		public String getMimeType() {
-			return null;
-		}
-
-		public JInternalFrame open(final URI uri) {
-			return new FileManager(uri == null?null:Paths.get(uri).toFile());
-		}
+	protected void close() {
+		closing = true;
+		thread.interrupt();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -92,24 +91,6 @@ public class FileManager extends Frame {
                 setMaximizable(true);
                 setResizable(true);
                 setTitle("Files");
-                setToolTipText("");
-                addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-                        public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
-                        }
-                        public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
-                                formInternalFrameClosing(evt);
-                        }
-                        public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
-                        }
-                        public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
-                        }
-                        public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
-                        }
-                        public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
-                        }
-                        public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
-                        }
-                });
 
                 chooser.setFileSelectionMode(javax.swing.JFileChooser.FILES_AND_DIRECTORIES);
                 chooser.addActionListener(new java.awt.event.ActionListener() {
@@ -145,14 +126,10 @@ public class FileManager extends Frame {
 			break;
 		case JFileChooser.CANCEL_SELECTION:
 			dispose();
+			close();
 			break;
 		}
         }//GEN-LAST:event_chooserActionPerformed
-
-        private void formInternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosing
-		closing = true;
-		thread.interrupt();
-        }//GEN-LAST:event_formInternalFrameClosing
 
         private void chooserPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_chooserPropertyChange
 		if (JFileChooser.DIRECTORY_CHANGED_PROPERTY.equals(evt.getPropertyName())) {

@@ -36,6 +36,7 @@ public class Frame extends JInternalFrame implements App {
 	private boolean single;
 	private String type;
 	private Icon icon;
+	private URI uri;
 
 	public Frame() {
 		initComponents();
@@ -89,6 +90,17 @@ public class Frame extends JInternalFrame implements App {
 		return single;
 	}
 
+	public void setURI(final URI uri) {
+		this.uri = uri;
+		if (uri != null) {
+			open();
+		}
+	}
+
+	public URI getURI() {
+		return uri;
+	}
+
 	@Override
 	public final void open(final JDesktopPane desktop, final URI uri) {
 		final Frame frame = single?this:newInstance();
@@ -97,9 +109,7 @@ public class Frame extends JInternalFrame implements App {
 			desktop.add(frame);
 		}
 		frame.select();
-		if (uri != null) {
-			frame.open(uri);
-		}
+		frame.setURI(uri);
 	}
 
 	public void select() {
@@ -130,7 +140,7 @@ public class Frame extends JInternalFrame implements App {
 		}
 	}
 
-	protected void open(final URI uri) {
+	protected void open() {
 	}
 
 	protected void close() {
