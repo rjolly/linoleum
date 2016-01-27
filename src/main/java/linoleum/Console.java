@@ -1,9 +1,9 @@
 package linoleum;
 
 import javax.swing.ImageIcon;
-import linoleum.application.Frame;
+import linoleum.application.AppFrame;
 
-public class Console extends Frame {
+public class Console extends AppFrame {
 
 	public Console() {
 		initComponents();

@@ -13,9 +13,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
-import linoleum.application.Frame;
+import linoleum.application.AppFrame;
 
-public class FileManager extends Frame {
+public class FileManager extends AppFrame {
 	private boolean closing;
 	private final Thread thread;
 

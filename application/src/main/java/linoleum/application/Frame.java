@@ -21,22 +21,16 @@ package linoleum.application;
 
 import java.awt.Component;
 import java.beans.PropertyVetoException;
-import java.net.URI;
 import java.util.prefs.Preferences;
-import javax.swing.Icon;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JRootPane;
 
-public class Frame extends JInternalFrame implements App {
+public class Frame extends JInternalFrame {
 	private ApplicationManager manager;
 	private JMenuBar savedMenuBar;
 	private JMenuBar menuBar;
-	private boolean single;
-	private String type;
-	private Icon icon;
-	private URI uri;
 
 	public Frame() {
 		initComponents();
@@ -64,54 +58,6 @@ public class Frame extends JInternalFrame implements App {
 		return menuBar;
 	}
 
-	public void setIcon(final Icon icon) {
-		this.icon = icon;
-	}
-
-	@Override
-	public Icon getIcon() {
-		return icon;
-	}
-
-	public void setMimeType(final String type) {
-		this.type = type;
-	}
-
-	@Override
-	public String getMimeType() {
-		return type;
-	}
-
-	public void setSingle(final boolean single) {
-		this.single = single;
-	}
-
-	public boolean isSingle() {
-		return single;
-	}
-
-	public void setURI(final URI uri) {
-		this.uri = uri;
-		if (uri != null) {
-			open();
-		}
-	}
-
-	public URI getURI() {
-		return uri;
-	}
-
-	@Override
-	public final void open(final JDesktopPane desktop, final URI uri) {
-		final Frame frame = single?this:newInstance();
-		if (frame.getDesktopPane() == null) {
-			frame.loadBounds();
-			desktop.add(frame);
-		}
-		frame.select();
-		frame.setURI(uri);
-	}
-
 	public void select() {
 		setVisible(true);
 		try {
@@ -132,20 +78,6 @@ public class Frame extends JInternalFrame implements App {
 		setBounds(x, y, width, height);
 	}
 
-	private Frame newInstance() {
-		try {
-			return getClass().newInstance();
-		} catch (final ReflectiveOperationException ex) {
-			throw new RuntimeException(ex);
-		}
-	}
-
-	protected void open() {
-	}
-
-	protected void close() {
-	}
-
 	/**
 	 * This method is called from within the constructor to initialize the
 	 * form. WARNING: Do NOT modify this code. The content of this method is
@@ -160,7 +92,6 @@ public class Frame extends JInternalFrame implements App {
                         public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
                         }
                         public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
-                                formInternalFrameClosing(evt);
                         }
                         public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                         }
@@ -186,10 +117,6 @@ public class Frame extends JInternalFrame implements App {
 
                 pack();
         }// </editor-fold>//GEN-END:initComponents
-
-        private void formInternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosing
-		close();
-        }//GEN-LAST:event_formInternalFrameClosing
 
         private void formInternalFrameActivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameActivated
 		final JRootPane panel = getDesktopPane().getRootPane();

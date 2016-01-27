@@ -19,9 +19,9 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import javax.swing.ImageIcon;
 import linoleum.application.ApplicationManager;
-import linoleum.application.Frame;
+import linoleum.application.AppFrame;
 
-public class ScriptShell extends Frame implements ScriptShellPanel.CommandProcessor {
+public class ScriptShell extends AppFrame implements ScriptShellPanel.CommandProcessor {
 	private volatile ScriptEngine engine;
 	private CountDownLatch engineReady = new CountDownLatch(1);
 	private String extension;
