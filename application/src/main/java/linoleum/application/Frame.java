@@ -58,6 +58,11 @@ public class Frame extends JInternalFrame {
 		return menuBar;
 	}
 
+	public void open(final JDesktopPane desktop) {
+		loadBounds();
+		desktop.add(this);
+	}
+
 	public void select() {
 		setVisible(true);
 		try {
@@ -69,7 +74,7 @@ public class Frame extends JInternalFrame {
 		} catch (final PropertyVetoException ex) {}
 	}
 
-	public void loadBounds() {
+	private void loadBounds() {
 		final Preferences prefs = Preferences.userNodeForPackage(getClass());
 		final int x = prefs.getInt(getName() + ".x", getX());
 		final int y = prefs.getInt(getName() + ".y", getY());

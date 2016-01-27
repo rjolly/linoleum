@@ -74,8 +74,7 @@ public class AppFrame extends Frame implements App {
 	public final void open(final JDesktopPane desktop, final URI uri) {
 		final AppFrame frame = single?this:newInstance();
 		if (frame.getDesktopPane() == null) {
-			frame.loadBounds();
-			desktop.add(frame);
+			frame.open(desktop);
 		}
 		frame.select();
 		frame.setURI(uri);
