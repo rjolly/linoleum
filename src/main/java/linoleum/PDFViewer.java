@@ -11,44 +11,32 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Paths;
-import javax.swing.ImageIcon;
-import javax.swing.JInternalFrame;
+import linoleum.application.AppFrame;
 
-public class PDFViewer extends JInternalFrame {
+public class PDFViewer extends AppFrame {
 	public final static String TITLE = "SwingLabs PDF Viewer";
 	private int curpage = -1;
 	private PDFFile curFile;
 	private String docName;
 	private PagePreparer pagePrep;
 
-	public static class Application implements linoleum.application.Application {
-		public String getName() {
-			return PDFViewer.class.getSimpleName();
-		}
-
-		public ImageIcon getIcon() {
-			return null;
-		}
-
-		public String getMimeType() {
-			return "application/pdf";
-		}
-
-		public JInternalFrame open(final URI uri) {
-			return new PDFViewer(uri == null?null:Paths.get(uri).toFile());
-		}
+	public PDFViewer() {
+		initComponents();
+		setMimeType("application/pdf");
+		setEnabling();
 	}
 
-	public PDFViewer(final File file) {
-		initComponents();
+	@Override
+	public AppFrame getFrame() {
+		return new PDFViewer();
+	}
+
+	@Override
+	protected void open() {
 		try {
-			if (file != null) {
-				openFile(file);
-			} else {
-				setEnabling();
-			}
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
+			openFile(Paths.get(getURI()).toFile());
+		} catch (final IOException ex) {
+			ex.printStackTrace();
 		}
 	}
 

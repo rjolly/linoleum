@@ -11,7 +11,6 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
-import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
 import linoleum.application.AppFrame;
 
@@ -19,7 +18,7 @@ public class FileManager extends AppFrame {
 	private boolean closing;
 	private final Thread thread;
 
-	public FileManager() {
+	public FileManager(final boolean start) {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
 		thread = new Thread() {
@@ -56,14 +55,16 @@ public class FileManager extends AppFrame {
 				return Paths.get(chooser.getCurrentDirectory().toURI()).register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
 			}
 		};
+		if (start) thread.start();
+	}
+
+	public FileManager() {
+		this(false);
 	}
 
 	@Override
 	public void setURI(final URI uri) {
-		open();
-		if (uri != null) {
-			chooser.setCurrentDirectory(Paths.get(uri).toFile());
-		}
+		chooser.setCurrentDirectory(Paths.get(uri).toFile());
 	}
 
 	@Override
@@ -71,10 +72,12 @@ public class FileManager extends AppFrame {
 		return chooser.getCurrentDirectory().toURI();
 	}
 
-	protected void open() {
-		thread.start();
+	@Override
+	public AppFrame getFrame() {
+		return new FileManager(true);
 	}
 
+	@Override
 	protected void close() {
 		closing = true;
 		thread.interrupt();

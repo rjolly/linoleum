@@ -11,44 +11,29 @@ import javax.activation.MimeType;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
+import linoleum.application.SingleFrame;
 
-public class ImageViewer extends JInternalFrame {
+public class ImageViewer extends SingleFrame {
 	private static final String type = "image/*";
-	private final File files[];
+	private File files[] = new File[0];
 	private int index;
 
-	public static class Application implements linoleum.application.Application {
-		public String getName() {
-			return ImageViewer.class.getSimpleName();
-		}
-
-		public ImageIcon getIcon() {
-			return null;
-		}
-
-		public String getMimeType() {
-			return type;
-		}
-
-		public JInternalFrame open(final URI uri) {
-			return new ImageViewer(uri == null?null:Paths.get(uri).toFile());
-		}
+	public ImageViewer() {
+		initComponents();
+		setMimeType(type);
 	}
 
-	public ImageViewer(final File file) {
-		initComponents();
-		if (file != null) {
-			files = file.getParentFile().listFiles(new FileFilter() {
-				public boolean accept(final File file) {
-					return canOpen(file);
-				}
-			});
-			Arrays.sort(files);
-			index = Arrays.binarySearch(files, file);
-			open();
-		} else {
-			files = new File[] {};
-		}
+	@Override
+	protected void open() {
+		final File file = Paths.get(getURI()).toFile();
+		files = file.getParentFile().listFiles(new FileFilter() {
+			public boolean accept(final File file) {
+				return canOpen(file);
+			}
+		});
+		Arrays.sort(files);
+		index = Arrays.binarySearch(files, file);
+		init();
 	}
 
 	private static boolean canOpen(final File file) {
@@ -59,7 +44,7 @@ public class ImageViewer extends JInternalFrame {
 		return false;
 	}
 
-	private void open() {
+	private void init() {
 		if (index < files.length) {
 			final File file = files[index];
 			JPanel panel = null;
@@ -122,12 +107,12 @@ public class ImageViewer extends JInternalFrame {
 
         private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
 		if (files.length > 0) index = (index - 1 + files.length) % files.length;
-		open();
+		init();
         }//GEN-LAST:event_backButtonActionPerformed
 
         private void forwardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_forwardButtonActionPerformed
 		if (files.length > 0) index = (index + 1) % files.length;
-		open();
+		init();
         }//GEN-LAST:event_forwardButtonActionPerformed
 
 

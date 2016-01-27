@@ -23,8 +23,7 @@ import java.net.URI;
 import javax.swing.Icon;
 import javax.swing.JDesktopPane;
 
-public class AppFrame extends Frame implements App {
-	private boolean single;
+public abstract class AppFrame extends Frame implements App {
 	private String type;
 	private Icon icon;
 	private URI uri;
@@ -51,40 +50,25 @@ public class AppFrame extends Frame implements App {
 		return type;
 	}
 
-	public void setSingle(final boolean single) {
-		this.single = single;
-	}
-
-	public boolean isSingle() {
-		return single;
-	}
-
 	public void setURI(final URI uri) {
 		this.uri = uri;
-		if (uri != null) {
-			open();
-		}
+		open();
 	}
 
 	public URI getURI() {
 		return uri;
 	}
 
-	@Override
+	public abstract AppFrame getFrame();
+
 	public final void open(final JDesktopPane desktop, final URI uri) {
-		final AppFrame frame = single?this:newInstance();
+		final AppFrame frame = getFrame();
 		if (frame.getDesktopPane() == null) {
 			frame.open(desktop);
 		}
 		frame.select();
-		frame.setURI(uri);
-	}
-
-	private AppFrame newInstance() {
-		try {
-			return getClass().newInstance();
-		} catch (final ReflectiveOperationException ex) {
-			throw new RuntimeException(ex);
+		if (uri != null) {
+			frame.setURI(uri);
 		}
 	}
 

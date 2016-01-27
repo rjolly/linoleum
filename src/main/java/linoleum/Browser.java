@@ -15,18 +15,18 @@ import java.util.ArrayList;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
-import javax.swing.JInternalFrame;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.Document;
 import linoleum.html.EditorKit;
 import linoleum.html.FrameURL;
+import linoleum.application.AppFrame;
 
-public class Browser extends JInternalFrame {
-	private final Icon goIcon = new javax.swing.ImageIcon(getClass().getResource("Go16.png"));
-	private final Icon stopIcon = new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
-	private final Icon reloadIcon = new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Refresh16.gif"));
+public class Browser extends AppFrame {
+	private final Icon goIcon = new ImageIcon(getClass().getResource("Go16.png"));
+	private final Icon stopIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
+	private final Icon reloadIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Refresh16.gif"));
 	private List<FrameURL> history = new ArrayList<>();
 	private final CardLayout layout;
 	private PageLoader loader;
@@ -35,26 +35,10 @@ public class Browser extends JInternalFrame {
 	private int index;
 	private URL url;
 
-	public static class Application implements linoleum.application.Application {
-		public String getName() {
-			return Browser.class.getSimpleName();
-		}
-
-		public ImageIcon getIcon() {
-			return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif"));
-		}
-
-		public String getMimeType() {
-			return "text/html";
-		}
-
-		public JInternalFrame open(final URI uri) {
-			return new Browser(uri);
-		}
-	}
-
-	public Browser(final URI uri) {
+	public Browser() {
 		initComponents();
+		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif")));
+		setMimeType("text/html");
 		update();
 		layout = (CardLayout)jPanel2.getLayout();
 		jEditorPane1.setEditorKitForContentType("text/html", new EditorKit());
@@ -83,18 +67,27 @@ public class Browser extends JInternalFrame {
 				}
 			}
 		});
-		try {
-			if (uri != null) open(uri.toURL());
-		} catch (final MalformedURLException ex) {
-			throw new RuntimeException(ex);
-		}
 	}
 
 	private void open(final String str) {
 		try {
 			open(new URL(str));
 		} catch (final MalformedURLException ex) {
-			throw new RuntimeException(ex);
+			ex.printStackTrace();
+		}
+	}
+
+	@Override
+	public AppFrame getFrame() {
+		return new Browser();
+	}
+
+	@Override
+	protected void open() {
+		try {
+			open(getURI().toURL());
+		} catch (final MalformedURLException ex) {
+			ex.printStackTrace();
 		}
 	}
 

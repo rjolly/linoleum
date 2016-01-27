@@ -1,15 +1,14 @@
 package linoleum;
 
 import javax.swing.ImageIcon;
-import linoleum.application.AppFrame;
+import linoleum.application.SingleFrame;
 
-public class Console extends AppFrame {
+public class Console extends SingleFrame {
 
 	public Console() {
 		initComponents();
 		setContentPane(new ConsolePanel());
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
-		setSingle(true);
 	}
 
 	@SuppressWarnings("unchecked")

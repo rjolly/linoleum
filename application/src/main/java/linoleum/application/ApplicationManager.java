@@ -149,7 +149,7 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 					}
 
 					@Override
-					public void open(final JDesktopPane desktop, URI uri) {
+					public void open(final JDesktopPane desktop, final URI uri) {
 						if (frame.getDesktopPane() == null) {
 							desktop.add(frame);
 						}
@@ -177,7 +177,7 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 				}
 
 				@Override
-				public void open(final JDesktopPane desktop, URI uri) {
+				public void open(final JDesktopPane desktop, final URI uri) {
 					final JInternalFrame frame = app.open(uri);
 					if (frame.getDesktopPane() == null) {
 						if (frame instanceof Frame) {
@@ -186,11 +186,7 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 							desktop.add(frame);
 						}
 					}
-					if (frame instanceof Frame) {
-						((Frame)frame).select();
-					} else {
-						select(frame);
-					}
+					select(frame);
 				}
 			});
 		}

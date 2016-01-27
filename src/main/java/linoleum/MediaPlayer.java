@@ -21,9 +21,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
-import linoleum.application.AppFrame;
+import linoleum.application.SingleFrame;
 
-public class MediaPlayer extends AppFrame {
+public class MediaPlayer extends SingleFrame {
 	private Player player;
 	private static final String audio = "audio/*";
 	private static final String video = "video/*";
@@ -38,12 +38,12 @@ public class MediaPlayer extends AppFrame {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Movie24.gif")));
 		setMimeType(audio + ":" + video);
-		setSingle(true);
 	}
 
+	@Override
 	protected void open() {
-		final File file = Paths.get(getURI()).toFile();
 		stop();
+		final File file = Paths.get(getURI()).toFile();
 		files = file.getParentFile().listFiles(new FileFilter() {
 			public boolean accept(final File file) {
 				return canOpen(file);
@@ -64,6 +64,7 @@ public class MediaPlayer extends AppFrame {
 		return false;
 	}
 
+	@Override
 	protected void close() {
 		stop();
 	}
@@ -102,8 +103,8 @@ public class MediaPlayer extends AppFrame {
 				final Component component = player.getVisualComponent();
 				if (component != null) {
 					jPanel1.add(component);
-					pack();
 				}
+				pack();
 				player.addControllerListener(listener);
 				timer = new Timer();
 				timer.schedule(new TimerTask() {
@@ -165,7 +166,6 @@ public class MediaPlayer extends AppFrame {
 			player = null;
 			jButton1.setIcon(playIcon);
 			jPanel1.removeAll();
-			pack();
 		}
 	}
 

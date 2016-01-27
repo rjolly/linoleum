@@ -1,12 +1,11 @@
 package linoleum;
 
-import linoleum.application.AppFrame;
+import linoleum.application.SingleFrame;
 
-public class Clock extends AppFrame {
+public class Clock extends SingleFrame {
 
 	public Clock() {
 		initComponents();
-		setSingle(true);
 	}
 
 	@SuppressWarnings("unchecked")
