@@ -25,6 +25,7 @@ public class PackageManager {
 	public static final PackageManager instance = new PackageManager();
 	private final File lib = new File(System.getProperty("linoleum.home", System.getProperty("user.dir")), "lib");
 	private final List<ClassPathListener> listeners = new ArrayList<>();
+	private final Map<String, File> installed = new HashMap<>();
 	private final Map<String, File> map = new HashMap<>();
 
 	private PackageManager() {
@@ -43,8 +44,8 @@ public class PackageManager {
 		listeners.remove(listener);
 	}
 
-	public File getLib() {
-		return lib;
+	public File[] installed() {
+		return installed.values().toArray(new File[0]);
 	}
 
 	private void populate() {
@@ -65,7 +66,7 @@ public class PackageManager {
 		for (final String str : classpath) {
 			final File file = new File(str);
 			if (file.isFile() && file.getName().endsWith(".jar")) {
-				map.put(new Package(file).getName(), file);
+				put(new Package(file).getName(), file);
 			}
 		}
 		if (classpath.length > 0) {
@@ -77,11 +78,16 @@ public class PackageManager {
 				if (cp != null) for (final String str : cp.split(" ")) {
 					final File file = new File(jar.getParentFile(), str);
 					if (file.isFile() && file.getName().endsWith(".jar")) {
-						map.put(new Package(file).getName(), file);
+						put(new Package(file).getName(), file);
 					}
 				}
 			} catch (final IOException e) {}
 		}
+	}
+
+	private void put(final String name, final File file) {
+		map.put(name, file);
+		installed.put(name, file);
 	}
 
 	public void install(final String name, final String conf) throws Exception {
@@ -112,7 +118,7 @@ public class PackageManager {
 		final String name = new Package(file).getName();
 		if (!map.containsKey(name)) try {
 			((ClassLoader)ClassLoader.getSystemClassLoader()).addURL(file.toURI().toURL());
-			map.put(name, file);
+			put(name, file);
 		} catch (final Exception e) {}
 	}
 }

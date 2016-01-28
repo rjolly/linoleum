@@ -6,7 +6,7 @@ function install(pkg, conf) {
 }
 
 function installed() {
-    return Packages.linoleum.PackageManager.instance.getLib().listFiles();
+    return Packages.linoleum.PackageManager.instance.installed();
 }
 
 // adapted from https://weblogs.java.net/blog/forax/archive/2006/09/using_jrunscrip.html
