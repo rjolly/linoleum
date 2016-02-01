@@ -8,7 +8,7 @@ mainClass in (Compile, packageBin) := Some("linoleum.Desktop")
 
 mainClass in (Compile, run) := Some("linoleum.Desktop")
 
-libraryDependencies := Seq("org.apache.ivy" % "ivy" % "2.4.0", "org.swinglabs" % "pdf-renderer" % "1.0.5", "javax.media" % "jmf" % "2.1.1e", "java3d" % "j3d-core" % "1.3.1", "java3d" % "j3d-core-utils" % "1.3.1", "net.java.linoleum" % "application" % "1.1", "net.java.linoleum" % "jlfgr" % "1_0")
+libraryDependencies := Seq("org.apache.ivy" % "ivy" % "2.4.0", "com.github.rjolly" % "pdf-renderer" % "140", "javax.media" % "jmf" % "2.1.1e", "java3d" % "j3d-core" % "1.3.1", "java3d" % "j3d-core-utils" % "1.3.1", "net.java.linoleum" % "application" % "1.1", "net.java.linoleum" % "jlfgr" % "1_0")
 
 autoScalaLibrary := false
 
