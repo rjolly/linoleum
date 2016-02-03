@@ -27,5 +27,5 @@ public interface App {
 	public String getName();
 	public Icon getIcon();
 	public String getMimeType();
-	public void open(JDesktopPane desktop, URI uri);
+	public void open(ApplicationManager manager, URI uri);
 }

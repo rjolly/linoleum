@@ -22,6 +22,7 @@ package linoleum.application;
 import java.net.URI;
 import javax.swing.Icon;
 import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
 
 public abstract class AppFrame extends Frame implements App {
 	private String type;
@@ -61,12 +62,16 @@ public abstract class AppFrame extends Frame implements App {
 
 	public abstract AppFrame getFrame();
 
-	public final void open(final JDesktopPane desktop, final URI uri) {
-		final AppFrame frame = getFrame();
-		if (frame.getDesktopPane() == null) {
-			frame.open(desktop);
+	public final void open(final ApplicationManager manager, final URI uri) {
+		AppFrame current = null;
+		for (final JInternalFrame frame : manager.getDesktopPane().getAllFrames()) {
+			if (getClass().isAssignableFrom(frame.getClass())) current = (AppFrame)frame;
 		}
-		frame.select();
+		final AppFrame frame = current != null && (uri == null || current.getURI() == null || uri.equals(current.getURI()))?current:getFrame();
+		if (frame.getDesktopPane() == null) {
+			frame.open(manager);
+		}
+		manager.select(frame);
 		if (uri != null) {
 			frame.setURI(uri);
 		}

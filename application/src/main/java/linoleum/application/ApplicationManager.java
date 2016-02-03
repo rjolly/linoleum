@@ -108,7 +108,7 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 
 	public void open(final String name, final URI uri) {
 		if (map.containsKey(name)) {
-			map.get(name).open(getDesktopPane(), uri);
+			map.get(name).open(this, uri);
 		}
 	}
 
@@ -149,9 +149,9 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 					}
 
 					@Override
-					public void open(final JDesktopPane desktop, final URI uri) {
+					public void open(final ApplicationManager manager, final URI uri) {
 						if (frame.getDesktopPane() == null) {
-							desktop.add(frame);
+							manager.getDesktopPane().add(frame);
 						}
 						select(frame);
 					}
@@ -177,13 +177,13 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 				}
 
 				@Override
-				public void open(final JDesktopPane desktop, final URI uri) {
+				public void open(final ApplicationManager manager, final URI uri) {
 					final JInternalFrame frame = app.open(uri);
 					if (frame.getDesktopPane() == null) {
 						if (frame instanceof Frame) {
-							((Frame)frame).open(desktop);
+							((Frame)frame).open(manager);
 						} else {
-							desktop.add(frame);
+							manager.getDesktopPane().add(frame);
 						}
 					}
 					select(frame);
@@ -201,6 +201,10 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 				frame.setSelected(true);
 			}
 		} catch (final PropertyVetoException ex) {}
+	}
+
+	public void select() {
+		select(this);
 	}
 
 	private final void process(final App app) {

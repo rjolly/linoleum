@@ -17,7 +17,6 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import javax.swing.ImageIcon;
-import linoleum.application.ApplicationManager;
 import linoleum.application.AppFrame;
 
 public class ScriptShell extends AppFrame implements ScriptShellPanel.CommandProcessor {
@@ -64,11 +63,6 @@ public class ScriptShell extends AppFrame implements ScriptShellPanel.CommandPro
 			res = se.getMessage();
 		}
 		return res;
-	}
-
-	@Override
-	public ApplicationManager getApplicationManager() {
-		return super.getApplicationManager();
 	}
 
 	@Override

@@ -41,10 +41,7 @@ public class Frame extends JInternalFrame {
 		initComponents();
 	}
 
-	protected ApplicationManager getApplicationManager() {
-		if (manager == null) for (final JInternalFrame frame : getDesktopPane().getAllFrames()) {
-			if (frame instanceof ApplicationManager) manager = (ApplicationManager)frame;
-		}
+	public ApplicationManager getApplicationManager() {
 		return manager;
 	}
 
@@ -63,15 +60,9 @@ public class Frame extends JInternalFrame {
 		desktop.add(this);
 	}
 
-	public void select() {
-		setVisible(true);
-		try {
-			if (isIcon()) {
-				setIcon(false);
-			} else {
-				setSelected(true);
-			}
-		} catch (final PropertyVetoException ex) {}
+	public void open(final ApplicationManager manager) {
+		open(manager.getDesktopPane());
+		this.manager = manager;
 	}
 
 	private void loadBounds() {
