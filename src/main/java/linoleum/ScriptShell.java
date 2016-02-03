@@ -28,16 +28,17 @@ public class ScriptShell extends AppFrame implements ScriptShellPanel.CommandPro
 	public ScriptShell(final boolean start) {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
+		createScriptEngine();
+		setContentPane(new ScriptShellPanel(this));
+		final Thread thread = new Thread() {
+			@Override
+			public void run() {
+				initScriptEngine();
+				engineReady.countDown();
+			}
+		};
 		if (start) {
-			createScriptEngine();
-			setContentPane(new ScriptShellPanel(this));
-			new Thread() {
-				@Override
-				public void run() {
-					initScriptEngine();
-					engineReady.countDown();
-				}
-			}.start();
+			thread.start();
 		}
 	}
 

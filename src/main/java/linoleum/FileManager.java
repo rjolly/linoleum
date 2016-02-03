@@ -55,7 +55,9 @@ public class FileManager extends AppFrame {
 				return Paths.get(chooser.getCurrentDirectory().toURI()).register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
 			}
 		};
-		if (start) thread.start();
+		if (start) {
+			thread.start();
+		}
 	}
 
 	public FileManager() {

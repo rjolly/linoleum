@@ -8,6 +8,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -83,12 +84,22 @@ public class Browser extends AppFrame {
 	}
 
 	@Override
-	protected void open() {
+	public void setURI(final URI uri) {
 		try {
-			open(getURI().toURL());
+			open(uri.toURL());
 		} catch (final MalformedURLException ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	@Override
+	public URI getURI() {
+		try {
+			return current == null?null:current.getURL().toURI();
+		} catch (final URISyntaxException ex) {
+			ex.printStackTrace();
+		}
+		return null;
 	}
 
 	private void open(final URL url) {
