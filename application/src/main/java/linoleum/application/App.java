@@ -28,4 +28,5 @@ public interface App {
 	public Icon getIcon();
 	public String getMimeType();
 	public void open(ApplicationManager manager, URI uri);
+	public void open(ApplicationManager manager);
 }

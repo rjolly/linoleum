@@ -45,8 +45,7 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 	private final Icon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
 	private final Map<String, App> map = new HashMap<>();
 	private final Map<String, String> apps = new HashMap<>();
-	private final Map<String, Icon> icons = new HashMap<>();
-	private final DefaultListModel<String> model = new DefaultListModel<>();
+	private final DefaultListModel<App> model = new DefaultListModel<>();
 	private final ListCellRenderer renderer = new Renderer();
 
 	private class Renderer extends JLabel implements ListCellRenderer {
@@ -69,9 +68,10 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 				setForeground(list.getForeground());
 			}
 
-			final String name = (String)value;
-			setIcon(icons.get(name));
-			setText(name);
+			final App app = (App)value;
+			final Icon icon = app.getIcon();
+			setIcon(icon == null?defaultIcon:icon);
+			setText(app.getName());
 			setFont(list.getFont());
 
 			return this;
@@ -113,7 +113,7 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 	}
 
 	private void open(final int index) {
-		open(model.getElementAt(index), null);
+		model.getElementAt(index).open(this);
 	}
 
 	public void classPathChanged(final ClassPathChangeEvent e) {
@@ -150,6 +150,11 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 
 					@Override
 					public void open(final ApplicationManager manager, final URI uri) {
+						open(manager);
+					}
+
+					@Override
+					public void open(final ApplicationManager manager) {
 						if (frame.getDesktopPane() == null) {
 							manager.getDesktopPane().add(frame);
 						}
@@ -188,6 +193,11 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 					}
 					select(frame);
 				}
+
+				@Override
+				public void open(final ApplicationManager manager) {
+					open(manager, null);
+				}
 			});
 		}
 	}
@@ -211,13 +221,11 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 		final String name = app.getName();
 		if (!map.containsKey(name)) {
 			map.put(name, app);
-			final Icon icon = app.getIcon();
-			icons.put(name, icon == null?defaultIcon:icon);
 			final String type = app.getMimeType();
 			if (type != null) for (final String s : type.split(":")) apps.put(s, name);
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
-					model.addElement(name);
+					model.addElement(app);
 				}
 			});
 		}
