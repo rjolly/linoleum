@@ -41,6 +41,14 @@ public class Frame extends JInternalFrame {
 		initComponents();
 	}
 
+	public void setApplicationManager(final ApplicationManager manager) {
+		if (getDesktopPane() == null) {
+			open(manager.getDesktopPane());
+			this.manager = manager;
+		}
+		manager.select(this);
+	}
+
 	public ApplicationManager getApplicationManager() {
 		return manager;
 	}
@@ -58,11 +66,6 @@ public class Frame extends JInternalFrame {
 	public void open(final JDesktopPane desktop) {
 		loadBounds();
 		desktop.add(this);
-	}
-
-	public void open(final ApplicationManager manager) {
-		open(manager.getDesktopPane());
-		this.manager = manager;
 	}
 
 	private void loadBounds() {

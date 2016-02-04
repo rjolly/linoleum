@@ -63,18 +63,28 @@ public abstract class AppFrame extends Frame implements App {
 	public abstract AppFrame getFrame();
 
 	public final void open(final ApplicationManager manager, final URI uri) {
-		AppFrame current = null;
-		for (final JInternalFrame frame : manager.getDesktopPane().getAllFrames()) {
-			if (getClass().isAssignableFrom(frame.getClass())) current = (AppFrame)frame;
-		}
-		final AppFrame frame = current != null && (uri == null || current.getURI() == null || uri.equals(current.getURI()))?current:getFrame();
-		if (frame.getDesktopPane() == null) {
-			frame.open(manager);
-		}
-		manager.select(frame);
-		if (uri != null) {
+		final AppFrame frame = find(manager.getDesktopPane(), uri);
+		frame.setApplicationManager(manager);
+		if (!uri.equals(frame.getURI())) {
 			frame.setURI(uri);
 		}
+	}
+
+	private AppFrame find(final JDesktopPane desktop, final URI uri) {
+		for (final JInternalFrame c : desktop.getAllFrames()) {
+			if (getClass().isAssignableFrom(c.getClass())) {
+				final AppFrame frame = (AppFrame)c;
+				if (frame.getURI() == null || uri.equals(frame.getURI())) {
+					return frame;
+				}
+			}
+		}
+		return getFrame();
+	}
+
+	public final void open(final ApplicationManager manager) {
+		final AppFrame frame = getFrame();
+		frame.setApplicationManager(manager);
 	}
 
 	protected void open() {

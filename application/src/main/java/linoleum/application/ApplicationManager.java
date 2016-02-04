@@ -184,14 +184,14 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 				@Override
 				public void open(final ApplicationManager manager, final URI uri) {
 					final JInternalFrame frame = app.open(uri);
-					if (frame.getDesktopPane() == null) {
-						if (frame instanceof Frame) {
-							((Frame)frame).open(manager);
-						} else {
+					if (frame instanceof Frame) {
+						((Frame)frame).setApplicationManager(manager);
+					} else {
+						if (frame.getDesktopPane() == null) {
 							manager.getDesktopPane().add(frame);
 						}
+						select(frame);
 					}
-					select(frame);
 				}
 
 				@Override
