@@ -11,9 +11,9 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Paths;
-import linoleum.application.AppFrame;
+import linoleum.application.Frame;
 
-public class PDFViewer extends AppFrame {
+public class PDFViewer extends Frame {
 	public final static String TITLE = "SwingLabs PDF Viewer";
 	private int curpage = -1;
 	private PDFFile curFile;
@@ -27,7 +27,7 @@ public class PDFViewer extends AppFrame {
 	}
 
 	@Override
-	public AppFrame getFrame() {
+	public Frame getFrame() {
 		return new PDFViewer();
 	}
 

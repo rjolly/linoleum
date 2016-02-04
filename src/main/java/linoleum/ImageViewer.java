@@ -9,11 +9,10 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import javax.activation.MimeType;
 import javax.swing.ImageIcon;
-import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
-import linoleum.application.SingleFrame;
+import linoleum.application.Frame;
 
-public class ImageViewer extends SingleFrame {
+public class ImageViewer extends Frame {
 	private static final String type = "image/*";
 	private File files[] = new File[0];
 	private int index;

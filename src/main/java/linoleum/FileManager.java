@@ -12,11 +12,11 @@ import java.nio.file.WatchService;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
-import linoleum.application.AppFrame;
+import linoleum.application.Frame;
 
-public class FileManager extends AppFrame {
-	private boolean closing;
+public class FileManager extends Frame {
 	private final Thread thread;
+	private boolean closing;
 
 	public FileManager(final boolean start) {
 		initComponents();
@@ -52,7 +52,7 @@ public class FileManager extends AppFrame {
 			}
 
 			private WatchKey register(final WatchService service) throws IOException {
-				return Paths.get(chooser.getCurrentDirectory().toURI()).register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
+				return Paths.get(getURI()).register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
 			}
 		};
 		if (start) {
@@ -75,7 +75,7 @@ public class FileManager extends AppFrame {
 	}
 
 	@Override
-	public AppFrame getFrame() {
+	public Frame getFrame() {
 		return new FileManager(true);
 	}
 

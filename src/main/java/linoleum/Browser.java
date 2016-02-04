@@ -22,9 +22,9 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.Document;
 import linoleum.html.EditorKit;
 import linoleum.html.FrameURL;
-import linoleum.application.AppFrame;
+import linoleum.application.Frame;
 
-public class Browser extends AppFrame {
+public class Browser extends Frame {
 	private final Icon goIcon = new ImageIcon(getClass().getResource("Go16.png"));
 	private final Icon stopIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
 	private final Icon reloadIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Refresh16.gif"));
@@ -79,7 +79,7 @@ public class Browser extends AppFrame {
 	}
 
 	@Override
-	public AppFrame getFrame() {
+	public Frame getFrame() {
 		return new Browser();
 	}
 

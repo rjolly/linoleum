@@ -21,16 +21,21 @@ package linoleum.application;
 
 import java.awt.Component;
 import java.beans.PropertyVetoException;
+import java.net.URI;
 import java.util.prefs.Preferences;
+import javax.swing.Icon;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JRootPane;
 
-public class Frame extends JInternalFrame {
+public class Frame extends JInternalFrame implements App {
 	private ApplicationManager manager;
 	private JMenuBar savedMenuBar;
 	private JMenuBar menuBar;
+	private String type;
+	private Icon icon;
+	private URI uri;
 
 	public Frame() {
 		initComponents();
@@ -63,6 +68,68 @@ public class Frame extends JInternalFrame {
 		return menuBar;
 	}
 
+	public void setIcon(final Icon icon) {
+		this.icon = icon;
+	}
+
+	@Override
+	public Icon getIcon() {
+		return icon;
+	}
+
+	public void setMimeType(final String type) {
+		this.type = type;
+	}
+
+	@Override
+	public String getMimeType() {
+		return type;
+	}
+
+	public void setURI(final URI uri) {
+		this.uri = uri;
+		open();
+	}
+
+	public URI getURI() {
+		return uri;
+	}
+
+	protected Frame getFrame() {
+		return this;
+	}
+
+	public final void open(final ApplicationManager manager, final URI uri) {
+		final Frame frame = find(manager.getDesktopPane(), uri);
+		frame.setApplicationManager(manager);
+		if (!uri.equals(frame.getURI())) {
+			frame.setURI(uri);
+		}
+	}
+
+	public final void open(final ApplicationManager manager) {
+		final Frame frame = getFrame();
+		frame.setApplicationManager(manager);
+	}
+
+	private Frame find(final JDesktopPane desktop, final URI uri) {
+		for (final JInternalFrame c : desktop.getAllFrames()) {
+			if (getClass().isAssignableFrom(c.getClass())) {
+				final Frame frame = (Frame)c;
+				if (frame.getURI() == null || uri.equals(frame.getURI())) {
+					return frame;
+				}
+			}
+		}
+		return getFrame();
+	}
+
+	protected void open() {
+	}
+
+	protected void close() {
+	}
+
 	public void open(final JDesktopPane desktop) {
 		loadBounds();
 		desktop.add(this);
@@ -91,6 +158,7 @@ public class Frame extends JInternalFrame {
                         public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
                         }
                         public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+                                formInternalFrameClosing(evt);
                         }
                         public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                         }
@@ -116,6 +184,10 @@ public class Frame extends JInternalFrame {
 
                 pack();
         }// </editor-fold>//GEN-END:initComponents
+
+        private void formInternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosing
+		close();
+        }//GEN-LAST:event_formInternalFrameClosing
 
         private void formInternalFrameActivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameActivated
 		final JRootPane panel = getDesktopPane().getRootPane();

@@ -11,9 +11,9 @@ import java.net.URL;
 import javax.swing.JPanel;
 import com.sun.j3d.loaders.Scene;
 import com.sun.j3d.loaders.objectfile.ObjectFile;
-import linoleum.application.SingleFrame;
+import linoleum.application.Frame;
 
-public class ObjLoad extends SingleFrame {
+public class ObjLoad extends Frame {
 
     private final boolean spin = false;
     private final boolean noTriangulate = false;

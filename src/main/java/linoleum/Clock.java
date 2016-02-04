@@ -1,8 +1,8 @@
 package linoleum;
 
-import linoleum.application.SingleFrame;
+import linoleum.application.Frame;
 
-public class Clock extends SingleFrame {
+public class Clock extends Frame {
 
 	public Clock() {
 		initComponents();

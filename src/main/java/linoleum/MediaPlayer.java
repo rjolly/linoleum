@@ -21,9 +21,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
-import linoleum.application.SingleFrame;
+import linoleum.application.Frame;
 
-public class MediaPlayer extends SingleFrame {
+public class MediaPlayer extends Frame {
 	private Player player;
 	private static final String audio = "audio/*";
 	private static final String video = "video/*";
