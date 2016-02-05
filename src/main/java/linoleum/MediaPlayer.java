@@ -29,7 +29,7 @@ public class MediaPlayer extends Frame {
 	private static final String video = "video/*";
 	private final Icon playIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"));
 	private final Icon pauseIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Pause16.gif"));
-	private File files[] = new File[] {};
+	private File files[] = new File[0];
 	private boolean slide;
 	private Timer timer;
 	private int index;
@@ -41,9 +41,9 @@ public class MediaPlayer extends Frame {
 	}
 
 	@Override
-	protected void open() {
+	public void setURI(final URI uri) {
 		stop();
-		final File file = Paths.get(getURI()).toFile();
+		final File file = Paths.get(uri).toFile();
 		files = file.getParentFile().listFiles(new FileFilter() {
 			public boolean accept(final File file) {
 				return canOpen(file);
@@ -67,6 +67,9 @@ public class MediaPlayer extends Frame {
 	@Override
 	protected void close() {
 		stop();
+		setTitle("Media Player");
+		files = new File[0];
+		index = 0;
 	}
 
 	private ControllerListener listener = new ControllerListener() {
@@ -87,6 +90,14 @@ public class MediaPlayer extends Frame {
 			}
 		}
 	};
+
+	@Override
+	public URI getURI() {
+		if (index < files.length) {
+			return files[index].toURI();
+		}
+		return null;
+	}
 
 	private void prepare() {
 		if (index < files.length) {

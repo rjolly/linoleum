@@ -23,8 +23,8 @@ public class ImageViewer extends Frame {
 	}
 
 	@Override
-	protected void open() {
-		final File file = Paths.get(getURI()).toFile();
+	public void setURI(final URI uri) {
+		final File file = Paths.get(uri).toFile();
 		files = file.getParentFile().listFiles(new FileFilter() {
 			public boolean accept(final File file) {
 				return canOpen(file);
@@ -43,6 +43,14 @@ public class ImageViewer extends Frame {
 		return false;
 	}
 
+	@Override
+	public URI getURI() {
+		if (index < files.length) {
+			return files[index].toURI();
+		}
+		return null;
+	}
+
 	private void init() {
 		if (index < files.length) {
 			final File file = files[index];
@@ -53,6 +61,14 @@ public class ImageViewer extends Frame {
 			jScrollPane1.setViewportView(panel);
 			setTitle(file.getName());
 		}
+	}
+
+	@Override
+	protected void close() {
+		jScrollPane1.setViewportView(null);
+		setTitle("Image Viewer");
+		files = new File[0];
+		index = 0;
 	}
 
 	@SuppressWarnings("unchecked")
