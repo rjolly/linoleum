@@ -7,7 +7,6 @@ import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Paths;
@@ -19,6 +18,7 @@ public class PDFViewer extends Frame {
 	private PDFFile curFile;
 	private String docName;
 	private PagePreparer pagePrep;
+	private PagePanel page;
 
 	public PDFViewer() {
 		initComponents();
@@ -57,11 +57,11 @@ public class PDFViewer extends Frame {
 		final PDFFile newfile = new PDFFile(buf);
 
 		// set up our document
-		this.curFile = newfile;
+		curFile = newfile;
 		docName = name;
 		setTitle(TITLE + ": " + docName);
-
-		setEnabling();
+		page = new PagePanel(jScrollPane1.getSize());
+		jScrollPane1.setViewportView(page);
 
 		// display page 1.
 		gotoPage(0);
@@ -104,7 +104,7 @@ public class PDFViewer extends Frame {
 
 	public final void setEnabling() {
 		boolean fileavailable = curFile != null;
-		boolean pageshown = page.getPage() != null;
+		boolean pageshown = page != null && page.getPage() != null;
 
 		pageField.setEnabled(fileavailable);
 		prevButton.setEnabled(pageshown);
@@ -145,7 +145,6 @@ public class PDFViewer extends Frame {
         private void initComponents() {
 
                 jScrollPane1 = new javax.swing.JScrollPane();
-                page = new linoleum.PagePanel();
                 jPanel1 = new javax.swing.JPanel();
                 firstButton = new javax.swing.JButton();
                 prevButton = new javax.swing.JButton();
@@ -163,8 +162,6 @@ public class PDFViewer extends Frame {
                                 formComponentResized(evt);
                         }
                 });
-
-                jScrollPane1.setViewportView(page);
 
                 firstButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/sun/pdfview/gfx/first.gif"))); // NOI18N
                 firstButton.addActionListener(new java.awt.event.ActionListener() {
@@ -242,7 +239,7 @@ public class PDFViewer extends Frame {
         }//GEN-LAST:event_lastButtonActionPerformed
 
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-                page.showPage();
+                if (page != null) page.showPage();
         }//GEN-LAST:event_formComponentResized
 
         private void pageFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pageFieldActionPerformed
@@ -255,7 +252,6 @@ public class PDFViewer extends Frame {
         private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JButton lastButton;
         private javax.swing.JButton nextButton;
-        private linoleum.PagePanel page;
         private javax.swing.JTextField pageField;
         private javax.swing.JButton prevButton;
         // End of variables declaration//GEN-END:variables

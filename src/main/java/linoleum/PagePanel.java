@@ -65,8 +65,8 @@ public class PagePanel extends JPanel implements Scrollable, ImageObserver, Mous
 
 	private static final int n = 20;
 
-	public PagePanel() {
-		setSize(getPreferredSize());
+	public PagePanel(final Dimension size) {
+		setSize(size);
 		setFocusable(true);
 		addMouseListener(this);
 		addMouseMotionListener(this);
