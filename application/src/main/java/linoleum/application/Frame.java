@@ -114,7 +114,7 @@ public class Frame extends JInternalFrame implements App {
 
 	private Frame find(final JDesktopPane desktop, final URI uri) {
 		for (final JInternalFrame c : desktop.getAllFrames()) {
-			if (getClass().isAssignableFrom(c.getClass())) {
+			if (getName().equals(c.getName()) && c instanceof Frame) {
 				final Frame frame = (Frame)c;
 				if (frame.getURI() == null || uri.equals(frame.getURI())) {
 					return frame;
