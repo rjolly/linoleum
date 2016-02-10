@@ -153,7 +153,7 @@ public class Browser extends Frame {
 				jEditorPane1.setPage(dest, this, force);
 				success = true;
 			} catch (final IOException ioe) {
-				getToolkit().beep();
+				ioe.printStackTrace();
 			}
 			return jEditorPane1.getPage();
 		}

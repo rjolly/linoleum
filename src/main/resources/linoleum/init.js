@@ -161,3 +161,11 @@ function open(name, app) {
 	frame.getApplicationManager().open(app, uri);
     }
 }
+
+function exit(code) {
+    frame.dispose();
+}
+
+function quit(code) {
+    exit(code);
+}

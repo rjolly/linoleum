@@ -112,6 +112,12 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 		}
 	}
 
+	public void open(final String name) {
+		if (map.containsKey(name)) {
+			map.get(name).open(this);
+		}
+	}
+
 	private void open(final int index) {
 		model.getElementAt(index).open(this);
 	}
