@@ -32,7 +32,7 @@ public class ImageViewer extends Frame {
 		});
 		Arrays.sort(files);
 		index = Arrays.binarySearch(files, file);
-		init();
+		open();
 	}
 
 	private static boolean canOpen(final File file) {
@@ -51,7 +51,8 @@ public class ImageViewer extends Frame {
 		return null;
 	}
 
-	private void init() {
+	@Override
+	protected void open() {
 		if (index < files.length) {
 			final File file = files[index];
 			JPanel panel = null;
@@ -122,12 +123,12 @@ public class ImageViewer extends Frame {
 
         private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
 		if (files.length > 0) index = (index - 1 + files.length) % files.length;
-		init();
+		open();
         }//GEN-LAST:event_backButtonActionPerformed
 
         private void forwardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_forwardButtonActionPerformed
 		if (files.length > 0) index = (index + 1) % files.length;
-		init();
+		open();
         }//GEN-LAST:event_forwardButtonActionPerformed
 
 

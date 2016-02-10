@@ -7,6 +7,7 @@ import javax.vecmath.*;
 import java.awt.BorderLayout;
 import java.awt.GraphicsConfiguration;
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import javax.swing.JPanel;
 import com.sun.j3d.loaders.Scene;
@@ -130,10 +131,11 @@ public class ObjLoad extends Frame {
 
 	@Override
 	protected void open() {
+		final URI uri = getURI();
 		drawingPanel.removeAll();
 		setTitle(title);
-		try {
-			final URL filename = getURI().toURL();
+		if (uri != null) try {
+			final URL filename = uri.toURL();
 			setTitle(new File(filename.getPath()).getName());
 
 			// Get the preferred graphics configuration for the default screen
@@ -157,8 +159,7 @@ public class ObjLoad extends Frame {
 
 	@Override
 	protected void close() {
-		drawingPanel.removeAll();
-		setTitle(title);
+		setURI(null);
 	}
 
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

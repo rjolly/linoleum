@@ -51,7 +51,6 @@ public class MediaPlayer extends Frame {
 		});
 		Arrays.sort(files);
 		index = Arrays.binarySearch(files, file);
-		prepare();
 		play();
 	}
 
@@ -65,33 +64,6 @@ public class MediaPlayer extends Frame {
 	}
 
 	@Override
-	protected void close() {
-		stop();
-		setTitle("Media Player");
-		files = new File[0];
-		index = 0;
-	}
-
-	private ControllerListener listener = new ControllerListener() {
-
-		@Override
-		public void controllerUpdate(ControllerEvent ce) {
-			if (ce instanceof EndOfMediaEvent) {
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						stop();
-						if (files.length > 0) index = (index + 1) % files.length;
-						prepare();
-						if (index > 0) {
-							play();
-						}
-					}
-				});
-			}
-		}
-	};
-
-	@Override
 	public URI getURI() {
 		if (index < files.length) {
 			return files[index].toURI();
@@ -99,19 +71,14 @@ public class MediaPlayer extends Frame {
 		return null;
 	}
 
-	private void prepare() {
-		if (index < files.length) {
-			final File file = files[index];
-			setTitle(file.getName());
-		}
-	}
-
-	private void init() {
+	@Override
+	protected void open() {
 		if (index < files.length) {
 			final File file = files[index];
 			try {
 				player = Manager.createRealizedPlayer(file.toURI().toURL());
 				final Component component = player.getVisualComponent();
+				setTitle(file.getName());
 				if (component != null) {
 					jPanel1.add(component);
 				}
@@ -134,7 +101,9 @@ public class MediaPlayer extends Frame {
 						}
 					}
 				}, 0, 1000);
-			} catch (final Exception ex) {}
+			} catch (final Exception ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 
@@ -142,9 +111,35 @@ public class MediaPlayer extends Frame {
 		return String.format("%tT", 82800000+(time.getNanoseconds()/1000000));
 	}
 
+	@Override
+	protected void close() {
+		stop();
+		setTitle("Media Player");
+		files = new File[0];
+		index = 0;
+	}
+
+	private ControllerListener listener = new ControllerListener() {
+
+		@Override
+		public void controllerUpdate(ControllerEvent ce) {
+			if (ce instanceof EndOfMediaEvent) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						stop();
+						if (index + 1 < files.length) {
+							index += 1;
+							play();
+						}
+					}
+				});
+			}
+		}
+	};
+
 	private void play() {
 		if (player == null) {
-			init();
+			open();
 		}
 		if (player != null) {
 			if (player.getState() == Player.Started) {
@@ -255,13 +250,13 @@ public class MediaPlayer extends Frame {
         private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
 		stop();
 		if (files.length > 0) index = (index + 1) % files.length;
-		prepare();
+		play();
         }//GEN-LAST:event_jButton3ActionPerformed
 
         private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
 		stop();
 		if (files.length > 0) index = (index - 1 + files.length) % files.length;
-		prepare();
+		play();
         }//GEN-LAST:event_jButton2ActionPerformed
 
         private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
