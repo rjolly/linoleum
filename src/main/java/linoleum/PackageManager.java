@@ -23,12 +23,13 @@ import org.apache.ivy.core.settings.IvySettings;
 
 public class PackageManager {
 	public static final PackageManager instance = new PackageManager();
-	private final File lib = new File(System.getProperty("linoleum.home", System.getProperty("user.dir")), "lib");
 	private final List<ClassPathListener> listeners = new ArrayList<>();
 	private final Map<String, File> installed = new HashMap<>();
 	private final Map<String, File> map = new HashMap<>();
+	private final File lib = new File("lib");
 
 	private PackageManager() {
+		lib.mkdir();
 		populate();
 		add(new File(new File(System.getProperty("java.home")), "../lib/tools.jar"));
 		for (final File file: lib.listFiles()) {

@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -136,7 +137,8 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		// set pre-defined global variables
 		setGlobals();
 		// load pre-defined initialization file
-		loadInitFile();
+		loadInitFile(ClassLoader.getSystemResource("com/sun/tools/script/shell/init." + extension));
+		loadInitFile(getClass().getResource("init." + extension));
 		// load current user's initialization file
 		loadUserInitFile();
 	}
@@ -147,17 +149,16 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		engine.put("frame", this);
 	}
 
-	private void loadInitFile() {
+	private void loadInitFile(final URL url) {
 		String oldFilename = (String) engine.get(ScriptEngine.FILENAME);
-		engine.put(ScriptEngine.FILENAME, "<built-in init." + extension + ">");
-		try {
-			InputStream stream = ClassLoader.getSystemResourceAsStream("com/sun/tools/script/shell/init."
-				+ extension);
-			if (stream != null) {
-				engine.eval(new InputStreamReader(new BufferedInputStream(stream)));
-			}
-		} catch (Exception exp) {
-			exp.printStackTrace();
+		if (url == null) {
+			return;
+		}
+		engine.put(ScriptEngine.FILENAME, url.getPath());
+		try (final InputStreamReader reader = new InputStreamReader(url.openStream())) {
+			engine.eval(reader);
+		} catch (final Exception ex) {
+			ex.printStackTrace();
 		} finally {
 			engine.put(ScriptEngine.FILENAME, oldFilename);
 		}
@@ -165,19 +166,15 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 
 	private void loadUserInitFile() {
 		final String oldFilename = (String) engine.get(ScriptEngine.FILENAME);
-		final String dir = System.getProperty("linoleum.home", System.getProperty("user.dir"));
-		if (dir == null) {
-			return;
-		}
-		final File file = new File(dir, "init." + extension);
+		final File file = new File("init." + extension);
 		if (!file.exists()) {
 			return;
 		}
 		engine.put(ScriptEngine.FILENAME, file.getName());
-		try {
-			engine.eval(new FileReader(file));
-		} catch (Exception exp) {
-			exp.printStackTrace();
+		try (final InputStreamReader reader = new FileReader(file)) {
+			engine.eval(reader);
+		} catch (final Exception ex) {
+			ex.printStackTrace();
 		} finally {
 			engine.put(ScriptEngine.FILENAME, oldFilename);
 		}
