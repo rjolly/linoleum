@@ -21,15 +21,31 @@ function javac(srcDir, destDir) {
     Packages.linoleum.Tools.instance.compile(fileset(srcDir, ".*\.java"), installed(), pathToFile(destDir), ["-source", "1.7", "-target", "1.7"]);
 }
 
+function javadoc(srcDir, destDir) {
+    if (srcDir == undefined) {
+	srcDir = ".";
+    }
+    if (destDir == undefined) {
+	destDir = srcDir;
+    }
+    files = fileset(srcDir, ".*\.java");
+    dir = pathToFile(destDir);
+    Packages.com.sun.tools.javadoc.Main.execute(["-d", dir].concat(files));
+}
+
 function copy(src, dest, pattern) {
     Packages.linoleum.Tools.instance.copy(pathToFile(src), fileset(src, pattern), pathToFile(dest));
 }
 
-function jar(dest, dir, pattern) {
+function jar(dest, dir, pattern, manifest) {
     if (dir == undefined) {
 	dir = ".";
     }
-    Packages.linoleum.Tools.instance.jar(pathToFile("manifest.mf"), pathToFile(dir), fileset(dir, pattern), pathToFile(dest));
+    if (manifest == undefined) {
+	Packages.linoleum.Tools.instance.jar(pathToFile(dir), fileset(dir, pattern), pathToFile(dest));
+    } else {
+	Packages.linoleum.Tools.instance.jar(pathToFile(dir), fileset(dir, pattern), pathToFile(dest), pathToFile(manifest));
+    }
 }
 
 function clean(dir) {
@@ -133,6 +149,10 @@ function run(name) {
 	array[i] = arguments[i+1];
     }
     Packages.linoleum.Tools.instance.run(name, curDir, array);
+}
+
+function javap(name) {
+    Packages.com.sun.tools.javap.Main.run(["-c", "-classpath", curDir.getCanonicalPath(), name], new java.io.PrintWriter(java.lang.System.out));
 }
 
 function pwd() {

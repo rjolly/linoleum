@@ -24,10 +24,19 @@ To install an application (or any Ivy module), in the script shell:
 To build linoleum from itself, first clone the repository by external means (for now), then in the script shell:
   cd("/path/to/linoleum");
   mkdirs("build/classes");
+  mkdirs("build/javadoc");
+  mkdirs("build/sources");
+
   javac("src/main/java", "build/classes");
   copy("src/main/resources", "build/classes");
+  javadoc("src/main/java", "build/javadoc");
+  copy("src/main/java", "build/sources");
+  copy("src/main/resources", "build/sources");
+
   mkdir("dist");
-  jar("dist/linoleum.jar", "build/classes");
+  jar("dist/linoleum.jar", "build/classes", ".*", "manifest.mf");
+  jar("dist/linoleum-javadoc.jar", "build/javadoc");
+  jar("dist/linoleum-source.jar", "build/sources");
 
 
 To publish an application:

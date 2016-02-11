@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
+import java.util.jar.Attributes;
 import javax.tools.JavaCompiler;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
@@ -50,9 +51,20 @@ public class Tools {
 		}
 	}
 
-	public void jar(final File manifest, final File dir, final File files[], final File dest) throws IOException {
+	public void jar(final File dir, final File files[], final File dest) throws IOException {
+		final Manifest manifest = new Manifest();
+		final Attributes attr = manifest.getMainAttributes();
+		attr.put(Attributes.Name.MANIFEST_VERSION, "1.0");
+		jar(dir, files, dest, manifest);
+	}
+
+	public void jar(final File dir, final File files[], final File dest, final File manifest) throws IOException {
+		jar(dir, files, dest, new Manifest(new FileInputStream(manifest)));
+	}
+
+	private void jar(final File dir, final File files[], final File dest, final Manifest manifest) throws IOException {
 		final Path path = dir.toPath();
-		try (final JarOutputStream jos = new JarOutputStream(new FileOutputStream(dest), manifest.exists()?new Manifest(new FileInputStream(manifest)):new Manifest())) {
+		try (final JarOutputStream jos = new JarOutputStream(new FileOutputStream(dest), manifest)) {
 			for (final File file : files) {
 				final JarEntry entry = new JarEntry(path.relativize(file.toPath()).toString().replace(File.separatorChar, '/'));
 				try (final InputStream is = new FileInputStream(file)) {
