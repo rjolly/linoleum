@@ -139,8 +139,12 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		// load pre-defined initialization file
 		loadInitFile(ClassLoader.getSystemResource("com/sun/tools/script/shell/init." + extension));
 		loadInitFile(getClass().getResource("init." + extension));
-		// load current user's initialization file
-		loadUserInitFile();
+		final File home = PackageManager.instance.home();
+		loadUserInitFile(new File(home, "init." + extension));
+		if (!home.equals(new File("."))) {
+			// load current user's initialization file
+			loadUserInitFile(new File("init." + extension));
+		}
 	}
 
 	// set pre-defined global variables for script
@@ -164,9 +168,8 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		}
 	}
 
-	private void loadUserInitFile() {
+	private void loadUserInitFile(final File file) {
 		final String oldFilename = (String) engine.get(ScriptEngine.FILENAME);
-		final File file = new File("init." + extension);
 		if (!file.exists()) {
 			return;
 		}

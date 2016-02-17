@@ -5,17 +5,23 @@ import java.io.File;
 public class Package {
 	private final String name;
 	private final String version;
+	private final boolean snapshot;
 
 	public Package(final File file) {
-		final String str = file.getName();
-		final String s = str.substring(0, str.lastIndexOf("."));
-		final int n = s.lastIndexOf("-");
-		if (n < 0) {
-			name = s;
-			version = "";
+		String str = file.getName();
+		str = str.substring(0, str.lastIndexOf("."));
+		int n = str.lastIndexOf("-");
+		snapshot = n > -1 && "SNAPSHOT".equals(str.substring(n + 1));
+		if (snapshot) {
+			str = str.substring(0, n);
+			n = str.lastIndexOf("-");
+		}
+		if (n > -1) {
+			name = str.substring(0, n);
+			version = str.substring(n + 1);
 		} else {
-			name = s.substring(0, n);
-			version = s.substring(n + 1);
+			name = str;
+			version = "";
 		}
 	}
 
@@ -25,5 +31,9 @@ public class Package {
 
 	public String getVersion() {
 		return version;
+	}
+
+	public boolean isSnapshot() {
+		return snapshot;
 	}
 }

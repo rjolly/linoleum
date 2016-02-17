@@ -27,13 +27,26 @@ public class PackageManager {
 	private final Map<String, File> installed = new HashMap<>();
 	private final Map<String, File> map = new HashMap<>();
 	private final File lib = new File("lib");
+	private final FileFilter filter = new FileFilter() {
+		public boolean accept(final File file) {
+			return file.isFile() && file.getName().endsWith(".jar");
+		}
+	};
 
 	private PackageManager() {
-		lib.mkdir();
 		populate();
 		add(new File(new File(System.getProperty("java.home")), "../lib/tools.jar"));
-		for (final File file: lib.listFiles()) {
-			add(file);
+		final File dir = new File(home(), "lib");
+		if (dir.isDirectory()) {
+			for (final File file: dir.listFiles(filter)) {
+				add(file);
+			}
+		}
+		lib.mkdir();
+		if (lib.isDirectory()) {
+			for (final File file: lib.listFiles(filter)) {
+				add(file);
+			}
 		}
 	}
 
@@ -49,16 +62,16 @@ public class PackageManager {
 		return installed.values().toArray(new File[0]);
 	}
 
+	public File home() {
+		return map.get("linoleum").getParentFile();
+	}
+
 	private void populate() {
 		final String extdirs[] = System.getProperty("java.ext.dirs").split(File.pathSeparator);
 		for (final String str : extdirs) {
 			final File dir = new File(str);
 			if (dir.isDirectory()) {
-				for (final File file : dir.listFiles(new FileFilter() {
-					public boolean accept(final File file) {
-						return file.isFile() && file.getName().endsWith(".jar");
-					}
-				})) {
+				for (final File file : dir.listFiles(filter)) {
 					map.put(new Package(file).getName(), file);
 				}
 			}
