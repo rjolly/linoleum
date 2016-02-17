@@ -326,8 +326,10 @@ public class Browser extends Frame {
 			linkActivated(evt);
 		} else if (evt.getEventType() == HyperlinkEvent.EventType.ENTERED) {
 			url = evt.getURL();
-			jLabel1.setText(url.toString());
-			((JEditorPane)evt.getSource()).setComponentPopupMenu(jPopupMenu1);
+			if (url != null) {
+				jLabel1.setText(url.toString());
+				((JEditorPane)evt.getSource()).setComponentPopupMenu(jPopupMenu1);
+			}
 		} else if (evt.getEventType() == HyperlinkEvent.EventType.EXITED) {
 			((JEditorPane)evt.getSource()).setComponentPopupMenu(null);
 			jLabel1.setText("");

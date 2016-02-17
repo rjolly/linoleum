@@ -8,11 +8,18 @@ import java.io.FilterInputStream;
 import java.io.BufferedInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
+import java.net.URI;
+import java.net.CookieManager;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 import javax.swing.UIManager;
 import javax.swing.JEditorPane;
 import javax.swing.SwingUtilities;
@@ -25,6 +32,13 @@ import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 
 public class EditorPane extends JEditorPane {
+	final Basic basic = new Basic(this);
+	final Map<String, String> map = new HashMap<>();
+	final CookieManager manager = new CookieManager();
+
+	public void setPage(final URL page) throws IOException {
+		setPage(new FrameURL(page), null, false);
+	}
 
 	public void setPage(final FrameURL dest, final PageLoader loader, final boolean force) throws IOException {
 		final URL page = dest.getURL();
@@ -85,6 +99,10 @@ public class EditorPane extends JEditorPane {
 			final String charset = (String) getClientProperty("charset");
 			final Reader r = (charset != null)?new InputStreamReader(in, charset):new InputStreamReader(in);
 			getEditorKit().read(r, doc, 0);
+			final URL url = (URL)doc.getProperty(Document.StreamDescriptionProperty);
+			if (url != null) {
+				map.remove(url.getHost());
+			}
 		} catch (final BadLocationException e) {
 			throw new IOException(e.getMessage());
 		} catch (final ChangedCharSetException ccse) {
@@ -101,8 +119,7 @@ public class EditorPane extends JEditorPane {
 				in.close();
 				final URL url = (URL)doc.getProperty(Document.StreamDescriptionProperty);
 				if (url != null) {
-					final URLConnection conn = url.openConnection();
-					in = conn.getInputStream();
+					in = getStream(url, null);
 				} else {
 					//there is nothing we can do to recover stream
 					throw ccse;
@@ -116,33 +133,55 @@ public class EditorPane extends JEditorPane {
 		}
 	}
 
-	protected InputStream getStream(final URL page, final PageLoader loader) throws IOException {
+	InputStream getStream(final URL page, final PageLoader loader) throws IOException {
+		return getStream(page, loader, "");
+	}
+
+	protected InputStream getStream(final URL page, final PageLoader loader, final String auth) throws IOException {
 		final URLConnection conn = page.openConnection();
+		final String host = conn.getURL().getHost();
+		if (auth.startsWith("Basic")) {
+			if (!map.containsKey(host)) {
+				map.put(host, basic.auth());
+			}
+			conn.addRequestProperty("Authorization", map.get(host));
+		}
 		if (conn instanceof HttpURLConnection) {
 			final HttpURLConnection hconn = (HttpURLConnection) conn;
 			hconn.setInstanceFollowRedirects(false);
+			useCookies(conn);
 			final Object postData = getPostData();
 			if (postData != null) {
 				handlePostData(hconn, postData);
 			}
 			final int response = hconn.getResponseCode();
 			final boolean redirect = (response >= 300 && response <= 399);
+			handleCookies(conn);
 			if (redirect) {
+				clearPostData();
 				final String loc = conn.getHeaderField("Location");
 				return getStream(loc.startsWith("http", 0)?new URL(loc):new URL(page, loc), loader);
 			}
+			if (auth.isEmpty() && response == HttpURLConnection.HTTP_UNAUTHORIZED) {
+				return getStream(page, loader, conn.getHeaderField("WWW-authenticate"));
+			}
 		}
 		handleConnectionProperties(conn);
-		loader.setLength(conn.getContentLength());
-		return new PageStream(conn.getInputStream(), loader);
+		try {
+			return new PageStream(conn.getInputStream(), loader, conn.getContentLength());
+		} catch (final IOException ex) {
+			map.remove(host);
+			throw ex;
+		}
 	}
 
 	static class PageStream extends FilterInputStream {
 		private final PageLoader loader;
 		private int n;
 
-		public PageStream(final InputStream in, final PageLoader loader) {
+		public PageStream(final InputStream in, final PageLoader loader, final int length) {
 			super(in);
+			if (loader != null) loader.setLength(length);
 			this.loader = loader;
 		}
 
@@ -151,12 +190,12 @@ public class EditorPane extends JEditorPane {
 			if (n > -1) {
 				this.n += n;
 			}
-			loader.setNumber(this.n);
+			if (loader != null) loader.setNumber(this.n);
 			return n;
 		}
 	}
 
-	private void handleConnectionProperties(final URLConnection conn) {
+	private void handleConnectionProperties(final URLConnection conn) throws IOException {
 		if (pageProperties == null) {
 			pageProperties = new Hashtable<String, Object>();
 		}
@@ -170,6 +209,43 @@ public class EditorPane extends JEditorPane {
 		if (enc != null) {
 			pageProperties.put("content-encoding", enc);
 		}
+	}
+
+	private void handleCookies(final URLConnection conn) throws IOException {
+		final Map<String, List<String>> map = new HashMap<>();
+		for (final Map.Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
+			final String key = entry.getKey();
+			if ("Set-Cookie".equals(key)) {
+				final List<String> list = new ArrayList<>();
+				for (final String value : entry.getValue()) {
+					list.add(value.replace(" -0000", " GMT"));
+				}
+				map.put(key, list);
+			} else {
+				map.put(key, entry.getValue());
+			}
+		}
+		try {
+			manager.put(conn.getURL().toURI(), map);
+		} catch (final URISyntaxException ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	private void useCookies(final URLConnection conn) throws IOException {
+		try {
+			for (final Map.Entry<String, List<String>> entry : manager.get(conn.getURL().toURI(), conn.getRequestProperties()).entrySet()) {
+				for (final String value : entry.getValue()) {
+					conn.addRequestProperty(entry.getKey(), value);
+				}
+			}
+		} catch (final URISyntaxException ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	private void clearPostData() {
+		getDocument().putProperty(PostDataProperty, null);
 	}
 
 	private Object getPostData() {
