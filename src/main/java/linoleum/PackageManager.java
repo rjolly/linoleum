@@ -5,6 +5,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.jar.Manifest;
@@ -17,9 +18,11 @@ import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.report.ResolveReport;
 import org.apache.ivy.core.resolve.ResolveOptions;
+import org.apache.ivy.core.publish.PublishOptions;
 import org.apache.ivy.core.retrieve.RetrieveOptions;
 import org.apache.ivy.core.retrieve.RetrieveReport;
-import org.apache.ivy.core.settings.IvySettings;
+import org.apache.ivy.plugins.parser.m2.PomModuleDescriptorWriter;
+import org.apache.ivy.plugins.parser.m2.PomWriterOptions;
 
 public class PackageManager {
 	public static final PackageManager instance = new PackageManager();
@@ -32,8 +35,10 @@ public class PackageManager {
 			return file.isFile() && file.getName().endsWith(".jar");
 		}
 	};
+	private final Ivy ivy = Ivy.newInstance();
 
 	private PackageManager() {
+		init();
 		populate();
 		add(new File(new File(System.getProperty("java.home")), "../lib/tools.jar"));
 		final File dir = new File(home(), "lib");
@@ -64,6 +69,19 @@ public class PackageManager {
 
 	public File home() {
 		return map.get("linoleum").getParentFile();
+	}
+
+	private void init() {
+		final File settings = new File("ivysettings.xml");
+		try {
+			if (settings.exists()) {
+				ivy.configure(settings);
+			} else {
+				ivy.configureDefault();
+			}
+		} catch (final Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	private void populate() {
@@ -104,13 +122,31 @@ public class PackageManager {
 		installed.put(name, file);
 	}
 
+	public void makepom(final File source, final File pom) throws Exception {
+		final ResolveReport resolveReport = ivy.resolve(source);
+		final ModuleDescriptor md = resolveReport.getModuleDescriptor();
+		final PomWriterOptions options = new PomWriterOptions();
+		options.setPrintIvyInfo(false);
+		PomModuleDescriptorWriter.write(md, pom, options);
+	}
+
+	public void publish(final File source, final File dir, final String resolver) throws Exception {
+		final ResolveReport resolveReport = ivy.resolve(source);
+		final ModuleDescriptor md = resolveReport.getModuleDescriptor();
+		final ModuleRevisionId mRID = md.getModuleRevisionId();
+		final String pattern[] = new String[] { dir.getPath() + "/[artifact]-[type].[ext]", dir.getPath() + "/[artifact].[ext]" };
+		final PublishOptions options = new PublishOptions();
+		options.setOverwrite(true);
+		if (resolver.startsWith("local")) {
+			options.setSrcIvyPattern(source.getParent() + "/[artifact].[ext]");
+		}
+		ivy.publish(mRID, Arrays.asList(pattern), resolver, options);
+	}
+
 	public void install(final String name, final String conf) throws Exception {
-		final IvySettings ivySettings = new IvySettings();
-		ivySettings.loadDefault();
-		final Ivy ivy = Ivy.newInstance(ivySettings);
 		final ModuleRevisionId mRID = ModuleRevisionId.parse(name);
 		final ResolveOptions resolveOptions = new ResolveOptions();
-		resolveOptions.setConfs(new String[]{conf});
+		resolveOptions.setConfs(new String[] { conf });
 		final ResolveReport resolveReport = ivy.resolve(mRID, resolveOptions, true);
 		final ModuleDescriptor md = resolveReport.getModuleDescriptor();
 		final RetrieveOptions retrieveOptions = new RetrieveOptions();

@@ -48,6 +48,23 @@ function jar(dest, dir, pattern, manifest) {
     }
 }
 
+function makepom(dest, source) {
+    if (source == undefined) {
+	source = "ivy.xml";
+    }
+    Packages.linoleum.PackageManager.instance.makepom(pathToFile(source), pathToFile(dest));
+}
+
+function publish(dir, resolver, source) {
+    if (resolver == undefined) {
+	resolver = "local";
+    }
+    if (source == undefined) {
+	source = "ivy.xml";
+    }
+    Packages.linoleum.PackageManager.instance.publish(pathToFile(source), pathToFile(dir), resolver);
+}
+
 function clean(dir) {
     if (dir == undefined) {
 	dir = ".";
@@ -90,7 +107,7 @@ function grep(pattern, dir, files) {
 	dir = ".";
     }
     function callback(file) {
-	println(java.util.regex.Pattern.compile("\\\\").matcher(file.getCanonicalPath()).replaceAll("/") + ":");
+	println(fileToPath(file) + ":");
 	cat(file, pattern);
     }
     dir = pathToFile(dir);
@@ -112,7 +129,7 @@ function fileset(path, pattern) {
 
 function find(dir, pattern, callback) {
     dir = pathToFile(dir);
-    if (!callback) callback = println;
+    if (!callback) callback = printfile;
     var files = dir.listFiles();
     for (var f in files) {
 	var file = files[f];
@@ -132,7 +149,7 @@ function find(dir, pattern, callback) {
 
 function finddir(dir, callback) {
     dir = pathToFile(dir);
-    if (!callback) callback = println;
+    if (!callback) callback = printfile;
     var files = dir.listFiles();
     for (var f in files) {
 	var file = files[f];
@@ -141,6 +158,10 @@ function finddir(dir, callback) {
 	    callback(file);
 	}
     }
+}
+
+function printfile(file) {
+    println(fileToPath(file));
 }
 
 function run(name) {
@@ -152,25 +173,35 @@ function run(name) {
 }
 
 function javap(name) {
-    Packages.com.sun.tools.javap.Main.run(["-c", "-classpath", curDir.getCanonicalPath(), name], new java.io.PrintWriter(java.lang.System.out));
+    Packages.com.sun.tools.javap.Main.run(["-c", "-classpath", curDir.getPath(), name], new java.io.PrintWriter(java.lang.System.out));
 }
 
-function pwd() {
-    println(curDir);
+function fileToPath(file) {
+    return java.util.regex.Pattern.compile("\\\\").matcher(relativize(curDir, file).getPath()).replaceAll("/");
 }
 
-function cd(target) {
-    if (target == undefined) {
-	target = sysProps["user.home"];
+function pathToFile(pathname) {
+    var file = pathname
+    if (!(file instanceof File)) {
+	file = new File(pathname);
+	if (!file.isAbsolute()) {
+	    file = new File(curDir, pathname);
+	}
     }
-    if (!(target instanceof File)) {
-	target = pathToFile(target);
+    return relativize(new File("."), file);
+}
+
+function relativize(baseDir, file) {
+    var path = file.getCanonicalPath();
+    var base = baseDir.getCanonicalPath();
+    if (path.startsWith(base)) {
+	if (path.equals(base)) {
+	    path = ".";
+	} else {
+	    path = path.substring(base.length() + 1);
+	}
     }
-    if (target.exists() && target.isDirectory()) {
-	curDir = target.getCanonicalFile();
-    } else {
-	println(target + " is not a directory");
-    }
+    return new File(path);
 }
 
 function open(name, app) {
