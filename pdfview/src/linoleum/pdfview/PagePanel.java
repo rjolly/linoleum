@@ -1,4 +1,4 @@
-package linoleum;
+package linoleum.pdfview;
 
 import com.sun.pdfview.Flag;
 import com.sun.pdfview.PDFPage;

@@ -2,7 +2,6 @@ linoleum.FileManager
 linoleum.ScriptShell
 linoleum.MediaPlayer
 linoleum.ImageViewer
-linoleum.PDFViewer
 linoleum.ObjLoad
 linoleum.Browser
 linoleum.Console
