@@ -40,7 +40,10 @@ public class PackageManager {
 	private PackageManager() {
 		init();
 		populate();
-		add(new File(new File(System.getProperty("java.home")), "../lib/tools.jar"));
+		final File tools = new File(new File(System.getProperty("java.home")), "../lib/tools.jar");
+		if (tools.exists()) {
+			add(tools);
+		}
 		final File dir = new File(home(), "lib");
 		if (dir.isDirectory()) {
 			for (final File file: dir.listFiles(filter)) {
@@ -153,7 +156,10 @@ public class PackageManager {
 		retrieveOptions.setDestArtifactPattern(lib.getPath() + "/[artifact]-[revision].[ext]");
 		final RetrieveReport retrieveReport = ivy.retrieve(md.getModuleRevisionId(), retrieveOptions);
 		for (final Object obj : retrieveReport.getCopiedFiles()) {
-			add((File)obj);
+			final File file = (File)obj;
+			if (file.getName().endsWith(".jar")) {
+				add(file);
+			}
 		}
 		fireClassPathChange(new ClassPathChangeEvent(this));
 	}
@@ -165,8 +171,9 @@ public class PackageManager {
 	}
 
 	private void add(final File file) {
-		final String name = new Package(file).getName();
-		if (!map.containsKey(name)) try {
+		final Package pkg = new Package(file);
+		final String name = pkg.getName();
+		if (!pkg.isSourcesOrJavadoc() && !map.containsKey(name)) try {
 			((ClassLoader)ClassLoader.getSystemClassLoader()).addURL(file.toURI().toURL());
 			put(name, file);
 		} catch (final Exception e) {}

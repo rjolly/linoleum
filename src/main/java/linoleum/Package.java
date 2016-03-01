@@ -3,25 +3,43 @@ package linoleum;
 import java.io.File;
 
 public class Package {
-	private final String name;
-	private final String version;
-	private final boolean snapshot;
+	private String name;
+	private String version;
+	private boolean snapshot;
+	private boolean sources;
+	private String suffix;
 
 	public Package(final File file) {
-		String str = file.getName();
-		str = str.substring(0, str.lastIndexOf("."));
-		int n = str.lastIndexOf("-");
-		snapshot = n > -1 && "SNAPSHOT".equals(str.substring(n + 1));
-		if (snapshot) {
-			str = str.substring(0, n);
-			n = str.lastIndexOf("-");
-		}
+		name = file.getName();
+		int n = name.lastIndexOf(".");
 		if (n > -1) {
-			name = str.substring(0, n);
-			version = str.substring(n + 1);
-		} else {
-			name = str;
-			version = "";
+			suffix = name.substring(n + 1);
+			name = name.substring(0, n);
+			if ("jar".equals(suffix)) {
+				n = name.lastIndexOf("-");
+				if (n > -1) {
+					version = name.substring(n + 1);
+					name = name.substring(0, n);
+					if ("sources".equals(version) || "javadoc".equals(version)) {
+						version = null;
+						sources = true;
+						n = name.lastIndexOf("-");
+						if (n > -1) {
+							version = name.substring(n + 1);
+							name = name.substring(0, n);
+							if ("SNAPSHOT".equals(version)) {
+								version = null;
+								snapshot = true;
+								n = name.lastIndexOf("-");
+								if (n > -1) {
+									version = name.substring(n + 1);
+									name = name.substring(0, n);
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -35,5 +53,13 @@ public class Package {
 
 	public boolean isSnapshot() {
 		return snapshot;
+	}
+
+	public boolean isSourcesOrJavadoc() {
+		return sources;
+	}
+
+	public String getSuffix() {
+		return suffix;
 	}
 }
