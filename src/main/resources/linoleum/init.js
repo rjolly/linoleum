@@ -21,6 +21,13 @@ function javac(srcDir, destDir) {
     Packages.linoleum.Tools.instance.compile(fileset(srcDir, ".*\.java"), installed(), pathToFile(destDir), ["-source", "1.7", "-target", "1.7"]);
 }
 
+function classpath() {
+    var str = "";
+    var files = installed();
+    for(i in files) str += relativize(new File("."), files[i]).getPath() + (i < files.length - 1 ? java.io.File.pathSeparator : "");
+    return str;
+}
+
 function javadoc(srcDir, destDir) {
     if (srcDir == undefined) {
 	srcDir = ".";
@@ -28,9 +35,9 @@ function javadoc(srcDir, destDir) {
     if (destDir == undefined) {
 	destDir = srcDir;
     }
-    files = fileset(srcDir, ".*\.java");
-    dir = pathToFile(destDir);
-    Packages.com.sun.tools.javadoc.Main.execute(["-d", dir].concat(files));
+    var files = fileset(srcDir, ".*\.java");
+    var dir = pathToFile(destDir);
+    Packages.com.sun.tools.javadoc.Main.execute(["-classpath", classpath(), "-d", dir].concat(files));
 }
 
 function copy(src, dest, pattern) {
@@ -66,10 +73,17 @@ function publish(dir, resolver, source) {
 }
 
 function clean(dir) {
+    remove(dir, ".*\.class");
+}
+
+function remove(dir, pattern) {
     if (dir == undefined) {
 	dir = ".";
     }
-    find(dir, ".*\.class", rm);
+    if (pattern == undefined) {
+	pattern = ".*";
+    }
+    find(dir, pattern, rm);
     finddir(dir, rmdir);
     rmdir(dir);
 }
@@ -205,7 +219,7 @@ function relativize(baseDir, file) {
 }
 
 function open(name, app) {
-    uri = pathToFile(name).toURI();
+    var uri = pathToFile(name).toURI();
     if (app == undefined) {
 	frame.getApplicationManager().open(uri);
     } else {
