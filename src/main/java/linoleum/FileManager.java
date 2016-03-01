@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
@@ -52,7 +53,9 @@ public class FileManager extends Frame {
 			}
 
 			private WatchKey register(final WatchService service) throws IOException {
-				return Paths.get(getURI()).register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
+				final Path path = Paths.get(getURI());
+				setTitle(path.toFile().getName());
+				return path.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
 			}
 		};
 		if (start) {
@@ -95,7 +98,6 @@ public class FileManager extends Frame {
                 setIconifiable(true);
                 setMaximizable(true);
                 setResizable(true);
-                setTitle("Files");
 
                 chooser.setFileSelectionMode(javax.swing.JFileChooser.FILES_AND_DIRECTORIES);
                 chooser.addActionListener(new java.awt.event.ActionListener() {
