@@ -153,7 +153,7 @@ public class PackageManager {
 		final ResolveReport resolveReport = ivy.resolve(mRID, resolveOptions, true);
 		final ModuleDescriptor md = resolveReport.getModuleDescriptor();
 		final RetrieveOptions retrieveOptions = new RetrieveOptions();
-		retrieveOptions.setDestArtifactPattern(lib.getPath() + "/[artifact]-[revision].[ext]");
+		retrieveOptions.setDestArtifactPattern(lib.getPath() + "/[artifact]-[revision](-[classifier]).[ext]");
 		final RetrieveReport retrieveReport = ivy.retrieve(md.getModuleRevisionId(), retrieveOptions);
 		for (final Object obj : retrieveReport.getCopiedFiles()) {
 			final File file = (File)obj;
