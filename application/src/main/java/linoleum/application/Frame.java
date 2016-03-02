@@ -100,7 +100,14 @@ public class Frame extends JInternalFrame implements App {
 	}
 
 	public final void open(final ApplicationManager manager, final URI uri) {
-		final Frame frame = find(manager.getDesktopPane(), uri);
+		final JDesktopPane desktop = manager.getDesktopPane();
+		Frame frame = find(desktop, uri);
+		if (frame == null) {
+			frame = find(desktop, null);
+		}
+		if (frame == null) {
+			frame = getFrame();
+		}
 		frame.setApplicationManager(manager);
 		if (!uri.equals(frame.getURI())) {
 			frame.setURI(uri);
@@ -116,12 +123,12 @@ public class Frame extends JInternalFrame implements App {
 		for (final JInternalFrame c : desktop.getAllFrames()) {
 			if (getName().equals(c.getName()) && c instanceof Frame) {
 				final Frame frame = (Frame)c;
-				if (frame.getURI() == null || uri.equals(frame.getURI())) {
+				if (uri == null?null == frame.getURI():uri.equals(frame.getURI())) {
 					return frame;
 				}
 			}
 		}
-		return getFrame();
+		return null;
 	}
 
 	protected void open() {
