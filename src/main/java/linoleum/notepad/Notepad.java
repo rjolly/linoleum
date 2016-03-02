@@ -5,7 +5,6 @@ import java.awt.event.*;
 import java.beans.*;
 import java.io.*;
 import java.net.*;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.*;
 import javax.swing.*;
@@ -16,10 +15,8 @@ import javax.swing.event.*;
 @SuppressWarnings("serial")
 public class Notepad extends JPanel {
 
-    protected static Properties properties;
+    private static Properties properties;
     public static ResourceBundle resources;
-    private final static String EXIT_AFTER_PAINT = "-exit";
-    private static boolean exitAfterFirstPaint;
 
     private static final String[] MENUBAR_KEYS = {"file", "edit", "debug"};
     private static final String[] TOOLBAR_KEYS = {"new", "open", "save", "-", "cut", "copy", "paste"};
@@ -30,41 +27,30 @@ public class Notepad extends JPanel {
     static {
         try {
             properties = new Properties();
-            properties.load(Notepad.class.getResourceAsStream(
-                    "NotepadSystem.properties"));
-            resources = ResourceBundle.getBundle("linoleum.notepad.Notepad",
-                    Locale.getDefault());
+            properties.load(Notepad.class.getResourceAsStream("NotepadSystem.properties"));
+            resources = ResourceBundle.getBundle("linoleum.notepad.Notepad", Locale.getDefault());
         } catch (MissingResourceException | IOException  e) {
-            System.err.println("Notepad.properties "
-                    + "or NotepadSystem.properties not found");
+            System.err.println("Notepad.properties or NotepadSystem.properties not found");
             System.exit(1);
         }
     }
 
-    @Override
-    public void paintChildren(Graphics g) {
-        super.paintChildren(g);
-        if (exitAfterFirstPaint) {
-            System.exit(0);
-        }
-    }
-
     @SuppressWarnings("OverridableMethodCallInConstructor")
-    public Notepad() {
+    public Notepad(final Frame frame) {
         super(true);
-
+        this.frame = frame;
         setBorder(BorderFactory.createEtchedBorder());
         setLayout(new BorderLayout());
 
         // create the embedded JTextComponent
         editor = createEditor();
+
         // Add this as a listener for undoable edits.
         editor.getDocument().addUndoableEditListener(undoHandler);
 
         // install the command table
-        commands = new HashMap<Object, Action>();
-        Action[] actions = getActions();
-        for (Action a : actions) {
+        final ActionMap commands = editor.getActionMap();
+        for (final Action a : defaultActions) {
             commands.put(a.getValue(Action.NAME), a);
         }
 
@@ -86,46 +72,10 @@ public class Notepad extends JPanel {
         panel.add("Center", scroller);
         add("Center", panel);
         add("South", createStatusbar());
+        update();
     }
 
-	public static class Application implements linoleum.application.Application {
-		public String getName() {
-			return Notepad.class.getSimpleName();
-		}
-
-		public ImageIcon getIcon() {
-			return new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Edit24.gif"));
-		}
-
-		public String getMimeType() {
-			return "text/*";
-		}
-
-		public JInternalFrame open(final URI uri) {
-			final JInternalFrame frame = new linoleum.application.Frame(resources.getString("Title"));
-			final Notepad notepad = new Notepad();
-			frame.getContentPane().add("Center", notepad);
-			if (uri != null) notepad.open(Paths.get(uri).toFile(), frame);
-			frame.setJMenuBar(notepad.createMenubar());
-			frame.setSize(500, 400);
-			return frame;
-		}
-	}
-
-    /**
-     * Fetch the list of actions supported by this
-     * editor.  It is implemented to return the list
-     * of actions supported by the embedded JTextComponent
-     * augmented with the actions defined locally.
-     */
-    public Action[] getActions() {
-        return TextAction.augmentList(editor.getActions(), defaultActions);
-    }
-
-    /**
-     * Create an editor to represent the given document.
-     */
-    protected JTextComponent createEditor() {
+    private JTextComponent createEditor() {
         JTextArea c = new JTextArea();
         c.setDragEnabled(true);
         c.setLineWrap(true);
@@ -133,76 +83,38 @@ public class Notepad extends JPanel {
         return c;
     }
 
-    /**
-     * Fetch the editor contained in this panel
-     */
-    protected JTextComponent getEditor() {
-        return editor;
-    }
-
-
-    /**
-     * To shutdown when run as an application.  This is a
-     * fairly lame implementation.   A more self-respecting
-     * implementation would at least check to see if a save
-     * was needed.
-     */
-    protected static final class AppCloser extends WindowAdapter {
-
-        @Override
-        public void windowClosing(WindowEvent e) {
-            System.exit(0);
-        }
-    }
-
-    /**
-     * Find the hosting frame, for the file-chooser dialog.
-     */
-    protected JInternalFrame getFrame() {
-        for (Container p = getParent(); p != null; p = p.getParent()) {
-            if (p instanceof JInternalFrame) {
-                return (JInternalFrame) p;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * This is the hook through which all menu items are
-     * created.
-     */
-    protected JMenuItem createMenuItem(String cmd) {
-        JMenuItem mi = new JMenuItem(getResourceString(cmd + labelSuffix));
-        URL url = getResource(cmd + imageSuffix);
-        if (url != null) {
-            mi.setHorizontalTextPosition(JButton.RIGHT);
-            mi.setIcon(new ImageIcon(url));
-        }
+    private Action getAction(final String cmd) {
         String astr = getProperty(cmd + actionSuffix);
         if (astr == null) {
             astr = cmd;
         }
-        mi.setActionCommand(astr);
-        Action a = getAction(astr);
+        final Action a = editor.getActionMap().get(astr);
         if (a != null) {
-            mi.addActionListener(a);
-            a.addPropertyChangeListener(createActionChangeListener(mi));
-            mi.setEnabled(a.isEnabled());
-        } else {
-            mi.setEnabled(false);
+            final String name = getResourceString(cmd + labelSuffix);
+            if (name != null) {
+                a.putValue(Action.NAME, name);
+            }
+            final URL url = getResource(cmd + imageSuffix);
+            if (url != null) {
+                a.putValue(Action.SMALL_ICON, new ImageIcon(url));
+            }
+            final String tip = getResourceString(cmd + tipSuffix);
+            if (tip != null) {
+                a.putValue(Action.SHORT_DESCRIPTION, tip);
+            }
+            final String acc = getResourceString(cmd + acceleratorSuffix);
+            if (acc != null) {
+                a.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(acc));
+            }
         }
-        return mi;
+        return a;
     }
 
-    protected Action getAction(String cmd) {
-        return commands.get(cmd);
-    }
-
-    protected String getProperty(String key) {
+    private String getProperty(String key) {
         return properties.getProperty(key);
     }
 
-    protected String getResourceString(String nm) {
+    private String getResourceString(String nm) {
         String str;
         try {
             str = resources.getString(nm);
@@ -212,101 +124,40 @@ public class Notepad extends JPanel {
         return str;
     }
 
-    protected URL getResource(String key) {
+    private URL getResource(String key) {
         String name = getResourceString(key);
         if (name != null) {
-            return this.getClass().getResource(name);
+            return getClass().getResource(name);
         }
         return null;
     }
 
-    /**
-     * Create a status bar
-     */
-    protected Component createStatusbar() {
+    private Component createStatusbar() {
         // need to do something reasonable here
         status = new StatusBar();
         return status;
     }
 
-    /**
-     * Resets the undo manager.
-     */
-    protected void resetUndoManager() {
+    private void resetUndoManager() {
         undo.discardAllEdits();
+        modified = 0;
         undoAction.update();
         redoAction.update();
     }
 
-    /**
-     * Create the toolbar.  By default this reads the
-     * resource file for the definition of the toolbar.
-     */
     private Component createToolbar() {
         toolbar = new JToolBar();
         for (String toolKey: getToolBarKeys()) {
             if (toolKey.equals("-")) {
                 toolbar.add(Box.createHorizontalStrut(5));
             } else {
-                toolbar.add(createTool(toolKey));
+                toolbar.add(getAction(toolKey));
             }
         }
         toolbar.add(Box.createHorizontalGlue());
         return toolbar;
     }
 
-    /**
-     * Hook through which every toolbar item is created.
-     */
-    protected Component createTool(String key) {
-        return createToolbarButton(key);
-    }
-
-    /**
-     * Create a button to go inside of the toolbar.  By default this
-     * will load an image resource.  The image filename is relative to
-     * the classpath (including the '.' directory if its a part of the
-     * classpath), and may either be in a JAR file or a separate file.
-     *
-     * @param key The key in the resource file to serve as the basis
-     *  of lookups.
-     */
-    protected JButton createToolbarButton(String key) {
-        URL url = getResource(key + imageSuffix);
-        JButton b = new JButton(new ImageIcon(url)) {
-
-            @Override
-            public float getAlignmentY() {
-                return 0.5f;
-            }
-        };
-        b.setRequestFocusEnabled(false);
-        b.setMargin(new Insets(1, 1, 1, 1));
-
-        String astr = getProperty(key + actionSuffix);
-        if (astr == null) {
-            astr = key;
-        }
-        Action a = getAction(astr);
-        if (a != null) {
-            b.setActionCommand(astr);
-            b.addActionListener(a);
-        } else {
-            b.setEnabled(false);
-        }
-
-        String tip = getResourceString(key + tipSuffix);
-        if (tip != null) {
-            b.setToolTipText(tip);
-        }
-
-        return b;
-    }
-
-    /**
-     * Create the menubar for the app.  By default this pulls the
-     * definition of the menu from the associated resource file.
-     */
     public JMenuBar createMenubar() {
         JMenuBar mb = new JMenuBar();
         for(String menuKey: getMenuBarKeys()){
@@ -318,27 +169,19 @@ public class Notepad extends JPanel {
         return mb;
     }
 
-    /**
-     * Create a menu for the app.  By default this pulls the
-     * definition of the menu from the associated resource file.
-     */
-    protected JMenu createMenu(String key) {
+    private JMenu createMenu(String key) {
         JMenu menu = new JMenu(getResourceString(key + labelSuffix));
         for (String itemKey: getItemKeys(key)) {
             if (itemKey.equals("-")) {
                 menu.addSeparator();
             } else {
-                JMenuItem mi = createMenuItem(itemKey);
-                menu.add(mi);
+                menu.add(getAction(itemKey));
             }
         }
         return menu;
     }
 
-    /**
-     *  Get keys for menus
-     */
-    protected String[] getItemKeys(String key) {
+    private String[] getItemKeys(String key) {
         switch (key) {
             case "file":
                 return FILE_KEYS;
@@ -351,99 +194,48 @@ public class Notepad extends JPanel {
         }
     }
 
-    protected String[] getMenuBarKeys() {
+    private String[] getMenuBarKeys() {
         return MENUBAR_KEYS;
     }
 
-    protected String[] getToolBarKeys() {
+    private String[] getToolBarKeys() {
         return TOOLBAR_KEYS;
     }
 
-    // Yarked from JMenu, ideally this would be public.
-    protected PropertyChangeListener createActionChangeListener(JMenuItem b) {
-        return new ActionChangedListener(b);
-    }
-
-    // Yarked from JMenu, ideally this would be public.
-
-    private class ActionChangedListener implements PropertyChangeListener {
-
-        JMenuItem menuItem;
-
-        ActionChangedListener(JMenuItem mi) {
-            super();
-            this.menuItem = mi;
-        }
-
-        public void propertyChange(PropertyChangeEvent e) {
-            String propertyName = e.getPropertyName();
-            if (e.getPropertyName().equals(Action.NAME)) {
-                String text = (String) e.getNewValue();
-                menuItem.setText(text);
-            } else if (propertyName.equals("enabled")) {
-                Boolean enabledState = (Boolean) e.getNewValue();
-                menuItem.setEnabled(enabledState.booleanValue());
-            }
-        }
-    }
     private JTextComponent editor;
-    private Map<Object, Action> commands;
     private JToolBar toolbar;
     private JComponent status;
     private JInternalFrame elementTreeFrame;
-    protected ElementTreePanel elementTreePanel;
+    private ElementTreePanel elementTreePanel;
+    private Frame frame;
+    private int modified;
+    private File parent;
     private File file;
 
-    /**
-     * Listener for the edits on the current document.
-     */
-    protected UndoableEditListener undoHandler = new UndoHandler();
-    /** UndoManager that we add edits to. */
-    protected UndoManager undo = new UndoManager();
-    /**
-     * Suffix applied to the key used in resource file
-     * lookups for an image.
-     */
+    private UndoableEditListener undoHandler = new UndoHandler();
+    private UndoManager undo = new UndoManager();
+
     public static final String imageSuffix = "Image";
-    /**
-     * Suffix applied to the key used in resource file
-     * lookups for a label.
-     */
     public static final String labelSuffix = "Label";
-    /**
-     * Suffix applied to the key used in resource file
-     * lookups for an action.
-     */
     public static final String actionSuffix = "Action";
-    /**
-     * Suffix applied to the key used in resource file
-     * lookups for tooltip text.
-     */
     public static final String tipSuffix = "Tooltip";
+    public static final String acceleratorSuffix = "Accelerator";
+
     public static final String openAction = "open";
     public static final String newAction = "new";
     public static final String saveAction = "save";
-    public static final String exitAction = "exit";
     public static final String showElementTreeAction = "showElementTree";
-
 
     class UndoHandler implements UndoableEditListener {
 
-        /**
-         * Messaged when the Document has created an edit, the edit is
-         * added to <code>undo</code>, an instance of UndoManager.
-         */
         public void undoableEditHappened(UndoableEditEvent e) {
             undo.addEdit(e.getEdit());
+            if (modified >= 0) modified += 1;
             undoAction.update();
             redoAction.update();
         }
     }
 
-
-    /**
-     * FIXME - I'm not very useful yet
-     */
     class StatusBar extends JComponent {
 
         public StatusBar() {
@@ -459,19 +251,15 @@ public class Notepad extends JPanel {
     // --- action implementations -----------------------------------
     private UndoAction undoAction = new UndoAction();
     private RedoAction redoAction = new RedoAction();
-    /**
-     * Actions defined by the Notepad class
-     */
+
     private Action[] defaultActions = {
         new NewAction(),
         new OpenAction(),
         new SaveAction(),
-        new ExitAction(),
         new ShowElementTreeAction(),
         undoAction,
         redoAction
     };
-
 
     class UndoAction extends AbstractAction {
 
@@ -483,6 +271,7 @@ public class Notepad extends JPanel {
         public void actionPerformed(ActionEvent e) {
             try {
                 undo.undo();
+                modified -= 1;
             } catch (CannotUndoException ex) {
                 Logger.getLogger(UndoAction.class.getName()).log(Level.SEVERE,
                         "Unable to undo", ex);
@@ -491,7 +280,7 @@ public class Notepad extends JPanel {
             redoAction.update();
         }
 
-        protected void update() {
+        void update() {
             if (undo.canUndo()) {
                 setEnabled(true);
                 putValue(Action.NAME, undo.getUndoPresentationName());
@@ -499,9 +288,9 @@ public class Notepad extends JPanel {
                 setEnabled(false);
                 putValue(Action.NAME, "Undo");
             }
+            Notepad.this.update();
         }
     }
-
 
     class RedoAction extends AbstractAction {
 
@@ -513,6 +302,7 @@ public class Notepad extends JPanel {
         public void actionPerformed(ActionEvent e) {
             try {
                 undo.redo();
+                modified += 1;
             } catch (CannotRedoException ex) {
                 Logger.getLogger(RedoAction.class.getName()).log(Level.SEVERE,
                         "Unable to redo", ex);
@@ -521,7 +311,7 @@ public class Notepad extends JPanel {
             undoAction.update();
         }
 
-        protected void update() {
+        void update() {
             if (undo.canRedo()) {
                 setEnabled(true);
                 putValue(Action.NAME, undo.getRedoPresentationName());
@@ -532,7 +322,6 @@ public class Notepad extends JPanel {
         }
     }
 
-
     class OpenAction extends NewAction {
 
         OpenAction() {
@@ -540,25 +329,43 @@ public class Notepad extends JPanel {
         }
 
         @Override
-        public void actionPerformed(ActionEvent e) {
-            if (file != null) open(file, getFrame());
+        public void actionPerformed(final ActionEvent e) {
+            if (parent == null) try {
+                parent = new File(".").getCanonicalFile();
+            } catch (final IOException ex) {
+                ex.printStackTrace();
+            }
+            if (parent != null) {
+                frame.getApplicationManager().open(parent.toURI());
+            }
         }
     }
 
-	void open(final File file, final JInternalFrame frame) {
-		Document oldDoc = getEditor().getDocument();
-		if (oldDoc != null) {
-			oldDoc.removeUndoableEditListener(undoHandler);
-		}
-		if (elementTreePanel != null) {
-			elementTreePanel.setEditor(null);
-		}
-		getEditor().setDocument(new PlainDocument());
-		this.file = file;
-		frame.setTitle(file.getName());
-		Thread loader = new FileLoader(file, editor.getDocument(), frame);
-		loader.start();
-	}
+    public void open(final File file) {
+        setFile(file);
+        if (file.exists()) {
+            new FileLoader().execute();
+        } else {
+            editor.getDocument().addUndoableEditListener(undoHandler);
+            resetUndoManager();
+        }
+    }
+
+    private void setFile(final File file) {
+        final Document doc = editor.getDocument();
+        if (doc != null) {
+            doc.removeUndoableEditListener(undoHandler);
+        }
+        editor.setDocument(new PlainDocument());
+        if (file != null) {
+            parent = file.getParentFile();
+        }
+        this.file = file;
+    }
+
+    public File getFile() {
+        return file;
+    }
 
     class SaveAction extends AbstractAction {
 
@@ -566,17 +373,16 @@ public class Notepad extends JPanel {
             super(saveAction);
         }
 
-        public void actionPerformed(ActionEvent e) {
-	    if (file != null) save(file, getFrame());
+        public void actionPerformed(final ActionEvent e) {
+            save();
         }
     }
 
-	void save(final File file, final JInternalFrame frame) {
-		frame.setTitle(file.getName());
-		Thread saver = new FileSaver(file, editor.getDocument(), frame);
-		saver.start();
-	}
-
+    private void save() {
+        new FileSaver().execute();
+        modified = 0;
+        update();
+    }
 
     class NewAction extends AbstractAction {
 
@@ -588,40 +394,42 @@ public class Notepad extends JPanel {
             super(nm);
         }
 
-        public void actionPerformed(ActionEvent e) {
-            Document oldDoc = getEditor().getDocument();
-            if (oldDoc != null) {
-                oldDoc.removeUndoableEditListener(undoHandler);
+        public void actionPerformed(final ActionEvent e) {
+            if (modified != 0) {
+                final int option = JOptionPane.showInternalConfirmDialog(frame, resources.getString("Warning"), resources.getString("WarningTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+                switch (option) {
+                case JOptionPane.OK_OPTION:
+                    break;
+                default:
+                    return;
+                }
             }
-            getEditor().setDocument(new PlainDocument());
-            getEditor().getDocument().addUndoableEditListener(undoHandler);
+            setFile(null);
+            editor.getDocument().addUndoableEditListener(undoHandler);
             resetUndoManager();
-            file = null;
-            getFrame().setTitle(resources.getString("Title"));
             revalidate();
         }
     }
 
-
-    /**
-     * Really lame implementation of an exit command
-     */
-    class ExitAction extends AbstractAction {
-
-        ExitAction() {
-            super(exitAction);
+    private void update() {
+        String title = file == null?resources.getString("Title"):file.getName();
+        if (modified != 0) {
+            title += " (modified)";
         }
+        frame.setTitle(title);
+        getAction(saveAction).setEnabled(file != null && modified != 0);
+    }
 
-        public void actionPerformed(ActionEvent e) {
-            System.exit(0);
+    public void close() {
+        if (file != null && modified != 0) {
+            final int option = JOptionPane.showInternalConfirmDialog(frame, resources.getString("Question"), resources.getString("QuestionTitle"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            switch (option) {
+            case JOptionPane.YES_OPTION:
+                save();
+            }
         }
     }
 
-
-    /**
-     * Action that brings up a JFrame with a JTree showing the structure
-     * of the document.
-     */
     class ShowElementTreeAction extends AbstractAction {
 
         ShowElementTreeAction() {
@@ -630,6 +438,7 @@ public class Notepad extends JPanel {
 
         public void actionPerformed(ActionEvent e) {
             if (elementTreeFrame == null) {
+
                 // Create a frame containing an instance of
                 // ElementTreePanel.
                 try {
@@ -639,7 +448,7 @@ public class Notepad extends JPanel {
                     elementTreeFrame = new JInternalFrame();
                 }
 
-                getFrame().addInternalFrameListener(new InternalFrameAdapter() {
+                frame.addInternalFrameListener(new InternalFrameAdapter() {
 
                     @Override
                     public void internalFrameClosing(InternalFrameEvent weeee) {
@@ -649,153 +458,119 @@ public class Notepad extends JPanel {
                 Container fContentPane = elementTreeFrame.getContentPane();
 
                 fContentPane.setLayout(new BorderLayout());
-                elementTreePanel = new ElementTreePanel(getEditor());
+                elementTreePanel = new ElementTreePanel(editor);
                 fContentPane.add(elementTreePanel);
                 elementTreeFrame.pack();
             }
-	    getFrame().getDesktopPane().add(elementTreeFrame);
+	    frame.getDesktopPane().add(elementTreeFrame);
 	    elementTreeFrame.setClosable(true);
             elementTreeFrame.setVisible(true);
         }
     }
 
+    abstract class FileWorker extends SwingWorker<Document, Object> {
+        final Document doc = editor.getDocument();
+        final int length;
 
-    /**
-     * Thread to load a file into the text storage model
-     */
-    class FileLoader extends Thread {
+        FileWorker(final int length) {
+            this.length = length;
 
-        FileLoader(File f, Document doc, JInternalFrame frame) {
-            setPriority(4);
-            this.f = f;
-            this.doc = doc;
-            this.frame = frame;
+            // initialize the statusbar
+            status.removeAll();
+            final JProgressBar progress = new JProgressBar();
+            addPropertyChangeListener(new PropertyChangeListener() {
+                public  void propertyChange(final PropertyChangeEvent evt) {
+                    if ("progress".equals(evt.getPropertyName())) {
+                        progress.setValue((Integer)evt.getNewValue());
+                    }
+                }
+            });
+            status.add(progress);
+            status.revalidate();
+        }
+
+        void setNumber(final int n) {
+            if (length > 0) {
+                setProgress(100 * n / length);
+            }
         }
 
         @Override
-        public void run() {
-            try {
-                // initialize the statusbar
-                status.removeAll();
-                JProgressBar progress = new JProgressBar();
-                progress.setMinimum(0);
-                progress.setMaximum((int) f.length());
-                status.add(progress);
-                status.revalidate();
+        public void done() {
 
-                // try to start reading
-                Reader in = new FileReader(f);
-                char[] buff = new char[4096];
-                int nch;
-                while ((nch = in.read(buff, 0, buff.length)) != -1) {
-                    doc.insertString(doc.getLength(), new String(buff, 0, nch),
-                            null);
-                    progress.setValue(progress.getValue() + nch);
-                }
-                in.close();
-            } catch (IOException e) {
-                final String msg = e.getMessage();
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    public void run() {
-                        JOptionPane.showInternalMessageDialog(frame,
-                                "Could not open file: " + msg,
-                                "Error opening file",
-                                JOptionPane.ERROR_MESSAGE);
-                    }
-                });
-            } catch (BadLocationException e) {
-                System.err.println(e.getMessage());
-            }
-            doc.addUndoableEditListener(undoHandler);
             // we are done... get rid of progressbar
             status.removeAll();
             status.revalidate();
-
-            resetUndoManager();
-
-            if (elementTreePanel != null) {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    public void run() {
-                        elementTreePanel.setEditor(getEditor());
-                    }
-                });
-            }
         }
-        final JInternalFrame frame;
-        Document doc;
-        File f;
     }
 
-
-    /**
-     * Thread to save a document to file
-     */
-    class FileSaver extends Thread {
-
-        final JInternalFrame frame;
-        Document doc;
-        File f;
-
-        FileSaver(File f, Document doc, JInternalFrame frame) {
-            setPriority(4);
-            this.f = f;
-            this.doc = doc;
-            this.frame = frame;
+    class FileLoader extends FileWorker {
+        FileLoader() {
+            super((int)file.length());
+            if (elementTreePanel != null) {
+                elementTreePanel.setEditor(null);
+            }
         }
 
         @Override
-        @SuppressWarnings("SleepWhileHoldingLock")
-        public void run() {
-            try {
-                // initialize the statusbar
-                status.removeAll();
-                JProgressBar progress = new JProgressBar();
-                progress.setMinimum(0);
-                progress.setMaximum(doc.getLength());
-                status.add(progress);
-                status.revalidate();
+        public Document doInBackground() {
+            try (final Reader in = new FileReader(file)) {
+
+                // try to start reading
+                final char[] buff = new char[4096];
+                int nch;
+                int n = 0;
+                while ((nch = in.read(buff, 0, buff.length)) != -1) {
+                    doc.insertString(doc.getLength(), new String(buff, 0, nch), null);
+                    setNumber(n += nch);
+                }
+            } catch (final IOException e) {
+                e.printStackTrace();
+            } catch (final BadLocationException e) {
+                System.err.println(e.getMessage());
+            }
+            return doc;
+        }
+
+        @Override
+        public void done() {
+            super.done();
+            if (elementTreePanel != null) {
+                elementTreePanel.setEditor(editor);
+            }
+            doc.addUndoableEditListener(undoHandler);
+            resetUndoManager();
+        }
+    }
+
+    class FileSaver extends FileWorker {
+        FileSaver() {
+            super(editor.getDocument().getLength());
+        }
+
+        @Override
+        public Document doInBackground() {
+            try (final Writer out = new FileWriter(file)) {
 
                 // start writing
-                Writer out = new FileWriter(f);
-                Segment text = new Segment();
+                final Segment text = new Segment();
                 text.setPartialReturn(true);
-                int charsLeft = doc.getLength();
+                int charsLeft = length;
                 int offset = 0;
                 while (charsLeft > 0) {
                     doc.getText(offset, Math.min(4096, charsLeft), text);
                     out.write(text.array, text.offset, text.count);
                     charsLeft -= text.count;
                     offset += text.count;
-                    progress.setValue(offset);
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        Logger.getLogger(FileSaver.class.getName()).log(
-                                Level.SEVERE,
-                                null, e);
-                    }
+                    setNumber(offset);
                 }
                 out.flush();
-                out.close();
-            } catch (IOException e) {
-                final String msg = e.getMessage();
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    public void run() {
-                        JOptionPane.showInternalMessageDialog(frame,
-                                "Could not save file: " + msg,
-                                "Error saving file",
-                                JOptionPane.ERROR_MESSAGE);
-                    }
-                });
-            } catch (BadLocationException e) {
+            } catch (final IOException e) {
+                e.printStackTrace();
+            } catch (final BadLocationException e) {
                 System.err.println(e.getMessage());
             }
-            // we are done... get rid of progressbar
-            status.removeAll();
-            status.revalidate();
+            return doc;
         }
     }
 }
