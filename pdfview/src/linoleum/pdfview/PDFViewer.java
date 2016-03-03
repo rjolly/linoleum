@@ -22,6 +22,7 @@ public class PDFViewer extends Frame {
 
 	public PDFViewer() {
 		initComponents();
+		setTitle(TITLE);
 		setMimeType("application/pdf");
 		setEnabling();
 	}
@@ -59,7 +60,7 @@ public class PDFViewer extends Frame {
 		// set up our document
 		curFile = newfile;
 		docName = name;
-		setTitle(TITLE + ": " + docName);
+		setTitle(docName);
 		page = new PagePanel(jScrollPane1.getSize());
 		jScrollPane1.setViewportView(page);
 
@@ -156,7 +157,6 @@ public class PDFViewer extends Frame {
                 setIconifiable(true);
                 setMaximizable(true);
                 setResizable(true);
-                setTitle("PDF Viewer");
                 addComponentListener(new java.awt.event.ComponentAdapter() {
                         public void componentResized(java.awt.event.ComponentEvent evt) {
                                 formComponentResized(evt);
