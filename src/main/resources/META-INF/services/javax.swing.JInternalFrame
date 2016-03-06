@@ -4,6 +4,6 @@ linoleum.MediaPlayer
 linoleum.ImageViewer
 linoleum.notepad.Frame
 linoleum.ObjLoad
-linoleum.Browser
+linoleum.html.Browser
 linoleum.Console
 linoleum.Clock

@@ -1,4 +1,4 @@
-package linoleum;
+package linoleum.html;
 
 import java.awt.CardLayout;
 import java.awt.Container;
@@ -20,8 +20,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.Document;
-import linoleum.html.EditorKit;
-import linoleum.html.FrameURL;
 import linoleum.application.Frame;
 
 public class Browser extends Frame {
@@ -232,7 +230,7 @@ public class Browser extends Frame {
 
                 jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 0));
 
-                jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/linoleum/Back16.png"))); // NOI18N
+                jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/linoleum/html/Back16.png"))); // NOI18N
                 jButton2.setPreferredSize(new java.awt.Dimension(28, 28));
                 jButton2.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -241,7 +239,7 @@ public class Browser extends Frame {
                 });
                 jPanel3.add(jButton2);
 
-                jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/linoleum/Forward16.png"))); // NOI18N
+                jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/linoleum/html/Forward16.png"))); // NOI18N
                 jButton3.setPreferredSize(new java.awt.Dimension(28, 28));
                 jButton3.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -256,7 +254,7 @@ public class Browser extends Frame {
                         }
                 });
 
-                jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/linoleum/Go16.png"))); // NOI18N
+                jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/linoleum/html/Go16.png"))); // NOI18N
                 jButton1.setPreferredSize(new java.awt.Dimension(28, 28));
                 jButton1.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
