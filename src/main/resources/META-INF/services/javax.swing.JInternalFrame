@@ -1,8 +1,6 @@
 linoleum.FileManager
 linoleum.ScriptShell
-linoleum.media.MediaPlayer
 linoleum.ImageViewer
 linoleum.notepad.Frame
-linoleum.j3d.ObjLoad
 linoleum.Console
 linoleum.Clock
