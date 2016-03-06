@@ -10,11 +10,11 @@
         <conf name="runtime-test"/>
     </configurations>
     <dependencies>
-        <dependency org="commons-codec" name="commons-codec" rev="1.9" conf="compile->master"/>
         <dependency org="javax.media" name="jmf" rev="2.1.1e" conf="compile->master"/>
         <dependency org="java3d" name="j3d-core-utils" rev="1.3.1" conf="compile->master;runtime"/>
         <dependency org="net.java.linoleum" name="jlfgr" rev="1_0" conf="compile->master"/>
         <dependency org="net.java.linoleum" name="application" rev="1.1" conf="compile->master"/>
+        <dependency org="net.java.linoleum" name="html" rev="1.1" conf="compile->master;runtime"/>
         <dependency org="net.java.linoleum" name="pkg" rev="1.1" conf="compile->master;runtime"/>
     </dependencies>
 </ivy-module>
