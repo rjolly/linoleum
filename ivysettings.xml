@@ -1,13 +1,7 @@
 <ivysettings>
-    <settings defaultResolver="my">
+    <settings defaultResolver="default">
 	<property name="ivy.default.ivy.user.dir" value="${user.home}/.ivy2" />
 	<caches resolutionCacheDir="${user.home}/.ivy2/cache" defaultCacheDir="${user.home}/.ivy2/cache"/>
     </settings>
     <include url="${ivy.default.settings.dir}/ivysettings.xml"/>
-    <resolvers>
-        <chain name="my">
-            <ibiblio name="sonatype" m2compatible="true" root="${public}"/>
-            <resolver ref="default"/>
-        </chain>
-    </resolvers>
 </ivysettings>
