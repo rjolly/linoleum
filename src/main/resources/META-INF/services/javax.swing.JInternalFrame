@@ -3,6 +3,7 @@ linoleum.ScriptShell
 linoleum.MediaPlayer
 linoleum.ImageViewer
 linoleum.notepad.Frame
+linoleum.pkg.PackageManager
 linoleum.ObjLoad
 linoleum.Browser
 linoleum.Console

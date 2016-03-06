@@ -24,7 +24,7 @@ public class Desktop extends JFrame {
 
 	private Desktop() {
 		initComponents();
-		final PackageManager pkgs = PackageManager.instance;
+		final PackageInstaller pkgs = PackageInstaller.instance;
 		apps = new ApplicationManager();
 		pkgs.addClassPathListener(apps);
 		apps.open(desktopPane);

@@ -2,11 +2,11 @@ function install(pkg, conf) {
     if (conf == undefined) {
 	conf = "default";
     }
-    Packages.linoleum.PackageManager.instance.install(pkg, conf);
+    Packages.linoleum.pkg.PackageManager.instance.install(pkg, conf);
 }
 
 function installed() {
-    return Packages.linoleum.PackageManager.instance.installed();
+    return Packages.linoleum.PackageInstaller.instance.installed();
 }
 
 // adapted from https://weblogs.java.net/blog/forax/archive/2006/09/using_jrunscrip.html
@@ -59,7 +59,7 @@ function makepom(dest, source) {
     if (source == undefined) {
 	source = "ivy.xml";
     }
-    Packages.linoleum.PackageManager.instance.makepom(pathToFile(source), pathToFile(dest));
+    Packages.linoleum.pkg.PackageManager.instance.makepom(pathToFile(source), pathToFile(dest));
 }
 
 function publish(dir, resolver, source) {
@@ -69,7 +69,7 @@ function publish(dir, resolver, source) {
     if (source == undefined) {
 	source = "ivy.xml";
     }
-    Packages.linoleum.PackageManager.instance.publish(pathToFile(source), pathToFile(dir), resolver);
+    Packages.linoleum.pkg.PackageManager.instance.publish(pathToFile(source), pathToFile(dir), resolver);
 }
 
 function clean(dir) {

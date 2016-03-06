@@ -139,7 +139,7 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		// load pre-defined initialization file
 		loadInitFile(ClassLoader.getSystemResource("com/sun/tools/script/shell/init." + extension));
 		loadInitFile(getClass().getResource("init." + extension));
-		final File home = PackageManager.instance.home();
+		final File home = PackageInstaller.instance.home();
 		loadUserInitFile(new File(home, "init." + extension));
 		if (!home.equals(new File("."))) {
 			// load current user's initialization file
