@@ -1,4 +1,4 @@
-package linoleum;
+package linoleum.media;
 
 import java.awt.Component;
 import java.io.File;

@@ -1,4 +1,4 @@
-package linoleum;
+package linoleum.j3d;
 
 import com.sun.j3d.utils.universe.*;
 import com.sun.j3d.utils.behaviors.vp.*;
