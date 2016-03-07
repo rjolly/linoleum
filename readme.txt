@@ -2,11 +2,11 @@
 Required software:
 
 - jdk 1.7 ( http://www.oracle.com/technetwork/java/index.html )
-- jmf 2.1.1e ( http://www.oracle.com/technetwork/java/javasebusiness/downloads/java-archive-downloads-java-client-419417.html )
-- java3d 1.5.1 ( same as above )
 
 Optional software:
 
+- jmf 2.1.1e ( http://www.oracle.com/technetwork/java/javasebusiness/downloads/java-archive-downloads-java-client-419417.html )
+- java3d 1.5.1 ( same as above )
 - netbeans 7.4 ( https://netbeans.org/ )
 - ivybeans 1.2-nb71 ( https://code.google.com/p/ivybeans/ )
 
@@ -44,6 +44,8 @@ To use linoleum as your desktop environment in Linux:
 
 List of applications
 
+  net.java.linoleum#j3d;1.1		3D Object Loader (requires java3d)
   net.java.linoleum#jcterm;0.0.11	SSH2 Terminal Emulator in Pure Java
+  net.java.linoleum#media;1.1		Media Player (requires jmf)
   net.java.linoleum#pdfview;1.1		PDF viewer.
 
