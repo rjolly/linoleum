@@ -13,6 +13,7 @@ import java.net.URLConnection;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.net.CookieManager;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.logging.Logger;
 import javax.swing.UIManager;
 import javax.swing.JEditorPane;
 import javax.swing.SwingUtilities;
@@ -35,6 +37,7 @@ public class EditorPane extends JEditorPane {
 	final Basic basic = new Basic(this);
 	final Map<String, String> map = new HashMap<>();
 	final CookieManager manager = new CookieManager();
+	final Logger logger = Logger.getLogger(getClass().getName());
 
 	public void setPage(final URL page) throws IOException {
 		setPage(new FrameURL(page), null, false);
@@ -213,7 +216,9 @@ public class EditorPane extends JEditorPane {
 
 	private void handleCookies(final URLConnection conn) throws IOException {
 		final Map<String, List<String>> map = new HashMap<>();
-		for (final Map.Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
+		final Map<String, List<String>> fields = conn.getHeaderFields();
+		logger.config(fields.toString());
+		for (final Map.Entry<String, List<String>> entry : fields.entrySet()) {
 			final String key = entry.getKey();
 			if ("Set-Cookie".equals(key)) {
 				final List<String> list = new ArrayList<>();
@@ -242,6 +247,7 @@ public class EditorPane extends JEditorPane {
 		} catch (final URISyntaxException ex) {
 			ex.printStackTrace();
 		}
+		logger.config(conn.getRequestProperties().toString());
 	}
 
 	private void clearPostData() {
@@ -253,10 +259,12 @@ public class EditorPane extends JEditorPane {
 	}
 
 	private void handlePostData(final HttpURLConnection conn, final Object postData) throws IOException {
+		final String str = (String)postData;
+		logger.config(URLDecoder.decode(str, "UTF-8"));
 		conn.setDoOutput(true);
 		conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 		try (final DataOutputStream os = new DataOutputStream(conn.getOutputStream())) {
-			os.writeBytes((String)postData);
+			os.writeBytes(str);
 		}
 	}
 
