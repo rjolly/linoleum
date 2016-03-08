@@ -43,7 +43,7 @@ public class Notepad extends JPanel {
         setLayout(new BorderLayout());
 
         // create the embedded JTextComponent
-        editor = createEditor();
+        editor = new Editor();
 
         // Add this as a listener for undoable edits.
         editor.getDocument().addUndoableEditListener(undoHandler);
@@ -73,14 +73,6 @@ public class Notepad extends JPanel {
         add("Center", panel);
         add("South", createStatusbar());
         update();
-    }
-
-    private JTextComponent createEditor() {
-        JTextArea c = new JTextArea();
-        c.setDragEnabled(true);
-        c.setLineWrap(true);
-        c.setFont(new Font("monospaced", Font.PLAIN, 12));
-        return c;
     }
 
     private Action getAction(final String cmd) {
@@ -202,7 +194,7 @@ public class Notepad extends JPanel {
         return TOOLBAR_KEYS;
     }
 
-    private JTextComponent editor;
+    private Editor editor;
     private JToolBar toolbar;
     private JComponent status;
     private JInternalFrame elementTreeFrame;
@@ -286,7 +278,7 @@ public class Notepad extends JPanel {
                 putValue(Action.NAME, undo.getUndoPresentationName());
             } else {
                 setEnabled(false);
-                putValue(Action.NAME, "Undo");
+                putValue(Action.NAME, resources.getString("undoLabel"));
             }
             Notepad.this.update();
         }
@@ -317,7 +309,7 @@ public class Notepad extends JPanel {
                 putValue(Action.NAME, undo.getRedoPresentationName());
             } else {
                 setEnabled(false);
-                putValue(Action.NAME, "Redo");
+                putValue(Action.NAME, resources.getString("redoLabel"));
             }
         }
     }
@@ -352,11 +344,11 @@ public class Notepad extends JPanel {
     }
 
     private void setFile(final File file) {
-        final Document doc = editor.getDocument();
+        final Document doc = editor.getReplaceDocument();
         if (doc != null) {
             doc.removeUndoableEditListener(undoHandler);
         }
-        editor.setDocument(new PlainDocument());
+        editor.setDocument(new Document());
         if (file != null) {
             parent = file.getParentFile();
         }
@@ -469,7 +461,7 @@ public class Notepad extends JPanel {
     }
 
     abstract class FileWorker extends SwingWorker<Document, Object> {
-        final Document doc = editor.getDocument();
+        final Document doc = editor.getReplaceDocument();
         final int length;
 
         FileWorker(final int length) {
