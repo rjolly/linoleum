@@ -5,6 +5,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -15,8 +16,7 @@ import java.net.URL;
 import linoleum.application.event.ClassPathListener;
 import linoleum.application.event.ClassPathChangeEvent;
 
-public class PackageInstaller {
-	public static final PackageInstaller instance = new PackageInstaller();
+public class Packages {
 	private final List<ClassPathListener> listeners = new ArrayList<>();
 	private final Map<String, File> installed = new HashMap<>();
 	private final Map<String, File> map = new HashMap<>();
@@ -28,9 +28,8 @@ public class PackageInstaller {
 		}
 	};
 
-	private PackageInstaller() {
-		white.add("ivy");
-		white.add("commons-codec");
+	public Packages() {
+		white.addAll(Arrays.asList(System.getProperty("linoleum.whitelist", "").split(",")));
 		final String extdirs[] = System.getProperty("java.ext.dirs").split(File.pathSeparator);
 		for (final String str : extdirs) {
 			final File dir = new File(str);
@@ -65,13 +64,15 @@ public class PackageInstaller {
 		if (tools.exists()) {
 			add(tools);
 		}
-		File dir = new File(home(), "lib");
-		if (dir.isDirectory()) {
-			for (final File file: dir.listFiles(filter)) {
-				add(file);
+		final File home = home();
+		if (!home.equals(new File("."))) {
+			final File lib = new File(home, "lib");
+			if (lib.isDirectory()) {
+				for (final File file: lib.listFiles(filter)) {
+					add(file);
+				}
 			}
-		} else {
-			dir = dir.getParentFile();
+			final File dir = new File(home.getParentFile(), "java");
 			if (dir.isDirectory()) {
 				for (final File file: dir.listFiles(filter)) {
 					if (white.contains(new Package(file).getName())) {

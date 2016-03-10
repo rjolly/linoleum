@@ -15,17 +15,16 @@ import javax.swing.JOptionPane;
 import linoleum.application.ApplicationManager;
 
 public class Desktop extends JFrame {
+	public static final Packages pkgs = new Packages();
 	private static final String ABOUTMSG = "Linoleum 1.1 \n \nJava desktop environment "
 		+ "and software distribution. \n \nWritten by \n  "
 		+ "Raphael Jolly";
-	private final ApplicationManager apps;
+	private final ApplicationManager apps = new ApplicationManager();
 	private final GraphicsDevice devices[];
 	private Rectangle bounds;
 
 	private Desktop() {
 		initComponents();
-		final PackageInstaller pkgs = PackageInstaller.instance;
-		apps = new ApplicationManager();
 		pkgs.addClassPathListener(apps);
 		apps.open(desktopPane);
 		devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();

@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import linoleum.application.Frame;
 import linoleum.application.event.ClassPathChangeEvent;
-import linoleum.PackageInstaller;
+import linoleum.Desktop;
 import org.apache.ivy.Ivy;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
@@ -60,22 +60,21 @@ public class PackageManager extends Frame {
 	}
 
 	public void install(final String name, final String conf) throws Exception {
-		final PackageInstaller pkgs = PackageInstaller.instance;
 		final ModuleRevisionId mRID = ModuleRevisionId.parse(name);
 		final ResolveOptions resolveOptions = new ResolveOptions();
 		resolveOptions.setConfs(new String[] { conf });
 		final ResolveReport resolveReport = ivy.resolve(mRID, resolveOptions, true);
 		final ModuleDescriptor md = resolveReport.getModuleDescriptor();
 		final RetrieveOptions retrieveOptions = new RetrieveOptions();
-		retrieveOptions.setDestArtifactPattern(pkgs.lib().getPath() + "/[artifact]-[revision](-[classifier]).[ext]");
+		retrieveOptions.setDestArtifactPattern(Desktop.pkgs.lib().getPath() + "/[artifact]-[revision](-[classifier]).[ext]");
 		final RetrieveReport retrieveReport = ivy.retrieve(md.getModuleRevisionId(), retrieveOptions);
 		for (final Object obj : retrieveReport.getCopiedFiles()) {
 			final File file = (File)obj;
 			if (file.getName().endsWith(".jar")) {
-				pkgs.add(file);
+				Desktop.pkgs.add(file);
 			}
 		}
-		pkgs.fireClassPathChange(new ClassPathChangeEvent(this));
+		Desktop.pkgs.fireClassPathChange(new ClassPathChangeEvent(this));
 	}
 
 	@SuppressWarnings("unchecked")

@@ -5,10 +5,6 @@ function install(pkg, conf) {
     Packages.linoleum.pkg.PackageManager.instance.install(pkg, conf);
 }
 
-function installed() {
-    return Packages.linoleum.PackageInstaller.instance.installed();
-}
-
 // adapted from https://weblogs.java.net/blog/forax/archive/2006/09/using_jrunscrip.html
 
 function javac(srcDir, destDir) {
@@ -18,12 +14,12 @@ function javac(srcDir, destDir) {
     if (destDir == undefined) {
 	destDir = srcDir;
     }
-    Packages.linoleum.Tools.instance.compile(fileset(srcDir, ".*\.java"), installed(), pathToFile(destDir), ["-source", "1.7", "-target", "1.7"]);
+    Packages.linoleum.Tools.instance.compile(fileset(srcDir, ".*\.java"), pathToFile(destDir), ["-source", "1.7", "-target", "1.7"]);
 }
 
 function classpath() {
     var str = "";
-    var files = installed();
+    var files = Packages.linoleum.Tools.instance.classpath();
     for(i in files) str += relativize(new File("."), files[i]).getPath() + (i < files.length - 1 ? java.io.File.pathSeparator : "");
     return str;
 }
@@ -231,6 +227,29 @@ function exit(code) {
     frame.dispose();
 }
 
-function quit(code) {
-    exit(code);
+function log(str) {
+    Level = java.util.logging.Level;
+    var root = java.util.logging.Logger.getLogger("");
+    var handlers = root.getHandlers();
+    if (handlers.length > 0) {
+	var handler = handlers[0];
+	var level = handler.getLevel();
+	if (level > Level.CONFIG) {
+	    handler.setLevel(Level.CONFIG);
+	}
+    }
+    switch (str) {
+    case "config":
+	root.setLevel(Level.CONFIG);
+	break;
+    case "info":
+	root.setLevel(Level.INFO);
+	break;
+    case "warning":
+	root.setLevel(Level.WARNING);
+	break;
+    case "severe":
+	root.setLevel(Level.SEVERE);
+	break;
+    }
 }

@@ -25,10 +25,14 @@ public class Tools {
 
 	private Tools() {}
 
-	public void compile(final File files[], final File classpath[], final File destDir, final String options[]) throws IOException {
+	public File[] classpath() {
+		return Desktop.pkgs.installed();
+	}
+
+	public void compile(final File files[], final File destDir, final String options[]) throws IOException {
 		final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 		try (final StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null)) {
-			fileManager.setLocation(StandardLocation.CLASS_PATH, Arrays.asList(classpath));
+			fileManager.setLocation(StandardLocation.CLASS_PATH, Arrays.asList(classpath()));
 			fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList(new File[] {destDir}));
 			final JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, Arrays.asList(options), null, fileManager.getJavaFileObjectsFromFiles(Arrays.asList(files)));
 			task.call();
