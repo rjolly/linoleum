@@ -107,7 +107,7 @@ public class PackageInstaller {
 	}
 
 	public File home() {
-		return map.get("linoleum").getParentFile();
+		return (map.containsKey("linoleum")?map.get("linoleum"):lib).getParentFile();
 	}
 
 	public File lib() {
