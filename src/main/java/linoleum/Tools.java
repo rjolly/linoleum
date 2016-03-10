@@ -68,7 +68,7 @@ public class Tools {
 
 	private void jar(final File dir, final File files[], final File dest, final Manifest manifest) throws IOException {
 		final Path path = dir.toPath();
-		try (final JarOutputStream jos = new JarOutputStream(new FileOutputStream(dest), manifest)) {
+		try (final JarOutputStream jos = dest.getName().endsWith(".zip")?new JarOutputStream(new FileOutputStream(dest)):new JarOutputStream(new FileOutputStream(dest), manifest)) {
 			for (final File file : files) {
 				final JarEntry entry = new JarEntry(path.relativize(file.toPath()).toString().replace(File.separatorChar, '/'));
 				try (final InputStream is = new FileInputStream(file)) {

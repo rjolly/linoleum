@@ -2,9 +2,12 @@ package linoleum.pkg;
 
 import java.io.File;
 import java.util.Arrays;
+import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
 import linoleum.application.Frame;
 import linoleum.application.event.ClassPathChangeEvent;
 import linoleum.Desktop;
+import linoleum.Package;
 import org.apache.ivy.Ivy;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
@@ -18,11 +21,14 @@ import org.apache.ivy.plugins.parser.m2.PomWriterOptions;
 
 public class PackageManager extends Frame {
 	private final Ivy ivy = Ivy.newInstance();
+	private final DefaultTableModel model;
 	public static PackageManager instance;
 
 	public PackageManager() {
 		super("Packages");
 		initComponents();
+		model = (DefaultTableModel)jTable1.getModel();
+		refresh();
 		if (instance == null) {
 			instance = this;
 		}
@@ -75,6 +81,23 @@ public class PackageManager extends Frame {
 			}
 		}
 		Desktop.pkgs.fireClassPathChange(new ClassPathChangeEvent(this));
+	}
+
+	private void install(final String organization, final String module, final String revision) {
+		try {
+			install(organization + "#" + module + ";" + revision, "default");
+			refresh();
+		} catch (final Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	private void refresh() {
+		model.setRowCount(0);
+		for (final File file : Desktop.pkgs.installed()) {
+			final Package pkg = new Package(file);
+			model.addRow(new Object[] {pkg.getName(), pkg.getVersion(), pkg.isSnapshot()});
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -178,7 +201,11 @@ public class PackageManager extends Frame {
         }// </editor-fold>//GEN-END:initComponents
 
         private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-                // TODO add your handling code here:
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				install(jTextField1.getText(), jTextField2.getText(), jTextField3.getText());
+			}
+		});
         }//GEN-LAST:event_jButton1ActionPerformed
 
         // Variables declaration - do not modify//GEN-BEGIN:variables

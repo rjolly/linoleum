@@ -20,24 +20,24 @@ public class Package {
 				if (n > -1) {
 					version = name.substring(n + 1);
 					name = name.substring(0, n);
-					if ("sources".equals(version) || "javadoc".equals(version)) {
-						version = null;
-						sources = true;
-						n = name.lastIndexOf("-");
-						if (n > -1) {
-							version = name.substring(n + 1);
-							name = name.substring(0, n);
-							if ("SNAPSHOT".equals(version)) {
-								version = null;
-								snapshot = true;
-								n = name.lastIndexOf("-");
-								if (n > -1) {
-									version = name.substring(n + 1);
-									name = name.substring(0, n);
-								}
-							}
-						}
-					}
+				}
+			}
+			if ("sources".equals(version) || "javadoc".equals(version)) {
+				version = null;
+				sources = true;
+				n = name.lastIndexOf("-");
+				if (n > -1) {
+					version = name.substring(n + 1);
+					name = name.substring(0, n);
+				}
+			}
+			if ("SNAPSHOT".equals(version)) {
+				version = null;
+				snapshot = true;
+				n = name.lastIndexOf("-");
+				if (n > -1) {
+					version = name.substring(n + 1);
+					name = name.substring(0, n);
 				}
 			}
 		}
