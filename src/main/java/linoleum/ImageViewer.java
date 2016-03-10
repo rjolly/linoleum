@@ -131,7 +131,6 @@ public class ImageViewer extends Frame {
 		open();
         }//GEN-LAST:event_forwardButtonActionPerformed
 
-
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton backButton;
         private javax.swing.JButton forwardButton;

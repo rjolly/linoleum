@@ -288,7 +288,6 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 		}
         }//GEN-LAST:event_jList1MouseClicked
 
-
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JList jList1;
         private javax.swing.JScrollPane jScrollPane1;
