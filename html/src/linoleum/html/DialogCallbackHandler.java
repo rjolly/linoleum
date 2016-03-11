@@ -11,10 +11,12 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 /* Java imports */
 import java.awt.Component;
+import java.awt.Container;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.Box;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
@@ -25,7 +27,7 @@ public class DialogCallbackHandler implements CallbackHandler {
     /* -- Fields -- */
 
     /* The parent window, or null if using the default parent */
-    private Component parentComponent;
+    private Component parent;
     private static final int JPasswordFieldLen = 8 ;
     private static final int JTextFieldLen = 8 ;
 
@@ -33,8 +35,17 @@ public class DialogCallbackHandler implements CallbackHandler {
 
     public DialogCallbackHandler() { }
 
-    public DialogCallbackHandler(Component parentComponent) {
-        this.parentComponent = parentComponent;
+    public DialogCallbackHandler(final Component comp) {
+        parent = getFrame(comp);
+    }
+
+    private JInternalFrame getFrame(final Component comp) {
+        for (Container p = comp.getParent(); p != null; p = p.getParent()) {
+            if (p instanceof JInternalFrame) {
+                return (JInternalFrame) p;
+            }
+        }
+        return null;
     }
 
     private static interface Action {
@@ -134,7 +145,7 @@ public class DialogCallbackHandler implements CallbackHandler {
 
         /* Display the dialog */
         int result = JOptionPane.showInternalOptionDialog(
-            parentComponent,
+            parent,
             messages.toArray(),
             "Confirmation",                     /* title */
             confirmation.optionType,

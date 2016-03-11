@@ -34,7 +34,7 @@ import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 
 public class EditorPane extends JEditorPane {
-	final Basic basic = new Basic(this);
+	final Basic basic = new Basic();
 	final Map<String, String> map = new HashMap<>();
 	final CookieManager manager = new CookieManager();
 	final Logger logger = Logger.getLogger(getClass().getName());
@@ -145,7 +145,7 @@ public class EditorPane extends JEditorPane {
 		final String host = conn.getURL().getHost();
 		if (auth.startsWith("Basic")) {
 			if (!map.containsKey(host)) {
-				map.put(host, basic.auth());
+				map.put(host, basic.auth(this));
 			}
 			conn.addRequestProperty("Authorization", map.get(host));
 		}
