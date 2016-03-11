@@ -10,6 +10,9 @@ import javax.swing.JInternalFrame;
 import javax.swing.JDesktopPane;
 
 public class DesktopPane extends JDesktopPane {
+	public static final int DEFAULT_LAYER = 1;
+	public static final int DIALOG_LAYER = 2;
+	public static final int ICON_LAYER = 3;
 
 	public DesktopPane() {
 		final InputMap map = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
@@ -18,6 +21,7 @@ public class DesktopPane extends JDesktopPane {
 	}
 
 	public int getLayer(final Component c) {
-		return c instanceof JInternalFrame?1:c instanceof JInternalFrame.JDesktopIcon?2:super.getLayer(c);
+		final int layer = super.getLayer(c);
+		return c instanceof JInternalFrame.JDesktopIcon?ICON_LAYER:layer == 0 && c instanceof JInternalFrame?DEFAULT_LAYER:layer;
 	}
 }

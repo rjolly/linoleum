@@ -173,7 +173,7 @@ public class Desktop extends JFrame {
                 viewMenu.setMnemonic('v');
                 viewMenu.setText("View");
 
-                fullScreenMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.CTRL_MASK));
+                fullScreenMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.ALT_MASK | java.awt.event.InputEvent.CTRL_MASK));
                 fullScreenMenuItem.setMnemonic('f');
                 fullScreenMenuItem.setSelected(true);
                 fullScreenMenuItem.setText("Full screen");

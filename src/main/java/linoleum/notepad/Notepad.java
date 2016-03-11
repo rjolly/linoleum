@@ -21,7 +21,7 @@ public class Notepad extends JPanel {
     private static final String[] MENUBAR_KEYS = {"file", "edit", "debug"};
     private static final String[] TOOLBAR_KEYS = {"new", "open", "save", "-", "cut", "copy", "paste"};
     private static final String[] FILE_KEYS = {"new", "open", "save"};
-    private static final String[] EDIT_KEYS = {"cut", "copy", "paste", "-", "undo", "redo"};
+    private static final String[] EDIT_KEYS = {"cut", "copy", "paste", "-", "undo", "redo", "-", "find", "replace"};
     private static final String[] DEBUG_KEYS = {"dump", "showElementTree"};
 
     static {
@@ -73,6 +73,10 @@ public class Notepad extends JPanel {
         add("Center", panel);
         add("South", createStatusbar());
         update();
+    }
+
+    public Editor getEditor() {
+	return editor;
     }
 
     private Action getAction(final String cmd) {
@@ -213,11 +217,6 @@ public class Notepad extends JPanel {
     public static final String tipSuffix = "Tooltip";
     public static final String acceleratorSuffix = "Accelerator";
 
-    public static final String openAction = "open";
-    public static final String newAction = "new";
-    public static final String saveAction = "save";
-    public static final String showElementTreeAction = "showElementTree";
-
     class UndoHandler implements UndoableEditListener {
 
         public void undoableEditHappened(UndoableEditEvent e) {
@@ -250,7 +249,9 @@ public class Notepad extends JPanel {
         new SaveAction(),
         new ShowElementTreeAction(),
         undoAction,
-        redoAction
+        redoAction,
+        new FindAction(),
+        new ReplaceAction()
     };
 
     class UndoAction extends AbstractAction {
@@ -314,10 +315,34 @@ public class Notepad extends JPanel {
         }
     }
 
-    class OpenAction extends NewAction {
+    class FindAction extends AbstractAction {
+
+        FindAction() {
+            super("find");
+        }
+
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            frame.find();
+        }
+    }
+
+    class ReplaceAction extends AbstractAction {
+
+        ReplaceAction() {
+            super("replace");
+        }
+
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            frame.replace();
+        }
+    }
+
+    class OpenAction extends AbstractAction {
 
         OpenAction() {
-            super(openAction);
+            super("open");
         }
 
         @Override
@@ -362,7 +387,7 @@ public class Notepad extends JPanel {
     class SaveAction extends AbstractAction {
 
         SaveAction() {
-            super(saveAction);
+            super("save");
         }
 
         public void actionPerformed(final ActionEvent e) {
@@ -379,7 +404,7 @@ public class Notepad extends JPanel {
     class NewAction extends AbstractAction {
 
         NewAction() {
-            super(newAction);
+            super("new");
         }
 
         NewAction(String nm) {
@@ -409,7 +434,7 @@ public class Notepad extends JPanel {
             title += " (modified)";
         }
         frame.setTitle(title);
-        getAction(saveAction).setEnabled(file != null && modified != 0);
+        getAction("save").setEnabled(file != null && modified != 0);
     }
 
     public void close() {
@@ -425,7 +450,7 @@ public class Notepad extends JPanel {
     class ShowElementTreeAction extends AbstractAction {
 
         ShowElementTreeAction() {
-            super(showElementTreeAction);
+            super("showElementTree");
         }
 
         public void actionPerformed(ActionEvent e) {

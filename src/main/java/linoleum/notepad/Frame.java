@@ -1,22 +1,28 @@
 package linoleum.notepad;
 
+import java.awt.Dimension;
+import java.awt.Point;
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Paths;
 import javax.swing.ImageIcon;
+import javax.swing.JInternalFrame;
+import javax.swing.SwingUtilities;
 
 public class Frame extends linoleum.application.Frame {
 	private final Notepad notepad = new Notepad(this);
+	private boolean found;
 
 	public Frame() {
 		super(Notepad.resources.getString("Title"));
 		initComponents();
+		jInternalFrame1.pack();
 		getContentPane().add("Center", notepad);
 		setJMenuBar(notepad.createMenubar());
-		setSize(500, 400);
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Edit24.gif")));
 		setName(Notepad.class.getSimpleName());
 		setMimeType("text/*");
+		setSize(500, 400);
 	}
 
 	@Override
@@ -37,7 +43,41 @@ public class Frame extends linoleum.application.Frame {
 
 	@Override
 	public void close() {
+		jInternalFrame1.dispose();
 		notepad.close();
+	}
+
+	private void openDialog(final String title) {
+		if (jInternalFrame1.getDesktopPane() == null) {
+			getDesktopPane().add(jInternalFrame1);
+			setDialogLocation(jInternalFrame1);
+			jInternalFrame1.setLayer(2);
+		}
+		jInternalFrame1.setTitle(Notepad.resources.getString(title));
+		jInternalFrame1.setVisible(true);
+	}
+
+	private void setDialogLocation(final JInternalFrame dialog) {
+		final Dimension s = dialog.getSize();
+		final Dimension size = getSize();
+		final int x = (size.width - s.width) / 2;
+		final int y = (size.height - s.height) / 2;
+		final Point point = SwingUtilities.convertPoint(this, x, y, getDesktopPane());
+		dialog.setLocation(point.x, point.y);
+	}
+
+	public void find() {
+		openDialog("FindTitle");
+		jTextField2.setEnabled(false);
+		jButton2.setEnabled(false);
+		jButton3.setEnabled(false);
+	}
+
+	public void replace() {
+		openDialog("ReplaceTitle");
+		jTextField2.setEnabled(true);
+		jButton2.setEnabled(true);
+		jButton3.setEnabled(true);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -133,19 +173,39 @@ public class Frame extends linoleum.application.Frame {
         }// </editor-fold>//GEN-END:initComponents
 
         private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-                // TODO add your handling code here:
+		try {
+			found = notepad.getEditor().findNext(jTextField1.getText(), true);
+			setSelected(true);
+		} catch (final Exception ex) {
+			ex.printStackTrace();
+		}
         }//GEN-LAST:event_jButton1ActionPerformed
 
         private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-                // TODO add your handling code here:
+		if (found) try {
+			found = notepad.getEditor().replace(jTextField1.getText(), jTextField2.getText());
+			setSelected(true);
+		} catch (final Exception ex) {
+			ex.printStackTrace();
+		}
         }//GEN-LAST:event_jButton2ActionPerformed
 
         private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-                // TODO add your handling code here:
+		try {
+			notepad.getEditor().replaceAll(jTextField1.getText(), jTextField2.getText());
+			setSelected(true);
+		} catch (final Exception ex) {
+			ex.printStackTrace();
+		}
         }//GEN-LAST:event_jButton3ActionPerformed
 
         private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-                // TODO add your handling code here:
+		try {
+			jInternalFrame1.dispose();
+			setSelected(true);
+		} catch (final Exception ex) {
+			ex.printStackTrace();
+		}
         }//GEN-LAST:event_jButton4ActionPerformed
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
