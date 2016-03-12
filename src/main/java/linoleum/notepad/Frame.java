@@ -95,6 +95,7 @@ public class Frame extends linoleum.application.Frame {
                 jButton4 = new javax.swing.JButton();
 
                 jInternalFrame1.setClosable(true);
+                jInternalFrame1.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
 
                 jLabel1.setText("Find :");
 
@@ -169,6 +170,24 @@ public class Frame extends linoleum.application.Frame {
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 );
 
+                addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
+                        public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+                                formInternalFrameIconified(evt);
+                        }
+                        public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                });
+
                 pack();
         }// </editor-fold>//GEN-END:initComponents
 
@@ -201,12 +220,18 @@ public class Frame extends linoleum.application.Frame {
 
         private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
 		try {
-			jInternalFrame1.dispose();
+			jInternalFrame1.setVisible(false);
 			setSelected(true);
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}
         }//GEN-LAST:event_jButton4ActionPerformed
+
+        private void formInternalFrameIconified(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameIconified
+		if (jInternalFrame1.isVisible()) {
+			jInternalFrame1.setVisible(false);
+		}
+        }//GEN-LAST:event_formInternalFrameIconified
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
