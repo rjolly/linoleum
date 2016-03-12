@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=Linoleum
 Comment=This session logs you into Linoleum
-Exec=/home/user/linoleum/bin/linoleum
-TryExec=/home/user/linoleum/bin/linoleum
+Exec=linoleum
+TryExec=linoleum
 Icon=
 Type=Application
 Keywords=launch;Linoleum;desktop;session;

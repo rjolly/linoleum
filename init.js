@@ -1,8 +1,13 @@
-function install(pkg, conf) {
+function install(pkg, conf, dir) {
+    var instance = Packages.linoleum.pkg.PackageManager.instance;
     if (conf == undefined) {
 	conf = "default";
     }
-    Packages.linoleum.pkg.PackageManager.instance.install(pkg, conf);
+    if (dir == undefined) {
+	instance.install(pkg, conf);
+    } else {
+	instance.install(pkg, conf, pathToFile(dir));
+    }
 }
 
 // adapted from https://weblogs.java.net/blog/forax/archive/2006/09/using_jrunscrip.html

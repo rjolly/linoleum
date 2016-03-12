@@ -347,10 +347,8 @@ public class Notepad extends JPanel {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			if (parent == null) try {
-				parent = new File(".").getCanonicalFile();
-			} catch (final IOException ex) {
-				ex.printStackTrace();
+			if (parent == null) {
+				parent = new File("");
 			}
 			if (parent != null) {
 				frame.getApplicationManager().open(parent.toURI());

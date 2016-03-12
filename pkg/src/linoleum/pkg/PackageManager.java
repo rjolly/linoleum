@@ -66,13 +66,17 @@ public class PackageManager extends Frame {
 	}
 
 	public void install(final String name, final String conf) throws Exception {
+		install(name, conf, Desktop.pkgs.lib());
+	}
+
+	public void install(final String name, final String conf, final File dir) throws Exception {
 		final ModuleRevisionId mRID = ModuleRevisionId.parse(name);
 		final ResolveOptions resolveOptions = new ResolveOptions();
 		resolveOptions.setConfs(new String[] { conf });
 		final ResolveReport resolveReport = ivy.resolve(mRID, resolveOptions, true);
 		final ModuleDescriptor md = resolveReport.getModuleDescriptor();
 		final RetrieveOptions retrieveOptions = new RetrieveOptions();
-		retrieveOptions.setDestArtifactPattern(Desktop.pkgs.lib().getPath() + "/[artifact]-[revision](-[classifier]).[ext]");
+		retrieveOptions.setDestArtifactPattern(dir.getPath() + "/[artifact]-[revision](-[classifier]).[ext]");
 		final RetrieveReport retrieveReport = ivy.retrieve(md.getModuleRevisionId(), retrieveOptions);
 		for (final Object obj : retrieveReport.getCopiedFiles()) {
 			final File file = (File)obj;

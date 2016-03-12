@@ -78,7 +78,50 @@
 	<copy todir="${dist.dir}" file="init.js"/>
     </target>
 
-    <target name="bundle" depends="jar">
+    <target name="zip" depends="jar">
 	<zip destfile="../${application.title}.zip" basedir="${dist.dir}" excludes="ivy.xml"/>
+    </target>
+
+    <path id="classpath">
+        <fileset dir="../ant-deb-task/dist" includes="*.jar"/>
+    </path>
+
+    <taskdef resource="ant_deb_task.properties" classpathref="classpath"/>
+    
+    <target name="deb" depends="jar" description="build the deb file">
+        <deb
+            todir=".."
+            package="${package.name}"
+            section="libs"
+            depends="${depends}"
+            preinst="local/preinst"
+            postinst="local/postinst"
+            prerm="local/prerm"
+        >
+            <version upstream="${version}" debian="${version.debian}"/>
+            <maintainer name="Raphael Jolly" email="rjolly@users.sourceforge.net"/>
+            <description synopsis="Linoleum">
+Java desktop environment and software distribution.
+
+http://linoleum.java.net/
+            </description>
+            <tarfileset dir="${dist.dir}" prefix="usr/share/${package.name}">
+                <exclude name="bin/**"/>
+                <exclude name="lib/commons-codec-1.9.jar"/>
+                <exclude name="lib/ivy-2.4.0.jar"/>
+                <exclude name="lib/jsch-0.1.51.jar"/>
+                <exclude name="linoleum.desktop"/>
+                <exclude name="ivy.xml"/>
+                <exclude name="README.TXT"/>
+            </tarfileset>
+            <tarfileset dir="${dist.dir}/bin" prefix="usr/share/${package.name}/bin" filemode="755">
+                <exclude name="*.bat"/>
+            </tarfileset>
+            <tarfileset dir="${dist.dir}" prefix="usr/share/doc/${package.name}">
+                <include name="ivy.xml"/>
+                <include name="README.TXT"/>
+            </tarfileset>
+            <tarfileset file="local/linoleum.desktop" prefix="usr/share/xsessions"/>
+        </deb>
     </target>
 </project>

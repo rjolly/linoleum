@@ -1,3 +1,4 @@
 #!/bin/sh
-LINOLEUM_HOME=`dirname $0`/..
+LINOLEUM=`readlink -f $0`
+LINOLEUM_HOME=`dirname $LINOLEUM`/..
 java -Djava.system.class.loader=linoleum.ClassLoader -jar $LINOLEUM_HOME/linoleum.jar

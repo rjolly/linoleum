@@ -7,8 +7,7 @@ Optional software:
 
 - jmf 2.1.1e ( http://www.oracle.com/technetwork/java/javasebusiness/downloads/java-archive-downloads-java-client-419417.html )
 - java3d 1.5.1 ( same as above )
-- netbeans 7.4 ( https://netbeans.org/ )
-- ivybeans 1.2-nb71 ( https://code.google.com/p/ivybeans/ )
+- jai 1.1.2_01 ( same as above )
 
 
 To run linoleum, add dist/bin to your path, give dist/bin/linoleum execution privilege (unix), then:
@@ -39,7 +38,8 @@ To publish an application:
 
 
 To use linoleum as your desktop environment in Linux:
-  sudo cp linoleum.desktop /usr/share/xsessions/
+  wget https://java.net/downloads/linoleum/linoleum.deb
+  sudo dpkg -i linoleum.deb
 
 
 List of applications
@@ -47,5 +47,5 @@ List of applications
   net.java.linoleum#j3d;1.1		3D Object Loader (requires java3d)
   net.java.linoleum#jcterm;0.0.11	SSH2 Terminal Emulator in Pure Java
   net.java.linoleum#media;1.1		Media Player (requires jmf)
-  net.java.linoleum#pdfview;1.1		PDF viewer.
+  net.java.linoleum#pdfview;1.1		PDF viewer (may require jai in some cases)
 

@@ -5,11 +5,8 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.jar.Manifest;
 import java.util.jar.Attributes;
 import java.net.URL;
@@ -20,7 +17,6 @@ public class Packages {
 	private final List<ClassPathListener> listeners = new ArrayList<>();
 	private final Map<String, File> installed = new HashMap<>();
 	private final Map<String, File> map = new HashMap<>();
-	private final Set<String> white = new HashSet<>();
 	private final File lib = new File("lib");
 	private final FileFilter filter = new FileFilter() {
 		public boolean accept(final File file) {
@@ -29,7 +25,6 @@ public class Packages {
 	};
 
 	public Packages() {
-		white.addAll(Arrays.asList(System.getProperty("linoleum.whitelist", "").split(",")));
 		final String extdirs[] = System.getProperty("java.ext.dirs").split(File.pathSeparator);
 		for (final String str : extdirs) {
 			final File dir = new File(str);
@@ -65,19 +60,11 @@ public class Packages {
 			add(tools);
 		}
 		final File home = home();
-		if (!home.equals(new File("."))) {
+		if (!home.equals(new File(""))) {
 			final File lib = new File(home, "lib");
 			if (lib.isDirectory()) {
 				for (final File file: lib.listFiles(filter)) {
 					add(file);
-				}
-			}
-			final File dir = new File(home.getParentFile(), "java");
-			if (dir.isDirectory()) {
-				for (final File file: dir.listFiles(filter)) {
-					if (white.contains(new Package(file).getName())) {
-						add(file);
-					}
 				}
 			}
 		}
