@@ -76,7 +76,7 @@ public class Notepad extends JPanel {
 	}
 
 	public Editor getEditor() {
-	return editor;
+		return editor;
 	}
 
 	private Action getAction(final String cmd) {
@@ -247,6 +247,9 @@ public class Notepad extends JPanel {
 		new NewAction(),
 		new OpenAction(),
 		new SaveAction(),
+		new DefaultEditorKit.CutAction(),
+		new DefaultEditorKit.CopyAction(),
+		new DefaultEditorKit.PasteAction(),
 		new ShowElementTreeAction(),
 		undoAction,
 		redoAction,

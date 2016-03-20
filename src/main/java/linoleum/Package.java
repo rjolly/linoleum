@@ -1,8 +1,11 @@
 package linoleum;
 
 import java.io.File;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class Package {
+	private static final Pattern pattern = Pattern.compile("-\\d");
 	private String name;
 	private String version;
 	private boolean snapshot;
@@ -15,30 +18,19 @@ public class Package {
 		if (n > -1) {
 			suffix = name.substring(n + 1);
 			name = name.substring(0, n);
-			if ("jar".equals(suffix)) {
-				n = name.lastIndexOf("-");
-				if (n > -1) {
-					version = name.substring(n + 1);
-					name = name.substring(0, n);
-				}
+			final Matcher matcher = pattern.matcher(name);
+			if (matcher.find()) {
+				n = matcher.start();
+				version = name.substring(n + 1);
+				name = name.substring(0, n);
 			}
-			if ("sources".equals(version) || "javadoc".equals(version)) {
-				version = null;
+			if (version != null && (version.endsWith("-sources") || version.endsWith("-javadoc"))) {
+				version = version.substring(0, version.length() - 8);
 				sources = true;
-				n = name.lastIndexOf("-");
-				if (n > -1) {
-					version = name.substring(n + 1);
-					name = name.substring(0, n);
-				}
 			}
-			if ("SNAPSHOT".equals(version)) {
-				version = null;
+			if (version != null && version.endsWith("-SNAPSHOT")) {
+				version = version.substring(0, version.length() - 9);
 				snapshot = true;
-				n = name.lastIndexOf("-");
-				if (n > -1) {
-					version = name.substring(n + 1);
-					name = name.substring(0, n);
-				}
 			}
 		}
 	}

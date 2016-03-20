@@ -5,7 +5,7 @@ set -e
 if [ "$1" = "configure" ] ; then
     ln -s /usr/share/linoleum/bin/linoleum /usr/bin/
     ln -s ../../java/ivy.jar /usr/share/linoleum/lib/
-    ln -s ../../java/commons-codec.jar /usr/share/linoleum/lib/commons-codec-version.jar
+    ln -s ../../java/commons-codec.jar /usr/share/linoleum/lib/
     ln -s ../../java/jsch.jar /usr/share/linoleum/lib/
 fi
 

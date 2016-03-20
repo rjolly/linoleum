@@ -7,16 +7,10 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import javax.script.Bindings;
-import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 import javax.swing.ImageIcon;
 import linoleum.application.Frame;
 
@@ -108,7 +102,6 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		}
 		extension = engine.getFactory().getExtensions().get(0);
 		prompt = extension + ">";
-		engine.setBindings(createBindings(), ScriptContext.ENGINE_SCOPE);
 	}
 
 	// Name of the System property used to select scripting language
@@ -122,13 +115,6 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 			lang = "JavaScript";
 		}
 		return lang;
-	}
-
-	// create Bindings that is backed by a synchronized HashMap
-	private Bindings createBindings() {
-		Map<String, Object> map
-			= Collections.synchronizedMap(new HashMap<String, Object>());
-		return new SimpleBindings(map);
 	}
 
 	// create and initialize script engine

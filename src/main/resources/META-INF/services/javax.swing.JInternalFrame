@@ -1,6 +1,6 @@
-linoleum.FileManager
+linoleum.Console
 linoleum.ScriptShell
+linoleum.FileManager
 linoleum.ImageViewer
 linoleum.notepad.Frame
-linoleum.Console
 linoleum.Clock
