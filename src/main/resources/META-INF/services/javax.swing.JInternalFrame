@@ -2,5 +2,4 @@ linoleum.Console
 linoleum.ScriptShell
 linoleum.FileManager
 linoleum.ImageViewer
-linoleum.notepad.Frame
 linoleum.Clock
