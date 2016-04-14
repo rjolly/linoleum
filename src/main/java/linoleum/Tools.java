@@ -29,10 +29,17 @@ public class Tools {
 		return Desktop.pkgs.installed();
 	}
 
+	static File[] concat(final File a[], final File b[]) {
+		final File c[] = new File[a.length + b.length];
+		System.arraycopy(a, 0, c, 0, a.length);
+		System.arraycopy(b, 0, c, a.length, b.length);
+		return c;
+	}
+
 	public void compile(final File files[], final File destDir, final String options[]) throws IOException {
 		final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 		try (final StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null)) {
-			fileManager.setLocation(StandardLocation.CLASS_PATH, Arrays.asList(classpath()));
+			fileManager.setLocation(StandardLocation.CLASS_PATH, Arrays.asList(concat(classpath(), new File[] {destDir})));
 			fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList(new File[] {destDir}));
 			final JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, Arrays.asList(options), null, fileManager.getJavaFileObjectsFromFiles(Arrays.asList(files)));
 			task.call();

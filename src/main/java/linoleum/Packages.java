@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.jar.Manifest;
 import java.util.jar.Attributes;
 import java.net.URL;
@@ -15,7 +16,7 @@ import linoleum.application.event.ClassPathChangeEvent;
 
 public class Packages {
 	private final List<ClassPathListener> listeners = new ArrayList<>();
-	private final Map<String, File> installed = new HashMap<>();
+	private final Map<String, File> installed = new LinkedHashMap<>();
 	private final Map<String, File> map = new HashMap<>();
 	private final File lib = new File("lib");
 	private final FileFilter filter = new FileFilter() {

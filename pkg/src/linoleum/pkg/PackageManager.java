@@ -2,7 +2,7 @@ package linoleum.pkg;
 
 import java.io.File;
 import java.util.Arrays;
-import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 import linoleum.application.Frame;
 import linoleum.application.event.ClassPathChangeEvent;
@@ -90,7 +90,6 @@ public class PackageManager extends Frame {
 	private void install(final String organization, final String module, final String revision) {
 		try {
 			install(organization + "#" + module + ";" + revision, "default");
-			refresh();
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}
@@ -118,6 +117,8 @@ public class PackageManager extends Frame {
                 jSeparator1 = new javax.swing.JSeparator();
                 jScrollPane1 = new javax.swing.JScrollPane();
                 jTable1 = new javax.swing.JTable();
+
+                setName("Packages");
 
                 jLabel1.setText("Organization :");
 
@@ -205,11 +206,20 @@ public class PackageManager extends Frame {
         }// </editor-fold>//GEN-END:initComponents
 
         private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
+		jButton1.setEnabled(false);
+		(new SwingWorker<Object, Object>() {
+			@Override
+			public Object doInBackground() {
 				install(jTextField1.getText(), jTextField2.getText(), jTextField3.getText());
+				return null;
 			}
-		});
+
+			@Override
+			protected void done() {
+				jButton1.setEnabled(true);
+				refresh();
+			}
+		}).execute();
         }//GEN-LAST:event_jButton1ActionPerformed
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
