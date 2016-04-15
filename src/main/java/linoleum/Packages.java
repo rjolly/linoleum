@@ -3,6 +3,8 @@ package linoleum;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -18,7 +20,9 @@ public class Packages {
 	private final List<ClassPathListener> listeners = new ArrayList<>();
 	private final Map<String, File> installed = new LinkedHashMap<>();
 	private final Map<String, File> map = new HashMap<>();
+	private final File tools = new File(new File(System.getProperty("java.home")), "../lib/tools.jar");
 	private final File lib = new File("lib");
+	private final File home;
 	private final FileFilter filter = new FileFilter() {
 		public boolean accept(final File file) {
 			return file.isFile() && file.getName().endsWith(".jar");
@@ -56,22 +60,23 @@ public class Packages {
 				}
 			} catch (final IOException e) {}
 		}
-		final File tools = new File(new File(System.getProperty("java.home")), "../lib/tools.jar");
 		if (tools.exists()) {
 			add(tools);
 		}
-		final File home = home();
-		if (!home.equals(new File(""))) {
-			final File lib = new File(home, "lib");
-			if (lib.isDirectory()) {
-				for (final File file: lib.listFiles(filter)) {
-					add(file);
+		home = map.get("linoleum").getParentFile();
+		try {
+			if (!Files.isSameFile(home.toPath(), Paths.get(""))) {
+				final File lib = new File(home, "lib");
+				if (lib.isDirectory()) {
+					for (final File file : lib.listFiles(filter)) {
+						add(file);
+					}
 				}
 			}
-		}
+		} catch (final IOException e) {}
 		lib.mkdir();
 		if (lib.isDirectory()) {
-			for (final File file: lib.listFiles(filter)) {
+			for (final File file : lib.listFiles(filter)) {
 				add(file);
 			}
 		}
@@ -96,7 +101,7 @@ public class Packages {
 	}
 
 	public File home() {
-		return (map.containsKey("linoleum")?map.get("linoleum"):lib).getParentFile();
+		return home;
 	}
 
 	public File lib() {

@@ -6,7 +6,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.prefs.Preferences;
 import java.util.concurrent.CountDownLatch;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -112,7 +116,8 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		String lang = System.getProperty(LANGUAGE_KEY);
 		if (lang == null) {
 			// default is JavaScript
-			lang = "JavaScript";
+			final Preferences prefs = Preferences.userNodeForPackage(getClass());
+			lang = prefs.get(getName() + ".lang", "JavaScript");
 		}
 		return lang;
 	}
@@ -125,10 +130,12 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		loadInitFile(ClassLoader.getSystemResource("com/sun/tools/script/shell/init." + extension));
 		final File home = Desktop.pkgs.home();
 		loadUserInitFile(new File(home, "init." + extension));
-		if (!home.equals(new File(""))) {
-			// load current user's initialization file
-			loadUserInitFile(new File("init." + extension));
-		}
+		try {
+			if (!Files.isSameFile(home.toPath(), Paths.get(""))) {
+				// load current user's initialization file
+				loadUserInitFile(new File("init." + extension));
+			}
+		} catch (final IOException e) {}
 	}
 
 	// set pre-defined global variables for script

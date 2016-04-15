@@ -23,6 +23,12 @@ To install an application (or any Ivy module), in the script shell:
   install("org#module;version");
 
 
+Alternatively:
+  open "Packages"
+  enter the (org, module, version) triplet
+  click "Install"
+
+
 To build linoleum from itself, first clone the repository by external means (for now), then in the script shell:
   cd("/path/to/linoleum");
   load("build.js")

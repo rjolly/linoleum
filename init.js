@@ -10,6 +10,20 @@ function install(pkg, conf, dir) {
     }
 }
 
+function load(str) {
+	var stream = inStream(str);
+	var bstream = new BufferedInputStream(stream);
+	var reader = new BufferedReader(new InputStreamReader(bstream));
+	var oldFilename = engine.get(engine.FILENAME);
+	engine.put(engine.FILENAME, str);	
+	try {
+		engine.eval(reader);
+	} finally {
+		engine.put(engine.FILENAME, oldFilename);
+	        streamClose(stream);
+	}
+}
+
 // adapted from https://weblogs.java.net/blog/forax/archive/2006/09/using_jrunscrip.html
 
 function javac(srcDir, destDir) {

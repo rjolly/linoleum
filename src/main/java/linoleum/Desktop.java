@@ -16,9 +16,9 @@ import linoleum.application.ApplicationManager;
 
 public class Desktop extends JFrame {
 	public static final Packages pkgs = new Packages();
-	private static final String ABOUTMSG = "Linoleum 1.1 \n \nJava desktop environment "
+	private static final String ABOUTMSG = "%s %s.%s \n \nJava desktop environment "
 		+ "and software distribution. \n \nWritten by \n  "
-		+ "Raphael Jolly";
+		+ "%s";
 	private final ApplicationManager apps = new ApplicationManager();
 	private final GraphicsDevice devices[];
 	private Rectangle bounds;
@@ -36,7 +36,12 @@ public class Desktop extends JFrame {
 	}
 
 	private void about() {
-		JOptionPane.showInternalMessageDialog(desktopPane, ABOUTMSG);
+		final java.lang.Package pkg = getClass().getPackage();
+		JOptionPane.showInternalMessageDialog(desktopPane, String.format(ABOUTMSG,
+				pkg.getImplementationTitle(),
+				pkg.getSpecificationVersion(),
+				pkg.getImplementationVersion(),
+				pkg.getImplementationVendor()));
 	}
 
 	private void content() {

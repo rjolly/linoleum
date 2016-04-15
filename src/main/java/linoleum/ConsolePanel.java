@@ -8,7 +8,7 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 
 public class ConsolePanel extends JPanel {
-	private static boolean initialized;
+	private static boolean initialized = System.getProperty("linoleum.debug") != null;
 	private JTextArea editor;
 	private boolean updating;
 	private DocumentListener listener;
