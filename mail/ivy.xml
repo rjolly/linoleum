@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0">
+    <info module="mail" organisation="net.java.linoleum" revision="1.1"/>
+    <configurations>
+        <conf name="default" extends="runtime,master"/>
+        <conf name="master"/>
+        <conf name="compile"/>
+        <conf name="runtime"/>
+        <conf name="compile-test"/>
+        <conf name="runtime-test"/>
+    </configurations>
+    <dependencies>
+        <dependency org="com.sun.mail" name="javax.mail" rev="1.5.5" conf="compile->master;runtime->default"/>
+        <dependency org="net.java.linoleum" name="application" rev="1.1" conf="compile->master;runtime->default"/>
+        <dependency org="net.java.linoleum" name="jlfgr" rev="1_0" conf="runtime->default"/>
+    </dependencies>
+</ivy-module>
