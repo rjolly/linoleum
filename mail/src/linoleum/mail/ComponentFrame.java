@@ -2,10 +2,10 @@ package linoleum.mail;
 
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.WindowConstants;
 
-public class ComponentFrame extends JFrame {
+public class ComponentFrame extends JInternalFrame {
 
 	public ComponentFrame(Component what) {
 		this(what, "Component Frame");

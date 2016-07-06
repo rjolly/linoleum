@@ -4,26 +4,25 @@ import java.awt.*;
 import javax.mail.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.table.*;
 
 public class FolderViewer extends JPanel {
-	FolderModel model = new FolderModel();
-	private final MessageViewer mv;
-	JScrollPane scrollpane;
-	JTable table;
+	private final FolderModel model = new FolderModel();
+	private final JScrollPane scrollpane;
+	private final JTable table;
+	private MessageViewer mv;
 
-	public FolderViewer(final MessageViewer mv) {
+	public FolderViewer() {
 		super(new GridLayout(1,1));
-		this.mv = mv;
-
 		table = new JTable(model);
-		table.setShowGrid(false);
-
-		scrollpane = new JScrollPane(table);
-
 		// find out what is pressed
 		table.getSelectionModel().addListSelectionListener(new FolderPressed());
+		table.setShowGrid(false);
+		scrollpane = new JScrollPane(table);
 		add(scrollpane);
+	}
+
+	public void setMv(MessageViewer mv) {
+		this.mv = mv;
 	}
 
 	public void setFolder(Folder what) {

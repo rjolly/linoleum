@@ -1,6 +1,5 @@
 package linoleum.mail;
 
-import java.awt.Dimension;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -13,27 +12,15 @@ import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.URLName;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTree;
 import javax.swing.ImageIcon;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import linoleum.application.Frame;
 
 public class SimpleClient extends Frame {
-	private final MessageViewer mv = new MessageViewer();
-	private final FolderViewer fv = new FolderViewer(mv);
-	private final JScrollPane sp;
-	private final JSplitPane jsp;
-	private final JSplitPane jsp2;
-
 	public SimpleClient(final boolean first) {
 		initComponents();
-		setTitle("Simple JavaMail Client");
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail24.gif")));
 		if (first) try {
 			final File capfile = new File("simple.mailcap");
@@ -42,13 +29,6 @@ public class SimpleClient extends Frame {
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
-		sp = new JScrollPane();
-		sp.setPreferredSize(new Dimension(250, 300));
-		jsp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sp, fv);
-		jsp.setOneTouchExpandable(true);
-		jsp2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, jsp, mv);
-		jsp2.setOneTouchExpandable(true);
-		getContentPane().add(jsp2);
 	}
 
 	public SimpleClient() {
@@ -72,45 +52,73 @@ public class SimpleClient extends Frame {
 		} catch (final NoSuchProviderException e) {
 			e.printStackTrace();
 		}
-		final DefaultTreeModel treeModel = new DefaultTreeModel(root);
-		final JTree tree = new JTree(treeModel);
-		tree.addTreeSelectionListener(new TreePress());
-		sp.getViewport().add(tree);
-	}
-
-	class TreePress implements TreeSelectionListener {
-		public void valueChanged(final TreeSelectionEvent e) {
-			final TreePath path = e.getNewLeadSelectionPath();
-			if (path != null) {
-				final Object o = path.getLastPathComponent();
-				if (o instanceof FolderTreeNode) {
-					final FolderTreeNode node = (FolderTreeNode)o;
-					final Folder folder = node.getFolder();
-					try {
-						if ((folder.getType() & Folder.HOLDS_MESSAGES) != 0) {
-							fv.setFolder(folder);
-						}
-					} catch (final MessagingException me) {
-						me.printStackTrace();
-					}
-				}
-			}
-		}
+		jTree1.setModel(new DefaultTreeModel(root));
 	}
 
 	@SuppressWarnings("unchecked")
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
+                jSplitPane1 = new javax.swing.JSplitPane();
+                jSplitPane2 = new javax.swing.JSplitPane();
+                jScrollPane1 = new javax.swing.JScrollPane();
+                jTree1 = new javax.swing.JTree();
+                folderViewer = new linoleum.mail.FolderViewer();
+                messageViewer = new linoleum.mail.MessageViewer();
+
                 setClosable(true);
                 setIconifiable(true);
                 setMaximizable(true);
                 setResizable(true);
-                setName("Mail");
+                setTitle("Simple JavaMail Client");
+                setName("Mail"); // NOI18N
+
+                jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+                jTree1.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+                        public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+                                jTree1ValueChanged(evt);
+                        }
+                });
+                jScrollPane1.setViewportView(jTree1);
+
+                jSplitPane2.setLeftComponent(jScrollPane1);
+
+                folderViewer.setMv(messageViewer);
+                jSplitPane2.setRightComponent(folderViewer);
+
+                jSplitPane1.setTopComponent(jSplitPane2);
+                jSplitPane1.setRightComponent(messageViewer);
+
+                getContentPane().add(jSplitPane1, java.awt.BorderLayout.CENTER);
 
                 pack();
         }// </editor-fold>//GEN-END:initComponents
 
+        private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
+		final TreePath path = evt.getNewLeadSelectionPath();
+		if (path != null) {
+			final Object o = path.getLastPathComponent();
+			if (o instanceof FolderTreeNode) {
+				final FolderTreeNode node = (FolderTreeNode)o;
+				final Folder folder = node.getFolder();
+				try {
+					if ((folder.getType() & Folder.HOLDS_MESSAGES) != 0) {
+						folderViewer.setFolder(folder);
+					}
+				} catch (final MessagingException me) {
+					me.printStackTrace();
+				}
+			}
+		}
+        }//GEN-LAST:event_jTree1ValueChanged
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
+        private linoleum.mail.FolderViewer folderViewer;
+        private javax.swing.JScrollPane jScrollPane1;
+        private javax.swing.JSplitPane jSplitPane1;
+        private javax.swing.JSplitPane jSplitPane2;
+        private javax.swing.JTree jTree1;
+        private linoleum.mail.MessageViewer messageViewer;
         // End of variables declaration//GEN-END:variables
 }
