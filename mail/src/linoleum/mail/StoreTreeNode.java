@@ -24,13 +24,21 @@ public class StoreTreeNode extends DefaultMutableTreeNode {
 		return super.getChildCount();
 	}
 
-	protected void loadChildren() {
+	public boolean open() {
 		try {
 			// connect to the Store if we need to
 			if (!store.isConnected()) {
 				store.connect();
 			}
+			return true;
+		} catch (MessagingException me) {
+			me.printStackTrace();
+		}
+		return false;
+	}
 
+	protected void loadChildren() {
+		try {
 			// get the default folder, and list the
 			// subscribed folders on it
 			folder = store.getDefaultFolder();
