@@ -7,6 +7,7 @@ import java.beans.*;
 import javax.activation.*;
 import javax.mail.*;
 import javax.swing.JPanel;
+import javax.swing.JInternalFrame;
 
 public class MultipartViewer extends JPanel implements CommandObject {
 	protected DataHandler dh = null;
@@ -120,6 +121,15 @@ public class MultipartViewer extends JPanel implements CommandObject {
 		add(lab);
 	}
 
+	protected JInternalFrame getFrame() {
+		for (Container p = getParent(); p != null; p = p.getParent()) {
+			if (p instanceof JInternalFrame) {
+				return (JInternalFrame) p;
+			}
+		}
+		return null;
+	}
+
 	class AttachmentViewer implements ActionListener {
 		BodyPart bp = null;
 
@@ -129,6 +139,7 @@ public class MultipartViewer extends JPanel implements CommandObject {
 
 		public void actionPerformed(ActionEvent e) {
 			ComponentFrame f = new ComponentFrame(getComponent(bp), "Attachment");
+			getFrame().getDesktopPane().add(f);
 			f.pack();
 			f.show();
 		}

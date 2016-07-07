@@ -12,7 +12,7 @@ public class ComponentFrame extends JInternalFrame {
 	}
 
 	public ComponentFrame(Component what, String name) {
-		super(name);
+		super(name, true, true, true, true);
 
 		// make sure that we close and dispose ourselves when needed
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
