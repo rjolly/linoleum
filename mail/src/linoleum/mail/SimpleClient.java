@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.prefs.Preferences;
 import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
 import javax.mail.Folder;
@@ -25,25 +26,21 @@ public class SimpleClient extends Frame {
 	private final DefaultTreeModel model = new DefaultTreeModel(root);
 	private StoreTreeNode node;
 
-	public SimpleClient(final boolean first) {
+	public SimpleClient() {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail24.gif")));
-		if (first) try {
+		try {
 			final File capfile = new File("simple.mailcap");
 			final InputStream is = capfile.isFile()?new FileInputStream(capfile):getClass().getResourceAsStream("simple.mailcap");
 			CommandMap.setDefaultCommandMap(new MailcapCommandMap(is));
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
-	}
-
-	public SimpleClient() {
-		this(true);
-	}
-
-	@Override
-	public Frame getFrame() {
-		return new SimpleClient(false);
+		final Preferences prefs = Preferences.userNodeForPackage(getClass());
+		final String str = prefs.get(getName() + ".url", null);
+		if (str != null) {
+			open(str);
+		}
 	}
 
 	@Override
