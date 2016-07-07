@@ -102,6 +102,7 @@ public class SimpleClient extends Frame {
                 setName("Mail"); // NOI18N
 
                 jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+                jSplitPane1.setResizeWeight(1.0);
 
                 jTree1.setModel(model);
                 jTree1.setComponentPopupMenu(jPopupMenu1);
@@ -130,7 +131,7 @@ public class SimpleClient extends Frame {
                 jSplitPane2.setRightComponent(folderViewer);
 
                 jSplitPane1.setTopComponent(jSplitPane2);
-                jSplitPane1.setRightComponent(messageViewer);
+                jSplitPane1.setBottomComponent(messageViewer);
 
                 getContentPane().add(jSplitPane1, java.awt.BorderLayout.CENTER);
 
