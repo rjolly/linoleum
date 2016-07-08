@@ -110,6 +110,7 @@ public class SimpleClient extends Frame {
                 });
                 jTree1.addTreeWillExpandListener(new javax.swing.event.TreeWillExpandListener() {
                         public void treeWillCollapse(javax.swing.event.TreeExpansionEvent evt)throws javax.swing.tree.ExpandVetoException {
+                                jTree1TreeWillCollapse(evt);
                         }
                         public void treeWillExpand(javax.swing.event.TreeExpansionEvent evt)throws javax.swing.tree.ExpandVetoException {
                                 jTree1TreeWillExpand(evt);
@@ -192,6 +193,20 @@ public class SimpleClient extends Frame {
 			}
 		}
         }//GEN-LAST:event_jTree1MousePressed
+
+        private void jTree1TreeWillCollapse(javax.swing.event.TreeExpansionEvent evt)throws javax.swing.tree.ExpandVetoException {//GEN-FIRST:event_jTree1TreeWillCollapse
+		final TreePath path = evt.getPath();
+		if (path != null) {
+			final Object o = path.getLastPathComponent();
+			if (o instanceof StoreTreeNode) {
+				folderViewer.setFolder(null);
+				final boolean success = ((StoreTreeNode)o).close();
+				if (!success) {
+					throw new ExpandVetoException(evt);
+				}
+			}
+		}
+        }//GEN-LAST:event_jTree1TreeWillCollapse
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private linoleum.mail.FolderViewer folderViewer;

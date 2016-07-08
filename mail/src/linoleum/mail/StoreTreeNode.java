@@ -24,6 +24,18 @@ public class StoreTreeNode extends DefaultMutableTreeNode {
 		return super.getChildCount();
 	}
 
+	public boolean close() {
+		try {
+			if (store.isConnected()) {
+				store.close();
+			}
+			return true;
+		} catch (MessagingException me) {
+			me.printStackTrace();
+		}
+		return false;
+	}
+
 	public boolean open() {
 		try {
 			// connect to the Store if we need to

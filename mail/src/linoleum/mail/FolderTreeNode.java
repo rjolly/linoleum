@@ -1,7 +1,6 @@
 package linoleum.mail;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.mail.Store;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 
