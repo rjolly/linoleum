@@ -28,7 +28,7 @@ public class SimpleClient extends Frame {
 
 	public SimpleClient() {
 		initComponents();
-		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail24.gif")));
+		setIcon(new ImageIcon(getClass().getResource("Mail24.png")));
 		try {
 			final File capfile = new File("simple.mailcap");
 			final InputStream is = capfile.isFile()?new FileInputStream(capfile):getClass().getResourceAsStream("simple.mailcap");
