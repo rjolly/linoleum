@@ -1,10 +1,13 @@
 package linoleum.mail;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -38,10 +41,10 @@ public class Compose extends Frame {
 		content.setBorder(new EmptyBorder(0, 5, 0, 5));
 		content.setLineWrap(true);
 
-		JScrollPane textScroller = new JScrollPane(content,
-				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		JScrollPane textScroller = new JScrollPane(content);
 		top.add(textScroller, BorderLayout.CENTER);
+
+		top.add(buildButtonPanel(), BorderLayout.SOUTH);
 
 		setContentPane(top);
 		pack();
@@ -58,6 +61,22 @@ public class Compose extends Frame {
 	@Override
 	public void close() {
 		openFrames.remove(openFrameCount);
+	}
+
+	private JPanel buildButtonPanel() {
+		JPanel p = new JPanel();
+		p.setLayout(new BorderLayout());
+
+		JButton send = new JButton("Send");
+		send.addActionListener(new ActionListener() {
+			public void actionPerformed(final ActionEvent e) {
+				System.out.println("mail sent");
+				dispose();
+			}
+		});
+		p.add(send, BorderLayout.EAST);
+
+		return p;
 	}
 
 	private JPanel buildAddressPanel() {
