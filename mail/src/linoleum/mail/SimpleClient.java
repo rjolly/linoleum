@@ -102,6 +102,8 @@ public class SimpleClient extends Frame {
                 jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
                 jSplitPane1.setResizeWeight(1.0);
 
+                jSplitPane2.setDividerLocation(200);
+
                 jTree1.setModel(model);
                 jTree1.setComponentPopupMenu(jPopupMenu1);
                 jTree1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
