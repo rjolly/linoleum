@@ -1,6 +1,9 @@
 package linoleum.mail;
 
 import java.awt.BorderLayout;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -12,15 +15,18 @@ import linoleum.application.Frame;
 
 public class Compose extends Frame {
 
-	private int openFrameCount = 0;
+	private final int openFrameCount;
+	private final Collection<Integer> openFrames;
 	private static final int offset = 30;
 
 	public Compose() {
-		this(0);
+		this(new HashSet<Integer>(), 0);
 	}
 
-	public Compose(int openFrameCount) {
+	public Compose(final Collection<Integer> openFrames, final int openFrameCount) {
 		super("Untitled Message " + openFrameCount);
+		this.openFrameCount = openFrameCount;
+		this.openFrames = openFrames;
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail24.gif")));
 
 		JPanel top = new JPanel();
@@ -44,7 +50,14 @@ public class Compose extends Frame {
 
 	@Override
 	public Frame getFrame() {
-		return new Compose(++openFrameCount);
+		int openFrameCount = openFrames.isEmpty()?0:Collections.max(openFrames);
+		openFrames.add(++openFrameCount);
+		return new Compose(openFrames, openFrameCount);
+	}
+
+	@Override
+	public void close() {
+		openFrames.remove(openFrameCount);
 	}
 
 	private JPanel buildAddressPanel() {
