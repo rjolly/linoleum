@@ -3,6 +3,7 @@ package linoleum.mail;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyVetoException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -69,9 +70,13 @@ public class Compose extends Frame {
 
 		JButton send = new JButton("Send");
 		send.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent e) {
+			public void actionPerformed(final ActionEvent evt) {
 				System.out.println("mail sent");
-				dispose();
+				try {
+					setClosed(true);
+				} catch (final PropertyVetoException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 		p.add(send, BorderLayout.EAST);

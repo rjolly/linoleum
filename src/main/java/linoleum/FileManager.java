@@ -1,5 +1,6 @@
 package linoleum;
 
+import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -132,8 +133,11 @@ public class FileManager extends Frame {
 			getApplicationManager().open(file.toURI());
 			break;
 		case JFileChooser.CANCEL_SELECTION:
-			dispose();
-			close();
+			try {
+				setClosed(true);
+			} catch (final PropertyVetoException e) {
+				e.printStackTrace();
+			}
 			break;
 		}
         }//GEN-LAST:event_chooserActionPerformed
