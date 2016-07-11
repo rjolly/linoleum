@@ -67,6 +67,7 @@ public class SimpleClient extends Frame {
 
                 jPopupMenu1 = new javax.swing.JPopupMenu();
                 jMenuItem1 = new javax.swing.JMenuItem();
+                jPopupMenu2 = new javax.swing.JPopupMenu();
                 jMenuItem2 = new javax.swing.JMenuItem();
                 jSplitPane1 = new javax.swing.JSplitPane();
                 jSplitPane2 = new javax.swing.JSplitPane();
@@ -89,7 +90,7 @@ public class SimpleClient extends Frame {
                                 jMenuItem2ActionPerformed(evt);
                         }
                 });
-                jPopupMenu1.add(jMenuItem2);
+                jPopupMenu2.add(jMenuItem2);
 
                 setClosable(true);
                 setIconifiable(true);
@@ -103,9 +104,9 @@ public class SimpleClient extends Frame {
 
                 jTree1.setModel(model);
                 jTree1.setComponentPopupMenu(jPopupMenu1);
-                jTree1.addMouseListener(new java.awt.event.MouseAdapter() {
-                        public void mousePressed(java.awt.event.MouseEvent evt) {
-                                jTree1MousePressed(evt);
+                jTree1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+                        public void mouseMoved(java.awt.event.MouseEvent evt) {
+                                jTree1MouseMoved(evt);
                         }
                 });
                 jTree1.addTreeWillExpandListener(new javax.swing.event.TreeWillExpandListener() {
@@ -178,22 +179,6 @@ public class SimpleClient extends Frame {
 		}
         }//GEN-LAST:event_jTree1TreeWillExpand
 
-        private void jTree1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MousePressed
-		final TreePath path = jTree1.getPathForLocation(evt.getX(), evt.getY());
-		jMenuItem1.setEnabled(true);
-		jMenuItem2.setEnabled(false);
-		if (path != null) {
-			final Object o = path.getLastPathComponent();
-			if (o instanceof FolderTreeNode) {
-				jMenuItem1.setEnabled(false);
-			} else if (o instanceof StoreTreeNode) {
-				node = (StoreTreeNode)o;
-				jMenuItem1.setEnabled(false);
-				jMenuItem2.setEnabled(true);
-			}
-		}
-        }//GEN-LAST:event_jTree1MousePressed
-
         private void jTree1TreeWillCollapse(javax.swing.event.TreeExpansionEvent evt)throws javax.swing.tree.ExpandVetoException {//GEN-FIRST:event_jTree1TreeWillCollapse
 		final TreePath path = evt.getPath();
 		if (path != null) {
@@ -208,11 +193,26 @@ public class SimpleClient extends Frame {
 		}
         }//GEN-LAST:event_jTree1TreeWillCollapse
 
+        private void jTree1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseMoved
+		final TreePath path = jTree1.getPathForLocation(evt.getX(), evt.getY());
+		jTree1.setComponentPopupMenu(jPopupMenu1);
+		if (path != null) {
+			final Object o = path.getLastPathComponent();
+			if (o instanceof FolderTreeNode) {
+				jTree1.setComponentPopupMenu(null);
+			} else if (o instanceof StoreTreeNode) {
+				node = (StoreTreeNode)o;
+				jTree1.setComponentPopupMenu(jPopupMenu2);
+			}
+		}
+        }//GEN-LAST:event_jTree1MouseMoved
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private linoleum.mail.FolderViewer folderViewer;
         private javax.swing.JMenuItem jMenuItem1;
         private javax.swing.JMenuItem jMenuItem2;
         private javax.swing.JPopupMenu jPopupMenu1;
+        private javax.swing.JPopupMenu jPopupMenu2;
         private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JSplitPane jSplitPane1;
         private javax.swing.JSplitPane jSplitPane2;
