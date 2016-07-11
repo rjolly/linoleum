@@ -36,6 +36,7 @@ public class Frame extends JInternalFrame implements App {
 	private String type;
 	private Icon icon;
 	private URI uri;
+	private boolean ready;
 
 	public Frame() {
 		initComponents();
@@ -187,6 +188,9 @@ public class Frame extends JInternalFrame implements App {
                         public void componentMoved(java.awt.event.ComponentEvent evt) {
                                 formComponentMoved(evt);
                         }
+                        public void componentShown(java.awt.event.ComponentEvent evt) {
+                                formComponentShown(evt);
+                        }
                 });
 
                 pack();
@@ -209,7 +213,7 @@ public class Frame extends JInternalFrame implements App {
 
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
 		final JDesktopPane desktop = getDesktopPane();
-		if (desktop != null) {
+		if (ready) {
 			final Preferences prefs = Preferences.userNodeForPackage(getClass());
 			final Component c = evt.getComponent();
 			prefs.putInt(getName() + ".x", c.getX());
@@ -219,13 +223,17 @@ public class Frame extends JInternalFrame implements App {
 
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
 		final JDesktopPane desktop = getDesktopPane();
-		if (desktop != null) {
+		if (ready) {
 			final Preferences prefs = Preferences.userNodeForPackage(getClass());
 			final Component c = evt.getComponent();
 			prefs.putInt(getName() + ".width", c.getWidth());
 			prefs.putInt(getName() + ".height", c.getHeight());
 		}
         }//GEN-LAST:event_formComponentResized
+
+        private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+		ready = true;
+        }//GEN-LAST:event_formComponentShown
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         // End of variables declaration//GEN-END:variables
