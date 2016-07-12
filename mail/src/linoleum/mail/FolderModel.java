@@ -8,8 +8,8 @@ public class FolderModel extends AbstractTableModel {
 	Folder folder;
 	Message[] messages;
 
-	String[] columnNames = { "Date", "From", "Subject"};
-	Class[] columnTypes = { String.class, String.class, String.class };
+	String[] columnNames = { "Date", "From", "Subject", "Deleted"};
+	Class[] columnTypes = { String.class, String.class, String.class, Boolean.class };
 
 	public void setFolder(Folder what) throws MessagingException {
 		if (what != null) {
@@ -19,7 +19,7 @@ public class FolderModel extends AbstractTableModel {
 			}
 			// get the messages
 			messages = what.getMessages();
-			cached = new String[messages.length][];
+			cached = new Object[messages.length][];
 		} else {
 			messages = null;
 			cached = null;
@@ -29,6 +29,13 @@ public class FolderModel extends AbstractTableModel {
 			folder.close(true);
 		}
 		folder = what;
+		fireTableDataChanged();
+	}
+
+	public void delete(int which) throws MessagingException {
+		final boolean d = (Boolean)getValueAt(which, 3);
+		messages[which].setFlag(Flags.Flag.DELETED, !d);
+		cached[which] = null;
 		fireTableDataChanged();
 	}
 
@@ -64,7 +71,8 @@ public class FolderModel extends AbstractTableModel {
 		case 0:	// date
 		case 1: // From
 		case 2: // Subject
-			String[] what = getCachedData(aRow);
+		case 3: // Deleted
+			Object[] what = getCachedData(aRow);
 			if (what != null) {
 				return what[aColumn];
 			} else {
@@ -75,13 +83,13 @@ public class FolderModel extends AbstractTableModel {
 		}
 	}
 
-	protected static String[][] cached;
+	protected static Object[][] cached;
 
-	protected String[] getCachedData(int row) {
+	protected Object[] getCachedData(int row) {
 		if (cached[row] == null) {
 			try {
 				Message m = messages[row];
-				String[] theData = new String[4];
+				Object[] theData = new Object[4];
 
 				// Date
 				Date date = m.getSentDate();
@@ -106,6 +114,9 @@ public class FolderModel extends AbstractTableModel {
 				} else {
 					theData[2] = "(No Subject)";
 				}
+
+				// Deleted
+				theData[3] = m.isSet(Flags.Flag.DELETED);
 
 				cached[row] = theData;
 			} catch (MessagingException e) {

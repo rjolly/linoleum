@@ -1,6 +1,7 @@
 package linoleum.mail;
 
 import java.awt.*;
+import java.awt.event.*;
 import javax.mail.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -10,10 +11,29 @@ public class FolderViewer extends JPanel {
 	private final JScrollPane scrollpane;
 	private final JTable table;
 	private MessageViewer mv;
+	private int which;
 
 	public FolderViewer() {
 		super(new GridLayout(1,1));
+		final JPopupMenu popup = new JPopupMenu();
+		final JMenuItem item = new JMenuItem("Delete");
+		item.addActionListener(new ActionListener() {
+			public void actionPerformed(final ActionEvent evt) {
+				try {
+					model.delete(which);
+				} catch (final MessagingException me) {
+					me.printStackTrace();
+				}
+			}
+		});
+		popup.add(item);
 		table = new JTable(model);
+		table.addMouseMotionListener(new MouseMotionAdapter() {
+			public void mouseMoved(final MouseEvent evt) {
+				which = table.rowAtPoint(evt.getPoint());
+				table.setComponentPopupMenu(which < 0?null:popup);
+			}
+		});
 		// find out what is pressed
 		table.getSelectionModel().addListSelectionListener(new FolderPressed());
 		table.setShowGrid(false);
