@@ -25,6 +25,7 @@ public class SimpleClient extends Frame {
 	private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 	private final DefaultTreeModel model = new DefaultTreeModel(root);
 	private StoreTreeNode node;
+	static final String name = "Mail";
 
 	public SimpleClient() {
 		initComponents();
@@ -37,7 +38,7 @@ public class SimpleClient extends Frame {
 			ex.printStackTrace();
 		}
 		final Preferences prefs = Preferences.userNodeForPackage(getClass());
-		final String str = prefs.get(getName() + ".url", null);
+		final String str = prefs.get(name + ".url", null);
 		if (str != null) {
 			open(str);
 		}
@@ -97,7 +98,7 @@ public class SimpleClient extends Frame {
                 setMaximizable(true);
                 setResizable(true);
                 setTitle("Simple JavaMail Client");
-                setName("Mail"); // NOI18N
+                setName(name);
 
                 jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
                 jSplitPane1.setResizeWeight(1.0);
