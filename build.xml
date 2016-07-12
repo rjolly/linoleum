@@ -110,6 +110,7 @@ http://linoleum.java.net/
                 <exclude name="lib/commons-codec-1.9.jar"/>
                 <exclude name="lib/ivy-2.4.0.jar"/>
                 <exclude name="lib/jsch-0.1.51.jar"/>
+                <exclude name="lib/javax.mail-1.5.5.jar"/>
                 <exclude name="linoleum.desktop"/>
                 <exclude name="ivy.xml"/>
                 <exclude name="README.TXT"/>

@@ -7,6 +7,7 @@ if [ "$1" = "configure" ] ; then
     ln -s ../../java/ivy.jar /usr/share/linoleum/lib/
     ln -s ../../java/commons-codec.jar /usr/share/linoleum/lib/
     ln -s ../../java/jsch.jar /usr/share/linoleum/lib/
+    ln -s ../../java/javax.mail.jar /usr/share/linoleum/lib/
 fi
 
 exit 0

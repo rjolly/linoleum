@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Implementation-Vendor: Raphael Jolly
 Implementation-Title: Linoleum
-Implementation-Version: 1
+Implementation-Version: 2
 Specification-Vendor: com.github.rjolly
 Specification-Title: linoleum
 Specification-Version: 1.1

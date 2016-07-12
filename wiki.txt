@@ -18,6 +18,7 @@ The Desktop comes together with the following bundled applications:
 
 * file manager
 * browser
+* mail
 * script shell
 * notepad
 * clock
