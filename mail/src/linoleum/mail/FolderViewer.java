@@ -45,18 +45,14 @@ public class FolderViewer extends JPanel {
 		this.mv = mv;
 	}
 
-	public void setFolder(Folder what) {
-		try {
-			table.getSelectionModel().clearSelection();
-			if (mv != null) {
-				mv.setMessage(null);
-			}
-			model.setFolder(what);
-			scrollpane.invalidate();
-			scrollpane.validate();
-		} catch (MessagingException me) {
-			me.printStackTrace();
+	public void setFolder(Folder what) throws MessagingException {
+		table.getSelectionModel().clearSelection();
+		if (mv != null) {
+			mv.setMessage(null);
 		}
+		model.setFolder(what);
+		scrollpane.invalidate();
+		scrollpane.validate();
 	}
 
 	class FolderPressed implements ListSelectionListener {

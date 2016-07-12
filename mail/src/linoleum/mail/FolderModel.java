@@ -25,7 +25,7 @@ public class FolderModel extends AbstractTableModel {
 			cached = null;
 		}
 		// close previous folder and switch to new folder
-		if (folder != null) {
+		if (folder != null && folder != what) {
 			folder.close(true);
 		}
 		folder = what;
