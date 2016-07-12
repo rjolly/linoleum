@@ -22,6 +22,7 @@ import javax.swing.tree.TreePath;
 import linoleum.application.Frame;
 
 public class SimpleClient extends Frame {
+	private final SimpleAuthenticator auth = new SimpleAuthenticator(this);
 	private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 	private final DefaultTreeModel model = new DefaultTreeModel(root);
 	private StoreTreeNode node;
@@ -50,7 +51,6 @@ public class SimpleClient extends Frame {
 	}
 
 	void open(final String str) {
-		final SimpleAuthenticator auth = new SimpleAuthenticator(this);
 		final Session session = Session.getInstance(System.getProperties(), auth);
 		try {
 			final Store store = session.getStore(new URLName(str));
@@ -174,8 +174,9 @@ public class SimpleClient extends Frame {
 		if (path != null) {
 			final Object o = path.getLastPathComponent();
 			if (o instanceof StoreTreeNode) {
-				final boolean success = ((StoreTreeNode)o).open();
-				if (!success) {
+				try {
+					((StoreTreeNode)o).open();
+				} catch (final MessagingException me) {
 					throw new ExpandVetoException(evt);
 				}
 			}
@@ -188,8 +189,9 @@ public class SimpleClient extends Frame {
 			final Object o = path.getLastPathComponent();
 			if (o instanceof StoreTreeNode) {
 				folderViewer.setFolder(null);
-				final boolean success = ((StoreTreeNode)o).close();
-				if (!success) {
+				try {
+					((StoreTreeNode)o).close();
+				} catch (final MessagingException me) {
 					throw new ExpandVetoException(evt);
 				}
 			}
