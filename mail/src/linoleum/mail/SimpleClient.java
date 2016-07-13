@@ -146,7 +146,16 @@ public class SimpleClient extends Frame {
                 jSplitPane1.setTopComponent(jSplitPane2);
                 jSplitPane1.setBottomComponent(messageViewer);
 
-                getContentPane().add(jSplitPane1, java.awt.BorderLayout.CENTER);
+                javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+                getContentPane().setLayout(layout);
+                layout.setHorizontalGroup(
+                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE)
+                );
+                layout.setVerticalGroup(
+                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 437, Short.MAX_VALUE)
+                );
 
                 pack();
         }// </editor-fold>//GEN-END:initComponents

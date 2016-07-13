@@ -71,7 +71,7 @@ public class MultipartViewer extends JPanel implements CommandObject {
 				if (label == null) label = curr.getContentType();
 
 				Button but = new Button(label);
-				but.addActionListener( new AttachmentViewer(curr));
+				but.addActionListener(new AttachmentViewer(curr));
 				add(but, gc);
 			}
 		} catch(MessagingException me2) {

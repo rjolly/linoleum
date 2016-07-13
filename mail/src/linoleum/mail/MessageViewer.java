@@ -32,6 +32,7 @@ public class MessageViewer extends JPanel implements CommandObject {
 		headers = new TextArea("", 4, 80, TextArea.SCROLLBARS_NONE);
 		headers.setEditable(false);
 		add(headers, gb);
+		setMessage(null);
 	}
 
 	public void setMessage(Message what) {
@@ -45,7 +46,7 @@ public class MessageViewer extends JPanel implements CommandObject {
 			mainbody = getBodyComponent();
 		} else {
 			headers.setText("");
-			TextArea dummy = new TextArea("", 24, 80, TextArea.SCROLLBARS_NONE);
+			TextArea dummy = new TextArea("", 12, 80, TextArea.SCROLLBARS_NONE);
 			dummy.setEditable(false);
 			mainbody = dummy;
 		}
@@ -163,7 +164,9 @@ public class MessageViewer extends JPanel implements CommandObject {
 
 		public void actionPerformed(ActionEvent e) {
 			System.out.println("\n\nMessage Structure");
-			dumpPart("", displayed);
+			if (displayed != null) {
+				dumpPart("", displayed);
+			}
 		}
 
 		protected void dumpPart(String prefix, Part p) {
