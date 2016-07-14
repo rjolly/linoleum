@@ -38,16 +38,15 @@ public class MessageViewer extends JPanel implements CommandObject {
 	public void setMessage(Message what) {
 		displayed = what;
 
-		if (mainbody != null)
+		if (mainbody != null) {
 			remove(mainbody);
-
+		}
 		if (what != null) {
 			loadHeaders();
 			mainbody = getBodyComponent();
 		} else {
 			headers.setText("");
-			TextArea dummy = new TextArea("", 12, 80, TextArea.SCROLLBARS_NONE);
-			dummy.setEditable(false);
+			JPanel dummy = new JPanel();
 			mainbody = dummy;
 		}
 
