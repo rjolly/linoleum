@@ -5,45 +5,40 @@ import java.io.*;
 import java.beans.*;
 import javax.activation.*;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.JEditorPane;
 import javax.swing.JScrollPane;
+import javax.swing.text.Document;
+import javax.swing.text.EditorKit;
 
 public class TextViewer extends JPanel implements Viewer {
-	private JTextArea text_area = null;
-	private DataHandler dh = null;
-	private String verb = null;
+	private final JEditorPane text_area;
 
 	public TextViewer() {
 		super(new GridLayout(1,1));
 
 		// create the text area
-		text_area = new JTextArea();
+		text_area = new JEditorPane();
 		text_area.setEditable(false);
-		text_area.setLineWrap(true);
 
 		// create a scroll pane for the JTextArea
-		JScrollPane sp = new JScrollPane();
-		sp.setPreferredSize(new Dimension(600, 400));
+		final JScrollPane sp = new JScrollPane();
 		sp.getViewport().add(text_area);
 
 		add(sp);
 	}
 
 	public void setCommandContext(final String verb, final DataHandler dh) throws IOException {
-		this.verb = verb;
-		this.dh = dh;
-		int bytes_read = 0;
-		// check that we can actually read
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		final byte data[] = new byte[1024];
-		try (final InputStream ins = dh.getInputStream()) {
-			while ((bytes_read = ins.read(data)) > 0) {
-				baos.write(data, 0, bytes_read);
-			} 
+		final InputStream ins = dh.getInputStream();
+		String type = dh.getContentType();
+		int n = type.indexOf(";");
+		n = type.indexOf(";", n + 1);
+		if (n > 0) {
+			type = type.substring(0, n);
 		}
-		// convert the buffer into a string
-		// place in the text area
-		text_area.setText(baos.toString());
+		text_area.setContentType(type.toLowerCase());
+		final EditorKit kit = text_area.getEditorKit();
+		final Document doc = kit.createDefaultDocument();
+		text_area.read(ins, doc);
 	}
 
 	public void scrollToOrigin() {
