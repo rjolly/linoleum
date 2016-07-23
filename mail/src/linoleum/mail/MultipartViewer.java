@@ -9,9 +9,10 @@ import javax.mail.*;
 import javax.swing.JPanel;
 import javax.swing.JInternalFrame;
 
-public class MultipartViewer extends JPanel implements CommandObject {
-	protected DataHandler dh = null;
-	protected String verb = null;
+public class MultipartViewer extends JPanel implements Viewer {
+	Component comp;
+	DataHandler dh;
+	String verb;
 
 	public MultipartViewer() {
 		super(new GridBagLayout());
@@ -43,7 +44,7 @@ public class MultipartViewer extends JPanel implements CommandObject {
 		// get the first part
 		try {
 			BodyPart bp = mp.getBodyPart(0);
-			Component comp = getComponent(bp);
+			comp = getComponent(bp);
 			add(comp, gc);
 		} catch (MessagingException me) {
 			add(new Label(me.toString()), gc);
@@ -138,10 +139,18 @@ public class MultipartViewer extends JPanel implements CommandObject {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			ComponentFrame f = new ComponentFrame(getComponent(bp), "Attachment");
+			Component comp = getComponent(bp);
+			ComponentFrame f = new ComponentFrame(comp, "Attachment");
 			getFrame().getDesktopPane().add(f);
 			f.pack();
 			f.show();
+			if (comp instanceof Viewer) {
+				((Viewer)comp).scrollToOrigin();
+			}
 		}
+	}
+
+	public void scrollToOrigin() {
+		((Viewer)comp).scrollToOrigin();
 	}
 }

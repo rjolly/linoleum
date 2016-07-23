@@ -4,6 +4,6 @@
 # for our viewers
 #
 message/*;;		x-java-view=linoleum.mail.MessageViewer
-text/plain;;		x-java-view=linoleum.mail.TextViewer
+text/*;;		x-java-view=linoleum.mail.TextViewer
 multipart/*;;		x-java-view=linoleum.mail.MultipartViewer
 

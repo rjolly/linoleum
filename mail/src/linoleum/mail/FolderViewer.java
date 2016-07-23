@@ -86,6 +86,10 @@ public class FolderViewer extends JPanel {
 		model.setFolder(what);
 		scrollpane.invalidate();
 		scrollpane.validate();
+		final int n = model.getRowCount();
+		if (n > 0) {
+			table.scrollRectToVisible(table.getCellRect(n - 1, 0, true));
+		}
 	}
 
 	class FolderPressed implements ListSelectionListener {

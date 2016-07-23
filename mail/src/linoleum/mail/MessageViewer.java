@@ -8,7 +8,7 @@ import java.util.Date;
 import java.io.IOException;
 import javax.swing.JPanel;
 
-public class MessageViewer extends JPanel implements CommandObject {
+public class MessageViewer extends JPanel implements Viewer {
 	Message displayed = null;
 	DataHandler dataHandler = null;
 	String verb = null;
@@ -46,8 +46,7 @@ public class MessageViewer extends JPanel implements CommandObject {
 			mainbody = getBodyComponent();
 		} else {
 			headers.setText("");
-			JPanel dummy = new JPanel();
-			mainbody = dummy;
+			mainbody = new JPanel();
 		}
 
 		// add the main body
@@ -60,6 +59,13 @@ public class MessageViewer extends JPanel implements CommandObject {
 
 		invalidate();
 		validate();
+		scrollToOrigin();
+	}
+
+	public void scrollToOrigin() {
+		if (mainbody instanceof Viewer) {
+			((Viewer)mainbody).scrollToOrigin();
+		}
 	}
 
 	protected void addToolbar() {
@@ -136,9 +142,9 @@ public class MessageViewer extends JPanel implements CommandObject {
 			if (bean instanceof Component) {
 				return (Component)bean;
 			} else {
-				throw new MessagingException("bean is not a component " + bean.getClass().toString());
+				throw new MessagingException("bean is not a component: " + bean);
 			}
-		} catch (MessagingException me) {
+		} catch (final MessagingException me) {
 			return new Label(me.toString());
 		}
 	}
