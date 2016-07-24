@@ -23,6 +23,7 @@ import linoleum.application.Frame;
 
 public class SimpleClient extends Frame {
 	private final SimpleAuthenticator auth = new SimpleAuthenticator(this);
+	private final Session session = Session.getInstance(System.getProperties(), auth);
 	private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 	private final DefaultTreeModel model = new DefaultTreeModel(root);
 	private StoreTreeNode node;
@@ -52,7 +53,6 @@ public class SimpleClient extends Frame {
 	}
 
 	void open(final String str) {
-		final Session session = Session.getInstance(System.getProperties(), auth);
 		try {
 			final Store store = session.getStore(new URLName(str));
 			final StoreTreeNode storenode = new StoreTreeNode(store);
