@@ -141,8 +141,14 @@ public class MultipartViewer extends JPanel implements Viewer {
 		public void actionPerformed(ActionEvent e) {
 			Component comp = getComponent(bp);
 			ComponentFrame f = new ComponentFrame(comp, "Attachment");
-			getFrame().getDesktopPane().add(f);
+			JInternalFrame frame = getFrame();
+			frame.getDesktopPane().add(f);
 			f.pack();
+			final Dimension s = f.getSize();
+			final Dimension size = frame.getSize();
+			final int width = Math.min(s.width, size.width);
+			final int height = Math.min(s.height, size.height);
+			f.setSize(width, height);
 			f.show();
 			if (comp instanceof Viewer) {
 				((Viewer)comp).scrollToOrigin();

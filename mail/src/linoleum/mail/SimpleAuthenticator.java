@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.awt.*;
 import javax.swing.*;
 
+@SuppressWarnings("deprecation")
 public class SimpleAuthenticator extends Authenticator {
 	JInternalFrame frame;
 	String username;
