@@ -7,13 +7,12 @@ import javax.activation.*;
 import java.util.Date;
 import java.io.IOException;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
 public class MessageViewer extends JPanel implements Viewer {
-	Message displayed = null;
-	DataHandler dataHandler = null;
-	String verb = null;
+	Message displayed;
 	Component mainbody;
-	TextArea headers;
+	final JTextArea headers;
 
 	public MessageViewer() {
 		// set our layout
@@ -29,13 +28,13 @@ public class MessageViewer extends JPanel implements Viewer {
 		gb.weighty = 0.0;
 
 		// add the headers
-		headers = new TextArea("", 4, 80, TextArea.SCROLLBARS_NONE);
+		headers = new JTextArea("\n\n\n");
 		headers.setEditable(false);
 		add(headers, gb);
 		setMessage(null);
 	}
 
-	public void setMessage(Message what) {
+	public void setMessage(final Message what) {
 		displayed = what;
 
 		if (mainbody != null) {
@@ -45,12 +44,12 @@ public class MessageViewer extends JPanel implements Viewer {
 			loadHeaders();
 			mainbody = getBodyComponent();
 		} else {
-			headers.setText("");
+			headers.setText("\n\n\n");
 			mainbody = new JPanel();
 		}
 
 		// add the main body
-		GridBagConstraints gb = new GridBagConstraints();
+		final GridBagConstraints gb = new GridBagConstraints();
 		gb.gridwidth = GridBagConstraints.REMAINDER;
 		gb.fill = GridBagConstraints.BOTH;
 		gb.weightx = 1.0;
@@ -69,7 +68,7 @@ public class MessageViewer extends JPanel implements Viewer {
 	}
 
 	protected void addToolbar() {
-		GridBagConstraints gb = new GridBagConstraints();
+		final GridBagConstraints gb = new GridBagConstraints();
 		gb.gridheight = 1;
 		gb.gridwidth = 1;
 		gb.fill = GridBagConstraints.NONE;
@@ -80,19 +79,19 @@ public class MessageViewer extends JPanel implements Viewer {
 
 		// structure button
 		gb.gridwidth = GridBagConstraints.REMAINDER; // only for the last one
-		Button b = new Button("Structure");
+		final Button b = new Button("Structure");
 		b.addActionListener(new StructureAction());
 		add(b, gb);
 	}
 
 	protected void loadHeaders() {
 		// setup what we want in our viewer
-		StringBuffer sb = new StringBuffer();
+		final StringBuffer sb = new StringBuffer();
 
 		// date
 		sb.append("Date: ");
 		try {
-			Date duh = displayed.getSentDate();
+			final Date duh = displayed.getSentDate();
 			if (duh != null) {
 				sb.append(duh.toString());
 			} else {
@@ -122,8 +121,8 @@ public class MessageViewer extends JPanel implements Viewer {
 			sb.append(displayed.getSubject());
 
 			headers.setText(sb.toString());
-		} catch (MessagingException me) {
-			headers.setText("");
+		} catch (final MessagingException me) {
+			headers.setText("\n\n\n");
 		}
 	}
 
@@ -132,13 +131,13 @@ public class MessageViewer extends JPanel implements Viewer {
 		// now get a content viewer for the main type...
 		//------------
 		try {
-			DataHandler dh = displayed.getDataHandler();
-			CommandInfo ci = dh.getCommand("view");
+			final DataHandler dh = displayed.getDataHandler();
+			final CommandInfo ci = dh.getCommand("view");
 			if (ci == null) {
 				throw new MessagingException("view command failed on: " + displayed.getContentType());
 			}
 
-			Object bean = dh.getBean(ci);
+			final Object bean = dh.getBean(ci);
 			if (bean instanceof Component) {
 				return (Component)bean;
 			} else {
@@ -149,11 +148,8 @@ public class MessageViewer extends JPanel implements Viewer {
 		}
 	}
 
-	public void setCommandContext(String verb, DataHandler dh) throws IOException {
-		this.verb = verb;
-		dataHandler = dh;
-
-		Object o = dh.getContent();
+	public void setCommandContext(final String verb, final DataHandler dh) throws IOException {
+		final Object o = dh.getContent();
 		if (o instanceof Message) {
 			setMessage((Message)o);
 		} else {
@@ -165,16 +161,14 @@ public class MessageViewer extends JPanel implements Viewer {
 	}
 
 	class StructureAction implements ActionListener {
-		StringBuffer sb;
-
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(final ActionEvent e) {
 			System.out.println("\n\nMessage Structure");
 			if (displayed != null) {
 				dumpPart("", displayed);
 			}
 		}
 
-		protected void dumpPart(String prefix, Part p) {
+		protected void dumpPart(final String prefix, final Part p) {
 			try {
 				System.out.println(prefix + "----------------");
 				System.out.println(prefix + "Content-Type: " + p.getContentType());
@@ -195,9 +189,9 @@ public class MessageViewer extends JPanel implements Viewer {
 						dumpPart(newpref, mp.getBodyPart(i));
 					}
 				}
-			} catch (MessagingException e) {
+			} catch (final MessagingException e) {
 				e.printStackTrace();
-			} catch (IOException ioex) {
+			} catch (final IOException ioex) {
 				System.out.println("Cannot get content" + ioex.getMessage());
 			}
 		}

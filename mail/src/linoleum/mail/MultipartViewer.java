@@ -6,6 +6,7 @@ import java.io.*;
 import java.beans.*;
 import javax.activation.*;
 import javax.mail.*;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JInternalFrame;
 
@@ -71,7 +72,7 @@ public class MultipartViewer extends JPanel implements Viewer {
 				if (label == null) label = curr.getDescription();
 				if (label == null) label = curr.getContentType();
 
-				Button but = new Button(label);
+				JButton but = new JButton(label);
 				but.addActionListener(new AttachmentViewer(curr));
 				add(but, gc);
 			}
