@@ -1,14 +1,102 @@
 package linoleum.mail;
 
 import java.awt.*;
+import java.awt.event.*;
 import javax.mail.*;
 import javax.activation.*;
 import java.util.Date;
 import java.io.IOException;
+import javax.swing.Action;
+import javax.swing.AbstractAction;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 public class MessageViewer extends javax.swing.JPanel implements Viewer {
-	Message displayed;
-	Component mainbody;
+	private final Icon composeIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail16.gif"));
+	private final Icon deleteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Delete16.gif"));
+	private final Action composeAction = new ComposeAction();
+	private final Action replyAction = new ReplyAction();
+	private final Action replyToAllAction = new ReplyToAllAction();
+	private final Action deleteAction = new DeleteAction();
+	private final Action structureAction = new StructureAction();
+	private Message displayed;
+	private Component mainbody;
+
+	private class ComposeAction extends AbstractAction {
+		public ComposeAction() {
+			super("Compose", composeIcon);
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			System.out.println(getValue(Action.NAME));
+		}
+	}
+
+	private class ReplyAction extends AbstractAction {
+		public ReplyAction() {
+			super("Reply");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			System.out.println(getValue(Action.NAME));
+		}
+	}
+
+	private class ReplyToAllAction extends AbstractAction {
+		public ReplyToAllAction() {
+			super("Reply to all");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			System.out.println(getValue(Action.NAME));
+		}
+	}
+
+	private class DeleteAction extends AbstractAction {
+		public DeleteAction() {
+			super("Delete", deleteIcon);
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			System.out.println(getValue(Action.NAME));
+		}
+	}
+
+	private class StructureAction extends AbstractAction {
+		public StructureAction() {
+			super("\nMessage Structure");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			System.out.println(getValue(Action.NAME));
+			dumpPart("", displayed);
+		}
+	}
+
+	public Action getComposeAction() {
+		return composeAction;
+	}
+
+	public Action getReplyAction() {
+		return replyAction;
+	}
+
+	public Action getReplyToAllAction() {
+		return replyToAllAction;
+	}
+
+	public Action getDeleteAction() {
+		return deleteAction;
+	}
+
+	public Action getStructureAction() {
+		return structureAction;
+	}
 
 	public MessageViewer() {
 		initComponents();
@@ -23,11 +111,19 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 		}
 		if (what != null) {
 			loadHeaders();
+			replyAction.setEnabled(true);
+			replyToAllAction.setEnabled(true);
+			deleteAction.setEnabled(true);
+			structureAction.setEnabled(true);
 
 			// add the main body
 			jPanel1.add(mainbody = getBodyComponent());
 		} else {
 			headers.setText("");
+			replyAction.setEnabled(false);
+			replyToAllAction.setEnabled(false);
+			deleteAction.setEnabled(false);
+			structureAction.setEnabled(false);
 		}
 
 		invalidate();
@@ -129,46 +225,26 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
                 jButton4 = new javax.swing.JButton();
                 jButton5 = new javax.swing.JButton();
 
+                jButton1.setAction(getComposeAction());
                 jButton1.setText("Compose");
-                jButton1.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                jButton1ActionPerformed(evt);
-                        }
-                });
 
                 headers.setEditable(false);
                 headers.setRows(4);
                 jScrollPane1.setViewportView(headers);
 
+                jButton2.setAction(getReplyAction());
                 jButton2.setText("Reply");
-                jButton2.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                jButton2ActionPerformed(evt);
-                        }
-                });
 
+                jButton3.setAction(getReplyToAllAction());
                 jButton3.setText("Reply to all");
-                jButton3.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                jButton3ActionPerformed(evt);
-                        }
-                });
 
                 jPanel1.setLayout(new java.awt.CardLayout());
 
+                jButton4.setAction(getDeleteAction());
                 jButton4.setText("Delete");
-                jButton4.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                jButton4ActionPerformed(evt);
-                        }
-                });
 
+                jButton5.setAction(getStructureAction());
                 jButton5.setText("Structure");
-                jButton5.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                jButton5ActionPerformed(evt);
-                        }
-                });
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
                 this.setLayout(layout);
@@ -203,29 +279,6 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
                                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE))
                 );
         }// </editor-fold>//GEN-END:initComponents
-
-        private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-		System.out.println("Compose");
-        }//GEN-LAST:event_jButton1ActionPerformed
-
-        private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-		System.out.println("Reply");
-        }//GEN-LAST:event_jButton2ActionPerformed
-
-        private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-		System.out.println("Replay to all");
-        }//GEN-LAST:event_jButton3ActionPerformed
-
-        private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-		System.out.println("Delete");
-        }//GEN-LAST:event_jButton4ActionPerformed
-
-        private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-		System.out.println("\nMessage Structure");
-		if (displayed != null) {
-			dumpPart("", displayed);
-		}
-        }//GEN-LAST:event_jButton5ActionPerformed
 
 	private void dumpPart(final String prefix, final Part p) {
 		try {
