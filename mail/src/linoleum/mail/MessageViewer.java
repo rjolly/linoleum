@@ -1,60 +1,34 @@
 package linoleum.mail;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.mail.*;
 import javax.activation.*;
 import java.util.Date;
 import java.io.IOException;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
 
-public class MessageViewer extends JPanel implements Viewer {
+public class MessageViewer extends javax.swing.JPanel implements Viewer {
 	Message displayed;
 	Component mainbody;
-	final JTextArea headers;
 
 	public MessageViewer() {
-		// set our layout
-		super(new GridBagLayout());
-
-		// add the toolbar
-		addToolbar();
-
-		GridBagConstraints gb = new GridBagConstraints();
-		gb.gridwidth = GridBagConstraints.REMAINDER;
-		gb.fill = GridBagConstraints.BOTH;
-		gb.weightx = 1.0;
-		gb.weighty = 0.0;
-
-		// add the headers
-		headers = new JTextArea("\n\n\n");
-		headers.setEditable(false);
-		add(headers, gb);
+		initComponents();
 		setMessage(null);
 	}
 
-	public void setMessage(final Message what) {
+	public final void setMessage(final Message what) {
 		displayed = what;
 
 		if (mainbody != null) {
-			remove(mainbody);
+			jPanel1.remove(mainbody);
 		}
 		if (what != null) {
 			loadHeaders();
-			mainbody = getBodyComponent();
-		} else {
-			headers.setText("\n\n\n");
-			mainbody = new JPanel();
-		}
 
-		// add the main body
-		final GridBagConstraints gb = new GridBagConstraints();
-		gb.gridwidth = GridBagConstraints.REMAINDER;
-		gb.fill = GridBagConstraints.BOTH;
-		gb.weightx = 1.0;
-		gb.weighty = 1.0;
-		add(mainbody, gb);
+			// add the main body
+			jPanel1.add(mainbody = getBodyComponent());
+		} else {
+			headers.setText("");
+		}
 
 		invalidate();
 		validate();
@@ -67,24 +41,7 @@ public class MessageViewer extends JPanel implements Viewer {
 		}
 	}
 
-	protected void addToolbar() {
-		final GridBagConstraints gb = new GridBagConstraints();
-		gb.gridheight = 1;
-		gb.gridwidth = 1;
-		gb.fill = GridBagConstraints.NONE;
-		gb.anchor = GridBagConstraints.WEST;
-		gb.weightx = 0.0;
-		gb.weighty = 0.0;
-		gb.insets = new Insets(4,4,4,4);
-
-		// structure button
-		gb.gridwidth = GridBagConstraints.REMAINDER; // only for the last one
-		final Button b = new Button("Structure");
-		b.addActionListener(new StructureAction());
-		add(b, gb);
-	}
-
-	protected void loadHeaders() {
+	private void loadHeaders() {
 		// setup what we want in our viewer
 		final StringBuffer sb = new StringBuffer();
 
@@ -122,11 +79,11 @@ public class MessageViewer extends JPanel implements Viewer {
 
 			headers.setText(sb.toString());
 		} catch (final MessagingException me) {
-			headers.setText("\n\n\n");
+			headers.setText("");
 		}
 	}
 
-	protected Component getBodyComponent() {
+	private Component getBodyComponent() {
 		//------------
 		// now get a content viewer for the main type...
 		//------------
@@ -136,7 +93,6 @@ public class MessageViewer extends JPanel implements Viewer {
 			if (ci == null) {
 				throw new MessagingException("view command failed on: " + displayed.getContentType());
 			}
-
 			final Object bean = dh.getBean(ci);
 			if (bean instanceof Component) {
 				return (Component)bean;
@@ -155,45 +111,153 @@ public class MessageViewer extends JPanel implements Viewer {
 		} else {
 			System.out.println("MessageViewer - content not a Message object, " + o);
 			if (o != null) {
-				System.out.println(o.getClass().toString());
+				System.out.println(o.getClass());
 			}
 		}
 	}
 
-	class StructureAction implements ActionListener {
-		public void actionPerformed(final ActionEvent e) {
-			System.out.println("\n\nMessage Structure");
-			if (displayed != null) {
-				dumpPart("", displayed);
-			}
+	@SuppressWarnings("unchecked")
+        // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+        private void initComponents() {
+
+                jButton1 = new javax.swing.JButton();
+                jScrollPane1 = new javax.swing.JScrollPane();
+                headers = new javax.swing.JTextArea();
+                jButton2 = new javax.swing.JButton();
+                jButton3 = new javax.swing.JButton();
+                jPanel1 = new javax.swing.JPanel();
+                jButton4 = new javax.swing.JButton();
+                jButton5 = new javax.swing.JButton();
+
+                jButton1.setText("Compose");
+                jButton1.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jButton1ActionPerformed(evt);
+                        }
+                });
+
+                headers.setEditable(false);
+                headers.setRows(4);
+                jScrollPane1.setViewportView(headers);
+
+                jButton2.setText("Reply");
+                jButton2.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jButton2ActionPerformed(evt);
+                        }
+                });
+
+                jButton3.setText("Reply to all");
+                jButton3.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jButton3ActionPerformed(evt);
+                        }
+                });
+
+                jPanel1.setLayout(new java.awt.CardLayout());
+
+                jButton4.setText("Delete");
+                jButton4.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jButton4ActionPerformed(evt);
+                        }
+                });
+
+                jButton5.setText("Structure");
+                jButton5.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jButton5ActionPerformed(evt);
+                        }
+                });
+
+                javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+                this.setLayout(layout);
+                layout.setHorizontalGroup(
+                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jScrollPane1)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(jButton1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton5)
+                                .addContainerGap(32, Short.MAX_VALUE))
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                );
+                layout.setVerticalGroup(
+                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jButton1)
+                                        .addComponent(jButton2)
+                                        .addComponent(jButton3)
+                                        .addComponent(jButton4)
+                                        .addComponent(jButton5))
+                                .addGap(1, 1, 1)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE))
+                );
+        }// </editor-fold>//GEN-END:initComponents
+
+        private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+		System.out.println("Compose");
+        }//GEN-LAST:event_jButton1ActionPerformed
+
+        private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+		System.out.println("Reply");
+        }//GEN-LAST:event_jButton2ActionPerformed
+
+        private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+		System.out.println("Replay to all");
+        }//GEN-LAST:event_jButton3ActionPerformed
+
+        private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+		System.out.println("Delete");
+        }//GEN-LAST:event_jButton4ActionPerformed
+
+        private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+		System.out.println("\nMessage Structure");
+		if (displayed != null) {
+			dumpPart("", displayed);
 		}
+        }//GEN-LAST:event_jButton5ActionPerformed
 
-		protected void dumpPart(final String prefix, final Part p) {
-			try {
-				System.out.println(prefix + "----------------");
-				System.out.println(prefix + "Content-Type: " + p.getContentType());
-				System.out.println(prefix + "Class: " + p.getClass().toString());
+	private void dumpPart(final String prefix, final Part p) {
+		try {
+			System.out.println(prefix + "----------------");
+			System.out.println(prefix + "Content-Type: " + p.getContentType());
+			System.out.println(prefix + "Class: " + p.getClass());
 
-				Object o = p.getContent();
-				if (o == null) {
-					System.out.println(prefix + "Content:  is null");
-				} else {
-					System.out.println(prefix + "Content: " + o.getClass().toString());
+			final Object o = p.getContent();
+			System.out.println(prefix + "Content: " + (o == null?"is null":o.getClass()));
+			if (o instanceof Multipart) {
+				final String newpref = prefix + "\t";
+				final Multipart mp = (Multipart)o;
+				final int count = mp.getCount();
+				for (int i = 0; i < count; i++) {
+					dumpPart(newpref, mp.getBodyPart(i));
 				}
-
-				if (o instanceof Multipart) {
-					String newpref = prefix + "\t";
-					Multipart mp = (Multipart)o;
-					int count = mp.getCount();
-					for (int i = 0; i < count; i++) {
-						dumpPart(newpref, mp.getBodyPart(i));
-					}
-				}
-			} catch (final MessagingException e) {
-				e.printStackTrace();
-			} catch (final IOException ioex) {
-				System.out.println("Cannot get content" + ioex.getMessage());
 			}
+		} catch (final MessagingException e) {
+			e.printStackTrace();
+		} catch (final IOException ioex) {
+			System.out.println("Cannot get content" + ioex.getMessage());
 		}
 	}
+
+        // Variables declaration - do not modify//GEN-BEGIN:variables
+        private javax.swing.JTextArea headers;
+        private javax.swing.JButton jButton1;
+        private javax.swing.JButton jButton2;
+        private javax.swing.JButton jButton3;
+        private javax.swing.JButton jButton4;
+        private javax.swing.JButton jButton5;
+        private javax.swing.JPanel jPanel1;
+        private javax.swing.JScrollPane jScrollPane1;
+        // End of variables declaration//GEN-END:variables
 }
