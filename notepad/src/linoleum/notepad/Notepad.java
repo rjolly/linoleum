@@ -351,11 +351,9 @@ public class Notepad extends JPanel {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			if (parent == null) {
-				parent = new File("");
+				parent = new File(".");
 			}
-			if (parent != null) {
-				frame.getApplicationManager().open(parent.toURI());
-			}
+			frame.getApplicationManager().open(parent.toURI());
 		}
 	}
 
