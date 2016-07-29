@@ -5,7 +5,6 @@ import java.awt.event.*;
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.activation.*;
-import java.util.Collections;
 import java.util.Date;
 import java.io.IOException;
 import javax.swing.Action;
@@ -32,7 +31,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			final Compose frame = new Compose();
+			final Compose frame = new Compose(client.getSession());
 			frame.setApplicationManager(client.getApplicationManager());
 		}
 	}
@@ -44,11 +43,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			try {
-				reply(false);
-			} catch (final MessagingException me) {
-				me.printStackTrace();
-			}
+			reply(false);
 		}
 	}
 
@@ -59,11 +54,18 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			try {
-				reply(true);
-			} catch (final MessagingException me) {
-				me.printStackTrace();
-			}
+			reply(true);
+		}
+	}
+
+	private void reply(final boolean all) {
+		try {
+			final MimeMessage msg = (MimeMessage) displayed;
+			final MimeMessage reply = (MimeMessage) msg.reply(all);
+			final Compose frame = new Compose(client.getSession(), reply);
+			frame.setApplicationManager(client.getApplicationManager());
+		} catch (final MessagingException me) {
+			me.printStackTrace();
 		}
 	}
 
@@ -75,7 +77,8 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			try {
-				delete();
+				final boolean value = displayed.isSet(Flags.Flag.DELETED);
+				displayed.setFlag(Flags.Flag.DELETED, !value);
 			} catch (final MessagingException me) {
 				me.printStackTrace();
 			}
@@ -299,20 +302,6 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
                                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE))
                 );
         }// </editor-fold>//GEN-END:initComponents
-
-	@SuppressWarnings("unchecked")
-	private void reply(final boolean all) throws MessagingException {
-		final MimeMessage msg = (MimeMessage) displayed;
-		final MimeMessage reply = (MimeMessage) msg.reply(all);
-		for (final Object line : Collections.list(reply.getAllHeaderLines())) {
-			System.out.println(line);
-		}
-	}
-
-	private void delete() throws MessagingException {
-		final boolean value = displayed.isSet(Flags.Flag.DELETED);
-		displayed.setFlag(Flags.Flag.DELETED, !value);
-	}
 
 	private void dumpPart(final String prefix, final Part p) {
 		try {

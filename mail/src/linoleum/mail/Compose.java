@@ -37,19 +37,35 @@ public class Compose extends Frame {
 	private JTextField ccField;
 	private JTextField subField;
 	private JTextArea content;
-	private final SimpleAuthenticator auth = new SimpleAuthenticator(this);
+	private final Message msg;
+	private final Session session;
 	private final int openFrameCount;
 	private final Collection<Integer> openFrames;
+	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private static final int offset = 30;
 
 	public Compose() {
-		this(new HashSet<Integer>(), 0);
+		this(Session.getInstance(System.getProperties()));
 	}
 
-	public Compose(final Collection<Integer> openFrames, final int openFrameCount) {
+	public Compose(final Session session) {
+		this(session, new MimeMessage(session));
+	}
+
+	public Compose(final Session session, final Message msg) {
+		this(session, new HashSet<Integer>(), 0, msg);
+	}
+
+	public Compose(final Session session, final Collection<Integer> openFrames, final int openFrameCount) {
+		this(session, openFrames, openFrameCount, new MimeMessage(session));
+	}
+
+	public Compose(final Session session, final Collection<Integer> openFrames, final int openFrameCount, final Message msg) {
 		super("Untitled Message " + openFrameCount);
 		this.openFrameCount = openFrameCount;
 		this.openFrames = openFrames;
+		this.session = session;
+		this.msg = msg;
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail24.gif")));
 
 		JPanel top = new JPanel();
@@ -69,13 +85,21 @@ public class Compose extends Frame {
 		setContentPane(top);
 		pack();
 		setLocation(offset * openFrameCount, offset * openFrameCount);
+
+		try {
+			toField.setText(InternetAddress.toString(msg.getRecipients(Message.RecipientType.TO)));
+			ccField.setText(InternetAddress.toString(msg.getRecipients(Message.RecipientType.CC)));
+			subField.setText(msg.getSubject());
+		} catch (final MessagingException me) {
+			me.printStackTrace();
+		}
 	}
 
 	@Override
 	public Frame getFrame() {
 		int openFrameCount = openFrames.isEmpty()?0:Collections.max(openFrames);
 		openFrames.add(++openFrameCount);
-		return new Compose(openFrames, openFrameCount);
+		return new Compose(session, openFrames, openFrameCount);
 	}
 
 	@Override
@@ -84,10 +108,9 @@ public class Compose extends Frame {
 	}
 
 	private JPanel buildButtonPanel() {
-		JPanel p = new JPanel();
+		final JPanel p = new JPanel();
 		p.setLayout(new BorderLayout());
-
-		JButton send = new JButton("Send");
+		final JButton send = new JButton("Send");
 		send.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent evt) {
 				try {
@@ -103,13 +126,10 @@ public class Compose extends Frame {
 			}
 		});
 		p.add(send, BorderLayout.EAST);
-
 		return p;
 	}
 
 	private void send() throws MessagingException {
-		final Preferences prefs = Preferences.userNodeForPackage(getClass());
-		final String mailhost = prefs.get(SimpleClient.name + ".mailhost", null);
 		final String from = prefs.get(SimpleClient.name + ".from", null);
 		final String to = toField.getText();
 		final String cc = ccField.getText();
@@ -119,17 +139,7 @@ public class Compose extends Frame {
 		final String file = null;
 		final String url = prefs.get(SimpleClient.name + ".url", null);
 		final String record = prefs.get(SimpleClient.name + ".record", null);
-		final Properties props = System.getProperties();
-		final boolean debug = props.getProperty("linoleum.mail.debug") != null;
 
-		if (mailhost != null) {
-			props.put("mail.smtp.host", mailhost);
-		}
-		final Session session = Session.getInstance(props, auth);
-		if (debug) {
-			session.setDebug(true);
-		}
-		final Message msg = new MimeMessage(session);
 		if (from != null) {
 			msg.setFrom(new InternetAddress(from));
 		} else {

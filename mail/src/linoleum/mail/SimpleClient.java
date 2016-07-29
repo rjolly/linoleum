@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.Properties;
 import java.util.prefs.Preferences;
 import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
@@ -22,8 +23,11 @@ import javax.swing.tree.TreePath;
 import linoleum.application.Frame;
 
 public class SimpleClient extends Frame {
+	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final SimpleAuthenticator auth = new SimpleAuthenticator(this);
-	private final Session session = Session.getInstance(System.getProperties(), auth);
+	private final Properties props = System.getProperties();
+	private final boolean debug = props.getProperty("linoleum.mail.debug") != null;
+	private final Session session;
 	private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 	private final DefaultTreeModel model = new DefaultTreeModel(root);
 	private StoreTreeNode node;
@@ -40,11 +44,22 @@ public class SimpleClient extends Frame {
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
-		final Preferences prefs = Preferences.userNodeForPackage(getClass());
+		final String mailhost = prefs.get(name + ".mailhost", null);
+		if (mailhost != null) {
+			props.put("mail.smtp.host", mailhost);
+		}
+		session = Session.getInstance(props, auth);
+		if (debug) {
+			session.setDebug(true);
+		}
 		final String str = prefs.get(name + ".url", null);
 		if (str != null) {
 			open(str);
 		}
+	}
+
+	public Session getSession() {
+		return session;
 	}
 
 	@Override
