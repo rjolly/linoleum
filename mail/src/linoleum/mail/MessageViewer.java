@@ -77,8 +77,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			try {
-				final boolean value = displayed.isSet(Flags.Flag.DELETED);
-				displayed.setFlag(Flags.Flag.DELETED, !value);
+				client.getFolderViewer().getModel().delete(displayed);
 			} catch (final MessagingException me) {
 				me.printStackTrace();
 			}

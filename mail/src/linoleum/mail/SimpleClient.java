@@ -62,6 +62,10 @@ public class SimpleClient extends Frame {
 		return session;
 	}
 
+	public FolderViewer getFolderViewer() {
+		return folderViewer;
+	}
+
 	@Override
 	protected void open() {
 		open(getURI().toString());

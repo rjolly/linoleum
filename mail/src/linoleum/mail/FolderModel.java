@@ -32,6 +32,14 @@ public class FolderModel extends AbstractTableModel {
 		fireTableDataChanged();
 	}
 
+	public void delete(final Message msg) throws MessagingException {
+		for (int i = 0 ; i < messages.length ; i++) {
+			if (messages[i] == msg) {
+				delete(i, !msg.isSet(Flags.Flag.DELETED));
+			}
+		}
+	}
+
 	private void delete(int which, boolean value) throws MessagingException {
 		messages[which].setFlag(Flags.Flag.DELETED, value);
 		cached[which] = null;
