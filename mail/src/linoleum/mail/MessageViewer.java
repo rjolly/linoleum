@@ -21,6 +21,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 	private final Action replyToAllAction = new ReplyToAllAction();
 	private final Action deleteAction = new DeleteAction();
 	private final Action structureAction = new StructureAction();
+	private SimpleClient client;
 	private Message displayed;
 	private Component mainbody;
 
@@ -31,7 +32,8 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			System.out.println(getValue(Action.NAME));
+			final Compose frame = new Compose();
+			frame.setApplicationManager(client.getApplicationManager());
 		}
 	}
 
@@ -115,6 +117,10 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 	public MessageViewer() {
 		initComponents();
 		setMessage(null);
+	}
+
+	public void setClient(final SimpleClient client) {
+		this.client = client;
 	}
 
 	public final void setMessage(final Message what) {

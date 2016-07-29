@@ -144,6 +144,8 @@ public class SimpleClient extends Frame {
                 jSplitPane2.setRightComponent(folderViewer);
 
                 jSplitPane1.setTopComponent(jSplitPane2);
+
+                messageViewer.setClient(this);
                 jSplitPane1.setBottomComponent(messageViewer);
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
