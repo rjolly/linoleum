@@ -1,84 +1,31 @@
 package linoleum.mail;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
 import javax.mail.*;
-import javax.mail.internet.*;
-import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
-public class FolderViewer extends JPanel {
+public class FolderViewer extends javax.swing.JPanel {
 	private final FolderModel model = new FolderModel();
-	private final JScrollPane scrollpane;
-	private final JTable table;
 	private MessageViewer mv;
-	private int which;
+
+	public FolderModel getModel() {
+		return model;
+	}
 
 	public FolderViewer() {
-		super(new GridLayout(1,1));
-		final JPopupMenu popup = new JPopupMenu();
-		final JMenuItem reply = new JMenuItem("Reply");
-		reply.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent evt) {
-				try {
-					reply(false);
-				} catch (final MessagingException me) {
-					me.printStackTrace();
-				}
-			}
-		});
-		popup.add(reply);
-		final JMenuItem replyToAll = new JMenuItem("Reply to all");
-		replyToAll.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent evt) {
-				try {
-					reply(true);
-				} catch (final MessagingException me) {
-					me.printStackTrace();
-				}
-			}
-		});
-		popup.add(replyToAll);
-		final JMenuItem item = new JMenuItem("Delete");
-		item.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent evt) {
-				try {
-					model.delete(which);
-				} catch (final MessagingException me) {
-					me.printStackTrace();
-				}
-			}
-		});
-		popup.add(item);
-		table = new JTable(model);
-		table.addMouseMotionListener(new MouseMotionAdapter() {
-			public void mouseMoved(final MouseEvent evt) {
-				which = table.rowAtPoint(evt.getPoint());
-				table.setComponentPopupMenu(which < 0?null:popup);
-			}
-		});
+		initComponents();
+
 		// find out what is pressed
 		table.getSelectionModel().addListSelectionListener(new FolderPressed());
 		table.setShowGrid(false);
-		scrollpane = new JScrollPane(table);
-		add(scrollpane);
 	}
 
-	@SuppressWarnings("unchecked")
-	public void reply(boolean all) throws MessagingException {
-		final MimeMessage msg = (MimeMessage)model.getMessage(which);
-		final MimeMessage reply = (MimeMessage)msg.reply(all);
-		for (final Object line : Collections.list(reply.getAllHeaderLines())) {
-			System.out.println(line);
-		}
-	}
-
-	public void setMv(MessageViewer mv) {
+	public void setMv(final MessageViewer mv) {
 		this.mv = mv;
 	}
 
-	public void setFolder(Folder what) throws MessagingException {
+	public void setFolder(final Folder what) throws MessagingException {
 		table.getSelectionModel().clearSelection();
 		if (mv != null) {
 			mv.setMessage(null);
@@ -92,17 +39,44 @@ public class FolderViewer extends JPanel {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+        // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+        private void initComponents() {
+
+                scrollpane = new javax.swing.JScrollPane();
+                table = new javax.swing.JTable();
+
+                table.setModel(getModel());
+                scrollpane.setViewportView(table);
+
+                javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+                this.setLayout(layout);
+                layout.setHorizontalGroup(
+                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(scrollpane, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                );
+                layout.setVerticalGroup(
+                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(scrollpane, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                );
+        }// </editor-fold>//GEN-END:initComponents
+
 	class FolderPressed implements ListSelectionListener {
-		public void valueChanged(ListSelectionEvent e) {
+		public void valueChanged(final ListSelectionEvent e) {
 			if (model != null && !e.getValueIsAdjusting()) {
-				ListSelectionModel lm = (ListSelectionModel) e.getSource();
-				int which = lm.getMaxSelectionIndex();
+				final ListSelectionModel lm = (ListSelectionModel) e.getSource();
+				final int which = lm.getMaxSelectionIndex();
 				if (which != -1) {
 					// get the message and display it
-					Message msg = model.getMessage(which);
+					final Message msg = model.getMessage(which);
 					mv.setMessage(msg);
 				}
 			}
 		}
 	}
+
+        // Variables declaration - do not modify//GEN-BEGIN:variables
+        private javax.swing.JScrollPane scrollpane;
+        private javax.swing.JTable table;
+        // End of variables declaration//GEN-END:variables
 }

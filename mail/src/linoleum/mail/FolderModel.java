@@ -5,11 +5,11 @@ import java.util.Date;
 import javax.swing.table.AbstractTableModel; 
 
 public class FolderModel extends AbstractTableModel {
-	Folder folder;
-	Message[] messages;
-
-	String[] columnNames = { "Date", "From", "Subject", "Deleted"};
-	Class[] columnTypes = { String.class, String.class, String.class, Boolean.class };
+	private Folder folder;
+	private Message[] messages;
+	private final String[] columnNames = { "Date", "From", "Subject", "Deleted"};
+	private final Class[] columnTypes = { String.class, String.class, String.class, Boolean.class };
+	private final boolean[] editable = { false, false, false, true };
 
 	public void setFolder(Folder what) throws MessagingException {
 		if (what != null) {
@@ -32,9 +32,8 @@ public class FolderModel extends AbstractTableModel {
 		fireTableDataChanged();
 	}
 
-	public void delete(int which) throws MessagingException {
-		final boolean d = (Boolean)getValueAt(which, 3);
-		messages[which].setFlag(Flags.Flag.DELETED, !d);
+	private void delete(int which, boolean value) throws MessagingException {
+		messages[which].setFlag(Flags.Flag.DELETED, value);
 		cached[which] = null;
 		fireTableDataChanged();
 	}
@@ -64,6 +63,24 @@ public class FolderModel extends AbstractTableModel {
 			return 0;
 		}
 		return messages.length;
+	}
+
+	@Override
+	public boolean isCellEditable(final int rowIndex, final int columnIndex) {
+		return editable[columnIndex];
+	}
+
+	@Override
+	public void setValueAt(final Object aValue, final int rowIndex, final int columnIndex) {
+		switch(columnIndex) {
+		case 3:
+			try {
+				delete(rowIndex, (Boolean)aValue);
+			} catch (final MessagingException ex) {
+				ex.printStackTrace();
+			}
+		default:
+		}
 	}
 
 	public Object getValueAt(int aRow, int aColumn) {

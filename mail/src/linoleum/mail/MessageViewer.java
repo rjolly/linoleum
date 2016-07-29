@@ -3,7 +3,9 @@ package linoleum.mail;
 import java.awt.*;
 import java.awt.event.*;
 import javax.mail.*;
+import javax.mail.internet.*;
 import javax.activation.*;
+import java.util.Collections;
 import java.util.Date;
 import java.io.IOException;
 import javax.swing.Action;
@@ -40,7 +42,11 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			System.out.println(getValue(Action.NAME));
+			try {
+				reply(false);
+			} catch (final MessagingException me) {
+				me.printStackTrace();
+			}
 		}
 	}
 
@@ -51,7 +57,11 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			System.out.println(getValue(Action.NAME));
+			try {
+				reply(true);
+			} catch (final MessagingException me) {
+				me.printStackTrace();
+			}
 		}
 	}
 
@@ -62,7 +72,11 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			System.out.println(getValue(Action.NAME));
+			try {
+				delete();
+			} catch (final MessagingException me) {
+				me.printStackTrace();
+			}
 		}
 	}
 
@@ -279,6 +293,20 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
                                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE))
                 );
         }// </editor-fold>//GEN-END:initComponents
+
+	@SuppressWarnings("unchecked")
+	private void reply(final boolean all) throws MessagingException {
+		final MimeMessage msg = (MimeMessage) displayed;
+		final MimeMessage reply = (MimeMessage) msg.reply(all);
+		for (final Object line : Collections.list(reply.getAllHeaderLines())) {
+			System.out.println(line);
+		}
+	}
+
+	private void delete() throws MessagingException {
+		final boolean value = displayed.isSet(Flags.Flag.DELETED);
+		displayed.setFlag(Flags.Flag.DELETED, !value);
+	}
 
 	private void dumpPart(final String prefix, final Part p) {
 		try {

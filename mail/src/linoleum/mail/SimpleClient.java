@@ -112,9 +112,9 @@ public class SimpleClient extends Frame {
                 setName(name);
 
                 jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-                jSplitPane1.setResizeWeight(0.5);
+                jSplitPane1.setResizeWeight(0.4);
 
-                jSplitPane2.setDividerLocation(250);
+                jSplitPane2.setResizeWeight(0.4);
 
                 jTree1.setModel(model);
                 jTree1.setComponentPopupMenu(jPopupMenu1);
