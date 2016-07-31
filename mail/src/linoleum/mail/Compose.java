@@ -53,19 +53,24 @@ public class Compose extends Frame {
 	}
 
 	public Compose(final Session session, final Message msg) {
-		this(session, new HashSet<Integer>(), 0, msg);
+		this(session, new HashSet<Integer>(), msg);
 	}
 
-	public Compose(final Session session, final Collection<Integer> openFrames, final int openFrameCount) {
-		this(session, openFrames, openFrameCount, new MimeMessage(session));
+	public Compose(final Session session, final Collection<Integer> openFrames) {
+		this(session, openFrames, new MimeMessage(session));
 	}
 
-	public Compose(final Session session, final Collection<Integer> openFrames, final int openFrameCount, final Message msg) {
-		super("Untitled Message " + openFrameCount);
-		this.openFrameCount = openFrameCount;
+	public Compose(final Session session, final Collection<Integer> openFrames, final Message msg) {
+		openFrameCount = openFrames.isEmpty()?0:Collections.max(openFrames) + 1;
+		openFrames.add(openFrameCount);
 		this.openFrames = openFrames;
 		this.session = session;
 		this.msg = msg;
+                setClosable(true);
+                setIconifiable(true);
+                setMaximizable(true);
+                setResizable(true);
+		setTitle("Untitled Message " + openFrameCount);
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail24.gif")));
 
 		JPanel top = new JPanel();
@@ -97,9 +102,7 @@ public class Compose extends Frame {
 
 	@Override
 	public Frame getFrame() {
-		int openFrameCount = openFrames.isEmpty()?0:Collections.max(openFrames);
-		openFrames.add(++openFrameCount);
-		return new Compose(session, openFrames, openFrameCount);
+		return new Compose(session, openFrames);
 	}
 
 	@Override
