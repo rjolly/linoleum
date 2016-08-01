@@ -69,13 +69,17 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 	}
 
 	private String params(final Message msg) throws MessagingException {
-		final String to = mkString(msg.getRecipients(Message.RecipientType.TO));
+		final Address to[] = msg.getRecipients(Message.RecipientType.TO);
+		final Address cc[] = msg.getRecipients(Message.RecipientType.CC);
 		final StringBuilder bld = new StringBuilder();
+		if (cc != null) {
+			append(bld, "cc", mkString(cc));
+		}
 		append(bld, "inReplyTo", mkString(msg.getHeader("In-Reply-To")));
 		append(bld, "references", mkString(msg.getHeader("References")));
 		append(bld, "subject", msg.getSubject());
 		final String str = bld.toString();
-		return to + (str.isEmpty()?"":"?") + str;
+		return mkString(to) + (str.isEmpty()?"":"?") + str;
 	}
 
 	private StringBuilder append(final StringBuilder bld, final String key, final String value) {

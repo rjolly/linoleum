@@ -103,6 +103,9 @@ public class Compose extends Frame {
 				final String r[] = t.split("=");
 				if (r.length > 1) {
 					switch (r[0]) {
+					case "cc":
+						ccField.setText(r[1]);
+						break;
 					case "subject":
 						subField.setText(r[1]);
 						break;
