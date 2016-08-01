@@ -7,14 +7,22 @@ import java.beans.*;
 import javax.activation.*;
 import javax.mail.*;
 import javax.swing.JButton;
-import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JInternalFrame;
+import javax.swing.JSplitPane;
+import javax.swing.JPanel;
 
 public class MultipartViewer extends JPanel implements Viewer {
+	final JPanel p = new JPanel(new GridBagLayout());
+	final JScrollPane scp = new JScrollPane(p);
+	final JSplitPane sp = new JSplitPane();
 	Component comp;
 
 	public MultipartViewer() {
-		super(new GridBagLayout());
+		super(new GridLayout(1,1));
+		sp.setRightComponent(scp);
+		sp.setResizeWeight(1.0);
+		add(sp);
 	}
 
 	public void setCommandContext(final String verb, final DataHandler dh) throws IOException {
@@ -31,24 +39,19 @@ public class MultipartViewer extends JPanel implements Viewer {
 		// we display the first body part in a main frame on the left, and then
 		// on the right we display the rest of the parts as attachments
 
-		final GridBagConstraints gc = new GridBagConstraints();
-		gc.gridheight = GridBagConstraints.REMAINDER;
-		gc.fill = GridBagConstraints.BOTH;
-		gc.weightx = 1.0;
-		gc.weighty = 1.0;
-
 		// get the first part
 		try {
 			final BodyPart bp = mp.getBodyPart(0);
 			comp = getComponent(bp);
-			add(comp, gc);
+			sp.setLeftComponent(comp);
 		} catch (final MessagingException me) {
-			add(new Label(me.toString()), gc);
+			sp.setLeftComponent(new Label(me.toString()));
 		}
 
 		// see if there are more than one parts
 		try {
 			final int count = mp.getCount();
+			final GridBagConstraints gc = new GridBagConstraints();
 
 			// setup how to display them
 			gc.gridwidth = GridBagConstraints.REMAINDER;
@@ -69,7 +72,7 @@ public class MultipartViewer extends JPanel implements Viewer {
 
 				final JButton button = new JButton(label);
 				button.addActionListener(new AttachmentViewer(curr));
-				add(button, gc);
+				p.add(button, gc);
 			}
 		} catch(final MessagingException me) {
 			me.printStackTrace();
