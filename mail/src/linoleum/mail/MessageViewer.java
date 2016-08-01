@@ -208,16 +208,24 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 			// from
 			sb.append("From: ");
 			Address[] adds = displayed.getFrom();
-			if (adds != null && adds.length > 0) {
-				sb.append(adds[0].toString());
+			if (adds != null) {
+				sb.append(mkString(adds));
 			}
 			sb.append("\n");
 
 			// to
 			sb.append("To: ");
 			adds = displayed.getRecipients(Message.RecipientType.TO);
-			if (adds != null && adds.length > 0) {
-				sb.append(adds[0].toString());
+			if (adds != null) {
+				sb.append(mkString(adds));
+			}
+			sb.append("\n");
+
+			// cc
+			sb.append("Cc: ");
+			adds = displayed.getRecipients(Message.RecipientType.CC);
+			if (adds != null) {
+				sb.append(mkString(adds));
 			}
 			sb.append("\n");
 
@@ -281,7 +289,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
                 jButton1.setText("Compose");
 
                 headers.setEditable(false);
-                headers.setRows(4);
+                headers.setRows(5);
                 jScrollPane1.setViewportView(headers);
 
                 jButton2.setAction(getReplyAction());
