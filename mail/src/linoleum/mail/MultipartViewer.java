@@ -12,17 +12,12 @@ import javax.swing.JInternalFrame;
 
 public class MultipartViewer extends JPanel implements Viewer {
 	Component comp;
-	DataHandler dh;
-	String verb;
 
 	public MultipartViewer() {
 		super(new GridBagLayout());
 	}
 
-	public void setCommandContext(String verb, DataHandler dh) throws IOException {
-		this.verb = verb;
-		this.dh = dh;
-
+	public void setCommandContext(final String verb, final DataHandler dh) throws IOException {
 		// get the content, and hope it is a Multipart Object
 		Object content = dh.getContent();
 		if (content instanceof Multipart) {
@@ -32,11 +27,11 @@ public class MultipartViewer extends JPanel implements Viewer {
 		}
 	}
 
-	protected void setupDisplay(Multipart mp) {
+	private void setupDisplay(final Multipart mp) {
 		// we display the first body part in a main frame on the left, and then
 		// on the right we display the rest of the parts as attachments
 
-		GridBagConstraints gc = new GridBagConstraints();
+		final GridBagConstraints gc = new GridBagConstraints();
 		gc.gridheight = GridBagConstraints.REMAINDER;
 		gc.fill = GridBagConstraints.BOTH;
 		gc.weightx = 1.0;
@@ -44,16 +39,16 @@ public class MultipartViewer extends JPanel implements Viewer {
 
 		// get the first part
 		try {
-			BodyPart bp = mp.getBodyPart(0);
+			final BodyPart bp = mp.getBodyPart(0);
 			comp = getComponent(bp);
 			add(comp, gc);
-		} catch (MessagingException me) {
+		} catch (final MessagingException me) {
 			add(new Label(me.toString()), gc);
 		}
 
 		// see if there are more than one parts
 		try {
-			int count = mp.getCount();
+			final int count = mp.getCount();
 
 			// setup how to display them
 			gc.gridwidth = GridBagConstraints.REMAINDER;
@@ -66,64 +61,47 @@ public class MultipartViewer extends JPanel implements Viewer {
 
 			// for each one we create a button with the content type
 			for(int i = 1; i < count; i++) { // we skip the first one 
-				BodyPart curr = mp.getBodyPart(i);
+				final BodyPart curr = mp.getBodyPart(i);
 				String label = null;
 				if (label == null) label = curr.getFileName();
 				if (label == null) label = curr.getDescription();
 				if (label == null) label = curr.getContentType();
 
-				JButton but = new JButton(label);
-				but.addActionListener(new AttachmentViewer(curr));
-				add(but, gc);
+				final JButton button = new JButton(label);
+				button.addActionListener(new AttachmentViewer(curr));
+				add(button, gc);
 			}
-		} catch(MessagingException me2) {
-			me2.printStackTrace();
+		} catch(final MessagingException me) {
+			me.printStackTrace();
 		}
 	}
 
-	protected Component getComponent(BodyPart bp) {
+	private Component getComponent(final BodyPart bp) {
 		try {
-			DataHandler dh = bp.getDataHandler();
-			CommandInfo ci = dh.getCommand("view");
+			final DataHandler dh = bp.getDataHandler();
+			final CommandInfo ci = dh.getCommand("view");
 			if (ci == null) {
-				throw new MessagingException(
-					"view command failed on: " +
-					bp.getContentType());
+				throw new MessagingException("view command failed on: " + bp.getContentType());
 			}
-			Object bean = dh.getBean(ci);
+			final Object bean = dh.getBean(ci);
 			if (bean instanceof Component) {
 				return (Component)bean;
 			} else {
-				if (bean == null) {
-					throw new MessagingException(
-						"bean is null, class " + ci.getCommandClass() +
-						" , command " + ci.getCommandName());
-				} else {
-					throw new MessagingException(
-						"bean is not a awt.Component" +
-						bean.getClass().toString());
-				}
+				throw new MessagingException(bean == null?"bean is null, class " + ci.getCommandClass() + " , command " + ci.getCommandName():"bean is not a awt.Component" + bean.getClass());
 			}
-		} catch (MessagingException me) {
+		} catch (final MessagingException me) {
 			return new Label(me.toString());
 		}
 	}
 
-	protected void setupErrorDisplay(Object content) {
-		String error;
-
-		if (content == null) {
-			error = "Content is null";
-		} else {
-			error = "Object not of type Multipart, content class = " +
-				content.getClass().toString();
-		}
+	private void setupErrorDisplay(final Object content) {
+		final String error = content == null?"Content is null":"Object not of type Multipart, content class = " + content.getClass();
 		System.out.println(error);
-		Label lab = new Label(error);
+		final Label lab = new Label(error);
 		add(lab);
 	}
 
-	protected JInternalFrame getFrame() {
+	private JInternalFrame getFrame() {
 		for (Container p = getParent(); p != null; p = p.getParent()) {
 			if (p instanceof JInternalFrame) {
 				return (JInternalFrame) p;
@@ -133,16 +111,16 @@ public class MultipartViewer extends JPanel implements Viewer {
 	}
 
 	class AttachmentViewer implements ActionListener {
-		BodyPart bp = null;
+		final BodyPart bp;
 
-		public AttachmentViewer(BodyPart part) {
+		public AttachmentViewer(final BodyPart part) {
 			bp = part;
 		}
 
-		public void actionPerformed(ActionEvent e) {
-			Component comp = getComponent(bp);
-			ComponentFrame f = new ComponentFrame(comp, "Attachment");
-			JInternalFrame frame = getFrame();
+		public void actionPerformed(final ActionEvent e) {
+			final Component comp = getComponent(bp);
+			final ComponentFrame f = new ComponentFrame(comp, "Attachment");
+			final JInternalFrame frame = getFrame();
 			frame.getDesktopPane().add(f);
 			f.pack();
 			final Dimension s = f.getSize();
