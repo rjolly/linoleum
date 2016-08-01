@@ -20,7 +20,6 @@ import javax.mail.Transport;
 import javax.mail.URLName;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -35,9 +34,10 @@ import linoleum.application.Frame;
 public class Compose extends Frame {
 	private JTextField toField;
 	private JTextField ccField;
+	private JTextField bccField;
 	private JTextField subField;
 	private JTextArea content;
-	private final Message msg;
+	private Message msg;
 	private final Session session;
 	private final int openFrameCount;
 	private final Collection<Integer> openFrames;
@@ -49,23 +49,14 @@ public class Compose extends Frame {
 	}
 
 	public Compose(final Session session) {
-		this(session, new MimeMessage(session));
-	}
-
-	public Compose(final Session session, final Message msg) {
-		this(session, new HashSet<Integer>(), msg);
+		this(session, new HashSet<Integer>());
 	}
 
 	public Compose(final Session session, final Collection<Integer> openFrames) {
-		this(session, openFrames, new MimeMessage(session));
-	}
-
-	public Compose(final Session session, final Collection<Integer> openFrames, final Message msg) {
 		openFrameCount = openFrames.isEmpty()?0:Collections.max(openFrames) + 1;
 		openFrames.add(openFrameCount);
 		this.openFrames = openFrames;
 		this.session = session;
-		this.msg = msg;
                 setClosable(true);
                 setIconifiable(true);
                 setMaximizable(true);
@@ -90,14 +81,14 @@ public class Compose extends Frame {
 		setContentPane(top);
 		pack();
 		setLocation(offset * openFrameCount, offset * openFrameCount);
+	}
 
-		try {
-			toField.setText(InternetAddress.toString(msg.getRecipients(Message.RecipientType.TO)));
-			ccField.setText(InternetAddress.toString(msg.getRecipients(Message.RecipientType.CC)));
-			subField.setText(msg.getSubject());
-		} catch (final MessagingException me) {
-			me.printStackTrace();
-		}
+	public void setMessage(final Message msg) throws MessagingException {
+		toField.setText(InternetAddress.toString(msg.getRecipients(Message.RecipientType.TO)));
+		ccField.setText(InternetAddress.toString(msg.getRecipients(Message.RecipientType.CC)));
+		bccField.setText(InternetAddress.toString(msg.getRecipients(Message.RecipientType.BCC)));
+		subField.setText(msg.getSubject());
+		this.msg = msg;
 	}
 
 	@Override
@@ -136,7 +127,7 @@ public class Compose extends Frame {
 		final String from = prefs.get(SimpleClient.name + ".from", null);
 		final String to = toField.getText();
 		final String cc = ccField.getText();
-		final String bcc = null;
+		final String bcc = bccField.getText();
 		final String subject = subField.getText();
 		final String text = content.getText();
 		final String file = null;
@@ -191,20 +182,25 @@ public class Compose extends Frame {
 	}
 
 	private JPanel buildAddressPanel() {
-		JPanel p = new JPanel();
+		final JPanel p = new JPanel();
 		p.setLayout(new LabeledPairLayout());
 
-		JLabel toLabel = new JLabel("To: ", JLabel.RIGHT);
+		final JLabel toLabel = new JLabel("To: ", JLabel.RIGHT);
 		toField = new JTextField(25);
 		p.add(toLabel, "label");
 		p.add(toField, "field");
 
-		JLabel ccLabel = new JLabel("Cc: ", JLabel.RIGHT);
+		final JLabel ccLabel = new JLabel("Cc: ", JLabel.RIGHT);
 		ccField = new JTextField(25);
 		p.add(ccLabel, "label");
 		p.add(ccField, "field");
 
-		JLabel subLabel = new JLabel("Subj: ", JLabel.RIGHT);
+		final JLabel bccLabel = new JLabel("Bcc: ", JLabel.RIGHT);
+		bccField = new JTextField(25);
+		p.add(bccLabel, "label");
+		p.add(bccField, "field");
+
+		final JLabel subLabel = new JLabel("Subj: ", JLabel.RIGHT);
 		subField = new JTextField(25);
 		p.add(subLabel, "label");
 		p.add(subField, "field");

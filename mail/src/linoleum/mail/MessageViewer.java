@@ -31,8 +31,11 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			final Compose frame = new Compose(client.getSession());
-			frame.setApplicationManager(client.getApplicationManager());
+			try {
+				client.compose();
+			} catch (final MessagingException me) {
+				me.printStackTrace();
+			}
 		}
 	}
 
@@ -62,8 +65,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 		try {
 			final MimeMessage msg = (MimeMessage) displayed;
 			final MimeMessage reply = (MimeMessage) msg.reply(all);
-			final Compose frame = new Compose(client.getSession(), reply);
-			frame.setApplicationManager(client.getApplicationManager());
+			client.compose(reply);
 		} catch (final MessagingException me) {
 			me.printStackTrace();
 		}

@@ -9,11 +9,13 @@ import java.util.prefs.Preferences;
 import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
 import javax.mail.Folder;
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.URLName;
+import javax.mail.internet.MimeMessage;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -27,9 +29,10 @@ public class SimpleClient extends Frame {
 	private final SimpleAuthenticator auth = new SimpleAuthenticator(this);
 	private final Properties props = System.getProperties();
 	private final boolean debug = props.getProperty("linoleum.mail.debug") != null;
-	private final Session session;
 	private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 	private final DefaultTreeModel model = new DefaultTreeModel(root);
+	private final Session session;
+	private final Compose frame;
 	private StoreTreeNode node;
 	private FolderTreeNode foldernode;
 	static final String name = "Mail";
@@ -52,14 +55,20 @@ public class SimpleClient extends Frame {
 		if (debug) {
 			session.setDebug(true);
 		}
+		frame = new Compose(session);
 		final String str = prefs.get(name + ".url", null);
 		if (str != null) {
 			open(str);
 		}
 	}
 
-	public Session getSession() {
-		return session;
+	public void compose() throws MessagingException {
+		compose(new MimeMessage(session));
+	}
+
+	public void compose(final Message msg) throws MessagingException {
+		frame.open(getApplicationManager());
+		frame.setMessage(msg);
 	}
 
 	public FolderViewer getFolderViewer() {
