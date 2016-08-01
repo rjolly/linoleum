@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -20,6 +21,7 @@ import javax.mail.Transport;
 import javax.mail.URLName;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -37,7 +39,8 @@ public class Compose extends Frame {
 	private JTextField bccField;
 	private JTextField subField;
 	private JTextArea content;
-	private Message msg;
+	private String inReplyTo[];
+	private String references[];
 	private final Session session;
 	private final int openFrameCount;
 	private final Collection<Integer> openFrames;
@@ -53,8 +56,7 @@ public class Compose extends Frame {
 	}
 
 	public Compose(final Session session, final Collection<Integer> openFrames) {
-		openFrameCount = openFrames.isEmpty()?0:Collections.max(openFrames) + 1;
-		openFrames.add(openFrameCount);
+		openFrameCount = (openFrames.isEmpty()?0:Collections.max(openFrames)) + 1;
 		this.openFrames = openFrames;
 		this.session = session;
                 setClosable(true);
@@ -83,17 +85,40 @@ public class Compose extends Frame {
 		setLocation(offset * openFrameCount, offset * openFrameCount);
 	}
 
-	public void setMessage(final Message msg) throws MessagingException {
-		toField.setText(InternetAddress.toString(msg.getRecipients(Message.RecipientType.TO)));
-		ccField.setText(InternetAddress.toString(msg.getRecipients(Message.RecipientType.CC)));
-		bccField.setText(InternetAddress.toString(msg.getRecipients(Message.RecipientType.BCC)));
-		subField.setText(msg.getSubject());
-		this.msg = msg;
-	}
-
 	@Override
 	public Frame getFrame() {
 		return new Compose(session, openFrames);
+	}
+
+	@Override
+	public void open() {
+		final URI uri = getURI();
+		final String str = uri.getSchemeSpecificPart();
+		final String s[] = str.split("\\?");
+		if (s.length > 0) {
+			toField.setText(s[0]);
+		}
+		if (s.length > 1) {
+			for (final String t : s[1].split("&")) {
+				final String r[] = t.split("=");
+				if (r.length > 1) {
+					switch (r[0]) {
+					case "subject":
+						subField.setText(r[1]);
+						break;
+					case "inReplyTo":
+						inReplyTo = r[1].split(",");
+						break;
+					case "references":
+						references = r[1].split(",");
+						break;
+					default:
+					}
+				}
+			}
+			
+		}
+		openFrames.add(openFrameCount);
 	}
 
 	@Override
@@ -124,6 +149,7 @@ public class Compose extends Frame {
 	}
 
 	private void send() throws MessagingException {
+		final Message msg = new MimeMessage(session);
 		final String from = prefs.get(SimpleClient.name + ".from", null);
 		final String to = toField.getText();
 		final String cc = ccField.getText();
@@ -162,6 +188,16 @@ public class Compose extends Frame {
 			}
 		} else {
 			msg.setText(text);
+		}
+		if (inReplyTo != null) {
+			for (final String str : inReplyTo) {
+				msg.addHeader("In-Reply-To", str);
+			}
+		}
+		if (references != null) {
+			for (final String str : references) {
+				msg.addHeader("References", str);
+			}
 		}
 		msg.setHeader("X-Mailer", SimpleClient.name);
 		msg.setSentDate(new Date());

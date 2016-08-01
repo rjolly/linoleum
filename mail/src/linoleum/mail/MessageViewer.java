@@ -31,11 +31,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			try {
-				client.compose();
-			} catch (final MessagingException me) {
-				me.printStackTrace();
-			}
+			client.compose();
 		}
 	}
 
@@ -65,10 +61,42 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 		try {
 			final MimeMessage msg = (MimeMessage) displayed;
 			final MimeMessage reply = (MimeMessage) msg.reply(all);
-			client.compose(reply);
+			final String str = params(reply);
+			client.compose(str);
 		} catch (final MessagingException me) {
 			me.printStackTrace();
 		}
+	}
+
+	private String params(final Message msg) throws MessagingException {
+		final String to = mkString(msg.getRecipients(Message.RecipientType.TO));
+		final StringBuilder bld = new StringBuilder();
+		append(bld, "inReplyTo", mkString(msg.getHeader("In-Reply-To")));
+		append(bld, "references", mkString(msg.getHeader("References")));
+		append(bld, "subject", msg.getSubject());
+		final String str = bld.toString();
+		return to + (str.isEmpty()?"":"?") + str;
+	}
+
+	private StringBuilder append(final StringBuilder bld, final String key, final String value) {
+		if (value != null && !value.isEmpty()) {
+			if (bld.length() > 0) {
+				bld.append("&");
+			}
+			bld.append(key).append("=").append(value);
+		}
+		return bld;
+	}
+
+	private <T> String mkString(final T array[]) {
+		final StringBuilder bld = new StringBuilder();
+		for (int i = 0 ; i < array.length ; i++) {
+			if (i > 0) {
+				bld.append(",");
+			}
+			bld.append(array[i]);
+		}
+		return bld.toString();
 	}
 
 	private class DeleteAction extends AbstractAction {

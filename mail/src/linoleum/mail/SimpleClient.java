@@ -4,18 +4,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Properties;
 import java.util.prefs.Preferences;
 import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
 import javax.mail.Folder;
-import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.URLName;
-import javax.mail.internet.MimeMessage;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -62,13 +62,16 @@ public class SimpleClient extends Frame {
 		}
 	}
 
-	public void compose() throws MessagingException {
-		compose(new MimeMessage(session));
+	public void compose() {
+		compose("?");
 	}
 
-	public void compose(final Message msg) throws MessagingException {
-		frame.open(getApplicationManager());
-		frame.setMessage(msg);
+	public void compose(final String str) {
+		try {
+			frame.open(getApplicationManager(), new URI("mailto", str, null));
+		} catch (final URISyntaxException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public FolderViewer getFolderViewer() {
