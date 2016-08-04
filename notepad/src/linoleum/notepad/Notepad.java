@@ -358,15 +358,6 @@ public class Notepad extends JPanel {
 	}
 
 	public void open(final File file) {
-		if (modified != 0) {
-			final int option = JOptionPane.showInternalConfirmDialog(frame, resources.getString("Warning"), resources.getString("WarningTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-			switch (option) {
-			case JOptionPane.OK_OPTION:
-				break;
-			default:
-				return;
-			}
-		}
 		setFile(file);
 		if (file.exists()) {
 			new FileLoader().execute();
@@ -377,6 +368,15 @@ public class Notepad extends JPanel {
 	}
 
 	private void setFile(final File file) {
+		if (modified != 0) {
+			final int option = JOptionPane.showInternalConfirmDialog(frame, resources.getString("Warning"), resources.getString("WarningTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+			switch (option) {
+			case JOptionPane.OK_OPTION:
+				break;
+			default:
+				return;
+			}
+		}
 		final Document doc = editor.getReplaceDocument();
 		if (doc != null) {
 			doc.removeUndoableEditListener(undoHandler);
@@ -420,15 +420,6 @@ public class Notepad extends JPanel {
 		}
 
 		public void actionPerformed(final ActionEvent e) {
-			if (modified != 0) {
-				final int option = JOptionPane.showInternalConfirmDialog(frame, resources.getString("Warning"), resources.getString("WarningTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-				switch (option) {
-				case JOptionPane.OK_OPTION:
-					break;
-				default:
-					return;
-				}
-			}
 			setFile(null);
 			editor.getDocument().addUndoableEditListener(undoHandler);
 			resetUndoManager();
