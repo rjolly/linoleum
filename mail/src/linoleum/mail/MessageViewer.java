@@ -13,9 +13,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 public class MessageViewer extends javax.swing.JPanel implements Viewer {
-	private final Icon composeIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail16.gif"));
 	private final Icon deleteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Delete16.gif"));
-	private final Action composeAction = new ComposeAction();
 	private final Action replyAction = new ReplyAction();
 	private final Action replyToAllAction = new ReplyToAllAction();
 	private final Action deleteAction = new DeleteAction();
@@ -23,17 +21,6 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 	private SimpleClient client;
 	private Message displayed;
 	private Component mainbody;
-
-	private class ComposeAction extends AbstractAction {
-		public ComposeAction() {
-			super("Compose", composeIcon);
-		}
-
-		@Override
-		public void actionPerformed(final ActionEvent e) {
-			client.compose();
-		}
-	}
 
 	private class ReplyAction extends AbstractAction {
 		public ReplyAction() {
@@ -128,10 +115,6 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 			System.out.println(getValue(Action.NAME));
 			dumpPart("", displayed);
 		}
-	}
-
-	public Action getComposeAction() {
-		return composeAction;
 	}
 
 	public Action getReplyAction() {
@@ -280,32 +263,16 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
-                jButton1 = new javax.swing.JButton();
                 jScrollPane1 = new javax.swing.JScrollPane();
                 headers = new javax.swing.JTextArea();
-                jButton2 = new javax.swing.JButton();
-                jButton3 = new javax.swing.JButton();
                 jPanel1 = new javax.swing.JPanel();
-                jButton4 = new javax.swing.JButton();
                 jButton5 = new javax.swing.JButton();
-
-                jButton1.setAction(getComposeAction());
-                jButton1.setText("Compose");
 
                 headers.setEditable(false);
                 headers.setRows(5);
                 jScrollPane1.setViewportView(headers);
 
-                jButton2.setAction(getReplyAction());
-                jButton2.setText("Reply");
-
-                jButton3.setAction(getReplyToAllAction());
-                jButton3.setText("Reply to all");
-
                 jPanel1.setLayout(new java.awt.CardLayout());
-
-                jButton4.setAction(getDeleteAction());
-                jButton4.setText("Delete");
 
                 jButton5.setAction(getStructureAction());
                 jButton5.setText("Structure");
@@ -314,29 +281,16 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
                 this.setLayout(layout);
                 layout.setHorizontalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jScrollPane1)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton5)
-                                .addContainerGap(32, Short.MAX_VALUE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE)
                         .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(jButton5)
+                                .addGap(0, 0, Short.MAX_VALUE))
                 );
                 layout.setVerticalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jButton1)
-                                        .addComponent(jButton2)
-                                        .addComponent(jButton3)
-                                        .addComponent(jButton4)
-                                        .addComponent(jButton5))
+                                .addComponent(jButton5)
                                 .addGap(1, 1, 1)
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -369,10 +323,6 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JTextArea headers;
-        private javax.swing.JButton jButton1;
-        private javax.swing.JButton jButton2;
-        private javax.swing.JButton jButton3;
-        private javax.swing.JButton jButton4;
         private javax.swing.JButton jButton5;
         private javax.swing.JPanel jPanel1;
         private javax.swing.JScrollPane jScrollPane1;

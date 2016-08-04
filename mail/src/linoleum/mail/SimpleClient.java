@@ -1,5 +1,6 @@
 package linoleum.mail;
 
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -16,6 +17,9 @@ import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.URLName;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -25,6 +29,8 @@ import javax.swing.tree.TreePath;
 import linoleum.application.Frame;
 
 public class SimpleClient extends Frame {
+	private final Icon composeIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail16.gif"));
+	private final Action composeAction = new ComposeAction();
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final SimpleAuthenticator auth = new SimpleAuthenticator(this);
 	private final Properties props = System.getProperties();
@@ -36,6 +42,21 @@ public class SimpleClient extends Frame {
 	private StoreTreeNode node;
 	private FolderTreeNode foldernode;
 	static final String name = "Mail";
+
+	private class ComposeAction extends AbstractAction {
+		public ComposeAction() {
+			super("Compose", composeIcon);
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			compose("?");
+		}
+	}
+
+	public Action getComposeAction() {
+		return composeAction;
+	}
 
 	public SimpleClient() {
 		initComponents();
@@ -60,10 +81,6 @@ public class SimpleClient extends Frame {
 		if (str != null) {
 			open(str);
 		}
-	}
-
-	public void compose() {
-		compose("?");
 	}
 
 	public void compose(final String str) {
@@ -110,6 +127,14 @@ public class SimpleClient extends Frame {
                 jTree1 = new javax.swing.JTree();
                 folderViewer = new linoleum.mail.FolderViewer();
                 messageViewer = new linoleum.mail.MessageViewer();
+                jMenuBar1 = new javax.swing.JMenuBar();
+                jMenu1 = new javax.swing.JMenu();
+                jMenuItem4 = new javax.swing.JMenuItem();
+                jMenuItem5 = new javax.swing.JMenuItem();
+                jMenuItem6 = new javax.swing.JMenuItem();
+                jMenuItem7 = new javax.swing.JMenuItem();
+                jMenu2 = new javax.swing.JMenu();
+                jMenu3 = new javax.swing.JMenu();
 
                 jMenuItem1.setText("Add...");
                 jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
@@ -155,11 +180,11 @@ public class SimpleClient extends Frame {
                         }
                 });
                 jTree1.addTreeWillExpandListener(new javax.swing.event.TreeWillExpandListener() {
-                        public void treeWillCollapse(javax.swing.event.TreeExpansionEvent evt)throws javax.swing.tree.ExpandVetoException {
-                                jTree1TreeWillCollapse(evt);
-                        }
                         public void treeWillExpand(javax.swing.event.TreeExpansionEvent evt)throws javax.swing.tree.ExpandVetoException {
                                 jTree1TreeWillExpand(evt);
+                        }
+                        public void treeWillCollapse(javax.swing.event.TreeExpansionEvent evt)throws javax.swing.tree.ExpandVetoException {
+                                jTree1TreeWillCollapse(evt);
                         }
                 });
                 jTree1.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
@@ -179,6 +204,30 @@ public class SimpleClient extends Frame {
                 messageViewer.setClient(this);
                 jSplitPane1.setBottomComponent(messageViewer);
 
+                jMenu1.setText("Message");
+
+                jMenuItem4.setAction(getComposeAction());
+                jMenu1.add(jMenuItem4);
+
+                jMenuItem5.setAction(messageViewer.getReplyAction());
+                jMenu1.add(jMenuItem5);
+
+                jMenuItem6.setAction(messageViewer.getReplyToAllAction());
+                jMenu1.add(jMenuItem6);
+
+                jMenuItem7.setAction(messageViewer.getDeleteAction());
+                jMenu1.add(jMenuItem7);
+
+                jMenuBar1.add(jMenu1);
+
+                jMenu2.setText("Folder");
+                jMenuBar1.add(jMenu2);
+
+                jMenu3.setText("Account");
+                jMenuBar1.add(jMenu3);
+
+                setJMenuBar(jMenuBar1);
+
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);
                 layout.setHorizontalGroup(
@@ -187,7 +236,7 @@ public class SimpleClient extends Frame {
                 );
                 layout.setVerticalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 437, Short.MAX_VALUE)
+                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE)
                 );
 
                 pack();
@@ -277,9 +326,17 @@ public class SimpleClient extends Frame {
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private linoleum.mail.FolderViewer folderViewer;
+        private javax.swing.JMenu jMenu1;
+        private javax.swing.JMenu jMenu2;
+        private javax.swing.JMenu jMenu3;
+        private javax.swing.JMenuBar jMenuBar1;
         private javax.swing.JMenuItem jMenuItem1;
         private javax.swing.JMenuItem jMenuItem2;
         private javax.swing.JMenuItem jMenuItem3;
+        private javax.swing.JMenuItem jMenuItem4;
+        private javax.swing.JMenuItem jMenuItem5;
+        private javax.swing.JMenuItem jMenuItem6;
+        private javax.swing.JMenuItem jMenuItem7;
         private javax.swing.JPopupMenu jPopupMenu1;
         private javax.swing.JPopupMenu jPopupMenu2;
         private javax.swing.JPopupMenu jPopupMenu3;
