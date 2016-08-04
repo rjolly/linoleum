@@ -11,6 +11,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JSplitPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 public class MultipartViewer extends JPanel implements Viewer {
 	final JPanel p = new JPanel(new GridBagLayout());
@@ -113,7 +114,7 @@ public class MultipartViewer extends JPanel implements Viewer {
 		return null;
 	}
 
-	class AttachmentViewer implements ActionListener {
+	class AttachmentViewer implements ActionListener, Runnable {
 		final BodyPart bp;
 
 		public AttachmentViewer(final BodyPart part) {
@@ -121,6 +122,10 @@ public class MultipartViewer extends JPanel implements Viewer {
 		}
 
 		public void actionPerformed(final ActionEvent e) {
+			SwingUtilities.invokeLater(this);
+		}
+
+		public void run() {
 			final Component comp = getComponent(bp);
 			final ComponentFrame f = new ComponentFrame(comp, "Attachment");
 			final JInternalFrame frame = getFrame();
@@ -139,6 +144,8 @@ public class MultipartViewer extends JPanel implements Viewer {
 	}
 
 	public void scrollToOrigin() {
-		((Viewer)comp).scrollToOrigin();
+		if (comp instanceof Viewer) {
+			((Viewer)comp).scrollToOrigin();
+		}
 	}
 }
