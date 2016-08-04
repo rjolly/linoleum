@@ -11,7 +11,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JSplitPane;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 public class MultipartViewer extends JPanel implements Viewer {
 	final JPanel p = new JPanel(new GridBagLayout());
@@ -21,6 +21,7 @@ public class MultipartViewer extends JPanel implements Viewer {
 
 	public MultipartViewer() {
 		super(new GridLayout(1,1));
+		sp.setOneTouchExpandable(true);
 		sp.setRightComponent(scp);
 		sp.setResizeWeight(1.0);
 		add(sp);
@@ -114,7 +115,7 @@ public class MultipartViewer extends JPanel implements Viewer {
 		return null;
 	}
 
-	class AttachmentViewer implements ActionListener, Runnable {
+	class AttachmentViewer implements ActionListener {
 		final BodyPart bp;
 
 		public AttachmentViewer(final BodyPart part) {
@@ -122,24 +123,32 @@ public class MultipartViewer extends JPanel implements Viewer {
 		}
 
 		public void actionPerformed(final ActionEvent e) {
-			SwingUtilities.invokeLater(this);
-		}
+			(new SwingWorker<Object, Object>() {
+				Component comp;
 
-		public void run() {
-			final Component comp = getComponent(bp);
-			final ComponentFrame f = new ComponentFrame(comp, "Attachment");
-			final JInternalFrame frame = getFrame();
-			frame.getDesktopPane().add(f);
-			f.pack();
-			final Dimension s = f.getSize();
-			final Dimension size = frame.getSize();
-			final int width = Math.min(s.width, size.width);
-			final int height = Math.min(s.height, size.height);
-			f.setSize(width, height);
-			f.show();
-			if (comp instanceof Viewer) {
-				((Viewer)comp).scrollToOrigin();
-			}
+				@Override
+				public Object doInBackground() {
+					comp = getComponent(bp);
+					final ComponentFrame f = new ComponentFrame(comp, "Attachment");
+					final JInternalFrame frame = getFrame();
+					frame.getDesktopPane().add(f);
+					f.pack();
+					final Dimension s = f.getSize();
+					final Dimension size = frame.getSize();
+					final int width = Math.min(s.width, size.width);
+					final int height = Math.min(s.height, size.height);
+					f.setSize(width, height);
+					f.show();
+					return f;
+				}
+
+				@Override
+				protected void done() {
+					if (comp instanceof Viewer) {
+						((Viewer)comp).scrollToOrigin();
+					}
+				}
+			}).execute();
 		}
 	}
 
