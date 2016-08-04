@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Properties;
@@ -31,6 +31,9 @@ import linoleum.application.Frame;
 public class SimpleClient extends Frame {
 	private final Icon composeIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail16.gif"));
 	private final Action composeAction = new ComposeAction();
+	private final Action expungeAction = new ExpungeAction();
+	private final Action newAction = new NewAction();
+	private final Action deleteAction = new DeleteAction();
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final SimpleAuthenticator auth = new SimpleAuthenticator(this);
 	private final Properties props = System.getProperties();
@@ -40,7 +43,7 @@ public class SimpleClient extends Frame {
 	private final Session session;
 	private final Compose frame;
 	private StoreTreeNode node;
-	private FolderTreeNode foldernode;
+	private Folder folder;
 	static final String name = "Mail";
 
 	private class ComposeAction extends AbstractAction {
@@ -58,6 +61,58 @@ public class SimpleClient extends Frame {
 		return composeAction;
 	}
 
+	private class ExpungeAction extends AbstractAction {
+		public ExpungeAction() {
+			super("Expunge");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			try {
+				folder.expunge();
+				folderViewer.setFolder(folder);
+			} catch (final MessagingException me) {
+				me.printStackTrace();
+			}		}
+	}
+
+	public Action getExpungeAction() {
+		return expungeAction;
+	}
+
+	private class NewAction extends AbstractAction {
+		public NewAction() {
+			super("New");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			final String str = JOptionPane.showInternalInputDialog(SimpleClient.this, "Enter URL:");
+			if (str != null) {
+				open(str);
+			}
+		}
+	}
+
+	public Action getNewAction() {
+		return newAction;
+	}
+
+	private class DeleteAction extends AbstractAction {
+		public DeleteAction() {
+			super("Delete");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			model.removeNodeFromParent(node);
+		}
+	}
+
+	public Action getDeleteAction() {
+		return deleteAction;
+	}
+
 	public SimpleClient() {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("Mail24.png")));
@@ -65,7 +120,7 @@ public class SimpleClient extends Frame {
 			final File capfile = new File("simple.mailcap");
 			final InputStream is = capfile.isFile()?new FileInputStream(capfile):getClass().getResourceAsStream("simple.mailcap");
 			CommandMap.setDefaultCommandMap(new MailcapCommandMap(is));
-		} catch (final IOException ex) {
+		} catch (final FileNotFoundException ex) {
 			ex.printStackTrace();
 		}
 		final String mailhost = prefs.get(name + ".mailhost", null);
@@ -100,7 +155,7 @@ public class SimpleClient extends Frame {
 		open(getURI().toString());
 	}
 
-	void open(final String str) {
+	final void open(final String str) {
 		try {
 			final Store store = session.getStore(new URLName(str));
 			final StoreTreeNode storenode = new StoreTreeNode(store);
@@ -115,12 +170,6 @@ public class SimpleClient extends Frame {
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
-                jPopupMenu1 = new javax.swing.JPopupMenu();
-                jMenuItem1 = new javax.swing.JMenuItem();
-                jPopupMenu2 = new javax.swing.JPopupMenu();
-                jMenuItem2 = new javax.swing.JMenuItem();
-                jPopupMenu3 = new javax.swing.JPopupMenu();
-                jMenuItem3 = new javax.swing.JMenuItem();
                 jSplitPane1 = new javax.swing.JSplitPane();
                 jSplitPane2 = new javax.swing.JSplitPane();
                 jScrollPane1 = new javax.swing.JScrollPane();
@@ -129,36 +178,15 @@ public class SimpleClient extends Frame {
                 messageViewer = new linoleum.mail.MessageViewer();
                 jMenuBar1 = new javax.swing.JMenuBar();
                 jMenu1 = new javax.swing.JMenu();
+                jMenuItem1 = new javax.swing.JMenuItem();
+                jMenuItem2 = new javax.swing.JMenuItem();
+                jMenuItem3 = new javax.swing.JMenuItem();
                 jMenuItem4 = new javax.swing.JMenuItem();
+                jMenu2 = new javax.swing.JMenu();
                 jMenuItem5 = new javax.swing.JMenuItem();
+                jMenu3 = new javax.swing.JMenu();
                 jMenuItem6 = new javax.swing.JMenuItem();
                 jMenuItem7 = new javax.swing.JMenuItem();
-                jMenu2 = new javax.swing.JMenu();
-                jMenu3 = new javax.swing.JMenu();
-
-                jMenuItem1.setText("Add...");
-                jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                jMenuItem1ActionPerformed(evt);
-                        }
-                });
-                jPopupMenu1.add(jMenuItem1);
-
-                jMenuItem2.setText("Remove");
-                jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                jMenuItem2ActionPerformed(evt);
-                        }
-                });
-                jPopupMenu2.add(jMenuItem2);
-
-                jMenuItem3.setText("Expunge");
-                jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                jMenuItem3ActionPerformed(evt);
-                        }
-                });
-                jPopupMenu3.add(jMenuItem3);
 
                 setClosable(true);
                 setIconifiable(true);
@@ -173,12 +201,6 @@ public class SimpleClient extends Frame {
                 jSplitPane2.setResizeWeight(0.4);
 
                 jTree1.setModel(model);
-                jTree1.setComponentPopupMenu(jPopupMenu1);
-                jTree1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-                        public void mouseMoved(java.awt.event.MouseEvent evt) {
-                                jTree1MouseMoved(evt);
-                        }
-                });
                 jTree1.addTreeWillExpandListener(new javax.swing.event.TreeWillExpandListener() {
                         public void treeWillExpand(javax.swing.event.TreeExpansionEvent evt)throws javax.swing.tree.ExpandVetoException {
                                 jTree1TreeWillExpand(evt);
@@ -206,24 +228,37 @@ public class SimpleClient extends Frame {
 
                 jMenu1.setText("Message");
 
-                jMenuItem4.setAction(getComposeAction());
+                jMenuItem1.setAction(getComposeAction());
+                jMenu1.add(jMenuItem1);
+
+                jMenuItem2.setAction(messageViewer.getReplyAction());
+                jMenu1.add(jMenuItem2);
+
+                jMenuItem3.setAction(messageViewer.getReplyToAllAction());
+                jMenu1.add(jMenuItem3);
+
+                jMenuItem4.setAction(messageViewer.getDeleteAction());
+                jMenuItem4.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.event.InputEvent.CTRL_MASK));
                 jMenu1.add(jMenuItem4);
-
-                jMenuItem5.setAction(messageViewer.getReplyAction());
-                jMenu1.add(jMenuItem5);
-
-                jMenuItem6.setAction(messageViewer.getReplyToAllAction());
-                jMenu1.add(jMenuItem6);
-
-                jMenuItem7.setAction(messageViewer.getDeleteAction());
-                jMenu1.add(jMenuItem7);
 
                 jMenuBar1.add(jMenu1);
 
                 jMenu2.setText("Folder");
+
+                jMenuItem5.setAction(getExpungeAction());
+                jMenuItem5.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_MASK));
+                jMenu2.add(jMenuItem5);
+
                 jMenuBar1.add(jMenu2);
 
                 jMenu3.setText("Account");
+
+                jMenuItem6.setAction(getNewAction());
+                jMenu3.add(jMenuItem6);
+
+                jMenuItem7.setAction(getDeleteAction());
+                jMenu3.add(jMenuItem7);
+
                 jMenuBar1.add(jMenu3);
 
                 setJMenuBar(jMenuBar1);
@@ -247,7 +282,9 @@ public class SimpleClient extends Frame {
 		if (path != null) {
 			final Object o = path.getLastPathComponent();
 			if (o instanceof FolderTreeNode) {
-				final Folder folder = ((FolderTreeNode)o).getFolder();
+				folder = ((FolderTreeNode)o).getFolder();
+				expungeAction.setEnabled(true);
+				deleteAction.setEnabled(false);
 				try {
 					if ((folder.getType() & Folder.HOLDS_MESSAGES) != 0) {
 						folderViewer.setFolder(folder);
@@ -255,20 +292,13 @@ public class SimpleClient extends Frame {
 				} catch (final MessagingException me) {
 					me.printStackTrace();
 				}
+			} else if (o instanceof StoreTreeNode) {
+				node = (StoreTreeNode)o;
+				expungeAction.setEnabled(false);
+				deleteAction.setEnabled(true);
 			}
 		}
         }//GEN-LAST:event_jTree1ValueChanged
-
-        private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-		final String str = JOptionPane.showInternalInputDialog(this, "Enter URL:");
-		if (str != null) {
-			open(str);
-		}
-        }//GEN-LAST:event_jMenuItem1ActionPerformed
-
-        private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-                model.removeNodeFromParent(node);
-        }//GEN-LAST:event_jMenuItem2ActionPerformed
 
         private void jTree1TreeWillExpand(javax.swing.event.TreeExpansionEvent evt)throws javax.swing.tree.ExpandVetoException {//GEN-FIRST:event_jTree1TreeWillExpand
 		final TreePath path = evt.getPath();
@@ -299,31 +329,6 @@ public class SimpleClient extends Frame {
 		}
         }//GEN-LAST:event_jTree1TreeWillCollapse
 
-        private void jTree1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseMoved
-		final TreePath path = jTree1.getPathForLocation(evt.getX(), evt.getY());
-		jTree1.setComponentPopupMenu(jPopupMenu1);
-		if (path != null) {
-			final Object o = path.getLastPathComponent();
-			if (o instanceof FolderTreeNode) {
-				foldernode = (FolderTreeNode)o;
-				jTree1.setComponentPopupMenu(jPopupMenu3);
-			} else if (o instanceof StoreTreeNode) {
-				node = (StoreTreeNode)o;
-				jTree1.setComponentPopupMenu(jPopupMenu2);
-			}
-		}
-        }//GEN-LAST:event_jTree1MouseMoved
-
-        private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-		final Folder folder = foldernode.getFolder();
-		try {
-			folder.expunge();
-			folderViewer.setFolder(folder);
-		} catch (final MessagingException me) {
-			me.printStackTrace();
-		}
-        }//GEN-LAST:event_jMenuItem3ActionPerformed
-
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private linoleum.mail.FolderViewer folderViewer;
         private javax.swing.JMenu jMenu1;
@@ -337,9 +342,6 @@ public class SimpleClient extends Frame {
         private javax.swing.JMenuItem jMenuItem5;
         private javax.swing.JMenuItem jMenuItem6;
         private javax.swing.JMenuItem jMenuItem7;
-        private javax.swing.JPopupMenu jPopupMenu1;
-        private javax.swing.JPopupMenu jPopupMenu2;
-        private javax.swing.JPopupMenu jPopupMenu3;
         private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JSplitPane jSplitPane1;
         private javax.swing.JSplitPane jSplitPane2;
