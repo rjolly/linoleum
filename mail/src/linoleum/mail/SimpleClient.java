@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.prefs.Preferences;
 import javax.activation.CommandMap;
@@ -40,6 +42,7 @@ public class SimpleClient extends Frame {
 	private final boolean debug = props.getProperty("linoleum.mail.debug") != null;
 	private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 	private final DefaultTreeModel model = new DefaultTreeModel(root);
+	private final Map<URLName, StoreTreeNode> map = new HashMap<>();
 	private final Session session;
 	private final Compose frame;
 	private StoreTreeNode node;
@@ -156,13 +159,19 @@ public class SimpleClient extends Frame {
 	}
 
 	final void open(final String str) {
-		try {
-			final Store store = session.getStore(new URLName(str));
-			final StoreTreeNode storenode = new StoreTreeNode(store);
-			model.insertNodeInto(storenode, root, root.getChildCount());
+		final URLName name = new URLName(str);
+		StoreTreeNode storenode = map.get(name);
+		if (storenode == null) {
+			try {
+				final Store store = session.getStore(name);
+				map.put(name, storenode = new StoreTreeNode(store));
+				model.insertNodeInto(storenode, root, root.getChildCount());
+			} catch (final NoSuchProviderException e) {
+				e.printStackTrace();
+			}
+		}
+		if (storenode != null) {
 			jTree1.scrollPathToVisible(new TreePath(storenode.getPath()));
-		} catch (final NoSuchProviderException e) {
-			e.printStackTrace();
 		}
 	}
 
