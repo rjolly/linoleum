@@ -23,7 +23,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
@@ -34,8 +33,7 @@ public class SimpleClient extends Frame {
 	private final Icon composeIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail16.gif"));
 	private final Action composeAction = new ComposeAction();
 	private final Action expungeAction = new ExpungeAction();
-	private final Action newAction = new NewAction();
-	private final Action deleteAction = new DeleteAction();
+	private final Action settingsAction = new SettingsAction();
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final SimpleAuthenticator auth = new SimpleAuthenticator(this);
 	private final Properties props = System.getProperties();
@@ -45,7 +43,6 @@ public class SimpleClient extends Frame {
 	private final Map<URLName, StoreTreeNode> map = new HashMap<>();
 	private final Session session;
 	private final Compose frame;
-	private StoreTreeNode node;
 	private Folder folder;
 	static final String name = "Mail";
 
@@ -83,37 +80,23 @@ public class SimpleClient extends Frame {
 		return expungeAction;
 	}
 
-	private class NewAction extends AbstractAction {
-		public NewAction() {
-			super("New");
+	private class SettingsAction extends AbstractAction {
+		public SettingsAction() {
+			super("Settings");
 		}
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			final String str = JOptionPane.showInternalInputDialog(SimpleClient.this, "Enter URL:");
+			settings.show(SimpleClient.this);
+			final String str = prefs.get(name + ".url", null);
 			if (str != null) {
 				open(str);
 			}
 		}
 	}
 
-	public Action getNewAction() {
-		return newAction;
-	}
-
-	private class DeleteAction extends AbstractAction {
-		public DeleteAction() {
-			super("Delete");
-		}
-
-		@Override
-		public void actionPerformed(final ActionEvent e) {
-			model.removeNodeFromParent(node);
-		}
-	}
-
-	public Action getDeleteAction() {
-		return deleteAction;
+	public Action getSettingsAction() {
+		return settingsAction;
 	}
 
 	public SimpleClient() {
@@ -179,6 +162,7 @@ public class SimpleClient extends Frame {
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
+                settings = new linoleum.mail.Settings();
                 jSplitPane1 = new javax.swing.JSplitPane();
                 jSplitPane2 = new javax.swing.JSplitPane();
                 jScrollPane1 = new javax.swing.JScrollPane();
@@ -195,7 +179,6 @@ public class SimpleClient extends Frame {
                 jMenuItem5 = new javax.swing.JMenuItem();
                 jMenu3 = new javax.swing.JMenu();
                 jMenuItem6 = new javax.swing.JMenuItem();
-                jMenuItem7 = new javax.swing.JMenuItem();
 
                 setClosable(true);
                 setIconifiable(true);
@@ -262,11 +245,8 @@ public class SimpleClient extends Frame {
 
                 jMenu3.setText("Account");
 
-                jMenuItem6.setAction(getNewAction());
+                jMenuItem6.setAction(getSettingsAction());
                 jMenu3.add(jMenuItem6);
-
-                jMenuItem7.setAction(getDeleteAction());
-                jMenu3.add(jMenuItem7);
 
                 jMenuBar1.add(jMenu3);
 
@@ -293,7 +273,6 @@ public class SimpleClient extends Frame {
 			if (o instanceof FolderTreeNode) {
 				folder = ((FolderTreeNode)o).getFolder();
 				expungeAction.setEnabled(true);
-				deleteAction.setEnabled(false);
 				try {
 					if ((folder.getType() & Folder.HOLDS_MESSAGES) != 0) {
 						folderViewer.setFolder(folder);
@@ -301,10 +280,8 @@ public class SimpleClient extends Frame {
 				} catch (final MessagingException me) {
 					me.printStackTrace();
 				}
-			} else if (o instanceof StoreTreeNode) {
-				node = (StoreTreeNode)o;
+			} else {
 				expungeAction.setEnabled(false);
-				deleteAction.setEnabled(true);
 			}
 		}
         }//GEN-LAST:event_jTree1ValueChanged
@@ -350,11 +327,11 @@ public class SimpleClient extends Frame {
         private javax.swing.JMenuItem jMenuItem4;
         private javax.swing.JMenuItem jMenuItem5;
         private javax.swing.JMenuItem jMenuItem6;
-        private javax.swing.JMenuItem jMenuItem7;
         private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JSplitPane jSplitPane1;
         private javax.swing.JSplitPane jSplitPane2;
         private javax.swing.JTree jTree1;
         private linoleum.mail.MessageViewer messageViewer;
+        private linoleum.mail.Settings settings;
         // End of variables declaration//GEN-END:variables
 }
