@@ -11,6 +11,7 @@ import javax.swing.Action;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.KeyStroke;
 
 public class MessageViewer extends javax.swing.JPanel implements Viewer {
 	private final Icon deleteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Delete16.gif"));
@@ -93,6 +94,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 	private class DeleteAction extends AbstractAction {
 		public DeleteAction() {
 			super("Delete", deleteIcon);
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK | InputEvent.ALT_MASK));
 		}
 
 		@Override

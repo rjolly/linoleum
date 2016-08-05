@@ -1,6 +1,8 @@
 package linoleum.mail;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -23,6 +25,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.KeyStroke;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
@@ -64,6 +67,8 @@ public class SimpleClient extends Frame {
 	private class ExpungeAction extends AbstractAction {
 		public ExpungeAction() {
 			super("Expunge");
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_MASK));
+			setEnabled(false);
 		}
 
 		@Override
@@ -89,7 +94,7 @@ public class SimpleClient extends Frame {
 		public void actionPerformed(final ActionEvent e) {
 			settings.show(SimpleClient.this);
 			final String str = prefs.get(name + ".url", null);
-			if (str != null) {
+			if (str != null && !str.isEmpty()) {
 				open(str);
 			}
 		}
@@ -119,7 +124,7 @@ public class SimpleClient extends Frame {
 		}
 		frame = new Compose(session);
 		final String str = prefs.get(name + ".url", null);
-		if (str != null) {
+		if (str != null && !str.isEmpty()) {
 			open(str);
 		}
 	}
@@ -230,7 +235,6 @@ public class SimpleClient extends Frame {
                 jMenu1.add(jMenuItem3);
 
                 jMenuItem4.setAction(messageViewer.getDeleteAction());
-                jMenuItem4.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.event.InputEvent.CTRL_MASK));
                 jMenu1.add(jMenuItem4);
 
                 jMenuBar1.add(jMenu1);
@@ -238,7 +242,6 @@ public class SimpleClient extends Frame {
                 jMenu2.setText("Folder");
 
                 jMenuItem5.setAction(getExpungeAction());
-                jMenuItem5.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_MASK));
                 jMenu2.add(jMenuItem5);
 
                 jMenuBar1.add(jMenu2);
