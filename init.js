@@ -234,7 +234,10 @@ function relativize(baseDir, file) {
 }
 
 function open(name, app) {
-    var uri = pathToFile(name).toURI();
+    var uri = new java.net.URI(name);
+    if (!uri.isAbsolute()) {
+    	uri = pathToFile(name).toURI();
+    }
     if (app == undefined) {
 	frame.getApplicationManager().open(uri);
     } else {
