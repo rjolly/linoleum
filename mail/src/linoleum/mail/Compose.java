@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
@@ -27,6 +28,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JFileChooser;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -45,6 +47,7 @@ public class Compose extends Frame {
 	private final int openFrameCount;
 	private final Collection<Integer> openFrames;
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
+	private final FileChooser chooser = new FileChooser();
 	private static final int offset = 30;
 
 	public Compose() {
@@ -132,6 +135,16 @@ public class Compose extends Frame {
 	private JPanel buildButtonPanel() {
 		final JPanel p = new JPanel();
 		p.setLayout(new BorderLayout());
+		final JButton attach = new JButton("Attach");
+		attach.addActionListener(new ActionListener() {
+			public void actionPerformed(final ActionEvent evt) {
+				final int returnVal = chooser.showInternalOpenDialog(Compose.this);
+				if (returnVal != JFileChooser.APPROVE_OPTION) {
+					chooser.setSelectedFile(null);
+				}
+			}
+		});
+		p.add(attach, BorderLayout.WEST);
 		final JButton send = new JButton("Send");
 		send.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent evt) {
@@ -159,7 +172,7 @@ public class Compose extends Frame {
 		final String bcc = bccField.getText();
 		final String subject = subField.getText();
 		final String text = content.getText();
-		final String file = null;
+		final File file = chooser.getSelectedFile();
 		final String url = prefs.get(SimpleClient.name + ".url", null);
 		final String record = prefs.get(SimpleClient.name + ".record", null);
 
@@ -181,7 +194,7 @@ public class Compose extends Frame {
 				MimeBodyPart mbp1 = new MimeBodyPart();
 				mbp1.setText(text);
 				MimeBodyPart mbp2 = new MimeBodyPart();
-				mbp2.attachFile(file);
+				mbp2.attachFile(file.getPath());
 				MimeMultipart mp = new MimeMultipart();
 				mp.addBodyPart(mbp1);
 				mp.addBodyPart(mbp2);
