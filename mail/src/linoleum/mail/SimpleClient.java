@@ -40,7 +40,6 @@ public class SimpleClient extends Frame {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final SimpleAuthenticator auth = new SimpleAuthenticator(this);
 	private final Properties props = System.getProperties();
-	private final boolean debug = props.getProperty("linoleum.mail.debug") != null;
 	private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 	private final DefaultTreeModel model = new DefaultTreeModel(root);
 	private final Map<URLName, StoreTreeNode> map = new HashMap<>();
@@ -93,6 +92,12 @@ public class SimpleClient extends Frame {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			settings.show(SimpleClient.this);
+			final String mailhost = prefs.get(name + ".mailhost", null);
+			if (mailhost != null && !mailhost.isEmpty()) {
+				props.put("mail.smtp.host", mailhost);
+			}
+			final boolean debug = prefs.getBoolean(name + ".debug", false);
+			session.setDebug(debug);
 			final String str = prefs.get(name + ".url", null);
 			if (str != null && !str.isEmpty()) {
 				open(str);
@@ -115,10 +120,11 @@ public class SimpleClient extends Frame {
 			ex.printStackTrace();
 		}
 		final String mailhost = prefs.get(name + ".mailhost", null);
-		if (mailhost != null) {
+		if (mailhost != null && !mailhost.isEmpty()) {
 			props.put("mail.smtp.host", mailhost);
 		}
 		session = Session.getInstance(props, auth);
+		final boolean debug = prefs.getBoolean(name + ".debug", false);
 		if (debug) {
 			session.setDebug(true);
 		}
