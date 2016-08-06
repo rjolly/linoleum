@@ -43,6 +43,7 @@ public class Compose extends Frame {
 	private JTextArea content;
 	private String inReplyTo[];
 	private String references[];
+	private File file;
 	private final Session session;
 	private final int openFrameCount;
 	private final Collection<Integer> openFrames;
@@ -59,7 +60,8 @@ public class Compose extends Frame {
 	}
 
 	public Compose(final Session session, final Collection<Integer> openFrames) {
-		openFrameCount = (openFrames.isEmpty()?0:Collections.max(openFrames)) + 1;
+		openFrameCount = openFrames.isEmpty()?0:Collections.max(openFrames) + 1;
+		openFrames.add(openFrameCount);
 		this.openFrames = openFrames;
 		this.session = session;
                 setClosable(true);
@@ -94,8 +96,7 @@ public class Compose extends Frame {
 	}
 
 	@Override
-	public void open() {
-		final URI uri = getURI();
+	public void setURI(final URI uri) {
 		final String str = uri.getSchemeSpecificPart();
 		final String s[] = str.split("\\?");
 		if (s.length > 0) {
@@ -124,7 +125,7 @@ public class Compose extends Frame {
 			}
 			
 		}
-		openFrames.add(openFrameCount);
+		super.setURI(uri);
 	}
 
 	@Override
@@ -135,13 +136,20 @@ public class Compose extends Frame {
 	private JPanel buildButtonPanel() {
 		final JPanel p = new JPanel();
 		p.setLayout(new BorderLayout());
-		final JButton attach = new JButton("Attach");
+		final JButton attach = new JButton("Attach...");
 		attach.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent evt) {
 				final int returnVal = chooser.showInternalOpenDialog(Compose.this);
-				if (returnVal != JFileChooser.APPROVE_OPTION) {
-					chooser.setSelectedFile(null);
+				switch (returnVal) {
+				case JFileChooser.APPROVE_OPTION:
+					file = chooser.getSelectedFile();
+					break;
+				case JFileChooser.CANCEL_OPTION:
+					file = null;
+					break;
+				default:
 				}
+				attach.setText(file == null?"Attach...":file.getName());
 			}
 		});
 		p.add(attach, BorderLayout.WEST);
@@ -172,7 +180,6 @@ public class Compose extends Frame {
 		final String bcc = bccField.getText();
 		final String subject = subField.getText();
 		final String text = content.getText();
-		final File file = chooser.getSelectedFile();
 		final String url = prefs.get(SimpleClient.name + ".url", null);
 		final String record = prefs.get(SimpleClient.name + ".record", null);
 

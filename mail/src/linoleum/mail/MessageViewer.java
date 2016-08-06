@@ -49,8 +49,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 		try {
 			final MimeMessage msg = (MimeMessage) displayed;
 			final MimeMessage reply = (MimeMessage) msg.reply(all);
-			final String str = params(reply);
-			client.compose(str);
+			client.compose(params(reply));
 		} catch (final MessagingException me) {
 			me.printStackTrace();
 		}

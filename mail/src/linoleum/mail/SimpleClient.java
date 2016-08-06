@@ -55,7 +55,7 @@ public class SimpleClient extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			compose("?");
+			frame.open(getApplicationManager());
 		}
 	}
 
@@ -96,8 +96,7 @@ public class SimpleClient extends Frame {
 			if (mailhost != null && !mailhost.isEmpty()) {
 				props.put("mail.smtp.host", mailhost);
 			}
-			final boolean debug = prefs.getBoolean(name + ".debug", false);
-			session.setDebug(debug);
+			session.setDebug(prefs.getBoolean(name + ".debug", false));
 			final String str = prefs.get(name + ".url", null);
 			if (str != null && !str.isEmpty()) {
 				open(str);
