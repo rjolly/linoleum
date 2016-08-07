@@ -17,55 +17,51 @@ import javax.swing.SwingUtilities;
 import linoleum.application.Frame;
 
 public class FileManager extends Frame {
-	private final Thread thread;
-	private boolean closing;
-
-	public FileManager(final boolean start) {
-		initComponents();
-		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
-		thread = new Thread() {
-
-			@Override
-			public void run() {
-				try (final WatchService service = FileSystems.getDefault().newWatchService()) {
-					WatchKey key = register(service);
-					for (;;) {
-						try {
-							key = service.take();
-							for (final WatchEvent<?> event : key.pollEvents()) {
-								SwingUtilities.invokeLater(new Runnable() {
-									public void run() {
-										chooser.rescanCurrentDirectory();
-									}
-								});
-							}
-							key.reset();
-						} catch (final InterruptedException e) {
-							if (closing) {
-								service.close();
-								break;
-							} else {
-								key.cancel();
-								key = register(service);
-							}
+	private final Thread thread = new Thread() {
+		@Override
+		public void run() {
+			try (final WatchService service = FileSystems.getDefault().newWatchService()) {
+				WatchKey key = register(service);
+				for (;;) {
+					try {
+						key = service.take();
+						for (final WatchEvent<?> event : key.pollEvents()) {
+							SwingUtilities.invokeLater(new Runnable() {
+								public void run() {
+									chooser.rescanCurrentDirectory();
+								}
+							});
+						}
+						key.reset();
+					} catch (final InterruptedException e) {
+						if (closing) {
+							service.close();
+							break;
+						} else {
+							key.cancel();
+							key = register(service);
 						}
 					}
-				} catch (final IOException e) {}
-			}
-
-			private WatchKey register(final WatchService service) throws IOException {
-				final Path path = Paths.get(getURI());
-				setTitle(path.toFile().getName());
-				return path.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
-			}
-		};
-		if (start) {
-			thread.start();
+				}
+			} catch (final IOException e) {}
 		}
-	}
+
+		private WatchKey register(final WatchService service) throws IOException {
+			final Path path = Paths.get(getURI());
+			setTitle(path.toFile().getName());
+			return path.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
+		}
+	};
+	private boolean closing;
 
 	public FileManager() {
-		this(false);
+		initComponents();
+		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
+	}
+
+	@Override
+	public void open() {
+		thread.start();
 	}
 
 	@Override
@@ -80,7 +76,7 @@ public class FileManager extends Frame {
 
 	@Override
 	public Frame getFrame() {
-		return new FileManager(true);
+		return new FileManager();
 	}
 
 	@Override

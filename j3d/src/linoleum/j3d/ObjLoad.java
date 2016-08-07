@@ -132,8 +132,6 @@ public class ObjLoad extends Frame {
 	@Override
 	protected void open() {
 		final URI uri = getURI();
-		drawingPanel.removeAll();
-		setTitle(title);
 		if (uri != null) try {
 			final URL filename = uri.toURL();
 			setTitle(new File(filename.getPath()).getName());
@@ -147,6 +145,7 @@ public class ObjLoad extends Frame {
 
 			// Create SimpleUniverse; add canvas to drawing panel
 			final SimpleUniverse univ = createUniverse(c);
+			drawingPanel.removeAll();
 			drawingPanel.add(c, BorderLayout.CENTER);
 
 			// Create the content branch and add it to the universe
@@ -160,6 +159,8 @@ public class ObjLoad extends Frame {
 	@Override
 	protected void close() {
 		setURI(null);
+		drawingPanel.removeAll();
+		setTitle(title);
 	}
 
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

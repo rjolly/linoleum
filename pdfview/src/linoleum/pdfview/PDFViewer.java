@@ -7,6 +7,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Paths;
@@ -34,8 +35,9 @@ public class PDFViewer extends Frame {
 
 	@Override
 	protected void open() {
-		try {
-			openFile(Paths.get(getURI()).toFile());
+		final URI uri = getURI();
+		if (uri != null) try {
+			openFile(Paths.get(uri).toFile());
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}

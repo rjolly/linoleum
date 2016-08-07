@@ -42,7 +42,6 @@ public class MediaPlayer extends Frame {
 
 	@Override
 	public void setURI(final URI uri) {
-		stop();
 		final File file = Paths.get(uri).toFile();
 		files = file.getParentFile().listFiles(new FileFilter() {
 			public boolean accept(final File file) {
@@ -51,7 +50,6 @@ public class MediaPlayer extends Frame {
 		});
 		Arrays.sort(files);
 		index = Arrays.binarySearch(files, file);
-		play();
 	}
 
 	private static boolean canOpen(final File file) {
@@ -73,6 +71,7 @@ public class MediaPlayer extends Frame {
 
 	@Override
 	protected void open() {
+		stop();
 		if (index < files.length) {
 			final File file = files[index];
 			try {
@@ -105,6 +104,7 @@ public class MediaPlayer extends Frame {
 				ex.printStackTrace();
 			}
 		}
+		play();
 	}
 
 	private static String format(final Time time) {
@@ -120,16 +120,16 @@ public class MediaPlayer extends Frame {
 	}
 
 	private ControllerListener listener = new ControllerListener() {
-
 		@Override
 		public void controllerUpdate(ControllerEvent ce) {
 			if (ce instanceof EndOfMediaEvent) {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						stop();
 						if (index + 1 < files.length) {
 							index += 1;
-							play();
+							open();
+						} else {
+							stop();
 						}
 					}
 				});
@@ -138,9 +138,6 @@ public class MediaPlayer extends Frame {
 	};
 
 	private void play() {
-		if (player == null) {
-			open();
-		}
 		if (player != null) {
 			if (player.getState() == Player.Started) {
 				player.stop();
@@ -244,19 +241,21 @@ public class MediaPlayer extends Frame {
         }// </editor-fold>//GEN-END:initComponents
 
         private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-		play();
+		if (player == null) {
+			open();
+		} else {
+			play();
+		}
         }//GEN-LAST:event_jButton1ActionPerformed
 
         private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-		stop();
 		if (files.length > 0) index = (index + 1) % files.length;
-		play();
+		open();
         }//GEN-LAST:event_jButton3ActionPerformed
 
         private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-		stop();
 		if (files.length > 0) index = (index - 1 + files.length) % files.length;
-		play();
+		open();
         }//GEN-LAST:event_jButton2ActionPerformed
 
         private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed

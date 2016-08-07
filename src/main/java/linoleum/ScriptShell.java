@@ -25,25 +25,23 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	private volatile String prompt;
 	private String extension;
 
-	public ScriptShell(final boolean start) {
+	public ScriptShell() {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
 		createScriptEngine();
+		setTitle(engine.getFactory().getLanguageName());
 		setContentPane(new ScriptShellPanel(this));
-		final Thread thread = new Thread() {
+	}
+
+	@Override
+	public void open() {
+		(new Thread() {
 			@Override
 			public void run() {
 				initScriptEngine();
 				engineReady.countDown();
 			}
-		};
-		if (start) {
-			thread.start();
-		}
-	}
-
-	public ScriptShell() {
-		this(false);
+		}).start();
 	}
 
 	@Override
@@ -68,7 +66,7 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 
 	@Override
 	public Frame getFrame() {
-		return new ScriptShell(true);
+		return new ScriptShell();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -79,7 +77,6 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
                 setIconifiable(true);
                 setMaximizable(true);
                 setResizable(true);
-                setTitle("Script");
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);

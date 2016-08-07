@@ -86,7 +86,6 @@ public class Frame extends JInternalFrame implements App {
 
 	public void setURI(final URI uri) {
 		this.uri = uri;
-		open();
 	}
 
 	public URI getURI() {
@@ -104,14 +103,18 @@ public class Frame extends JInternalFrame implements App {
 	public final void open(final ApplicationManager manager, final URI uri) {
 		final JDesktopPane desktop = manager.getDesktopPane();
 		final Frame frame = find(desktop, uri);
+		final boolean changed = uri != null && !uri.equals(frame.getURI());
+		if (changed) {
+			frame.setURI(uri);
+		}
 		if (frame.getDesktopPane() == null) {
 			frame.setApplicationManager(manager);
 			desktop.add(frame);
+			frame.open();
+		} else if (changed) {
+			frame.open();
 		}
 		manager.select(frame);
-		if (uri != null && !uri.equals(frame.getURI())) {
-			frame.setURI(uri);
-		}
 	}
 
 	private Frame find(final JDesktopPane desktop, final URI uri) {
