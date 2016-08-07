@@ -26,8 +26,13 @@ public class Frame extends linoleum.application.Frame {
 	}
 
 	@Override
+	public void open() {
+		notepad.open();
+	}
+
+	@Override
 	public void setURI(final URI uri) {
-		notepad.open(Paths.get(uri).toFile());
+		notepad.setFile(Paths.get(uri).toFile());
 	}
 
 	@Override

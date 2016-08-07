@@ -32,7 +32,6 @@ public class ImageViewer extends Frame {
 		});
 		Arrays.sort(files);
 		index = Arrays.binarySearch(files, file);
-		open();
 	}
 
 	private static boolean canOpen(final File file) {

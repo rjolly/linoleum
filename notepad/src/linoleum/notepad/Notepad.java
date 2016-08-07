@@ -357,9 +357,8 @@ public class Notepad extends JPanel {
 		}
 	}
 
-	public void open(final File file) {
-		setFile(file);
-		if (file.exists()) {
+	public void open() {
+		if (file != null && file.exists()) {
 			new FileLoader().execute();
 		} else {
 			editor.getDocument().addUndoableEditListener(undoHandler);
@@ -367,7 +366,7 @@ public class Notepad extends JPanel {
 		}
 	}
 
-	private void setFile(final File file) {
+	public void setFile(final File file) {
 		if (modified != 0) {
 			final int option = JOptionPane.showInternalConfirmDialog(frame, resources.getString("Warning"), resources.getString("WarningTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 			switch (option) {
