@@ -43,8 +43,8 @@ public class SimpleClient extends Frame {
 	private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 	private final DefaultTreeModel model = new DefaultTreeModel(root);
 	private final Map<URLName, StoreTreeNode> map = new HashMap<>();
-	private final Session session;
-	private final Compose frame;
+	private final Session session = Session.getInstance(props, auth);
+	private final Compose frame = new Compose(session);
 	private Folder folder;
 	static final String name = "Mail";
 
@@ -92,15 +92,7 @@ public class SimpleClient extends Frame {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			settings.show(SimpleClient.this);
-			final String mailhost = prefs.get(name + ".mailhost", null);
-			if (mailhost != null && !mailhost.isEmpty()) {
-				props.put("mail.smtp.host", mailhost);
-			}
-			session.setDebug(prefs.getBoolean(name + ".debug", false));
-			final String str = prefs.get(name + ".url", null);
-			if (str != null && !str.isEmpty()) {
-				open(str);
-			}
+			open();
 		}
 	}
 
@@ -118,20 +110,6 @@ public class SimpleClient extends Frame {
 		} catch (final FileNotFoundException ex) {
 			ex.printStackTrace();
 		}
-		final String mailhost = prefs.get(name + ".mailhost", null);
-		if (mailhost != null && !mailhost.isEmpty()) {
-			props.put("mail.smtp.host", mailhost);
-		}
-		session = Session.getInstance(props, auth);
-		final boolean debug = prefs.getBoolean(name + ".debug", false);
-		if (debug) {
-			session.setDebug(true);
-		}
-		frame = new Compose(session);
-		final String str = prefs.get(name + ".url", null);
-		if (str != null && !str.isEmpty()) {
-			open(str);
-		}
 	}
 
 	public void compose(final String str) {
@@ -147,8 +125,21 @@ public class SimpleClient extends Frame {
 	}
 
 	@Override
-	protected void open() {
-		open(getURI().toString());
+	public void open() {
+		final URI uri = getURI();
+		if (uri != null) {
+			open(uri.toString());
+		} else {
+			final String mailhost = prefs.get(name + ".mailhost", null);
+			if (mailhost != null && !mailhost.isEmpty()) {
+				props.put("mail.smtp.host", mailhost);
+			}
+			session.setDebug(prefs.getBoolean(name + ".debug", false));
+			final String str = prefs.get(name + ".url", null);
+			if (str != null && !str.isEmpty()) {
+				open(str);
+			}
+		}
 	}
 
 	final void open(final String str) {

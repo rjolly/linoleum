@@ -60,8 +60,7 @@ public class Compose extends Frame {
 	}
 
 	public Compose(final Session session, final Collection<Integer> openFrames) {
-		openFrameCount = openFrames.isEmpty()?0:Collections.max(openFrames) + 1;
-		openFrames.add(openFrameCount);
+		openFrameCount = (openFrames.isEmpty()?0:Collections.max(openFrames)) + 1;
 		this.openFrames = openFrames;
 		this.session = session;
                 setClosable(true);
@@ -96,36 +95,38 @@ public class Compose extends Frame {
 	}
 
 	@Override
-	public void setURI(final URI uri) {
-		final String str = uri.getSchemeSpecificPart();
-		final String s[] = str.split("\\?");
-		if (s.length > 0) {
-			toField.setText(s[0]);
-		}
-		if (s.length > 1) {
-			for (final String t : s[1].split("&")) {
-				final String r[] = t.split("=");
-				if (r.length > 1) {
-					switch (r[0]) {
-					case "cc":
-						ccField.setText(r[1]);
-						break;
-					case "subject":
-						subField.setText(r[1]);
-						break;
-					case "inReplyTo":
-						inReplyTo = r[1].split(",");
-						break;
-					case "references":
-						references = r[1].split(",");
-						break;
-					default:
+	public void open() {
+		final URI uri = getURI();
+		if (uri != null) {
+			final String str = uri.getSchemeSpecificPart();
+			final String s[] = str.split("\\?");
+			if (s.length > 0) {
+				toField.setText(s[0]);
+			}
+			if (s.length > 1) {
+				for (final String t : s[1].split("&")) {
+					final String r[] = t.split("=");
+					if (r.length > 1) {
+						switch (r[0]) {
+						case "cc":
+							ccField.setText(r[1]);
+							break;
+						case "subject":
+							subField.setText(r[1]);
+							break;
+						case "inReplyTo":
+							inReplyTo = r[1].split(",");
+							break;
+						case "references":
+							references = r[1].split(",");
+							break;
+						default:
+						}
 					}
 				}
 			}
-			
 		}
-		super.setURI(uri);
+		openFrames.add(openFrameCount);
 	}
 
 	@Override
