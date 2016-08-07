@@ -19,10 +19,11 @@ import javax.swing.ImageIcon;
 import linoleum.application.Frame;
 
 public class ScriptShell extends Frame implements ScriptShellPanel.CommandProcessor {
+	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
+	private final CountDownLatch engineReady = new CountDownLatch(1);
 	private volatile ScriptEngine engine;
-	private CountDownLatch engineReady = new CountDownLatch(1);
-	private String extension;
 	private volatile String prompt;
+	private String extension;
 
 	public ScriptShell(final boolean start) {
 		initComponents();
@@ -116,7 +117,6 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		String lang = System.getProperty(LANGUAGE_KEY);
 		if (lang == null) {
 			// default is JavaScript
-			final Preferences prefs = Preferences.userNodeForPackage(getClass());
 			lang = prefs.get(getName() + ".lang", "JavaScript");
 		}
 		return lang;

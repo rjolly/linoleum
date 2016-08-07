@@ -30,6 +30,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JRootPane;
 
 public class Frame extends JInternalFrame implements App {
+	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private ApplicationManager manager;
 	private JMenuBar savedMenuBar;
 	private JMenuBar menuBar;
@@ -48,11 +49,7 @@ public class Frame extends JInternalFrame implements App {
 	}
 
 	public void setApplicationManager(final ApplicationManager manager) {
-		if (getDesktopPane() == null) {
-			open(manager.getDesktopPane());
-			this.manager = manager;
-		}
-		manager.select(this);
+		this.manager = manager;
 	}
 
 	public ApplicationManager getApplicationManager() {
@@ -100,24 +97,21 @@ public class Frame extends JInternalFrame implements App {
 		return this;
 	}
 
-	public final void open(final ApplicationManager manager, final URI uri) {
-		final JDesktopPane desktop = manager.getDesktopPane();
-		Frame frame = find(desktop, uri);
-		if (frame == null) {
-			frame = find(desktop, null);
-		}
-		if (frame == null) {
-			frame = getFrame();
-		}
-		frame.setApplicationManager(manager);
-		if (!uri.equals(frame.getURI())) {
-			frame.setURI(uri);
-		}
+	public final void open(final ApplicationManager manager) {
+		open(manager, null);
 	}
 
-	public final void open(final ApplicationManager manager) {
-		final Frame frame = getFrame();
-		frame.setApplicationManager(manager);
+	public final void open(final ApplicationManager manager, final URI uri) {
+		final JDesktopPane desktop = manager.getDesktopPane();
+		final Frame frame = find(desktop, uri);
+		if (frame.getDesktopPane() == null) {
+			frame.setApplicationManager(manager);
+			desktop.add(frame);
+		}
+		manager.select(frame);
+		if (uri != null && !uri.equals(frame.getURI())) {
+			frame.setURI(uri);
+		}
 	}
 
 	private Frame find(final JDesktopPane desktop, final URI uri) {
@@ -129,7 +123,7 @@ public class Frame extends JInternalFrame implements App {
 				}
 			}
 		}
-		return null;
+		return getFrame();
 	}
 
 	protected void open() {
@@ -138,18 +132,9 @@ public class Frame extends JInternalFrame implements App {
 	protected void close() {
 	}
 
+	@Deprecated
 	public void open(final JDesktopPane desktop) {
-		loadBounds();
 		desktop.add(this);
-	}
-
-	private void loadBounds() {
-		final Preferences prefs = Preferences.userNodeForPackage(getClass());
-		final int x = prefs.getInt(getName() + ".x", getX());
-		final int y = prefs.getInt(getName() + ".y", getY());
-		final int width = prefs.getInt(getName() + ".width", getWidth());
-		final int height = prefs.getInt(getName() + ".height", getHeight());
-		setBounds(x, y, width, height);
 	}
 
 	/**
@@ -164,6 +149,7 @@ public class Frame extends JInternalFrame implements App {
                 setName(getClass().getSimpleName());
                 addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
                         public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+                                formInternalFrameOpened(evt);
                         }
                         public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
                                 formInternalFrameClosing(evt);
@@ -196,6 +182,14 @@ public class Frame extends JInternalFrame implements App {
                 pack();
         }// </editor-fold>//GEN-END:initComponents
 
+        private void formInternalFrameOpened(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameOpened
+		final int x = prefs.getInt(getName() + ".x", getX());
+		final int y = prefs.getInt(getName() + ".y", getY());
+		final int width = prefs.getInt(getName() + ".width", getWidth());
+		final int height = prefs.getInt(getName() + ".height", getHeight());
+		setBounds(x, y, width, height);
+        }//GEN-LAST:event_formInternalFrameOpened
+
         private void formInternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosing
 		close();
         }//GEN-LAST:event_formInternalFrameClosing
@@ -212,9 +206,7 @@ public class Frame extends JInternalFrame implements App {
         }//GEN-LAST:event_formInternalFrameDeactivated
 
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
-		final JDesktopPane desktop = getDesktopPane();
 		if (ready) {
-			final Preferences prefs = Preferences.userNodeForPackage(getClass());
 			final Component c = evt.getComponent();
 			prefs.putInt(getName() + ".x", c.getX());
 			prefs.putInt(getName() + ".y", c.getY());
@@ -222,9 +214,7 @@ public class Frame extends JInternalFrame implements App {
         }//GEN-LAST:event_formComponentMoved
 
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-		final JDesktopPane desktop = getDesktopPane();
 		if (ready) {
-			final Preferences prefs = Preferences.userNodeForPackage(getClass());
 			final Component c = evt.getComponent();
 			prefs.putInt(getName() + ".width", c.getWidth());
 			prefs.putInt(getName() + ".height", c.getHeight());
