@@ -26,7 +26,6 @@ public class Frame extends linoleum.application.Frame {
 		jInternalFrame1.pack();
 		getContentPane().add("Center", notepad);
 		setJMenuBar(notepad.createMenubar());
-		setName(Notepad.class.getSimpleName());
 		setSize(500, 400);
 	}
 

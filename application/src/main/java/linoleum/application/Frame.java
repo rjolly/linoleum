@@ -47,10 +47,12 @@ public class Frame extends JInternalFrame implements App {
 
 	public Frame() {
 		this(new HashSet<Integer>());
+                setName(getClass().getSimpleName());
 	}
 
 	public Frame(final String title) {
 		this(new HashSet<Integer>(), title);
+                setName(getClass().getSimpleName());
 	}
 
 	public Frame(final Collection<Integer> openFrames, final String title) {
@@ -140,8 +142,13 @@ public class Frame extends JInternalFrame implements App {
 			frame.setURI(uri);
 		}
 		if (frame.getDesktopPane() == null) {
-			if (frame.getApplicationManager() == null) {
-				frame.setApplicationManager(manager);
+			if (frame.manager == null) {
+				frame.manager = manager;
+				if (frame != this) {
+					frame.setName(getName());
+					frame.icon = icon;
+					frame.type = type;
+				}
 				desktop.add(frame);
 			} else {
 				desktop.add(frame);
@@ -185,7 +192,6 @@ public class Frame extends JInternalFrame implements App {
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
-                setName(getClass().getSimpleName());
                 addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
                         public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
                                 formInternalFrameOpened(evt);
