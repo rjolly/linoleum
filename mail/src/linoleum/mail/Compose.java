@@ -8,9 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Properties;
 import java.util.prefs.Preferences;
 import javax.mail.Folder;
@@ -45,30 +43,26 @@ public class Compose extends Frame {
 	private String references[];
 	private File file;
 	private final Session session;
-	private final int openFrameCount;
-	private final Collection<Integer> openFrames;
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final FileChooser chooser = new FileChooser();
-	private static final int offset = 30;
 
 	public Compose() {
 		this(Session.getInstance(System.getProperties()));
 	}
 
 	public Compose(final Session session) {
-		this(session, new HashSet<Integer>());
+		this.session = session;
 	}
 
 	public Compose(final Session session, final Collection<Integer> openFrames) {
-		openFrameCount = (openFrames.isEmpty()?0:Collections.max(openFrames)) + 1;
-		this.openFrames = openFrames;
-		this.session = session;
+		super(openFrames);
                 setClosable(true);
                 setIconifiable(true);
                 setMaximizable(true);
                 setResizable(true);
-		setTitle("Untitled Message " + openFrameCount);
+		setTitle("Untitled Message " + (index + 1));
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail24.gif")));
+		this.session = session;
 
 		JPanel top = new JPanel();
 		top.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -86,11 +80,10 @@ public class Compose extends Frame {
 
 		setContentPane(top);
 		pack();
-		setLocation(offset * openFrameCount, offset * openFrameCount);
 	}
 
 	@Override
-	public Frame getFrame() {
+	public Frame getFrame(final Collection<Integer> openFrames) {
 		return new Compose(session, openFrames);
 	}
 
@@ -126,12 +119,6 @@ public class Compose extends Frame {
 				}
 			}
 		}
-		openFrames.add(openFrameCount);
-	}
-
-	@Override
-	public void close() {
-		openFrames.remove(openFrameCount);
 	}
 
 	private JPanel buildButtonPanel() {

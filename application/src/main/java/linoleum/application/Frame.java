@@ -22,6 +22,9 @@ package linoleum.application;
 import java.awt.Component;
 import java.beans.PropertyVetoException;
 import java.net.URI;
+import java.util.HashSet;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.prefs.Preferences;
 import javax.swing.Icon;
 import javax.swing.JDesktopPane;
@@ -38,14 +41,35 @@ public class Frame extends JInternalFrame implements App {
 	private Icon icon;
 	private URI uri;
 	private boolean ready;
+	protected final int index;
+	private final Collection<Integer> openFrames;
+	private static final int offset = 30;
 
 	public Frame() {
-		initComponents();
+		this(new HashSet<Integer>());
 	}
 
 	public Frame(final String title) {
 		super(title, true, true, true, true);
 		initComponents();
+		openFrames = new HashSet<Integer>();
+		index = 0;
+	}
+
+	public Frame(final Collection<Integer> openFrames) {
+		initComponents();
+		index = openFrames.isEmpty()?0:Collections.max(openFrames) + 1;
+		this.openFrames = openFrames;
+	}
+
+	private void openFrame() {
+		openFrames.add(index);
+		open();
+	}
+
+	private void closeFrame() {
+		close();
+		openFrames.remove(index);
 	}
 
 	public void setApplicationManager(final ApplicationManager manager) {
@@ -93,6 +117,10 @@ public class Frame extends JInternalFrame implements App {
 	}
 
 	protected Frame getFrame() {
+		return getFrame(openFrames);
+	}
+
+	protected Frame getFrame(final Collection<Integer> openFrames) {
 		return this;
 	}
 
@@ -113,10 +141,10 @@ public class Frame extends JInternalFrame implements App {
 				desktop.add(frame);
 			} else {
 				desktop.add(frame);
-				frame.open();
+				frame.openFrame();
 			}
 		} else if (changed) {
-			frame.open();
+			frame.openFrame();
 		}
 		manager.select(frame);
 	}
@@ -194,12 +222,12 @@ public class Frame extends JInternalFrame implements App {
 		final int y = prefs.getInt(getName() + ".y", getY());
 		final int width = prefs.getInt(getName() + ".width", getWidth());
 		final int height = prefs.getInt(getName() + ".height", getHeight());
-		setBounds(x, y, width, height);
-		open();
+		setBounds(x + offset * index, y + offset * index, width, height);
+		openFrame();
         }//GEN-LAST:event_formInternalFrameOpened
 
         private void formInternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosing
-		close();
+		closeFrame();
         }//GEN-LAST:event_formInternalFrameClosing
 
         private void formInternalFrameActivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameActivated
@@ -216,8 +244,8 @@ public class Frame extends JInternalFrame implements App {
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
 		if (ready) {
 			final Component c = evt.getComponent();
-			prefs.putInt(getName() + ".x", c.getX());
-			prefs.putInt(getName() + ".y", c.getY());
+			prefs.putInt(getName() + ".x", c.getX() - offset * index);
+			prefs.putInt(getName() + ".y", c.getY() - offset * index);
 		}
         }//GEN-LAST:event_formComponentMoved
 
