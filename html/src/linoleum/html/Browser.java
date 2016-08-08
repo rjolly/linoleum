@@ -13,6 +13,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collection;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
@@ -34,7 +35,8 @@ public class Browser extends Frame {
 	private int index;
 	private URL url;
 
-	public Browser() {
+	public Browser(final Collection<Integer> openFrames) {
+		super(openFrames);
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif")));
 		setMimeType("text/html");
@@ -77,8 +79,8 @@ public class Browser extends Frame {
 	}
 
 	@Override
-	public Frame getFrame() {
-		return new Browser();
+	public Frame getFrame(final Collection<Integer> openFrames) {
+		return new Browser(openFrames);
 	}
 
 	@Override

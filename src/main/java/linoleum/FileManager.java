@@ -11,6 +11,7 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.Collection;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
@@ -54,7 +55,8 @@ public class FileManager extends Frame {
 	};
 	private boolean closing;
 
-	public FileManager() {
+	public FileManager(final Collection<Integer> openFrames) {
+		super(openFrames);
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
 	}
@@ -75,8 +77,8 @@ public class FileManager extends Frame {
 	}
 
 	@Override
-	public Frame getFrame() {
-		return new FileManager();
+	public Frame getFrame(final Collection<Integer> openFrames) {
+		return new FileManager(openFrames);
 	}
 
 	@Override

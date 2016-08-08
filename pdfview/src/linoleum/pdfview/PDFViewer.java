@@ -11,6 +11,7 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Paths;
+import java.util.Collection;
 import linoleum.application.Frame;
 
 public class PDFViewer extends Frame {
@@ -21,7 +22,8 @@ public class PDFViewer extends Frame {
 	private PagePreparer pagePrep;
 	private PagePanel page;
 
-	public PDFViewer() {
+	public PDFViewer(final Collection<Integer> openFrames) {
+		super(openFrames);
 		initComponents();
 		setTitle(TITLE);
 		setMimeType("application/pdf");
@@ -29,8 +31,8 @@ public class PDFViewer extends Frame {
 	}
 
 	@Override
-	public Frame getFrame() {
-		return new PDFViewer();
+	public Frame getFrame(final Collection<Integer> openFrames) {
+		return new PDFViewer(openFrames);
 	}
 
 	@Override

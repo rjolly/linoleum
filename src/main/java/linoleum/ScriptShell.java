@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.prefs.Preferences;
 import java.util.concurrent.CountDownLatch;
 import javax.script.ScriptEngine;
@@ -27,7 +28,8 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	private volatile String prompt;
 	private String extension;
 
-	public ScriptShell() {
+	public ScriptShell(final Collection<Integer> openFrames) {
+		super(openFrames);
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
 		createScriptEngine();
@@ -72,8 +74,8 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	}
 
 	@Override
-	public Frame getFrame() {
-		return new ScriptShell();
+	public Frame getFrame(final Collection<Integer> openFrames) {
+		return new ScriptShell(openFrames);
 	}
 
 	@SuppressWarnings("unchecked")

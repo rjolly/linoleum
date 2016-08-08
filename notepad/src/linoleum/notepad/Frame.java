@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Paths;
+import java.util.Collection;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
@@ -13,8 +14,8 @@ public class Frame extends linoleum.application.Frame {
 	private final Notepad notepad = new Notepad(this);
 	private boolean found;
 
-	public Frame() {
-		super(Notepad.resources.getString("Title"));
+	public Frame(final Collection<Integer> openFrames) {
+		super(openFrames, Notepad.resources.getString("Title"));
 		initComponents();
 		jInternalFrame1.pack();
 		getContentPane().add("Center", notepad);
@@ -42,8 +43,8 @@ public class Frame extends linoleum.application.Frame {
 	}
 
 	@Override
-	public Frame getFrame() {
-		return new Frame();
+	public Frame getFrame(final Collection<Integer> openFrames) {
+		return new Frame(openFrames);
 	}
 
 	@Override

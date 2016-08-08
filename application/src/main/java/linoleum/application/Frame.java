@@ -50,10 +50,14 @@ public class Frame extends JInternalFrame implements App {
 	}
 
 	public Frame(final String title) {
+		this(new HashSet<Integer>(), title);
+	}
+
+	public Frame(final Collection<Integer> openFrames, final String title) {
 		super(title, true, true, true, true);
 		initComponents();
-		openFrames = new HashSet<Integer>();
-		index = 0;
+		index = openFrames.isEmpty()?0:Collections.max(openFrames) + 1;
+		this.openFrames = openFrames;
 	}
 
 	public Frame(final Collection<Integer> openFrames) {
