@@ -108,9 +108,13 @@ public class Frame extends JInternalFrame implements App {
 			frame.setURI(uri);
 		}
 		if (frame.getDesktopPane() == null) {
-			frame.setApplicationManager(manager);
-			desktop.add(frame);
-			frame.open();
+			if (frame.getApplicationManager() == null) {
+				frame.setApplicationManager(manager);
+				desktop.add(frame);
+			} else {
+				desktop.add(frame);
+				frame.open();
+			}
 		} else if (changed) {
 			frame.open();
 		}
@@ -191,6 +195,7 @@ public class Frame extends JInternalFrame implements App {
 		final int width = prefs.getInt(getName() + ".width", getWidth());
 		final int height = prefs.getInt(getName() + ".height", getHeight());
 		setBounds(x, y, width, height);
+		open();
         }//GEN-LAST:event_formInternalFrameOpened
 
         private void formInternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosing

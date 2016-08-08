@@ -65,7 +65,7 @@ public class Packages {
 		}
 		home = map.get("linoleum").getParentFile();
 		try {
-			if (!Files.isSameFile(home.toPath(), Paths.get(""))) {
+			if (!Files.isSameFile(home.toPath(), Paths.get("."))) {
 				final File lib = new File(home, "lib");
 				if (lib.isDirectory()) {
 					for (final File file : lib.listFiles(filter)) {

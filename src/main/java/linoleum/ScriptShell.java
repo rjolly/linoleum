@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -21,6 +22,7 @@ import linoleum.application.Frame;
 public class ScriptShell extends Frame implements ScriptShellPanel.CommandProcessor {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final CountDownLatch engineReady = new CountDownLatch(1);
+	private final URI uri = new File(".").toURI();
 	private volatile ScriptEngine engine;
 	private volatile String prompt;
 	private String extension;
@@ -42,6 +44,11 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 				engineReady.countDown();
 			}
 		}).start();
+	}
+
+	@Override
+	public URI getURI() {
+		return uri;
 	}
 
 	@Override
@@ -128,7 +135,7 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		final File home = Desktop.pkgs.home();
 		loadUserInitFile(new File(home, "init." + extension));
 		try {
-			if (!Files.isSameFile(home.toPath(), Paths.get(""))) {
+			if (!Files.isSameFile(home.toPath(), Paths.get("."))) {
 				// load current user's initialization file
 				loadUserInitFile(new File("init." + extension));
 			}
