@@ -28,10 +28,13 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	private volatile String prompt;
 	private String extension;
 
+	public ScriptShell() {
+		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
+	}
+
 	public ScriptShell(final Collection<Integer> openFrames) {
 		super(openFrames);
 		initComponents();
-		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
 		createScriptEngine();
 		setTitle(engine.getFactory().getLanguageName());
 		setContentPane(new ScriptShellPanel(this));

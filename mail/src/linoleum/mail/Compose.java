@@ -52,6 +52,7 @@ public class Compose extends Frame {
 
 	public Compose(final Session session) {
 		this.session = session;
+		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail24.gif")));
 	}
 
 	public Compose(final Session session, final Collection<Integer> openFrames) {
@@ -61,7 +62,6 @@ public class Compose extends Frame {
                 setMaximizable(true);
                 setResizable(true);
 		setTitle("Untitled Message " + (index + 1));
-		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail24.gif")));
 		this.session = session;
 
 		JPanel top = new JPanel();

@@ -22,11 +22,14 @@ public class PDFViewer extends Frame {
 	private PagePreparer pagePrep;
 	private PagePanel page;
 
+	public PDFViewer() {
+		setMimeType("application/pdf");
+	}
+
 	public PDFViewer(final Collection<Integer> openFrames) {
 		super(openFrames);
 		initComponents();
 		setTitle(TITLE);
-		setMimeType("application/pdf");
 		setEnabling();
 	}
 

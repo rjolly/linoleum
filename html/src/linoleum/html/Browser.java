@@ -28,20 +28,21 @@ public class Browser extends Frame {
 	private final Icon stopIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
 	private final Icon reloadIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Refresh16.gif"));
 	private List<FrameURL> history = new ArrayList<>();
-	private final CardLayout layout;
 	private PageLoader loader;
 	private FrameURL current;
 	private boolean reload;
 	private int index;
 	private URL url;
 
+	public Browser() {
+		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif")));
+		setMimeType("text/html");
+	}
+
 	public Browser(final Collection<Integer> openFrames) {
 		super(openFrames);
 		initComponents();
-		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif")));
-		setMimeType("text/html");
 		update();
-		layout = (CardLayout)jPanel2.getLayout();
 		jEditorPane1.setEditorKitForContentType("text/html", new EditorKit());
 		jEditorPane1.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 		jTextField1.getDocument().addDocumentListener(new DocumentListener() {
@@ -125,6 +126,7 @@ public class Browser extends Frame {
 	}
 
 	private class PageLoader extends linoleum.html.PageLoader {
+		private final CardLayout layout = (CardLayout)jPanel2.getLayout();
 		private final Cursor cursor = jEditorPane1.getCursor();
 		private final FrameURL dest;
 		private final boolean force;

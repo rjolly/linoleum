@@ -14,15 +14,19 @@ public class Frame extends linoleum.application.Frame {
 	private final Notepad notepad = new Notepad(this);
 	private boolean found;
 
+	public Frame() {
+		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Edit24.gif")));
+		setName(Notepad.class.getSimpleName());
+		setMimeType("text/*");
+	}
+
 	public Frame(final Collection<Integer> openFrames) {
 		super(openFrames, Notepad.resources.getString("Title"));
 		initComponents();
 		jInternalFrame1.pack();
 		getContentPane().add("Center", notepad);
 		setJMenuBar(notepad.createMenubar());
-		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Edit24.gif")));
 		setName(Notepad.class.getSimpleName());
-		setMimeType("text/*");
 		setSize(500, 400);
 	}
 

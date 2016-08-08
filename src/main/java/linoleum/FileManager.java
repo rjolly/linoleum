@@ -55,10 +55,13 @@ public class FileManager extends Frame {
 	};
 	private boolean closing;
 
+	public FileManager() {
+		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
+	}
+
 	public FileManager(final Collection<Integer> openFrames) {
 		super(openFrames);
 		initComponents();
-		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
 	}
 
 	@Override
