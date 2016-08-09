@@ -20,6 +20,8 @@
 package linoleum.application;
 
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Point;
 import java.beans.PropertyVetoException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -216,6 +218,19 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 				frame.setSelected(true);
 			}
 		} catch (final PropertyVetoException ex) {}
+		final Dimension size = getDesktopPane().getSize();
+		final Dimension s = frame.getSize();
+		final Point p = frame.getLocation();
+		final int x = Math.max(Math.min(p.x - (p.x + s.width - size.width), p.x), 0);
+		final int y = Math.max(Math.min(p.y - (p.y + s.height - size.height), p.y), 0);
+		if (x != p.x || y != p.y) {
+			frame.setLocation(x, y);
+		}
+		final int width = Math.min(s.width, size.width);
+		final int height = Math.min(s.height, size.height);
+		if (width < s.width || height < s.height) {
+			frame.setSize(width, height);
+		}
 	}
 
 	public void select() {
