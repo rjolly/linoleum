@@ -178,18 +178,33 @@
         <Property name="useNullLayout" type="boolean" value="true"/>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="label">
+        <Container class="javax.swing.JInternalFrame" name="frame">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/linoleum/Linoleum_2.jpg"/>
-            </Property>
+            <Property name="visible" type="boolean" value="true"/>
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="100" y="50" width="-1" height="-1"/>
+              <AbsoluteConstraints x="90" y="40" width="-1" height="-1"/>
             </Constraint>
           </Constraints>
-        </Component>
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+          <SubComponents>
+            <Component class="javax.swing.JLabel" name="label">
+              <Properties>
+                <Property name="horizontalAlignment" type="int" value="0"/>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/linoleum/Linoleum_2.jpg"/>
+                </Property>
+              </Properties>
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                  <BorderConstraints direction="Center"/>
+                </Constraint>
+              </Constraints>
+            </Component>
+          </SubComponents>
+        </Container>
       </SubComponents>
     </Container>
   </SubComponents>

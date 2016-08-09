@@ -1,9 +1,11 @@
 package linoleum;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -25,6 +27,7 @@ public class Desktop extends JFrame {
 
 	private Desktop() {
 		initComponents();
+		frame.setLayer(0);
 		pkgs.addClassPathListener(apps);
 		desktopPane.add(apps);
 		devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
@@ -71,9 +74,12 @@ public class Desktop extends JFrame {
 	}
 
 	private void resize() {
-		final Dimension s = label.getSize();
 		final Dimension size = desktopPane.getSize();
-		label.setLocation((size.width - s.width) / 2, (size.height - s.height) / 2);
+		final Insets insets = frame.getInsets();
+		final Container panel = frame.getContentPane();
+		final int width = frame.getWidth() - panel.getWidth();
+		final int height = frame.getHeight() - panel.getHeight();
+		frame.setBounds(-insets.left, insets.bottom - height, size.width + width, size.height + height);
 	}
 
 	private void screenshot() {
@@ -92,6 +98,7 @@ public class Desktop extends JFrame {
         private void initComponents() {
 
                 desktopPane = new linoleum.DesktopPane();
+                frame = new javax.swing.JInternalFrame();
                 label = new javax.swing.JLabel();
                 menuBar = new javax.swing.JMenuBar();
                 fileMenu = new javax.swing.JMenu();
@@ -118,9 +125,14 @@ public class Desktop extends JFrame {
                         }
                 });
 
+                frame.setVisible(true);
+
+                label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
                 label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/linoleum/Linoleum_2.jpg"))); // NOI18N
-                desktopPane.add(label);
-                label.setBounds(100, 50, 409, 307);
+                frame.getContentPane().add(label, java.awt.BorderLayout.CENTER);
+
+                desktopPane.add(frame);
+                frame.setBounds(90, 40, 420, 343);
 
                 fileMenu.setMnemonic('f');
                 fileMenu.setText("File");
@@ -286,6 +298,7 @@ public class Desktop extends JFrame {
         private javax.swing.JMenu editMenu;
         private javax.swing.JMenuItem exitMenuItem;
         private javax.swing.JMenu fileMenu;
+        private javax.swing.JInternalFrame frame;
         private javax.swing.JCheckBoxMenuItem fullScreenMenuItem;
         private javax.swing.JMenu helpMenu;
         private javax.swing.JLabel label;

@@ -20,8 +20,14 @@ public class DesktopPane extends JDesktopPane {
 		map.put(KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK), "selectPreviousFrame");
 	}
 
+	@Override
+	public Component add(final Component comp) {
+		addImpl(comp, DEFAULT_LAYER, -1);
+		return comp;
+	}
+
 	public int getLayer(final Component c) {
 		final int layer = super.getLayer(c);
-		return c instanceof JInternalFrame.JDesktopIcon?ICON_LAYER:layer == 0 && c instanceof JInternalFrame?DEFAULT_LAYER:layer;
+		return c instanceof JInternalFrame.JDesktopIcon?ICON_LAYER:layer;
 	}
 }
