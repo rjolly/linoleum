@@ -85,6 +85,12 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 		refresh();
 	}
 
+	public ApplicationManager(final JDesktopPane desktop) {
+		this();
+		setApplicationManager(this);
+		desktop.add(this);
+	}
+
 	public void open(final URI uri) {
 		open(getApplication(uri), uri);
 	}

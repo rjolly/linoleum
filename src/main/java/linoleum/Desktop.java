@@ -21,15 +21,15 @@ public class Desktop extends JFrame {
 	private static final String ABOUTMSG = "%s %s.%s \n \nJava desktop environment "
 		+ "and software distribution. \n \nWritten by \n  "
 		+ "%s";
-	private final ApplicationManager apps = new ApplicationManager();
+	private final ApplicationManager apps;
 	private final GraphicsDevice devices[];
 	private Rectangle bounds;
 
 	private Desktop() {
 		initComponents();
 		frame.setLayer(0);
+		apps = new ApplicationManager(desktopPane);
 		pkgs.addClassPathListener(apps);
-		desktopPane.add(apps);
 		devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 		bounds = getBounds();
 	}
