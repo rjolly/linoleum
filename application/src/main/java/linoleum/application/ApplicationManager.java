@@ -72,26 +72,27 @@ public class ApplicationManager extends Frame {
 				setBackground(list.getBackground());
 				setForeground(list.getForeground());
 			}
-
 			final App app = (App)value;
 			final Icon icon = app.getIcon();
 			setIcon(icon == null?defaultIcon:icon);
 			setText(app.getName());
 			setFont(list.getFont());
-
 			return this;
 		}
 	};
 
 	public ApplicationManager() {
 		initComponents();
-		refresh();
 	}
 
 	public ApplicationManager(final JDesktopPane desktop) {
 		this();
 		setApplicationManager(this);
 		desktop.add(this);
+	}
+
+	public List<OptionPanel> getOptionPanels() {
+		return options;
 	}
 
 	public void open(final URI uri) {
@@ -157,10 +158,11 @@ public class ApplicationManager extends Frame {
 
 	@Override
 	public void classPathChanged(final ClassPathChangeEvent e) {
-		refresh();
+		open();
 	}
 
-	private void refresh() {
+	@Override
+	public void open() {
 		for (final JInternalFrame frame : ServiceLoader.load(JInternalFrame.class)) {
 			if (frame instanceof App) {
 				process((App)frame);
@@ -288,7 +290,11 @@ public class ApplicationManager extends Frame {
 					list.add(name);
 				}
 			}
-			options.add(app.getOptionPanel());
+			final OptionPanel panel = app.getOptionPanel();
+			if (panel != null) {
+				panel.setName(app.getName());
+				options.add(panel);
+			}
 			model.addElement(app);
 		}
 	}

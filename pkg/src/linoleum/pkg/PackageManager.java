@@ -5,6 +5,7 @@ import java.util.Arrays;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 import linoleum.application.Frame;
+import linoleum.application.ApplicationManager;
 import linoleum.application.event.ClassPathChangeEvent;
 import linoleum.Desktop;
 import linoleum.Package;
@@ -28,7 +29,6 @@ public class PackageManager extends Frame {
 		super("Packages");
 		initComponents();
 		model = (DefaultTableModel)jTable1.getModel();
-		refresh();
 		if (instance == null) {
 			instance = this;
 		}
@@ -41,6 +41,14 @@ public class PackageManager extends Frame {
 			}
 		} catch (final Exception ex) {
 			ex.printStackTrace();
+		}
+	}
+
+	public void open() {
+		model.setRowCount(0);
+		for (final File file : Desktop.pkgs.installed()) {
+			final Package pkg = new Package(file);
+			model.addRow(new Object[] {pkg.getName(), pkg.getVersion(), pkg.isSnapshot()});
 		}
 	}
 
@@ -84,7 +92,10 @@ public class PackageManager extends Frame {
 				Desktop.pkgs.add(file);
 			}
 		}
-		getApplicationManager().fireClassPathChange(new ClassPathChangeEvent(this));
+		final ApplicationManager apps = getApplicationManager();
+		if (apps != null) {
+			apps.fireClassPathChange(new ClassPathChangeEvent(this));
+		}
 	}
 
 	private void install(final String organization, final String module, final String revision) {
@@ -97,15 +108,7 @@ public class PackageManager extends Frame {
 
 	@Override
 	public void classPathChanged(final ClassPathChangeEvent e) {
-		refresh();
-	}
-
-	private void refresh() {
-		model.setRowCount(0);
-		for (final File file : Desktop.pkgs.installed()) {
-			final Package pkg = new Package(file);
-			model.addRow(new Object[] {pkg.getName(), pkg.getVersion(), pkg.isSnapshot()});
-		}
+		open();
 	}
 
 	@SuppressWarnings("unchecked")

@@ -71,7 +71,9 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 	}
 
 	private void openFrame() {
-		manager.addClassPathListener(this);
+		if (manager != null) {
+			manager.addClassPathListener(this);
+		}
 		openFrames.add(index);
 		open();
 	}
@@ -79,7 +81,9 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 	private void closeFrame() {
 		close();
 		openFrames.remove(index);
-		manager.removeClassPathListener(this);
+		if (manager != null) {
+			manager.removeClassPathListener(this);
+		}
 	}
 
 	public void setApplicationManager(final ApplicationManager manager) {

@@ -23,6 +23,7 @@ import java.net.URI;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
+@Deprecated
 public interface Application {
 	public String getName();
 	public ImageIcon getIcon();
