@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.prefs.Preferences;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
@@ -27,6 +28,7 @@ public class Browser extends Frame {
 	private final Icon goIcon = new ImageIcon(getClass().getResource("Go16.png"));
 	private final Icon stopIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
 	private final Icon reloadIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Refresh16.gif"));
+	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private List<FrameURL> history = new ArrayList<>();
 	private PageLoader loader;
 	private FrameURL current;
@@ -72,11 +74,12 @@ public class Browser extends Frame {
 	}
 
 	private void open(final String str) {
-		try {
-			open(new URL(str));
-		} catch (final MalformedURLException ex) {
+		if (!reload) try {
+			setURI(new URI(str));
+		} catch (final URISyntaxException ex) {
 			ex.printStackTrace();
 		}
+		open();
 	}
 
 	@Override
@@ -87,7 +90,7 @@ public class Browser extends Frame {
 	@Override
 	public void setURI(final URI uri) {
 		try {
-			open(uri.toURL());
+			current = new FrameURL(uri.toURL());
 		} catch (final MalformedURLException ex) {
 			ex.printStackTrace();
 		}
@@ -95,16 +98,26 @@ public class Browser extends Frame {
 
 	@Override
 	public URI getURI() {
-		try {
-			return current == null?null:current.getURL().toURI();
+		if (current != null) try {
+			return current.getURL().toURI();
 		} catch (final URISyntaxException ex) {
 			ex.printStackTrace();
 		}
 		return null;
 	}
 
-	private void open(final URL url) {
-		open(reload?current:new FrameURL(url), 1, reload);
+	public void open() {
+		if (current == null) {
+			final String str = prefs.get(getName() + ".home", null);
+			if (str != null) try {
+				setURI(new URI(str));
+			} catch (final URISyntaxException ex) {
+				ex.printStackTrace();
+			}
+		}
+		if (current != null) {
+			open(current, 1, reload);
+		}
 	}
 
 	private void linkActivated(final HyperlinkEvent evt) {
