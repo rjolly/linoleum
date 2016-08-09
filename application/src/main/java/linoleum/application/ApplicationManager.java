@@ -48,7 +48,7 @@ public class ApplicationManager extends Frame {
 	private final Icon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
 	private final List<ClassPathListener> listeners = new ArrayList<>();
 	private final Map<String, App> map = new HashMap<>();
-	private final Map<String, String> apps = new HashMap<>();
+	private final Map<String, List<String>> apps = new HashMap<>();
 	private final DefaultListModel<App> model = new DefaultListModel<>();
 	private final ListCellRenderer renderer = new Renderer();
 
@@ -98,22 +98,30 @@ public class ApplicationManager extends Frame {
 	}
 
 	private String getApplication(final URI uri) {
+		final List<String> list = getApplications(uri);
+		return list.size() > 0?list.get(0):null;
+	}
+
+	private List<String> getApplications(final URI uri) {
+		final List<String> list = new ArrayList<>();
 		final Path path = Paths.get(uri);
 		try {
 			final String str = Files.probeContentType(path);
 			if (apps.containsKey(str)) {
-				return apps.get(str);
+				list.addAll(apps.get(str));
 			}
 			final MimeType type = new MimeType(str);
-			for (final Map.Entry<String, String> entry : apps.entrySet()) {
+			for (final Map.Entry<String, List<String>> entry : apps.entrySet()) {
 				final String key = entry.getKey();
-				final String value = entry.getValue();
+				final List<String> value = entry.getValue();
 				if (type.match(key)) {
-					return value;
+					list.addAll(value);
 				}
 			}
-		} catch (final Exception ex) {}
-		return path.toFile().isDirectory()?"FileManager":null;
+		} catch (final Exception ex) {
+			ex.printStackTrace();
+		}
+		return list;
 	}
 
 	public void open(final String name, final URI uri) {
@@ -260,7 +268,15 @@ public class ApplicationManager extends Frame {
 		if (!map.containsKey(name)) {
 			map.put(name, app);
 			final String type = app.getMimeType();
-			if (type != null) for (final String s : type.split(":")) apps.put(s, name);
+			if (type != null) {
+				for (final String s : type.split(":")) {
+					List<String> list = apps.get(s);
+					if (list == null) {
+						apps.put(s, list = new ArrayList<>());
+					}
+					list.add(name);
+				}
+			}
 			model.addElement(app);
 		}
 	}

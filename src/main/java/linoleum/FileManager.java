@@ -57,6 +57,7 @@ public class FileManager extends Frame {
 
 	public FileManager() {
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
+		setMimeType("application/octet-stream");
 	}
 
 	public FileManager(final Collection<Integer> openFrames) {
