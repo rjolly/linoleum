@@ -31,6 +31,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import linoleum.application.FileChooser;
 import linoleum.application.Frame;
 
 public class Compose extends Frame {

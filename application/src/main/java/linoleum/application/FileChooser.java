@@ -1,4 +1,4 @@
-package linoleum.mail;
+package linoleum.application;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
