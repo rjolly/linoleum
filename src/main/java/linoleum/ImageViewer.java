@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import javax.activation.MimeType;
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import linoleum.application.Frame;
 

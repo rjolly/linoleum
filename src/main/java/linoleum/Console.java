@@ -21,7 +21,6 @@ public class Console extends Frame {
                 setMaximizable(true);
                 setResizable(true);
                 setTitle("Console");
-                setName(getClass().getSimpleName());
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);
