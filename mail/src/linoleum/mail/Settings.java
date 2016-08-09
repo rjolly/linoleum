@@ -3,8 +3,9 @@ package linoleum.mail;
 import java.awt.Component;
 import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
+import linoleum.application.OptionPanel;
 
-public class Settings extends javax.swing.JPanel {
+public class Settings extends OptionPanel {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 
 	public Settings() {
@@ -12,20 +13,29 @@ public class Settings extends javax.swing.JPanel {
 	}
 
 	public void show(final Component parent) {
+		load();
+		final int result = JOptionPane.showInternalConfirmDialog(parent, this, "Account settings", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+		if (result == JOptionPane.OK_OPTION) {
+			save();
+		}
+	}
+
+	public void load() {
 		jTextField1.setText(prefs.get(SimpleClient.name + ".url", null));
 		jTextField2.setText(prefs.get(SimpleClient.name + ".mailhost", null));
 		jTextField3.setText(prefs.get(SimpleClient.name + ".from", null));
 		jTextField4.setText(prefs.get(SimpleClient.name + ".record", "Sent"));
 		jCheckBox1.setSelected(prefs.getBoolean(SimpleClient.name + ".debug", false));
-		final int result = JOptionPane.showInternalConfirmDialog(parent, this, "Account settings", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			prefs.put(SimpleClient.name + ".url", jTextField1.getText());
-			prefs.put(SimpleClient.name + ".mailhost", jTextField2.getText());
-			prefs.put(SimpleClient.name + ".from", jTextField3.getText());
-			prefs.put(SimpleClient.name + ".record", jTextField4.getText());
-			prefs.putBoolean(SimpleClient.name + ".debug", jCheckBox1.isSelected());
-		}
 	}
+
+	public void save() {
+		prefs.put(SimpleClient.name + ".url", jTextField1.getText());
+		prefs.put(SimpleClient.name + ".mailhost", jTextField2.getText());
+		prefs.put(SimpleClient.name + ".from", jTextField3.getText());
+		prefs.put(SimpleClient.name + ".record", jTextField4.getText());
+		prefs.putBoolean(SimpleClient.name + ".debug", jCheckBox1.isSelected());
+	}
+
 	@SuppressWarnings("unchecked")
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {

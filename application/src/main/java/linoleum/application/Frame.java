@@ -176,6 +176,10 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 		return getFrame();
 	}
 
+	public OptionPanel getOptionPanel() {
+		return null;
+	}
+
 	protected void open() {
 	}
 

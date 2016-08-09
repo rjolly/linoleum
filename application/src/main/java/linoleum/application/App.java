@@ -23,10 +23,11 @@ import java.net.URI;
 import javax.swing.Icon;
 import javax.swing.JDesktopPane;
 
-public interface App {
+interface App {
 	public String getName();
 	public Icon getIcon();
 	public String getMimeType();
 	public void open(ApplicationManager manager, URI uri);
 	public void open(ApplicationManager manager);
+	public OptionPanel getOptionPanel();
 }

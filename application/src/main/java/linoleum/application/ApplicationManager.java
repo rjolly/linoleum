@@ -50,6 +50,7 @@ public class ApplicationManager extends Frame {
 	private final Map<String, App> map = new HashMap<>();
 	private final Map<String, List<String>> apps = new HashMap<>();
 	private final DefaultListModel<App> model = new DefaultListModel<>();
+	private final List<OptionPanel> options = new ArrayList<>(); 
 	private final ListCellRenderer renderer = new Renderer();
 
 	private class Renderer extends JLabel implements ListCellRenderer {
@@ -194,6 +195,11 @@ public class ApplicationManager extends Frame {
 						}
 						manager.select(frame);
 					}
+
+					@Override
+					public OptionPanel getOptionPanel() {
+						return null;
+					}
 				});
 			}
 		}
@@ -230,6 +236,11 @@ public class ApplicationManager extends Frame {
 				@Override
 				public void open(final ApplicationManager manager) {
 					open(manager, null);
+				}
+
+				@Override
+				public OptionPanel getOptionPanel() {
+					return null;
 				}
 			});
 		}
@@ -277,6 +288,7 @@ public class ApplicationManager extends Frame {
 					list.add(name);
 				}
 			}
+			options.add(app.getOptionPanel());
 			model.addElement(app);
 		}
 	}

@@ -31,6 +31,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreePath;
 import linoleum.application.Frame;
+import linoleum.application.OptionPanel;
 
 public class SimpleClient extends Frame {
 	private final Icon composeIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail16.gif"));
@@ -122,6 +123,11 @@ public class SimpleClient extends Frame {
 
 	public FolderViewer getFolderViewer() {
 		return folderViewer;
+	}
+
+	@Override
+	public OptionPanel getOptionPanel() {
+		return settings;
 	}
 
 	@Override
