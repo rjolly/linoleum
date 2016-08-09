@@ -27,6 +27,8 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -36,15 +38,15 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
-import javax.swing.SwingUtilities;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import linoleum.application.event.ClassPathListener;
 import linoleum.application.event.ClassPathChangeEvent;
 
-public class ApplicationManager extends Frame implements ClassPathListener {
+public class ApplicationManager extends Frame {
 	private final Icon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
+	private final List<ClassPathListener> listeners = new ArrayList<>();
 	private final Map<String, App> map = new HashMap<>();
 	private final Map<String, String> apps = new HashMap<>();
 	private final DefaultListModel<App> model = new DefaultListModel<>();
@@ -130,13 +132,23 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 		model.getElementAt(index).open(this);
 	}
 
+	public void addClassPathListener(final ClassPathListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeClassPathListener(final ClassPathListener listener) {
+		listeners.remove(listener);
+	}
+
+	public void fireClassPathChange(final ClassPathChangeEvent evt) {
+		for (final ClassPathListener listener : listeners) {
+			listener.classPathChanged(evt);
+		}
+	}
+
+	@Override
 	public void classPathChanged(final ClassPathChangeEvent e) {
 		refresh();
-		for (final App app : map.values()) {
-			if (app instanceof ClassPathListener) {
-				((ClassPathListener)app).classPathChanged(e);
-			}
-		}
 	}
 
 	private void refresh() {
@@ -249,11 +261,7 @@ public class ApplicationManager extends Frame implements ClassPathListener {
 			map.put(name, app);
 			final String type = app.getMimeType();
 			if (type != null) for (final String s : type.split(":")) apps.put(s, name);
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					model.addElement(app);
-				}
-			});
+			model.addElement(app);
 		}
 	}
 

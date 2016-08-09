@@ -29,7 +29,6 @@ public class Desktop extends JFrame {
 		initComponents();
 		frame.setLayer(0);
 		apps = new ApplicationManager(desktopPane);
-		pkgs.addClassPathListener(apps);
 		devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 		bounds = getBounds();
 	}

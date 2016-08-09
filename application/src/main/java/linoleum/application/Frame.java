@@ -31,8 +31,10 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JRootPane;
+import linoleum.application.event.ClassPathListener;
+import linoleum.application.event.ClassPathChangeEvent;
 
-public class Frame extends JInternalFrame implements App {
+public class Frame extends JInternalFrame implements App, ClassPathListener {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private ApplicationManager manager;
 	private JMenuBar savedMenuBar;
@@ -69,6 +71,7 @@ public class Frame extends JInternalFrame implements App {
 	}
 
 	private void openFrame() {
+		manager.addClassPathListener(this);
 		openFrames.add(index);
 		open();
 	}
@@ -76,6 +79,7 @@ public class Frame extends JInternalFrame implements App {
 	private void closeFrame() {
 		close();
 		openFrames.remove(index);
+		manager.removeClassPathListener(this);
 	}
 
 	public void setApplicationManager(final ApplicationManager manager) {
@@ -176,6 +180,9 @@ public class Frame extends JInternalFrame implements App {
 	}
 
 	protected void close() {
+	}
+
+	public void classPathChanged(final ClassPathChangeEvent e) {
 	}
 
 	@Deprecated

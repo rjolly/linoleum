@@ -84,7 +84,7 @@ public class PackageManager extends Frame {
 				Desktop.pkgs.add(file);
 			}
 		}
-		Desktop.pkgs.fireClassPathChange(new ClassPathChangeEvent(this));
+		getApplicationManager().fireClassPathChange(new ClassPathChangeEvent(this));
 	}
 
 	private void install(final String organization, final String module, final String revision) {
@@ -93,6 +93,11 @@ public class PackageManager extends Frame {
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	@Override
+	public void classPathChanged(final ClassPathChangeEvent e) {
+		refresh();
 	}
 
 	private void refresh() {
@@ -217,7 +222,6 @@ public class PackageManager extends Frame {
 			@Override
 			protected void done() {
 				jButton1.setEnabled(true);
-				refresh();
 			}
 		}).execute();
         }//GEN-LAST:event_jButton1ActionPerformed

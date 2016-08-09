@@ -5,19 +5,14 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.jar.Manifest;
 import java.util.jar.Attributes;
 import java.net.URL;
-import linoleum.application.event.ClassPathListener;
-import linoleum.application.event.ClassPathChangeEvent;
 
 public class Packages {
-	private final List<ClassPathListener> listeners = new ArrayList<>();
 	private final Map<String, File> installed = new LinkedHashMap<>();
 	private final Map<String, File> map = new HashMap<>();
 	private final File tools = new File(new File(System.getProperty("java.home")), "../lib/tools.jar");
@@ -29,7 +24,7 @@ public class Packages {
 		}
 	};
 
-	public Packages() {
+	Packages() {
 		final String extdirs[] = System.getProperty("java.ext.dirs").split(File.pathSeparator);
 		for (final String str : extdirs) {
 			final File dir = new File(str);
@@ -79,20 +74,6 @@ public class Packages {
 			for (final File file : lib.listFiles(filter)) {
 				add(file);
 			}
-		}
-	}
-
-	public void addClassPathListener(final ClassPathListener listener) {
-		listeners.add(listener);
-	}
-
-	public void removeClassPathListener(final ClassPathListener listener) {
-		listeners.remove(listener);
-	}
-
-	public void fireClassPathChange(final ClassPathChangeEvent evt) {
-		for (final ClassPathListener listener : listeners) {
-			listener.classPathChanged(evt);
 		}
 	}
 
