@@ -15,26 +15,29 @@ public class Settings extends OptionPanel {
 	public void show(final Component parent) {
 		load();
 		final int result = JOptionPane.showInternalConfirmDialog(parent, this, "Account settings", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-		if (result != JOptionPane.OK_OPTION) {
+		switch (result) {
+		case JOptionPane.OK_OPTION:
+			break;
+		default:
 			dirty = false;
 		}
 		save();
 	}
 
 	protected void loadImpl() {
-		jTextField1.setText(prefs.get(SimpleClient.name + ".url", null));
-		jTextField2.setText(prefs.get(SimpleClient.name + ".mailhost", null));
-		jTextField3.setText(prefs.get(SimpleClient.name + ".from", null));
-		jTextField4.setText(prefs.get(SimpleClient.name + ".record", "Sent"));
-		jCheckBox1.setSelected(prefs.getBoolean(SimpleClient.name + ".debug", false));
+		jTextField1.setText(prefs.get(getName() + ".url", null));
+		jTextField2.setText(prefs.get(getName() + ".mailhost", null));
+		jTextField3.setText(prefs.get(getName() + ".from", null));
+		jTextField4.setText(prefs.get(getName() + ".record", "Sent"));
+		jCheckBox1.setSelected(prefs.getBoolean(getName() + ".debug", false));
 	}
 
 	protected void saveImpl() {
-		prefs.put(SimpleClient.name + ".url", jTextField1.getText());
-		prefs.put(SimpleClient.name + ".mailhost", jTextField2.getText());
-		prefs.put(SimpleClient.name + ".from", jTextField3.getText());
-		prefs.put(SimpleClient.name + ".record", jTextField4.getText());
-		prefs.putBoolean(SimpleClient.name + ".debug", jCheckBox1.isSelected());
+		prefs.put(getName() + ".url", jTextField1.getText());
+		prefs.put(getName() + ".mailhost", jTextField2.getText());
+		prefs.put(getName() + ".from", jTextField3.getText());
+		prefs.put(getName() + ".record", jTextField4.getText());
+		prefs.putBoolean(getName() + ".debug", jCheckBox1.isSelected());
 	}
 
 	@SuppressWarnings("unchecked")
