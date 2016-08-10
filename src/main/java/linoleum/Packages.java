@@ -11,20 +11,23 @@ import java.util.LinkedHashMap;
 import java.util.jar.Manifest;
 import java.util.jar.Attributes;
 import java.net.URL;
+import linoleum.application.ApplicationManager;
+import linoleum.application.event.ClassPathChangeEvent;
 
 public class Packages {
-	private final Map<String, File> installed = new LinkedHashMap<>();
+	private final ApplicationManager apps;
 	private final Map<String, File> map = new HashMap<>();
+	private final Map<String, File> installed = new LinkedHashMap<>();
 	private final File tools = new File(new File(System.getProperty("java.home")), "../lib/tools.jar");
-	private final File lib = new File("lib");
-	private final File home;
+	final File home;
 	private final FileFilter filter = new FileFilter() {
 		public boolean accept(final File file) {
 			return file.isFile() && file.getName().endsWith(".jar");
 		}
 	};
 
-	Packages() {
+	Packages(final ApplicationManager apps) {
+		this.apps = apps;
 		final String extdirs[] = System.getProperty("java.ext.dirs").split(File.pathSeparator);
 		for (final String str : extdirs) {
 			final File dir = new File(str);
@@ -69,6 +72,7 @@ public class Packages {
 				}
 			}
 		} catch (final IOException e) {}
+		final File lib = new File("lib");
 		lib.mkdir();
 		if (lib.isDirectory()) {
 			for (final File file : lib.listFiles(filter)) {
@@ -81,12 +85,8 @@ public class Packages {
 		return installed.values().toArray(new File[0]);
 	}
 
-	public File home() {
-		return home;
-	}
-
-	public File lib() {
-		return lib;
+	public void commit(final Object source) {
+		apps.fireClassPathChange(new ClassPathChangeEvent(source));
 	}
 
 	public void add(final File file) {

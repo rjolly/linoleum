@@ -9,6 +9,7 @@ import linoleum.application.ApplicationManager;
 import linoleum.application.event.ClassPathChangeEvent;
 import linoleum.Desktop;
 import linoleum.Package;
+import linoleum.Packages;
 import org.apache.ivy.Ivy;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
@@ -21,7 +22,9 @@ import org.apache.ivy.plugins.parser.m2.PomModuleDescriptorWriter;
 import org.apache.ivy.plugins.parser.m2.PomWriterOptions;
 
 public class PackageManager extends Frame {
+	private final Packages pkgs = Desktop.instance.getPackages();
 	private final Ivy ivy = Ivy.newInstance();
+	private final File lib = new File("lib");
 	private final DefaultTableModel model;
 	public static PackageManager instance;
 
@@ -46,7 +49,7 @@ public class PackageManager extends Frame {
 
 	public void open() {
 		model.setRowCount(0);
-		for (final File file : Desktop.pkgs.installed()) {
+		for (final File file : pkgs.installed()) {
 			final Package pkg = new Package(file);
 			model.addRow(new Object[] {pkg.getName(), pkg.getVersion(), pkg.isSnapshot()});
 		}
@@ -74,7 +77,7 @@ public class PackageManager extends Frame {
 	}
 
 	public void install(final String name, final String conf) throws Exception {
-		install(name, conf, Desktop.pkgs.lib());
+		install(name, conf, lib);
 	}
 
 	public void install(final String name, final String conf, final File dir) throws Exception {
@@ -89,13 +92,10 @@ public class PackageManager extends Frame {
 		for (final Object obj : retrieveReport.getCopiedFiles()) {
 			final File file = (File)obj;
 			if (file.getName().endsWith(".jar")) {
-				Desktop.pkgs.add(file);
+				pkgs.add(file);
 			}
 		}
-		final ApplicationManager apps = getApplicationManager();
-		if (apps != null) {
-			apps.fireClassPathChange(new ClassPathChangeEvent(this));
-		}
+		pkgs.commit(this);
 	}
 
 	private void install(final String organization, final String module, final String revision) {

@@ -21,12 +21,13 @@ import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
 public class Tools {
+	private final Packages pkgs = Desktop.instance.getPackages();
 	public static final Tools instance = new Tools();
 
 	private Tools() {}
 
 	public File[] classpath() {
-		return Desktop.pkgs.installed();
+		return pkgs.installed();
 	}
 
 	static File[] concat(final File a[], final File b[]) {

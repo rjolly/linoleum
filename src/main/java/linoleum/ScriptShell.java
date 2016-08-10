@@ -20,6 +20,7 @@ import linoleum.application.Frame;
 public class ScriptShell extends Frame implements ScriptShellPanel.CommandProcessor {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final CountDownLatch engineReady = new CountDownLatch(1);
+	private final Packages pkgs = Desktop.instance.getPackages();
 	private final URI uri = new File(".").toURI();
 	private volatile ScriptEngine engine;
 	private volatile String prompt;
@@ -134,7 +135,7 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		setGlobals();
 		// load pre-defined initialization file
 		loadInitFile(ClassLoader.getSystemResource("com/sun/tools/script/shell/init." + extension));
-		final File home = Desktop.pkgs.home();
+		final File home = pkgs.home;
 		loadUserInitFile(new File(home, "init." + extension));
 		try {
 			if (!Files.isSameFile(home.toPath(), Paths.get("."))) {
