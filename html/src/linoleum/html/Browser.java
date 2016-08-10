@@ -23,12 +23,14 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.Document;
 import linoleum.application.Frame;
+import linoleum.application.OptionPanel;
 
 public class Browser extends Frame {
 	private final Icon goIcon = new ImageIcon(getClass().getResource("Go16.png"));
 	private final Icon stopIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
 	private final Icon reloadIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Refresh16.gif"));
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
+        private final Settings settings = new Settings();
 	private List<FrameURL> history = new ArrayList<>();
 	private PageLoader loader;
 	private FrameURL current;
@@ -80,6 +82,11 @@ public class Browser extends Frame {
 			ex.printStackTrace();
 		}
 		open();
+	}
+
+	@Override
+	public OptionPanel getOptionPanel() {
+		return settings;
 	}
 
 	@Override
