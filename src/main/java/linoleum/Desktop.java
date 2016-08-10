@@ -12,9 +12,15 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import java.util.prefs.Preferences;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 import linoleum.application.ApplicationManager;
+import linoleum.application.OptionPanel;
 
 public class Desktop extends JFrame {
 	public static Desktop instance;
@@ -24,6 +30,7 @@ public class Desktop extends JFrame {
 	private final Packages pkgs;
 	private final ApplicationManager apps;
 	private final GraphicsDevice devices[];
+	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private Rectangle bounds;
 
 	private Desktop() {
@@ -32,10 +39,24 @@ public class Desktop extends JFrame {
 		pkgs = new Packages(apps = new ApplicationManager(desktopPane));
 		devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 		bounds = getBounds();
+		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
+			public void preferenceChange(final PreferenceChangeEvent evt) {
+				label.setIcon(getBackgroundImage());
+			}
+		});
+	}
+
+	public OptionPanel getOptionPanel() {
+		return settings;
 	}
 
 	public Packages getPackages() {
 		return pkgs;
+	}
+
+	private Icon getBackgroundImage() {
+		final String str = prefs.get("background", null);
+		return str != null && !str.isEmpty()?new ImageIcon(str):new ImageIcon(getClass().getResource("Wave.png"));
 	}
 
 	private void open() {
@@ -101,6 +122,7 @@ public class Desktop extends JFrame {
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
+                settings = new linoleum.Settings();
                 desktopPane = new linoleum.DesktopPane();
                 frame = new javax.swing.JInternalFrame();
                 label = new javax.swing.JLabel();
@@ -132,11 +154,11 @@ public class Desktop extends JFrame {
                 frame.setVisible(true);
 
                 label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-                label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/linoleum/Wave.png"))); // NOI18N
+                label.setIcon(getBackgroundImage());
                 frame.getContentPane().add(label, java.awt.BorderLayout.CENTER);
 
                 desktopPane.add(frame);
-                frame.setBounds(90, 40, 420, 343);
+                frame.setBounds(90, 40, 24, 36);
 
                 fileMenu.setMnemonic('f');
                 fileMenu.setText("File");
@@ -312,6 +334,7 @@ public class Desktop extends JFrame {
         private javax.swing.JMenuItem saveAsMenuItem;
         private javax.swing.JMenuItem saveMenuItem;
         private javax.swing.JMenuItem screenshotMenuItem;
+        private linoleum.Settings settings;
         private javax.swing.JMenu viewMenu;
         // End of variables declaration//GEN-END:variables
 }

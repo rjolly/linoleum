@@ -8,6 +8,7 @@ import linoleum.application.OptionPanel;
 import linoleum.application.event.ClassPathChangeEvent;
 
 public class PreferenceManager extends Frame {
+	private final OptionPanel desktop = Desktop.instance.getOptionPanel();
 	private OptionPanel current;
 
 	public PreferenceManager() {
@@ -17,6 +18,9 @@ public class PreferenceManager extends Frame {
 
 	@Override
 	public void open() {
+		if (jTabbedPane1.indexOfTabComponent(desktop) < 0) {
+			jTabbedPane1.addTab(desktop.getName(), desktop);
+		}
 		final List<OptionPanel> list = getApplicationManager().getOptionPanels();
 		for(final OptionPanel panel : list) {
 			if (jTabbedPane1.indexOfTabComponent(panel) < 0) {
