@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.prefs.Preferences;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
 import javax.mail.Folder;
@@ -93,7 +95,6 @@ public class SimpleClient extends Frame {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			settings.show(SimpleClient.this);
-			open();
 		}
 	}
 
@@ -111,6 +112,11 @@ public class SimpleClient extends Frame {
 		} catch (final FileNotFoundException ex) {
 			ex.printStackTrace();
 		}
+		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
+			public void preferenceChange(final PreferenceChangeEvent evt) {
+				open();
+			}
+		});
 	}
 
 	public void compose(final String str) {

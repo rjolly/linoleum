@@ -127,7 +127,7 @@ public class Desktop extends JFrame {
                 frame.setVisible(true);
 
                 label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-                label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/linoleum/Linoleum_2.jpg"))); // NOI18N
+                label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/linoleum/Wave.png"))); // NOI18N
                 frame.getContentPane().add(label, java.awt.BorderLayout.CENTER);
 
                 desktopPane.add(frame);
