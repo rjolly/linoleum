@@ -1,6 +1,9 @@
 package linoleum;
 
 import java.util.prefs.Preferences;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import linoleum.application.FileChooser;
@@ -8,6 +11,7 @@ import linoleum.application.OptionPanel;
 
 public class Settings extends OptionPanel {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
+	private final DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
 	private final FileChooser chooser = new FileChooser();
 
 	public Settings() {
@@ -16,10 +20,17 @@ public class Settings extends OptionPanel {
 	}
 
 	protected void loadImpl() {
+		model.removeAllElements();
+		final ScriptEngineManager manager = new ScriptEngineManager();
+		for (final ScriptEngineFactory sef : manager.getEngineFactories()) {
+			model.addElement(sef.getEngineName());
+		}
+		model.setSelectedItem(prefs.get("language", null));
 		jTextField1.setText(prefs.get("background", null));
 	}
 
 	protected void saveImpl() {
+		prefs.put("language", (String) model.getSelectedItem());
 		prefs.put("background", jTextField1.getText());
 	}
 
@@ -35,6 +46,8 @@ public class Settings extends OptionPanel {
                 jLabel1 = new javax.swing.JLabel();
                 jTextField1 = new javax.swing.JTextField();
                 jButton1 = new javax.swing.JButton();
+                jLabel2 = new javax.swing.JLabel();
+                jComboBox1 = new javax.swing.JComboBox();
 
                 setName("General"); // NOI18N
 
@@ -47,23 +60,41 @@ public class Settings extends OptionPanel {
                         }
                 });
 
+                jLabel2.setText("Language :");
+
+                jComboBox1.setModel(model);
+                jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jComboBox1ActionPerformed(evt);
+                        }
+                });
+
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
                 this.setLayout(layout);
                 layout.setHorizontalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jLabel1)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jLabel1)
+                                        .addComponent(jLabel2))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton1)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jButton1))
+                                        .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addContainerGap())
                 );
                 layout.setVerticalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel2)
+                                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel1)
                                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -82,9 +113,15 @@ public class Settings extends OptionPanel {
 				}
         }//GEN-LAST:event_jButton1ActionPerformed
 
+        private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+		dirty = true;
+        }//GEN-LAST:event_jComboBox1ActionPerformed
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
+        private javax.swing.JComboBox jComboBox1;
         private javax.swing.JLabel jLabel1;
+        private javax.swing.JLabel jLabel2;
         private javax.swing.JTextField jTextField1;
         // End of variables declaration//GEN-END:variables
 }

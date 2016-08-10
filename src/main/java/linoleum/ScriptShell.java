@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.prefs.Preferences;
 import java.util.concurrent.CountDownLatch;
 import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.swing.ImageIcon;
@@ -106,27 +107,18 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
         // End of variables declaration//GEN-END:variables
 
 	private void createScriptEngine() {
-		ScriptEngineManager manager = new ScriptEngineManager();
-		String language = getScriptLanguage();
-		engine = manager.getEngineByName(language);
+		final String language = prefs.get("language", "Rhino");
+		final ScriptEngineManager manager = new ScriptEngineManager();
+		for (final ScriptEngineFactory sef : manager.getEngineFactories()) {
+			if (language.equals(sef.getEngineName())) {
+				engine = sef.getScriptEngine();
+			}
+		}
 		if (engine == null) {
 			throw new RuntimeException("cannot load " + language + " engine");
 		}
 		extension = engine.getFactory().getExtensions().get(0);
 		prompt = extension + ">";
-	}
-
-	// Name of the System property used to select scripting language
-	private static final String LANGUAGE_KEY = "linoleum.console.language";
-
-	private String getScriptLanguage() {
-		// check whether explicit System property is set
-		String lang = System.getProperty(LANGUAGE_KEY);
-		if (lang == null) {
-			// default is JavaScript
-			lang = prefs.get(getName() + ".lang", "JavaScript");
-		}
-		return lang;
 	}
 
 	// create and initialize script engine
