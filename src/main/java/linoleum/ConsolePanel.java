@@ -8,7 +8,7 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 
 public class ConsolePanel extends JPanel {
-	private static boolean initialized = System.getProperty("linoleum.debug") != null;
+	private boolean initialized;
 	private JTextArea editor;
 	private boolean updating;
 	private DocumentListener listener;
@@ -21,13 +21,6 @@ public class ConsolePanel extends JPanel {
 		try {
 			is = new PipedInputStream(src, 128);
 		} catch (IOException e) {}
-
-		if (!initialized) {
-			System.setIn(new BufferedInputStream(getInputStream()));
-			System.setOut(new PrintStream(new BufferedOutputStream(getOutputStream(), 128), true));
-			System.setErr(new PrintStream(new BufferedOutputStream(getOutputStream(), 128), true));
-			initialized = true;
-		}
 
 		setLayout(new BorderLayout());
 		this.editor = new JTextArea();
@@ -100,6 +93,15 @@ public class ConsolePanel extends JPanel {
 		hbox.add(button);
 		hbox.add(Box.createGlue());
 		add(hbox, BorderLayout.SOUTH);
+	}
+
+	void init() {
+		if (!initialized) {
+			System.setIn(new BufferedInputStream(getInputStream()));
+			System.setOut(new PrintStream(new BufferedOutputStream(getOutputStream(), 128), true));
+			System.setErr(new PrintStream(new BufferedOutputStream(getOutputStream(), 128), true));
+			initialized = true;
+		}
 	}
 
 	@Override

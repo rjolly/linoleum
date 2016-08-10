@@ -4,11 +4,16 @@ import javax.swing.ImageIcon;
 import linoleum.application.Frame;
 
 public class Console extends Frame {
+	private final ConsolePanel panel = new ConsolePanel();
 
 	public Console() {
 		initComponents();
-		setContentPane(new ConsolePanel());
+		setContentPane(panel);
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
+	}
+
+	public void open() {
+		panel.init();
 	}
 
 	@SuppressWarnings("unchecked")
