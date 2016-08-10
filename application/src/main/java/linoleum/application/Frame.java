@@ -144,7 +144,7 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 
 	public final void open(final ApplicationManager manager, final URI uri) {
 		final JDesktopPane desktop = manager.getDesktopPane();
-		final Frame frame = find(desktop, uri);
+		final Frame frame = getFrame(desktop, uri);
 		final boolean changed = uri != null && !uri.equals(frame.getURI());
 		if (changed) {
 			frame.setURI(uri);
@@ -152,11 +152,6 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 		if (frame.getDesktopPane() == null) {
 			if (frame.manager == null) {
 				frame.manager = manager;
-				if (frame != this) {
-					frame.setName(getName());
-					frame.icon = icon;
-					frame.type = type;
-				}
 				desktop.add(frame);
 			} else {
 				desktop.add(frame);
@@ -168,7 +163,7 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 		manager.select(frame);
 	}
 
-	private Frame find(final JDesktopPane desktop, final URI uri) {
+	private Frame getFrame(final JDesktopPane desktop, final URI uri) {
 		for (final JInternalFrame c : desktop.getAllFrames()) {
 			if (getName().equals(c.getName()) && c instanceof Frame) {
 				final Frame frame = (Frame)c;
@@ -177,7 +172,13 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 				}
 			}
 		}
-		return getFrame();
+		final Frame frame = getFrame();
+		if (frame != this) {
+			frame.setName(getName());
+			frame.icon = icon;
+			frame.type = type;
+		}
+		return frame;
 	}
 
 	public OptionPanel getOptionPanel() {
