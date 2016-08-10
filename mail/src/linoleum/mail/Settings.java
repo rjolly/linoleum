@@ -15,12 +15,13 @@ public class Settings extends OptionPanel {
 	public void show(final Component parent) {
 		load();
 		final int result = JOptionPane.showInternalConfirmDialog(parent, this, "Account settings", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			save();
+		if (result != JOptionPane.OK_OPTION) {
+			dirty = false;
 		}
+		save();
 	}
 
-	public void load() {
+	protected void loadImpl() {
 		jTextField1.setText(prefs.get(SimpleClient.name + ".url", null));
 		jTextField2.setText(prefs.get(SimpleClient.name + ".mailhost", null));
 		jTextField3.setText(prefs.get(SimpleClient.name + ".from", null));
@@ -28,7 +29,7 @@ public class Settings extends OptionPanel {
 		jCheckBox1.setSelected(prefs.getBoolean(SimpleClient.name + ".debug", false));
 	}
 
-	public void save() {
+	protected void saveImpl() {
 		prefs.put(SimpleClient.name + ".url", jTextField1.getText());
 		prefs.put(SimpleClient.name + ".mailhost", jTextField2.getText());
 		prefs.put(SimpleClient.name + ".from", jTextField3.getText());
@@ -59,6 +60,11 @@ public class Settings extends OptionPanel {
                 jLabel4.setText("Record :");
 
                 jCheckBox1.setText("Debug");
+                jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jCheckBox1ActionPerformed(evt);
+                        }
+                });
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
                 this.setLayout(layout);
@@ -107,6 +113,9 @@ public class Settings extends OptionPanel {
                 );
         }// </editor-fold>//GEN-END:initComponents
 
+        private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+		dirty = true;
+        }//GEN-LAST:event_jCheckBox1ActionPerformed
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JCheckBox jCheckBox1;

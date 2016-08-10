@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Properties;
 import java.util.prefs.Preferences;
 import javax.mail.Folder;
 import javax.mail.Message;
