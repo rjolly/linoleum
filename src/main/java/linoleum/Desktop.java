@@ -27,6 +27,7 @@ public class Desktop extends JFrame {
 	private static final String ABOUTMSG = "%s %s.%s \n \nJava desktop environment "
 		+ "and software distribution. \n \nWritten by \n  "
 		+ "%s";
+	private final Settings settings;
 	private final Packages pkgs;
 	private final ApplicationManager apps;
 	private final GraphicsDevice devices[];
@@ -36,7 +37,9 @@ public class Desktop extends JFrame {
 	private Desktop() {
 		initComponents();
 		frame.setLayer(0);
-		pkgs = new Packages(apps = new ApplicationManager(desktopPane));
+		apps = new ApplicationManager(desktopPane);
+		pkgs = new Packages(apps);
+		settings = new Settings(apps);
 		devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 		bounds = getBounds();
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
@@ -122,7 +125,6 @@ public class Desktop extends JFrame {
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
-                settings = new linoleum.Settings();
                 desktopPane = new linoleum.DesktopPane();
                 frame = new javax.swing.JInternalFrame();
                 label = new javax.swing.JLabel();
@@ -334,7 +336,6 @@ public class Desktop extends JFrame {
         private javax.swing.JMenuItem saveAsMenuItem;
         private javax.swing.JMenuItem saveMenuItem;
         private javax.swing.JMenuItem screenshotMenuItem;
-        private linoleum.Settings settings;
         private javax.swing.JMenu viewMenu;
         // End of variables declaration//GEN-END:variables
 }

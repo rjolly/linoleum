@@ -6,10 +6,13 @@ import javax.script.ScriptEngineManager;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import linoleum.application.ApplicationManager;
 import linoleum.application.FileChooser;
 import linoleum.application.OptionPanel;
+import linoleum.application.event.ClassPathChangeEvent;
+import linoleum.application.event.ClassPathListener;
 
-public class Settings extends OptionPanel {
+public class Settings extends OptionPanel implements ClassPathListener {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
 	private final FileChooser chooser = new FileChooser();
@@ -17,14 +20,28 @@ public class Settings extends OptionPanel {
 	public Settings() {
 		initComponents();
 		chooser.setFileFilter(new FileNameExtensionFilter("Images", "jpg", "gif", "png"));
+		refresh();
 	}
 
-	protected void loadImpl() {
+	public Settings(final ApplicationManager apps) {
+		this();
+		apps.addClassPathListener(this);
+	}
+
+	private void refresh() {
 		model.removeAllElements();
 		final ScriptEngineManager manager = new ScriptEngineManager();
 		for (final ScriptEngineFactory sef : manager.getEngineFactories()) {
 			model.addElement(sef.getEngineName());
 		}
+	}
+
+	@Override
+	public void classPathChanged(final ClassPathChangeEvent e) {
+		refresh();
+	}
+
+	protected void loadImpl() {
 		model.setSelectedItem(prefs.get("language", null));
 		jTextField1.setText(prefs.get("background", null));
 	}
