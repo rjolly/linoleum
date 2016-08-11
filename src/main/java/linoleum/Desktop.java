@@ -12,54 +12,35 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
-import javax.swing.ImageIcon;
-import javax.swing.Icon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import java.util.prefs.Preferences;
-import java.util.prefs.PreferenceChangeEvent;
-import java.util.prefs.PreferenceChangeListener;
+import linoleum.application.Frame;
 import linoleum.application.ApplicationManager;
-import linoleum.application.OptionPanel;
 
 public class Desktop extends JFrame {
 	public static Desktop instance;
 	private static final String ABOUTMSG = "%s %s.%s \n \nJava desktop environment "
 		+ "and software distribution. \n \nWritten by \n  "
 		+ "%s";
-	private final Settings settings;
-	private final Packages pkgs;
-	private final ApplicationManager apps;
+	private final ApplicationManager apps = new ApplicationManager();
+	private final Packages pkgs = new Packages(apps);
 	private final GraphicsDevice devices[];
-	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private Rectangle bounds;
 
 	private Desktop() {
 		initComponents();
 		frame.setLayer(0);
-		apps = new ApplicationManager(desktopPane);
-		pkgs = new Packages(apps);
-		settings = new Settings(apps);
+		desktopPane.add(apps);
 		devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 		bounds = getBounds();
-		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
-			public void preferenceChange(final PreferenceChangeEvent evt) {
-				label.setIcon(getBackgroundImage());
-			}
-		});
-	}
-
-	public OptionPanel getOptionPanel() {
-		return settings;
 	}
 
 	public Packages getPackages() {
 		return pkgs;
 	}
 
-	private Icon getBackgroundImage() {
-		final String str = prefs.get("background", null);
-		return str != null && !str.isEmpty()?new ImageIcon(str):new ImageIcon(getClass().getResource("Wave.png"));
+	Frame getBackgroundFrame() {
+		return frame;
 	}
 
 	private void open() {
@@ -126,8 +107,7 @@ public class Desktop extends JFrame {
         private void initComponents() {
 
                 desktopPane = new linoleum.DesktopPane();
-                frame = new javax.swing.JInternalFrame();
-                label = new javax.swing.JLabel();
+                frame = new linoleum.Background();
                 menuBar = new javax.swing.JMenuBar();
                 fileMenu = new javax.swing.JMenu();
                 openMenuItem = new javax.swing.JMenuItem();
@@ -154,13 +134,8 @@ public class Desktop extends JFrame {
                 });
 
                 frame.setVisible(true);
-
-                label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-                label.setIcon(getBackgroundImage());
-                frame.getContentPane().add(label, java.awt.BorderLayout.CENTER);
-
                 desktopPane.add(frame);
-                frame.setBounds(90, 40, 24, 36);
+                frame.setBounds(0, 0, 891, 531);
 
                 fileMenu.setMnemonic('f');
                 fileMenu.setText("File");
@@ -326,10 +301,9 @@ public class Desktop extends JFrame {
         private javax.swing.JMenu editMenu;
         private javax.swing.JMenuItem exitMenuItem;
         private javax.swing.JMenu fileMenu;
-        private javax.swing.JInternalFrame frame;
+        private linoleum.Background frame;
         private javax.swing.JCheckBoxMenuItem fullScreenMenuItem;
         private javax.swing.JMenu helpMenu;
-        private javax.swing.JLabel label;
         private javax.swing.JMenuBar menuBar;
         private javax.swing.JMenuItem openMenuItem;
         private javax.swing.JMenuItem pasteMenuItem;

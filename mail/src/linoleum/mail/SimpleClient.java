@@ -27,6 +27,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -94,7 +95,14 @@ public class SimpleClient extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			settings.show(SimpleClient.this);
+			optionPanel1.load();
+			final int result = JOptionPane.showInternalConfirmDialog(SimpleClient.this, optionPanel1, "Account settings", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+			switch (result) {
+			case JOptionPane.OK_OPTION:
+				optionPanel1.save();
+				break;
+			default:
+			}
 		}
 	}
 
@@ -113,6 +121,7 @@ public class SimpleClient extends Frame {
 			ex.printStackTrace();
 		}
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
+			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
 				open();
 			}
@@ -133,7 +142,25 @@ public class SimpleClient extends Frame {
 
 	@Override
 	public OptionPanel getOptionPanel() {
-		return settings;
+		return optionPanel1;
+	}
+
+	@Override
+	public void load() {
+		jTextField1.setText(prefs.get(getName() + ".url", null));
+		jTextField2.setText(prefs.get(getName() + ".mailhost", null));
+		jTextField3.setText(prefs.get(getName() + ".from", null));
+		jTextField4.setText(prefs.get(getName() + ".record", "Sent"));
+		jCheckBox1.setSelected(prefs.getBoolean(getName() + ".debug", false));
+	}
+
+	@Override
+	public void save() {
+		prefs.put(getName() + ".url", jTextField1.getText());
+		prefs.put(getName() + ".mailhost", jTextField2.getText());
+		prefs.put(getName() + ".from", jTextField3.getText());
+		prefs.put(getName() + ".record", jTextField4.getText());
+		prefs.putBoolean(getName() + ".debug", jCheckBox1.isSelected());
 	}
 
 	@Override
@@ -175,7 +202,16 @@ public class SimpleClient extends Frame {
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
-                settings = new linoleum.mail.Settings();
+                optionPanel1 = new linoleum.application.OptionPanel();
+                jLabel1 = new javax.swing.JLabel();
+                jTextField1 = new javax.swing.JTextField();
+                jLabel2 = new javax.swing.JLabel();
+                jTextField2 = new javax.swing.JTextField();
+                jLabel3 = new javax.swing.JLabel();
+                jTextField3 = new javax.swing.JTextField();
+                jLabel4 = new javax.swing.JLabel();
+                jTextField4 = new javax.swing.JTextField();
+                jCheckBox1 = new javax.swing.JCheckBox();
                 jSplitPane1 = new javax.swing.JSplitPane();
                 jSplitPane2 = new javax.swing.JSplitPane();
                 jScrollPane1 = new javax.swing.JScrollPane();
@@ -192,6 +228,69 @@ public class SimpleClient extends Frame {
                 jMenuItem5 = new javax.swing.JMenuItem();
                 jMenu3 = new javax.swing.JMenu();
                 jMenuItem6 = new javax.swing.JMenuItem();
+
+                optionPanel1.setFrame(this);
+
+                jLabel1.setText("URL :");
+
+                jLabel2.setText("Mailhost :");
+
+                jLabel3.setText("From :");
+
+                jLabel4.setText("Record :");
+
+                jCheckBox1.setText("Debug");
+                jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jCheckBox1ActionPerformed(evt);
+                        }
+                });
+
+                javax.swing.GroupLayout optionPanel1Layout = new javax.swing.GroupLayout(optionPanel1);
+                optionPanel1.setLayout(optionPanel1Layout);
+                optionPanel1Layout.setHorizontalGroup(
+                        optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jLabel2)
+                                        .addComponent(jLabel1)
+                                        .addComponent(jLabel3)
+                                        .addComponent(jLabel4))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                                                .addComponent(jCheckBox1)
+                                                .addGap(0, 0, Short.MAX_VALUE))
+                                        .addComponent(jTextField4)
+                                        .addComponent(jTextField3)
+                                        .addComponent(jTextField1)
+                                        .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE))
+                                .addContainerGap())
+                );
+                optionPanel1Layout.setVerticalGroup(
+                        optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel1)
+                                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel2)
+                                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel3)
+                                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel4)
+                                        .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jCheckBox1)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                );
 
                 setClosable(true);
                 setIconifiable(true);
@@ -267,11 +366,11 @@ public class SimpleClient extends Frame {
                 getContentPane().setLayout(layout);
                 layout.setHorizontalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE)
+                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 76, Short.MAX_VALUE)
                 );
                 layout.setVerticalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE)
+                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE)
                 );
 
                 pack();
@@ -326,8 +425,17 @@ public class SimpleClient extends Frame {
 		}
         }//GEN-LAST:event_jTree1TreeWillCollapse
 
+        private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+		optionPanel1.setDirty(true);
+        }//GEN-LAST:event_jCheckBox1ActionPerformed
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private linoleum.mail.FolderViewer folderViewer;
+        private javax.swing.JCheckBox jCheckBox1;
+        private javax.swing.JLabel jLabel1;
+        private javax.swing.JLabel jLabel2;
+        private javax.swing.JLabel jLabel3;
+        private javax.swing.JLabel jLabel4;
         private javax.swing.JMenu jMenu1;
         private javax.swing.JMenu jMenu2;
         private javax.swing.JMenu jMenu3;
@@ -341,8 +449,12 @@ public class SimpleClient extends Frame {
         private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JSplitPane jSplitPane1;
         private javax.swing.JSplitPane jSplitPane2;
+        private javax.swing.JTextField jTextField1;
+        private javax.swing.JTextField jTextField2;
+        private javax.swing.JTextField jTextField3;
+        private javax.swing.JTextField jTextField4;
         private javax.swing.JTree jTree1;
         private linoleum.mail.MessageViewer messageViewer;
-        private linoleum.mail.Settings settings;
+        private linoleum.application.OptionPanel optionPanel1;
         // End of variables declaration//GEN-END:variables
 }

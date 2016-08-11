@@ -7,7 +7,6 @@ import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
 import java.util.Date;
 import java.util.prefs.Preferences;
 import javax.mail.Folder;
@@ -51,12 +50,12 @@ public class Compose extends Frame {
 	}
 
 	public Compose(final Session session) {
-		this.session = session;
-		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail24.gif")));
+		this(session, null);
 	}
 
-	public Compose(final Session session, final Collection<Integer> openFrames) {
-		super(openFrames);
+	public Compose(final Session session, final Frame parent) {
+		super(parent);
+		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail24.gif")));
                 setClosable(true);
                 setIconifiable(true);
                 setMaximizable(true);
@@ -83,8 +82,8 @@ public class Compose extends Frame {
 	}
 
 	@Override
-	public Frame getFrame(final Collection<Integer> openFrames) {
-		return new Compose(session, openFrames);
+	public Frame getFrame(final Frame parent) {
+		return new Compose(session, parent);
 	}
 
 	@Override

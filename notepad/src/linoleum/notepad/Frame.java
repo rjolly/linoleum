@@ -5,7 +5,6 @@ import java.awt.Point;
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Paths;
-import java.util.Collection;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
@@ -15,14 +14,14 @@ public class Frame extends linoleum.application.Frame {
 	private boolean found;
 
 	public Frame() {
-		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Edit24.gif")));
-		setName(Notepad.class.getSimpleName());
-		setMimeType("text/*");
+		this(null);
 	}
 
-	public Frame(final Collection<Integer> openFrames) {
-		super(openFrames, Notepad.resources.getString("Title"));
+	public Frame(final linoleum.application.Frame parent) {
+		super(parent, Notepad.resources.getString("Title"));
 		initComponents();
+		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Edit24.gif")));
+		setMimeType("text/*");
 		jInternalFrame1.pack();
 		getContentPane().add("Center", notepad);
 		setJMenuBar(notepad.createMenubar());
@@ -46,8 +45,8 @@ public class Frame extends linoleum.application.Frame {
 	}
 
 	@Override
-	public Frame getFrame(final Collection<Integer> openFrames) {
-		return new Frame(openFrames);
+	public Frame getFrame(final linoleum.application.Frame parent) {
+		return new Frame(parent);
 	}
 
 	@Override
@@ -179,6 +178,7 @@ public class Frame extends linoleum.application.Frame {
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 );
 
+                setName(Notepad.class.getSimpleName());
                 addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
                         public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
                         }

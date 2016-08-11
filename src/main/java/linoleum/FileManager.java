@@ -11,13 +11,17 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.Collection;
+import java.util.prefs.Preferences;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
+import linoleum.application.FileChooser;
 import linoleum.application.Frame;
+import linoleum.application.OptionPanel;
 
 public class FileManager extends Frame {
+	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
+	private final FileChooser fileChooser = new FileChooser();
 	private final Thread thread = new Thread() {
 		@Override
 		public void run() {
@@ -54,25 +58,50 @@ public class FileManager extends Frame {
 		}
 	};
 	private boolean closing;
+	private boolean empty = true;
 
 	public FileManager() {
-		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
-		setMimeType("application/octet-stream");
+		this(null);
 	}
 
-	public FileManager(final Collection<Integer> openFrames) {
-		super(openFrames);
+	public FileManager(final Frame parent) {
+		super(parent);
 		initComponents();
+		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
+		setMimeType("application/octet-stream");
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	}
+
+	@Override
+	public OptionPanel getOptionPanel() {
+		return optionPanel1;
+	}
+
+	@Override
+	public void load() {
+		jTextField1.setText(prefs.get(getName() + ".home", null));
+	}
+
+	@Override
+	public void save() {
+		prefs.put(getName() + ".home", jTextField1.getText());
 	}
 
 	@Override
 	public void open() {
+		if (empty) {
+			final String str = prefs.get(getName() + ".home", null);
+			if (str != null && !str.isEmpty()) {
+				setURI(new File(str).toURI());
+			}
+		}
 		thread.start();
 	}
 
 	@Override
 	public void setURI(final URI uri) {
 		chooser.setCurrentDirectory(Paths.get(uri).toFile());
+		empty = false;
 	}
 
 	@Override
@@ -81,8 +110,8 @@ public class FileManager extends Frame {
 	}
 
 	@Override
-	public Frame getFrame(final Collection<Integer> openFrames) {
-		return new FileManager(openFrames);
+	public Frame getFrame(final Frame parent) {
+		return new FileManager(parent);
 	}
 
 	@Override
@@ -95,7 +124,50 @@ public class FileManager extends Frame {
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
+                optionPanel1 = new linoleum.application.OptionPanel();
+                jLabel2 = new javax.swing.JLabel();
+                jTextField1 = new javax.swing.JTextField();
+                jButton1 = new javax.swing.JButton();
                 chooser = new javax.swing.JFileChooser();
+
+                optionPanel1.setFrame(this);
+
+                jLabel2.setText("Home :");
+
+                jButton1.setText("Choose...");
+                jButton1.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jButton1ActionPerformed(evt);
+                        }
+                });
+
+                javax.swing.GroupLayout optionPanel1Layout = new javax.swing.GroupLayout(optionPanel1);
+                optionPanel1.setLayout(optionPanel1Layout);
+                optionPanel1Layout.setHorizontalGroup(
+                        optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                                                .addComponent(jLabel2)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jTextField1))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, optionPanel1Layout.createSequentialGroup()
+                                                .addGap(0, 303, Short.MAX_VALUE)
+                                                .addComponent(jButton1)))
+                                .addContainerGap())
+                );
+                optionPanel1Layout.setVerticalGroup(
+                        optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel2)
+                                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton1)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                );
 
                 setClosable(true);
                 setIconifiable(true);
@@ -150,7 +222,21 @@ public class FileManager extends Frame {
 		}
         }//GEN-LAST:event_chooserPropertyChange
 
+        private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+		final int returnVal = fileChooser.showInternalOpenDialog(optionPanel1);
+		switch (returnVal) {
+		case JFileChooser.APPROVE_OPTION:
+			jTextField1.setText(fileChooser.getSelectedFile().getPath());
+			break;
+		default:
+		}
+        }//GEN-LAST:event_jButton1ActionPerformed
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JFileChooser chooser;
+        private javax.swing.JButton jButton1;
+        private javax.swing.JLabel jLabel2;
+        private javax.swing.JTextField jTextField1;
+        private linoleum.application.OptionPanel optionPanel1;
         // End of variables declaration//GEN-END:variables
 }

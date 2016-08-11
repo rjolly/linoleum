@@ -8,7 +8,7 @@ import linoleum.application.OptionPanel;
 import linoleum.application.event.ClassPathChangeEvent;
 
 public class PreferenceManager extends Frame {
-	private final OptionPanel desktop = Desktop.instance.getOptionPanel();
+	private final OptionPanel desktop = Desktop.instance.getBackgroundFrame().getOptionPanel();
 	private OptionPanel current;
 	private boolean save;
 
@@ -28,10 +28,10 @@ public class PreferenceManager extends Frame {
 				jTabbedPane1.addTab(panel.getName(), panel);
 			}
 		}
-		load();
+		next();
 	}
 
-	private void load() {
+	private void next() {
 		final Component comp = jTabbedPane1.getSelectedComponent();
 		final OptionPanel panel = comp instanceof OptionPanel?(OptionPanel) comp:null;
 		if (panel != null && panel != current) {
@@ -51,7 +51,6 @@ public class PreferenceManager extends Frame {
 		save = false;
 	}
 
-	@Override
 	public void classPathChanged(final ClassPathChangeEvent e) {
 		open();
 	}
@@ -127,7 +126,7 @@ public class PreferenceManager extends Frame {
         }//GEN-LAST:event_jButton2ActionPerformed
 
         private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
-		load();
+		next();
         }//GEN-LAST:event_jTabbedPane1StateChanged
 
         // Variables declaration - do not modify//GEN-BEGIN:variables

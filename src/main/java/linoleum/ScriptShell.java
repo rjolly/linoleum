@@ -8,35 +8,68 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.prefs.Preferences;
 import java.util.concurrent.CountDownLatch;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import linoleum.application.Frame;
+import linoleum.application.OptionPanel;
+import linoleum.application.event.ClassPathChangeEvent;
 
 public class ScriptShell extends Frame implements ScriptShellPanel.CommandProcessor {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
+	private final DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
 	private final CountDownLatch engineReady = new CountDownLatch(1);
 	private final Packages pkgs = Desktop.instance.getPackages();
 	private final URI uri = new File(".").toURI();
 	private volatile ScriptEngine engine;
 	private volatile String prompt;
+	private	ScriptEngineManager manager;
 	private String extension;
 
 	public ScriptShell() {
-		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
+		this(null);
 	}
 
-	public ScriptShell(final Collection<Integer> openFrames) {
-		super(openFrames);
+	public ScriptShell(final Frame parent) {
+		super(parent);
 		initComponents();
+		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
 		createScriptEngine();
 		setTitle(engine.getFactory().getLanguageName());
 		setContentPane(new ScriptShellPanel(this));
+	}
+
+	private void refresh() {
+		model.removeAllElements();
+		manager = new ScriptEngineManager();
+		for (final ScriptEngineFactory sef : manager.getEngineFactories()) {
+			model.addElement(sef.getEngineName());
+		}
+	}
+
+	@Override
+	public void classPathChanged(final ClassPathChangeEvent e) {
+		refresh();
+	}
+
+	@Override
+	public OptionPanel getOptionPanel() {
+		return optionPanel1;
+	}
+
+	@Override
+	public void load() {
+		model.setSelectedItem(prefs.get(getName() + ".language", null));
+	}
+
+	@Override
+	public void save() {
+		prefs.put(getName() + ".language", (String) model.getSelectedItem());
 	}
 
 	@Override
@@ -76,13 +109,49 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	}
 
 	@Override
-	public Frame getFrame(final Collection<Integer> openFrames) {
-		return new ScriptShell(openFrames);
+	public Frame getFrame(final Frame parent) {
+		return new ScriptShell(parent);
 	}
 
 	@SuppressWarnings("unchecked")
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
+
+                optionPanel1 = new linoleum.application.OptionPanel();
+                jLabel2 = new javax.swing.JLabel();
+                jComboBox1 = new javax.swing.JComboBox();
+
+                optionPanel1.setFrame(this);
+
+                jLabel2.setText("Language :");
+
+                jComboBox1.setModel(model);
+                jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jComboBox1ActionPerformed(evt);
+                        }
+                });
+
+                javax.swing.GroupLayout optionPanel1Layout = new javax.swing.GroupLayout(optionPanel1);
+                optionPanel1.setLayout(optionPanel1Layout);
+                optionPanel1Layout.setHorizontalGroup(
+                        optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jComboBox1, 0, 294, Short.MAX_VALUE)
+                                .addContainerGap())
+                );
+                optionPanel1Layout.setVerticalGroup(
+                        optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel2)
+                                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                );
 
                 setClosable(true);
                 setIconifiable(true);
@@ -103,12 +172,19 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
                 pack();
         }// </editor-fold>//GEN-END:initComponents
 
+        private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+		optionPanel1.setDirty(true);
+        }//GEN-LAST:event_jComboBox1ActionPerformed
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
+        private javax.swing.JComboBox jComboBox1;
+        private javax.swing.JLabel jLabel2;
+        private linoleum.application.OptionPanel optionPanel1;
         // End of variables declaration//GEN-END:variables
 
 	private void createScriptEngine() {
-		final String language = prefs.get("language", "Rhino");
-		final ScriptEngineManager manager = new ScriptEngineManager();
+		final String language = prefs.get(getName() + ".language", "Rhino");
+		refresh();
 		for (final ScriptEngineFactory sef : manager.getEngineFactories()) {
 			if (language.equals(sef.getEngineName())) {
 				engine = sef.getScriptEngine();

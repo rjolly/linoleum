@@ -13,7 +13,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.prefs.Preferences;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -30,7 +29,6 @@ public class Browser extends Frame {
 	private final Icon stopIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
 	private final Icon reloadIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Refresh16.gif"));
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
-        private final Settings settings = new Settings();
 	private List<FrameURL> history = new ArrayList<>();
 	private PageLoader loader;
 	private FrameURL current;
@@ -39,37 +37,34 @@ public class Browser extends Frame {
 	private URL url;
 
 	public Browser() {
-		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif")));
-		setMimeType("text/html");
+		this(null);
 	}
 
-	public Browser(final Collection<Integer> openFrames) {
-		super(openFrames);
+	public Browser(final Frame parent) {
+		super(parent);
 		initComponents();
+		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif")));
+		setMimeType("text/html");
 		update();
 		jEditorPane1.setEditorKitForContentType("text/html", new EditorKit());
 		jEditorPane1.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 		jTextField1.getDocument().addDocumentListener(new DocumentListener() {
-
 			@Override
 			public void insertUpdate(final DocumentEvent e) {
 				update();
 			}
-
 			@Override
 			public void removeUpdate(final DocumentEvent e) {
 				update();
 			}
-
 			@Override
 			public void changedUpdate(final DocumentEvent e) {
 				update();
 			}
-
 			private void update() {
-				if (loader == null) {
-					reload = false;
-					jButton1.setIcon(goIcon);
+				if (loader == null && current != null) {
+					reload = jTextField1.getText().equals(current.getURL().toString());
+					jButton1.setIcon(reload?reloadIcon:goIcon);
 				}
 			}
 		});
@@ -86,12 +81,22 @@ public class Browser extends Frame {
 
 	@Override
 	public OptionPanel getOptionPanel() {
-		return settings;
+		return optionPanel1;
 	}
 
 	@Override
-	public Frame getFrame(final Collection<Integer> openFrames) {
-		return new Browser(openFrames);
+	public void load() {
+		jTextField2.setText(prefs.get(getName() + ".home", null));
+	}
+
+	@Override
+	public void save() {
+		prefs.put(getName() + ".home", jTextField2.getText());
+	}
+
+	@Override
+	public Frame getFrame(final Frame parent) {
+		return new Browser(parent);
 	}
 
 	@Override
@@ -116,7 +121,7 @@ public class Browser extends Frame {
 	public void open() {
 		if (current == null) {
 			final String str = prefs.get(getName() + ".home", null);
-			if (str != null) try {
+			if (str != null && !str.isEmpty()) try {
 				setURI(new URI(str));
 			} catch (final URISyntaxException ex) {
 				ex.printStackTrace();
@@ -227,6 +232,9 @@ public class Browser extends Frame {
 
                 jPopupMenu1 = new javax.swing.JPopupMenu();
                 jMenuItem1 = new javax.swing.JMenuItem();
+                optionPanel1 = new linoleum.application.OptionPanel();
+                jLabel2 = new javax.swing.JLabel();
+                jTextField2 = new javax.swing.JTextField();
                 jPanel3 = new javax.swing.JPanel();
                 jButton2 = new javax.swing.JButton();
                 jButton3 = new javax.swing.JButton();
@@ -245,6 +253,31 @@ public class Browser extends Frame {
                         }
                 });
                 jPopupMenu1.add(jMenuItem1);
+
+                optionPanel1.setFrame(this);
+
+                jLabel2.setText("Home page :");
+
+                javax.swing.GroupLayout optionPanel1Layout = new javax.swing.GroupLayout(optionPanel1);
+                optionPanel1.setLayout(optionPanel1Layout);
+                optionPanel1Layout.setHorizontalGroup(
+                        optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)
+                                .addContainerGap())
+                );
+                optionPanel1Layout.setVerticalGroup(
+                        optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel2)
+                                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                );
 
                 setClosable(true);
                 setIconifiable(true);
@@ -377,6 +410,7 @@ public class Browser extends Frame {
         private javax.swing.JButton jButton3;
         private linoleum.html.EditorPane jEditorPane1;
         private javax.swing.JLabel jLabel1;
+        private javax.swing.JLabel jLabel2;
         private javax.swing.JMenuItem jMenuItem1;
         private javax.swing.JPanel jPanel2;
         private javax.swing.JPanel jPanel3;
@@ -384,5 +418,7 @@ public class Browser extends Frame {
         private javax.swing.JProgressBar jProgressBar1;
         private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JTextField jTextField1;
+        private javax.swing.JTextField jTextField2;
+        private linoleum.application.OptionPanel optionPanel1;
         // End of variables declaration//GEN-END:variables
 }

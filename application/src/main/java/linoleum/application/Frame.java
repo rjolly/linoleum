@@ -20,7 +20,6 @@
 package linoleum.application;
 
 import java.awt.Component;
-import java.beans.PropertyVetoException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Collection;
@@ -48,26 +47,28 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 	private static final int offset = 30;
 
 	public Frame() {
-		this(new HashSet<Integer>());
-                setName(getClass().getSimpleName());
+		this((Frame) null);
 	}
 
 	public Frame(final String title) {
-		this(new HashSet<Integer>(), title);
-                setName(getClass().getSimpleName());
+		this(null, title);
 	}
 
-	public Frame(final Collection<Integer> openFrames, final String title) {
+	public Frame(final Frame parent, final String title) {
 		super(title, true, true, true, true);
 		initComponents();
-		index = openFrames.isEmpty()?0:Collections.max(openFrames) + 1;
-		this.openFrames = openFrames;
+		openFrames = parent == null?new HashSet<Integer>():parent.openFrames;
+		index = nextIndex();
 	}
 
-	public Frame(final Collection<Integer> openFrames) {
+	public Frame(final Frame parent) {
 		initComponents();
-		index = openFrames.isEmpty()?0:Collections.max(openFrames) + 1;
-		this.openFrames = openFrames;
+		openFrames = parent == null?new HashSet<Integer>():parent.openFrames;
+		index = nextIndex();
+	}
+
+	private int nextIndex() {
+		return openFrames.isEmpty()?0:Collections.max(openFrames) + 1;
 	}
 
 	private void openFrame() {
@@ -131,10 +132,10 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 	}
 
 	protected Frame getFrame() {
-		return getFrame(openFrames);
+		return getFrame(this);
 	}
 
-	protected Frame getFrame(final Collection<Integer> openFrames) {
+	protected Frame getFrame(final Frame parent) {
 		return this;
 	}
 
@@ -172,15 +173,10 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 				}
 			}
 		}
-		final Frame frame = getFrame();
-		if (frame != this) {
-			frame.setName(getName());
-			frame.icon = icon;
-			frame.type = type;
-		}
-		return frame;
+		return getFrame();
 	}
 
+	@Override
 	public OptionPanel getOptionPanel() {
 		return null;
 	}
@@ -191,6 +187,13 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 	protected void close() {
 	}
 
+	protected void load() {
+	}
+
+	protected void save() {
+	}
+
+	@Override
 	public void classPathChanged(final ClassPathChangeEvent e) {
 	}
 
@@ -208,6 +211,7 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
+                setName(getClass().getSimpleName());
                 addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
                         public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
                                 formInternalFrameOpened(evt);
