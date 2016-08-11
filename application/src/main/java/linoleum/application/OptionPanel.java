@@ -36,6 +36,7 @@ public abstract class OptionPanel extends JPanel {
 				((JTextComponent) comp).getDocument().addDocumentListener(listener);
 			}
 		}
+		dirty = false;
 	}
  
 	protected abstract void loadImpl();

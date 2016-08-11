@@ -132,10 +132,8 @@ public class Compose extends Frame {
 				case JFileChooser.APPROVE_OPTION:
 					file = chooser.getSelectedFile();
 					break;
-				case JFileChooser.CANCEL_OPTION:
-					file = null;
-					break;
 				default:
+					file = null;
 				}
 				attach.setText(file == null?"Attach...":file.getName());
 			}

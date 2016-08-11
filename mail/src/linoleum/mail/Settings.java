@@ -17,11 +17,10 @@ public class Settings extends OptionPanel {
 		final int result = JOptionPane.showInternalConfirmDialog(parent, this, "Account settings", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 		switch (result) {
 		case JOptionPane.OK_OPTION:
+			save();
 			break;
 		default:
-			dirty = false;
 		}
-		save();
 	}
 
 	protected void loadImpl() {
