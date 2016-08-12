@@ -1,6 +1,5 @@
 package linoleum;
 
-import java.awt.Component;
 import java.util.List;
 import javax.swing.ImageIcon;
 import linoleum.application.Frame;
@@ -9,8 +8,9 @@ import linoleum.application.event.ClassPathChangeEvent;
 
 public class PreferenceManager extends Frame {
 	private final OptionPanel desktop = Desktop.instance.getBackgroundFrame().getOptionPanel();
-	private OptionPanel current;
+	private int current;
 	private boolean save;
+	private boolean ready;
 
 	public PreferenceManager() {
 		initComponents();
@@ -19,36 +19,35 @@ public class PreferenceManager extends Frame {
 
 	@Override
 	public void open() {
-		if (jTabbedPane1.indexOfTabComponent(desktop) < 0) {
-			jTabbedPane1.addTab(desktop.getName(), desktop);
-		}
+		jTabbedPane1.add(desktop);
 		final List<OptionPanel> list = getApplicationManager().getOptionPanels();
 		for(final OptionPanel panel : list) {
-			if (jTabbedPane1.indexOfTabComponent(panel) < 0) {
-				jTabbedPane1.addTab(panel.getName(), panel);
-			}
+			jTabbedPane1.add(panel);
 		}
-		next();
+		jTabbedPane1.setSelectedIndex(current);
+		get(current).load();
+		ready = true;
 	}
 
 	private void next() {
-		final Component comp = jTabbedPane1.getSelectedComponent();
-		final OptionPanel panel = comp instanceof OptionPanel?(OptionPanel) comp:null;
-		if (panel != null && panel != current) {
-			if (current != null) {
-				current.save();
-			}
-			(current = panel).load();
+		final int c = jTabbedPane1.getSelectedIndex();
+		if (c != current) {
+			get(current).save();
+			get(current = c).load();
 		}
 	}
 
 	@Override
 	public void close() {
-		if (save && current != null) {
-			current.save();
+		if (save) {
+			get(current).save();
 		}
-		current = null;
 		save = false;
+		ready = false;
+	}
+
+	private final OptionPanel get(final int c) {
+		return (OptionPanel) jTabbedPane1.getComponentAt(c);
 	}
 
 	public void classPathChanged(final ClassPathChangeEvent e) {
@@ -126,7 +125,9 @@ public class PreferenceManager extends Frame {
         }//GEN-LAST:event_jButton2ActionPerformed
 
         private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
-		next();
+		if (ready) {
+			next();
+		}
         }//GEN-LAST:event_jTabbedPane1StateChanged
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
