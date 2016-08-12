@@ -36,6 +36,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.ServiceLoader;
+import java.util.prefs.Preferences;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 import javax.activation.MimeType;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
@@ -60,6 +63,7 @@ public class ApplicationManager extends Frame {
 	private final Map<String, List<String>> apps = new HashMap<>();
 	private final DefaultListModel<App> model = new DefaultListModel<>();
 	private final List<OptionPanel> options = new ArrayList<>(); 
+	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final ListCellRenderer renderer = new Renderer();
 	private final DefaultComboBoxModel<String> comboModel = new DefaultComboBoxModel<>();
 	private final DefaultTableModel tableModel;
@@ -96,6 +100,23 @@ public class ApplicationManager extends Frame {
 		tableModel = (DefaultTableModel)jTable1.getModel();
 		setApplicationManager(this);
 		addOptionPanel(this);
+		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
+			@Override
+			public void preferenceChange(final PreferenceChangeEvent evt) {
+				load(pref);
+			}
+		});
+	}
+
+	private void load(final Map<String, String> pref) {
+		pref.clear();
+		final String str = prefs.get(getName() + ".preferred", "");
+		for (final String entry : str.split(", ")) {
+			final String s[] = entry.split("=");
+			if (s.length > 1) {
+				pref.put(s[0], s[1]);
+			}
+		}
 	}
 
 	@Override
@@ -125,6 +146,8 @@ public class ApplicationManager extends Frame {
 	@Override
 	public void load() {
 		tableModel.setRowCount(0);
+		final Map<String, String> pref = new HashMap<>();
+		load(pref);
 		for (final String str : apps.keySet()) {
 			tableModel.addRow(new Object[] {str, pref.get(str)});
 		}
@@ -132,6 +155,7 @@ public class ApplicationManager extends Frame {
 
 	@Override
 	public void save() {
+		final Map<String, String> pref = new HashMap<>();
 		for (int row = 0 ; row < tableModel.getRowCount() ; row++) {
 			final String str = (String) tableModel.getValueAt(row, 0);
 			final String name = (String) tableModel.getValueAt(row, 1);
@@ -141,6 +165,8 @@ public class ApplicationManager extends Frame {
 				pref.remove(str);
 			}
 		}
+		final String str = pref.toString();
+		prefs.put(getName() + ".preferred", str.substring(1, str.length() - 1));
 	}
 
 	public void open(final URI uri) {
@@ -296,6 +322,7 @@ public class ApplicationManager extends Frame {
 				}
 			});
 		}
+		load(pref);
 	}
 
 	void select(final JInternalFrame frame) {
