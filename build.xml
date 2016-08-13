@@ -75,6 +75,7 @@
 	    <fileset dir="bin"/>
 	</copy>
 	<chmod file="${dist.dir}/bin/linoleum" perm="+x"/>
+	<chmod file="${dist.dir}/bin/linoleum-headless" perm="+x"/>
 	<copy todir="${dist.dir}" file="init.js"/>
     </target>
 

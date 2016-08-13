@@ -18,7 +18,7 @@ import linoleum.application.Frame;
 import linoleum.application.ApplicationManager;
 
 public class Desktop extends JFrame {
-	public static Desktop instance;
+	public static final Desktop instance = new Desktop();
 	private static final String ABOUTMSG = "%s %s.%s \n \nJava desktop environment "
 		+ "and software distribution. \n \nWritten by \n  "
 		+ "%s";
@@ -286,7 +286,7 @@ public class Desktop extends JFrame {
 		/* Create and display the form */
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				(instance = new Desktop()).fullScreen();
+				instance.fullScreen();
 			}
 		});
 	}
