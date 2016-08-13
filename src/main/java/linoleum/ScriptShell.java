@@ -64,7 +64,7 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 
 	@Override
 	public void load() {
-		model.setSelectedItem(prefs.get(getName() + ".language", null));
+		model.setSelectedItem(prefs.get(getName() + ".language", ""));
 	}
 
 	@Override
@@ -183,10 +183,10 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
         // End of variables declaration//GEN-END:variables
 
 	private void createScriptEngine() {
-		final String language = prefs.get(getName() + ".language", "Rhino");
+		final String language = prefs.get(getName() + ".language", "");
 		refresh();
 		for (final ScriptEngineFactory sef : manager.getEngineFactories()) {
-			if (language.equals(sef.getEngineName())) {
+			if (engine == null || language.equals(sef.getEngineName())) {
 				engine = sef.getScriptEngine();
 			}
 		}

@@ -86,7 +86,7 @@ public class Browser extends Frame {
 
 	@Override
 	public void load() {
-		jTextField2.setText(prefs.get(getName() + ".home", null));
+		jTextField2.setText(prefs.get(getName() + ".home", ""));
 	}
 
 	@Override
@@ -120,8 +120,8 @@ public class Browser extends Frame {
 
 	public void open() {
 		if (current == null) {
-			final String str = prefs.get(getName() + ".home", null);
-			if (str != null && !str.isEmpty()) try {
+			final String str = prefs.get(getName() + ".home", "");
+			if (!str.isEmpty()) try {
 				setURI(new URI(str));
 			} catch (final URISyntaxException ex) {
 				ex.printStackTrace();

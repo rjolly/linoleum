@@ -159,25 +159,25 @@ public class Compose extends Frame {
 
 	private void send() throws MessagingException {
 		final Message msg = new MimeMessage(session);
-		final String from = prefs.get(SimpleClient.name + ".from", null);
+		final String from = prefs.get(SimpleClient.name + ".from", "");
 		final String to = toField.getText();
 		final String cc = ccField.getText();
 		final String bcc = bccField.getText();
 		final String subject = subField.getText();
 		final String text = content.getText();
-		final String url = prefs.get(SimpleClient.name + ".url", null);
-		final String record = prefs.get(SimpleClient.name + ".record", null);
+		final String url = prefs.get(SimpleClient.name + ".url", "");
+		final String record = prefs.get(SimpleClient.name + ".record", "");
 
-		if (from != null) {
+		if (!from.isEmpty()) {
 			msg.setFrom(new InternetAddress(from));
 		} else {
 			msg.setFrom();
 		}
 		msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
-		if (cc != null) {
+		if (!cc.isEmpty()) {
 			msg.setRecipients(Message.RecipientType.CC, InternetAddress.parse(cc, false));
 		}
-		if (bcc != null) {
+		if (!bcc.isEmpty()) {
 			msg.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(bcc, false));
 		}
 		msg.setSubject(subject);
@@ -212,7 +212,7 @@ public class Compose extends Frame {
 		Transport.send(msg);
 		System.out.println("Mail was sent successfully.");
 
-		if (url != null && record != null) {
+		if (!url.isEmpty() && !record.isEmpty()) {
 			final Store store = session.getStore(new URLName(url));
 			store.connect();
 			final Folder folder = store.getFolder(record);

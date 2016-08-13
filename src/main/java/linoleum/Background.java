@@ -33,7 +33,7 @@ public class Background extends Frame {
 
 	@Override
 	public void load() {
-		jTextField1.setText(prefs.get(getName() + ".image", null));
+		jTextField1.setText(prefs.get(getName() + ".image", ""));
 	}
 
 	@Override
@@ -42,8 +42,8 @@ public class Background extends Frame {
 	}
 
 	private Icon getImage() {
-		final String str = prefs.get(getName() + ".image", null);
-		return str != null && !str.isEmpty()?new ImageIcon(str):new ImageIcon(getClass().getResource("Wave.png"));
+		final String str = prefs.get(getName() + ".image", "");
+		return !str.isEmpty()?new ImageIcon(str):new ImageIcon(getClass().getResource("Wave.png"));
 	}
 
 	/**

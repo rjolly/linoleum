@@ -147,20 +147,20 @@ public class SimpleClient extends Frame {
 
 	@Override
 	public void load() {
-		jTextField1.setText(prefs.get(getName() + ".url", null));
-		jTextField2.setText(prefs.get(getName() + ".mailhost", null));
-		jTextField3.setText(prefs.get(getName() + ".from", null));
-		jTextField4.setText(prefs.get(getName() + ".record", "Sent"));
-		jCheckBox1.setSelected(prefs.getBoolean(getName() + ".debug", false));
+		jTextField1.setText(prefs.get(name + ".url", ""));
+		jTextField2.setText(prefs.get(name + ".mailhost", ""));
+		jTextField3.setText(prefs.get(name + ".from", ""));
+		jTextField4.setText(prefs.get(name + ".record", "Sent"));
+		jCheckBox1.setSelected(prefs.getBoolean(name + ".debug", false));
 	}
 
 	@Override
 	public void save() {
-		prefs.put(getName() + ".url", jTextField1.getText());
-		prefs.put(getName() + ".mailhost", jTextField2.getText());
-		prefs.put(getName() + ".from", jTextField3.getText());
-		prefs.put(getName() + ".record", jTextField4.getText());
-		prefs.putBoolean(getName() + ".debug", jCheckBox1.isSelected());
+		prefs.put(name + ".url", jTextField1.getText());
+		prefs.put(name + ".mailhost", jTextField2.getText());
+		prefs.put(name + ".from", jTextField3.getText());
+		prefs.put(name + ".record", jTextField4.getText());
+		prefs.putBoolean(name + ".debug", jCheckBox1.isSelected());
 	}
 
 	@Override
@@ -169,13 +169,13 @@ public class SimpleClient extends Frame {
 		if (uri != null) {
 			open(uri.toString());
 		} else {
-			final String mailhost = prefs.get(name + ".mailhost", null);
-			if (mailhost != null && !mailhost.isEmpty()) {
+			final String mailhost = prefs.get(name + ".mailhost", "");
+			if (!mailhost.isEmpty()) {
 				props.put("mail.smtp.host", mailhost);
 			}
 			session.setDebug(prefs.getBoolean(name + ".debug", false));
-			final String str = prefs.get(name + ".url", null);
-			if (str != null && !str.isEmpty()) {
+			final String str = prefs.get(name + ".url", "");
+			if (!str.isEmpty()) {
 				open(str);
 			}
 		}

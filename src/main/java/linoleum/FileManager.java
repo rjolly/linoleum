@@ -79,7 +79,7 @@ public class FileManager extends Frame {
 
 	@Override
 	public void load() {
-		jTextField1.setText(prefs.get(getName() + ".home", null));
+		jTextField1.setText(prefs.get(getName() + ".home", ""));
 	}
 
 	@Override
@@ -90,8 +90,8 @@ public class FileManager extends Frame {
 	@Override
 	public void open() {
 		if (empty) {
-			final String str = prefs.get(getName() + ".home", null);
-			if (str != null && !str.isEmpty()) {
+			final String str = prefs.get(getName() + ".home", "");
+			if (!str.isEmpty()) {
 				setURI(new File(str).toURI());
 			}
 		}
