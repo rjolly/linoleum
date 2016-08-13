@@ -1,6 +1,7 @@
 package linoleum.mail;
 
 import javax.mail.*;
+import javax.mail.internet.*;
 import java.util.Date;
 import javax.swing.table.AbstractTableModel; 
 
@@ -127,7 +128,8 @@ public class FolderModel extends AbstractTableModel {
 				// From
 				Address[] adds = m.getFrom();
 				if (adds != null && adds.length != 0) {
-					theData[1] = adds[0].toString();			
+					final Address a = adds[0];
+					theData[1] = a instanceof InternetAddress?((InternetAddress) a).toUnicodeString():a.toString();			
 				} else {
 					theData[1] = "";
 				}

@@ -60,13 +60,13 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 		final Address cc[] = msg.getRecipients(Message.RecipientType.CC);
 		final StringBuilder bld = new StringBuilder();
 		if (cc != null) {
-			append(bld, "cc", mkString(cc));
+			append(bld, "cc", mkUnicodeString(cc));
 		}
 		append(bld, "inReplyTo", mkString(msg.getHeader("In-Reply-To")));
 		append(bld, "references", mkString(msg.getHeader("References")));
 		append(bld, "subject", msg.getSubject());
 		final String str = bld.toString();
-		return mkString(to) + (str.isEmpty()?"":"?") + str;
+		return mkUnicodeString(to) + (str.isEmpty()?"":"?") + str;
 	}
 
 	private StringBuilder append(final StringBuilder bld, final String key, final String value) {
@@ -77,6 +77,18 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 			bld.append(key).append("=").append(value);
 		}
 		return bld;
+	}
+
+	private <T> String mkUnicodeString(final Address array[]) {
+		final StringBuilder bld = new StringBuilder();
+		for (int i = 0 ; i < array.length ; i++) {
+			if (i > 0) {
+				bld.append(",");
+			}
+			final Address a = array[i];
+			bld.append(a instanceof InternetAddress?((InternetAddress) a).toUnicodeString():a.toString());
+		}
+		return bld.toString();
 	}
 
 	private <T> String mkString(final T array[]) {
@@ -197,7 +209,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 			sb.append("From: ");
 			Address[] adds = displayed.getFrom();
 			if (adds != null) {
-				sb.append(mkString(adds));
+				sb.append(mkUnicodeString(adds));
 			}
 			sb.append("\n");
 
@@ -205,7 +217,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 			sb.append("To: ");
 			adds = displayed.getRecipients(Message.RecipientType.TO);
 			if (adds != null) {
-				sb.append(mkString(adds));
+				sb.append(mkUnicodeString(adds));
 			}
 			sb.append("\n");
 
@@ -213,7 +225,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 			sb.append("Cc: ");
 			adds = displayed.getRecipients(Message.RecipientType.CC);
 			if (adds != null) {
-				sb.append(mkString(adds));
+				sb.append(mkUnicodeString(adds));
 			}
 			sb.append("\n");
 
