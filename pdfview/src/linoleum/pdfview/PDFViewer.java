@@ -3,6 +3,9 @@ package linoleum.pdfview;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
@@ -14,15 +17,62 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.nio.file.FileSystems;
+import javax.swing.Action;
+import javax.swing.AbstractAction;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.KeyStroke;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import linoleum.application.FileChooser;
 import linoleum.application.Frame;
 
 public class PDFViewer extends Frame {
 	public final static String TITLE = "SwingLabs PDF Viewer";
+	private final Icon openIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"));
+	private final Action openAction = new OpenAction();
+	private final Action closeAction = new CloseAction();
+	private final FileChooser chooser = new FileChooser();
 	private int curpage = -1;
 	private PDFFile curFile;
 	private String docName;
 	private PagePreparer pagePrep;
 	private PagePanel page;
+
+	private class OpenAction extends AbstractAction {
+		public OpenAction() {
+			super("Open...", openIcon);
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			final int returnVal = chooser.showInternalOpenDialog(PDFViewer.this);
+			switch (returnVal) {
+			case JFileChooser.APPROVE_OPTION:
+				final URI uri = getURI();
+				if (uri != null) {
+					close();
+				}
+				setURI(chooser.getSelectedFile().toURI());
+				open();
+				break;
+			default:
+			}
+		}
+	}
+
+	private class CloseAction extends AbstractAction {
+		public CloseAction() {
+			super("Close");
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_MASK));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			close();
+		}
+	}
 
 	public PDFViewer() {
 		this(null);
@@ -31,6 +81,7 @@ public class PDFViewer extends Frame {
 	public PDFViewer(final Frame parent) {
 		super(parent);
 		initComponents();
+		chooser.setFileFilter(new FileNameExtensionFilter("PDF Files", "pdf"));
 		setMimeType("application/pdf");
 		setTitle(TITLE);
 		setEnabling();
@@ -51,6 +102,7 @@ public class PDFViewer extends Frame {
 			} else {
 				openFile(path);
 			}
+			closeAction.setEnabled(true);
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
@@ -59,6 +111,23 @@ public class PDFViewer extends Frame {
 	@Override
 	protected void close() {
 		curFile = null;
+		docName = null;
+		setTitle(TITLE);
+		page = null;
+		jScrollPane1.setViewportView(page);
+		curpage = -1;
+
+		// update the page text field
+		pageField.setText(String.valueOf(curpage + 1));
+
+		// stop any previous page prepper, and start a new one
+		if (pagePrep != null) {
+			pagePrep.quit();
+		}
+
+		setEnabling();
+		closeAction.setEnabled(false);
+		setURI(null);
 		System.gc();
 	}
 
@@ -179,6 +248,10 @@ public class PDFViewer extends Frame {
                 pageField = new javax.swing.JTextField();
                 nextButton = new javax.swing.JButton();
                 lastButton = new javax.swing.JButton();
+                jMenuBar1 = new javax.swing.JMenuBar();
+                jMenu1 = new javax.swing.JMenu();
+                jMenuItem1 = new javax.swing.JMenuItem();
+                jMenuItem2 = new javax.swing.JMenuItem();
 
                 setClosable(true);
                 setIconifiable(true);
@@ -231,6 +304,20 @@ public class PDFViewer extends Frame {
                 });
                 jPanel1.add(lastButton);
 
+                jMenu1.setText("File");
+
+                jMenuItem1.setAction(openAction);
+                jMenuItem1.setText("Open...");
+                jMenu1.add(jMenuItem1);
+
+                jMenuItem2.setAction(closeAction);
+                jMenuItem2.setText("Close");
+                jMenu1.add(jMenuItem2);
+
+                jMenuBar1.add(jMenu1);
+
+                setJMenuBar(jMenuBar1);
+
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);
                 layout.setHorizontalGroup(
@@ -241,7 +328,7 @@ public class PDFViewer extends Frame {
                 layout.setVerticalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 );
@@ -275,6 +362,10 @@ public class PDFViewer extends Frame {
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton firstButton;
+        private javax.swing.JMenu jMenu1;
+        private javax.swing.JMenuBar jMenuBar1;
+        private javax.swing.JMenuItem jMenuItem1;
+        private javax.swing.JMenuItem jMenuItem2;
         private javax.swing.JPanel jPanel1;
         private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JButton lastButton;
