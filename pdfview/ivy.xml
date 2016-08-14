@@ -21,7 +21,7 @@
         <artifact name="pdfview" type="pom" ext="pom" conf="pom"/>
     </publications>
     <dependencies>
-        <dependency org="com.github.rjolly" name="pdf-renderer" rev="140" conf="runtime->default"/>
-        <dependency org="net.java.linoleum" name="application" rev="1.1" conf="runtime->default"/>
+        <dependency org="com.github.rjolly" name="pdf-renderer" rev="140" conf="compile->master;runtime->default"/>
+        <dependency org="net.java.linoleum" name="application" rev="1.1" conf="compile->master;runtime->default"/>
     </dependencies>
 </ivy-module>
