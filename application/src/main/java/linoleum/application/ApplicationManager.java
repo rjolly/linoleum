@@ -29,12 +29,11 @@ import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Iterator;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferenceChangeEvent;
@@ -59,8 +58,8 @@ public class ApplicationManager extends Frame {
 	private final Icon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
 	private final List<ClassPathListener> listeners = new ArrayList<>();
 	private final Map<String, App> map = new HashMap<>();
-	private final Map<String, String> pref = new HashMap<>();
-	private final Map<String, List<String>> apps = new HashMap<>();
+	private final SortedMap<String, String> pref = new TreeMap<>();
+	private final SortedMap<String, List<String>> apps = new TreeMap<>();
 	private final DefaultListModel<App> model = new DefaultListModel<>();
 	private final List<OptionPanel> options = new ArrayList<>(); 
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
@@ -146,7 +145,7 @@ public class ApplicationManager extends Frame {
 	@Override
 	public void load() {
 		tableModel.setRowCount(0);
-		final Map<String, String> pref = new HashMap<>();
+		final SortedMap<String, String> pref = new TreeMap<>();
 		load(pref);
 		for (final String str : apps.keySet()) {
 			tableModel.addRow(new Object[] {str, pref.get(str)});
@@ -155,7 +154,7 @@ public class ApplicationManager extends Frame {
 
 	@Override
 	public void save() {
-		final Map<String, String> pref = new HashMap<>();
+		final SortedMap<String, String> pref = new TreeMap<>();
 		for (int row = 0 ; row < tableModel.getRowCount() ; row++) {
 			final String str = (String) tableModel.getValueAt(row, 0);
 			final String name = (String) tableModel.getValueAt(row, 1);
@@ -174,32 +173,41 @@ public class ApplicationManager extends Frame {
 	}
 
 	private String getApplication(final URI uri) {
-		final Collection<String> coll = new LinkedHashSet<>();
+		String name = null;
 		final Path path = Paths.get(uri);
 		try {
 			final String str = Files.probeContentType(path);
 			if (apps.containsKey(str)) {
 				if (pref.containsKey(str)) {
-					coll.add(pref.get(str));
-				}
-				coll.addAll(apps.get(str));
-			}
-			final MimeType type = new MimeType(str);
-			for (final Map.Entry<String, List<String>> entry : apps.entrySet()) {
-				final String key = entry.getKey();
-				final List<String> value = entry.getValue();
-				if (type.match(key)) {
-					if (pref.containsKey(key)) {
-						coll.add(pref.get(key));
+					name = pref.get(str);
+				} else {
+					final List<String> value = apps.get(str);
+					if (value.size() > 0) {
+						name = value.get(0);
 					}
-					coll.addAll(value);
+				}
+			} else {
+				final MimeType type = new MimeType(str);
+				for (final Map.Entry<String, List<String>> entry : apps.entrySet()) {
+					final String key = entry.getKey();
+					if (type.match(key)) {
+						if (pref.containsKey(key)) {
+							name = pref.get(key);
+							break;
+						} else {
+							final List<String> value = entry.getValue();
+							if (value.size() > 0) {
+								name = value.get(0);
+								break;
+							}
+						}
+					}
 				}
 			}
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}
-		final Iterator<String> it = coll.iterator();
-		return it.hasNext()?it.next():null;
+		return name;
 	}
 
 	public void open(final String name, final URI uri) {

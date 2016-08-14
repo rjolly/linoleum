@@ -7,7 +7,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.jar.Manifest;
 import java.util.jar.Attributes;
 import java.net.URL;
@@ -17,7 +20,7 @@ import linoleum.application.event.ClassPathChangeEvent;
 public class Packages {
 	private final ApplicationManager apps;
 	private final Map<String, File> map = new HashMap<>();
-	private final Map<String, File> installed = new LinkedHashMap<>();
+	private final SortedMap<String, File> installed = new TreeMap<>();
 	private final File tools = new File(new File(System.getProperty("java.home")), "../lib/tools.jar");
 	final File home;
 	private final FileFilter filter = new FileFilter() {
@@ -81,8 +84,8 @@ public class Packages {
 		}
 	}
 
-	public File[] installed() {
-		return installed.values().toArray(new File[0]);
+	public Collection<File> installed() {
+		return Collections.unmodifiableCollection(installed.values());
 	}
 
 	public void commit(final Object source) {

@@ -27,7 +27,7 @@ public class Tools {
 	private Tools() {}
 
 	public File[] classpath() {
-		return pkgs.installed();
+		return pkgs.installed().toArray(new File[0]);
 	}
 
 	static File[] concat(final File a[], final File b[]) {
