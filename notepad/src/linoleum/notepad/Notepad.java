@@ -5,6 +5,10 @@ import java.awt.event.*;
 import java.beans.*;
 import java.io.*;
 import java.net.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.logging.*;
 import javax.swing.*;
@@ -205,8 +209,8 @@ public class Notepad extends JPanel {
 	private ElementTreePanel elementTreePanel;
 	private Frame frame;
 	private int modified;
-	private File parent;
-	private File file;
+	private Path parent;
+	private Path file;
 
 	private UndoableEditListener undoHandler = new UndoHandler();
 	private UndoManager undo = new UndoManager();
@@ -351,14 +355,14 @@ public class Notepad extends JPanel {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			if (parent == null) {
-				parent = new File(".");
+				parent = Paths.get(".");
 			}
-			frame.getApplicationManager().open(parent.toURI());
+			frame.getApplicationManager().open(parent.toUri());
 		}
 	}
 
 	public void open() {
-		if (file != null && file.exists()) {
+		if (file != null && Files.exists(file)) {
 			new FileLoader().execute();
 		} else {
 			editor.getDocument().addUndoableEditListener(undoHandler);
@@ -366,7 +370,7 @@ public class Notepad extends JPanel {
 		}
 	}
 
-	public void setFile(final File file) {
+	public void setFile(final Path file) {
 		if (modified != 0) {
 			final int option = JOptionPane.showInternalConfirmDialog(frame, resources.getString("Warning"), resources.getString("WarningTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 			switch (option) {
@@ -382,12 +386,12 @@ public class Notepad extends JPanel {
 		}
 		editor.setDocument(new Document());
 		if (file != null) {
-			parent = file.getParentFile();
+			parent = file.getParent();
 		}
 		this.file = file;
 	}
 
-	public File getFile() {
+	public Path getFile() {
 		return file;
 	}
 
@@ -427,7 +431,7 @@ public class Notepad extends JPanel {
 	}
 
 	private void update() {
-		String title = file == null?resources.getString("Title"):file.getName();
+		String title = file == null?resources.getString("Title"):file.getFileName().toString();
 		if (modified != 0) {
 			title += " (modified)";
 		}
@@ -512,16 +516,25 @@ public class Notepad extends JPanel {
 
 		@Override
 		public void done() {
-
 			// we are done... get rid of progressbar
 			status.removeAll();
 			status.revalidate();
 		}
 	}
 
+	private int getFileLength() {
+		int n = 0;
+		try {
+			n = (int) Files.size(file);
+		} catch (final IOException ex) {
+			ex.printStackTrace();
+		}
+		return n;
+	}
+
 	class FileLoader extends FileWorker {
 		FileLoader() {
-			super((int)file.length());
+			super(getFileLength());
 			if (elementTreePanel != null) {
 				elementTreePanel.setEditor(null);
 			}
@@ -529,8 +542,7 @@ public class Notepad extends JPanel {
 
 		@Override
 		public Document doInBackground() {
-			try (final Reader in = new FileReader(file)) {
-
+			try (final Reader in = Files.newBufferedReader(file, Charset.defaultCharset())) {
 				// try to start reading
 				final char[] buff = new char[4096];
 				int nch;
@@ -565,7 +577,7 @@ public class Notepad extends JPanel {
 
 		@Override
 		public Document doInBackground() {
-			try (final Writer out = new FileWriter(file)) {
+			try (final Writer out = Files.newBufferedWriter(file, Charset.defaultCharset())) {
 
 				// start writing
 				final Segment text = new Segment();

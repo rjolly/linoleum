@@ -2,8 +2,8 @@ package linoleum.notepad;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.io.File;
 import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
@@ -35,13 +35,13 @@ public class Frame extends linoleum.application.Frame {
 
 	@Override
 	public void setURI(final URI uri) {
-		notepad.setFile(Paths.get(uri).toFile());
+		notepad.setFile(Paths.get(uri));
 	}
 
 	@Override
 	public URI getURI() {
-		final File file = notepad.getFile();
-		return file == null?null:file.toURI();
+		final Path file = notepad.getFile();
+		return file == null?null:file.toUri();
 	}
 
 	@Override
