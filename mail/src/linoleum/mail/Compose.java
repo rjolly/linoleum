@@ -2,7 +2,6 @@ package linoleum.mail;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +19,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -33,6 +35,9 @@ import linoleum.application.FileChooser;
 import linoleum.application.Frame;
 
 public class Compose extends Frame {
+	private final Icon sendIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/SendMail16.gif"));
+	private final Action attachAction = new AttachAction();
+	private final Action sendAction = new SendAction();
 	private JTextField toField;
 	private JTextField ccField;
 	private JTextField bccField;
@@ -44,6 +49,45 @@ public class Compose extends Frame {
 	private final Session session;
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final FileChooser chooser = new FileChooser();
+
+	private class AttachAction extends AbstractAction {
+		public AttachAction() {
+			super("Attach...");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent evt) {
+			final int returnVal = chooser.showInternalOpenDialog(Compose.this);
+			switch (returnVal) {
+			case JFileChooser.APPROVE_OPTION:
+				file = chooser.getSelectedFile();
+				break;
+			default:
+				file = null;
+			}
+			putValue(Action.NAME, file == null?"Attach...":file.getName());
+		}
+	}
+
+	private class SendAction extends AbstractAction {
+		public SendAction() {
+			super("Send", sendIcon);
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent evt) {
+			try {
+				send();
+				try {
+					setClosed(true);
+				} catch (final PropertyVetoException e) {
+					e.printStackTrace();
+				}
+			} catch (final MessagingException me) {
+				me.printStackTrace();
+			}
+		}
+	}
 
 	public Compose() {
 		this(Session.getInstance(System.getProperties()));
@@ -123,36 +167,9 @@ public class Compose extends Frame {
 	private JPanel buildButtonPanel() {
 		final JPanel p = new JPanel();
 		p.setLayout(new BorderLayout());
-		final JButton attach = new JButton("Attach...");
-		attach.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent evt) {
-				final int returnVal = chooser.showInternalOpenDialog(Compose.this);
-				switch (returnVal) {
-				case JFileChooser.APPROVE_OPTION:
-					file = chooser.getSelectedFile();
-					break;
-				default:
-					file = null;
-				}
-				attach.setText(file == null?"Attach...":file.getName());
-			}
-		});
+		final JButton attach = new JButton(attachAction);
 		p.add(attach, BorderLayout.WEST);
-		final JButton send = new JButton("Send");
-		send.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent evt) {
-				try {
-					send();
-					try {
-						setClosed(true);
-					} catch (final PropertyVetoException e) {
-						e.printStackTrace();
-					}
-				} catch (final MessagingException me) {
-					me.printStackTrace();
-				}
-			}
-		});
+		final JButton send = new JButton(sendAction);
 		p.add(send, BorderLayout.EAST);
 		return p;
 	}

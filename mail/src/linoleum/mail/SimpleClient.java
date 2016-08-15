@@ -63,10 +63,6 @@ public class SimpleClient extends Frame {
 		}
 	}
 
-	public Action getComposeAction() {
-		return composeAction;
-	}
-
 	private class ExpungeAction extends AbstractAction {
 		public ExpungeAction() {
 			super("Expunge");
@@ -82,10 +78,6 @@ public class SimpleClient extends Frame {
 			} catch (final MessagingException me) {
 				me.printStackTrace();
 			}		}
-	}
-
-	public Action getExpungeAction() {
-		return expungeAction;
 	}
 
 	private class SettingsAction extends AbstractAction {
@@ -106,10 +98,6 @@ public class SimpleClient extends Frame {
 		}
 	}
 
-	public Action getSettingsAction() {
-		return settingsAction;
-	}
-
 	public SimpleClient() {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("Mail24.png")));
@@ -120,6 +108,8 @@ public class SimpleClient extends Frame {
 		} catch (final FileNotFoundException ex) {
 			ex.printStackTrace();
 		}
+		props.put("mail.mime.decodefilename", "true");
+		props.put("mstor.mbox.metadataStrategy", "none");
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
 			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
@@ -165,15 +155,18 @@ public class SimpleClient extends Frame {
 
 	@Override
 	public void open() {
+		final String mailhost = prefs.get(name + ".mailhost", "");
+		if (!mailhost.isEmpty()) {
+			props.put("mail.smtp.host", mailhost);
+		}
+		final boolean debug = prefs.getBoolean(name + ".debug", false);
+		if (debug) {
+			session.setDebug(true);
+		}
 		final URI uri = getURI();
 		if (uri != null) {
 			open(uri.toString());
 		} else {
-			final String mailhost = prefs.get(name + ".mailhost", "");
-			if (!mailhost.isEmpty()) {
-				props.put("mail.smtp.host", mailhost);
-			}
-			session.setDebug(prefs.getBoolean(name + ".debug", false));
 			final String str = prefs.get(name + ".url", "");
 			if (!str.isEmpty()) {
 				open(str);
@@ -332,7 +325,7 @@ public class SimpleClient extends Frame {
 
                 jMenu1.setText("Message");
 
-                jMenuItem1.setAction(getComposeAction());
+                jMenuItem1.setAction(composeAction);
                 jMenu1.add(jMenuItem1);
 
                 jMenuItem2.setAction(messageViewer.getReplyAction());
@@ -348,14 +341,14 @@ public class SimpleClient extends Frame {
 
                 jMenu2.setText("Folder");
 
-                jMenuItem5.setAction(getExpungeAction());
+                jMenuItem5.setAction(expungeAction);
                 jMenu2.add(jMenuItem5);
 
                 jMenuBar1.add(jMenu2);
 
                 jMenu3.setText("Account");
 
-                jMenuItem6.setAction(getSettingsAction());
+                jMenuItem6.setAction(settingsAction);
                 jMenu3.add(jMenuItem6);
 
                 jMenuBar1.add(jMenu3);

@@ -120,12 +120,12 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 
 	private class StructureAction extends AbstractAction {
 		public StructureAction() {
-			super("\nMessage Structure");
+			super("Message Structure");
 		}
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			System.out.println(getValue(Action.NAME));
+			System.out.println("\n" + getValue(Action.NAME));
 			dumpPart("", displayed);
 		}
 	}

@@ -111,14 +111,7 @@ public class Desktop extends JFrame {
                 menuBar = new javax.swing.JMenuBar();
                 fileMenu = new javax.swing.JMenu();
                 openMenuItem = new javax.swing.JMenuItem();
-                saveMenuItem = new javax.swing.JMenuItem();
-                saveAsMenuItem = new javax.swing.JMenuItem();
                 exitMenuItem = new javax.swing.JMenuItem();
-                editMenu = new javax.swing.JMenu();
-                cutMenuItem = new javax.swing.JMenuItem();
-                copyMenuItem = new javax.swing.JMenuItem();
-                pasteMenuItem = new javax.swing.JMenuItem();
-                deleteMenuItem = new javax.swing.JMenuItem();
                 viewMenu = new javax.swing.JMenu();
                 fullScreenMenuItem = new javax.swing.JCheckBoxMenuItem();
                 screenshotMenuItem = new javax.swing.JMenuItem();
@@ -149,15 +142,6 @@ public class Desktop extends JFrame {
                 });
                 fileMenu.add(openMenuItem);
 
-                saveMenuItem.setMnemonic('s');
-                saveMenuItem.setText("Save");
-                fileMenu.add(saveMenuItem);
-
-                saveAsMenuItem.setMnemonic('a');
-                saveAsMenuItem.setText("Save As ...");
-                saveAsMenuItem.setDisplayedMnemonicIndex(5);
-                fileMenu.add(saveAsMenuItem);
-
                 exitMenuItem.setMnemonic('x');
                 exitMenuItem.setText("Exit");
                 exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -168,27 +152,6 @@ public class Desktop extends JFrame {
                 fileMenu.add(exitMenuItem);
 
                 menuBar.add(fileMenu);
-
-                editMenu.setMnemonic('e');
-                editMenu.setText("Edit");
-
-                cutMenuItem.setMnemonic('t');
-                cutMenuItem.setText("Cut");
-                editMenu.add(cutMenuItem);
-
-                copyMenuItem.setMnemonic('y');
-                copyMenuItem.setText("Copy");
-                editMenu.add(copyMenuItem);
-
-                pasteMenuItem.setMnemonic('p');
-                pasteMenuItem.setText("Paste");
-                editMenu.add(pasteMenuItem);
-
-                deleteMenuItem.setMnemonic('d');
-                deleteMenuItem.setText("Delete");
-                editMenu.add(deleteMenuItem);
-
-                menuBar.add(editMenu);
 
                 viewMenu.setMnemonic('v');
                 viewMenu.setText("View");
@@ -294,11 +257,7 @@ public class Desktop extends JFrame {
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JMenuItem aboutMenuItem;
         private javax.swing.JMenuItem contentMenuItem;
-        private javax.swing.JMenuItem copyMenuItem;
-        private javax.swing.JMenuItem cutMenuItem;
-        private javax.swing.JMenuItem deleteMenuItem;
         private linoleum.DesktopPane desktopPane;
-        private javax.swing.JMenu editMenu;
         private javax.swing.JMenuItem exitMenuItem;
         private javax.swing.JMenu fileMenu;
         private linoleum.Background frame;
@@ -306,9 +265,6 @@ public class Desktop extends JFrame {
         private javax.swing.JMenu helpMenu;
         private javax.swing.JMenuBar menuBar;
         private javax.swing.JMenuItem openMenuItem;
-        private javax.swing.JMenuItem pasteMenuItem;
-        private javax.swing.JMenuItem saveAsMenuItem;
-        private javax.swing.JMenuItem saveMenuItem;
         private javax.swing.JMenuItem screenshotMenuItem;
         private javax.swing.JMenu viewMenu;
         // End of variables declaration//GEN-END:variables
