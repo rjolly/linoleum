@@ -1,50 +1,33 @@
 package linoleum;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import javax.activation.MimeType;
 import javax.swing.JPanel;
 import linoleum.application.Frame;
 
 public class ImageViewer extends Frame {
-	private static final String type = "image/*";
-	private File files[] = new File[0];
+	private Path files[] = new Path[0];
 	private int index;
 
 	public ImageViewer() {
 		initComponents();
-		setMimeType(type);
+		setMimeType("image/*");
 	}
 
 	@Override
 	public void setURI(final URI uri) {
-		final File file = Paths.get(uri).toFile();
-		files = file.getParentFile().listFiles(new FileFilter() {
-			public boolean accept(final File file) {
-				return canOpen(file);
-			}
-		});
-		Arrays.sort(files);
-		index = Arrays.binarySearch(files, file);
-	}
-
-	private static boolean canOpen(final File file) {
-		try {
-			final String str = Files.probeContentType(file.toPath());
-			return new MimeType(str).match(type);
-		} catch (final Exception ex) {}
-		return false;
+		final Path path = Paths.get(uri);
+		Arrays.sort(files = listFiles(path.getParent()).toArray(new Path[0]));
+		index = Arrays.binarySearch(files, path);
 	}
 
 	@Override
 	public URI getURI() {
 		if (index < files.length) {
-			return files[index].toURI();
+			return files[index].toUri();
 		}
 		return null;
 	}
@@ -52,13 +35,15 @@ public class ImageViewer extends Frame {
 	@Override
 	protected void open() {
 		if (index < files.length) {
-			final File file = files[index];
+			final Path file = files[index];
 			JPanel panel = null;
 			try {
 				panel = new ImagePanel(file);
-			} catch (final IOException ex) {}
+			} catch (final IOException ex) {
+				ex.printStackTrace();
+			}
 			jScrollPane1.setViewportView(panel);
-			setTitle(file.getName());
+			setTitle(file.getFileName().toString());
 		}
 	}
 
@@ -66,7 +51,7 @@ public class ImageViewer extends Frame {
 	protected void close() {
 		jScrollPane1.setViewportView(null);
 		setTitle("Image Viewer");
-		files = new File[0];
+		files = new Path[0];
 		index = 0;
 	}
 

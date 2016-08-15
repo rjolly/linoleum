@@ -2,14 +2,12 @@ package linoleum.media;
 
 import java.awt.Component;
 import java.io.File;
-import java.io.FileFilter;
 import java.net.URI;
-import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.activation.MimeType;
 import javax.media.ControllerEvent;
 import javax.media.ControllerListener;
 import javax.media.EndOfMediaEvent;
@@ -25,11 +23,9 @@ import linoleum.application.Frame;
 
 public class MediaPlayer extends Frame {
 	private Player player;
-	private static final String audio = "audio/*";
-	private static final String video = "video/*";
 	private final Icon playIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"));
 	private final Icon pauseIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Pause16.gif"));
-	private File files[] = new File[0];
+	private Path files[] = new Path[0];
 	private boolean slide;
 	private Timer timer;
 	private int index;
@@ -37,34 +33,20 @@ public class MediaPlayer extends Frame {
 	public MediaPlayer() {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Movie24.gif")));
-		setMimeType(audio + ":" + video);
+		setMimeType("audio/*:video/*");
 	}
 
 	@Override
 	public void setURI(final URI uri) {
-		final File file = Paths.get(uri).toFile();
-		files = file.getParentFile().listFiles(new FileFilter() {
-			public boolean accept(final File file) {
-				return canOpen(file);
-			}
-		});
-		Arrays.sort(files);
-		index = Arrays.binarySearch(files, file);
-	}
-
-	private static boolean canOpen(final File file) {
-		try {
-			final String str = Files.probeContentType(file.toPath());
-			final MimeType type = new MimeType(str);
-			return type.match(audio) || type.match(video);
-		} catch (final Exception ex) {}
-		return false;
+		final Path path = Paths.get(uri);
+		Arrays.sort(files = listFiles(path.getParent()).toArray(new Path[0]));
+		index = Arrays.binarySearch(files, path);
 	}
 
 	@Override
 	public URI getURI() {
 		if (index < files.length) {
-			return files[index].toURI();
+			return files[index].toUri();
 		}
 		return null;
 	}
@@ -73,11 +55,11 @@ public class MediaPlayer extends Frame {
 	protected void open() {
 		stop();
 		if (index < files.length) {
-			final File file = files[index];
+			final Path file = files[index];
 			try {
-				player = Manager.createRealizedPlayer(file.toURI().toURL());
+				player = Manager.createRealizedPlayer(file.toUri().toURL());
 				final Component component = player.getVisualComponent();
-				setTitle(file.getName());
+				setTitle(file.getFileName().toString());
 				if (component != null) {
 					jPanel1.add(component);
 				}
@@ -115,7 +97,7 @@ public class MediaPlayer extends Frame {
 	protected void close() {
 		stop();
 		setTitle("Media Player");
-		files = new File[0];
+		files = new Path[0];
 		index = 0;
 	}
 

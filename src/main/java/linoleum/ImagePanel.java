@@ -6,8 +6,9 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
@@ -17,8 +18,8 @@ public class ImagePanel extends JPanel implements MouseMotionListener {
 	private int x0;
 	private int y0;
 
-	public ImagePanel(final File file) throws IOException {
-		image = ImageIO.read(file);
+	public ImagePanel(final Path path) throws IOException {
+		image = ImageIO.read(Files.newInputStream(path));
 		addMouseMotionListener(this);
 	}
 

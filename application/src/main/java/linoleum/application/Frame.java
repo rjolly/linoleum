@@ -20,11 +20,18 @@
 package linoleum.application;
 
 import java.awt.Component;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Files;
+import java.nio.file.DirectoryStream;
 import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.prefs.Preferences;
+import javax.activation.MimeType;
 import javax.swing.Icon;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
@@ -190,6 +197,35 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 	protected boolean reuseFor(final URI that) {
 		final URI uri = getURI();
 		return that == null?uri == null:uri == null?false:uri.equals(that);
+	}
+
+	public final List<Path> listFiles(final Path path) {
+		final List<Path> list = new ArrayList<>();
+		try (final DirectoryStream<Path> stream = Files.newDirectoryStream(path, new DirectoryStream.Filter<Path>() {
+			public boolean accept(final Path entry) {
+				return canOpen(entry);
+			}
+		})) {
+			for (final Path entry : stream) {
+				list.add(entry);
+			}
+		} catch (final IOException ex) {
+			ex.printStackTrace();
+		}
+		return Collections.unmodifiableList(list);
+	}
+
+	protected boolean canOpen(final Path entry) {
+		boolean c = false;
+		try {
+			final MimeType t = new MimeType(Files.probeContentType(entry));
+			for (final String s : type.split(":")) {
+				c = c || t.match(s);
+			}
+		} catch (final Exception ex) {
+			ex.printStackTrace();
+		}
+		return c;
 	}
 
 	@Override
