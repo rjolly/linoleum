@@ -233,6 +233,14 @@ function relativize(baseDir, file) {
     return new File(path);
 }
 
+function wget(from, to) {
+    var url = new java.net.URL(from);
+    if (to == undefined) {
+	to = url.getFile().substring(1);
+    }
+    cp(url, pathToFile(to));
+}
+
 function open(name, app) {
     var uri = new java.net.URI(name);
     if (!uri.isAbsolute()) {
