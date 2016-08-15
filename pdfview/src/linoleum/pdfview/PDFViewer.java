@@ -10,7 +10,10 @@ import java.io.RandomAccessFile;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.FileSystems;
 import linoleum.application.Frame;
 
 public class PDFViewer extends Frame {
@@ -42,26 +45,43 @@ public class PDFViewer extends Frame {
 	protected void open() {
 		final URI uri = getURI();
 		if (uri != null) try {
-			openFile(Paths.get(uri).toFile());
+			final Path path = Paths.get(uri);
+			if (path.getFileSystem() == FileSystems.getDefault()) {
+				openFile(path.toFile());
+			} else {
+				openFile(path);
+			}
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
 	}
 
+	@Override
+	protected void close() {
+		curFile = null;
+		System.gc();
+	}
+
+	public void openFile(final Path path) throws IOException {
+		final byte[] byteBuf = Files.readAllBytes(path);
+		final ByteBuffer buf = ByteBuffer.allocate(byteBuf.length);
+		buf.put(byteBuf);
+		openPDFByteBuffer(buf, path.getFileName().toString());
+	}
+
 	public final void openFile(final File file) throws IOException {
 		// first open the file for random access
-		RandomAccessFile raf = new RandomAccessFile(file, "r");
+		final RandomAccessFile raf = new RandomAccessFile(file, "r");
 
 		// extract a file channel
 		try (final FileChannel channel = raf.getChannel()) {
-
 			// now memory-map a byte-buffer
-			ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-			openPDFByteBuffer(buf, file.getPath(), file.getName());
+			final ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+			openPDFByteBuffer(buf, file.getName());
 		}
 	}
 
-	private void openPDFByteBuffer(final ByteBuffer buf, final String path, final String name) throws IOException {
+	private void openPDFByteBuffer(final ByteBuffer buf, final String name) throws IOException {
 		final PDFFile newfile = new PDFFile(buf);
 
 		// set up our document
