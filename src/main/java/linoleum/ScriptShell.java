@@ -25,7 +25,6 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	private final DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
 	private final CountDownLatch engineReady = new CountDownLatch(1);
 	private final Packages pkgs = Desktop.instance.getPackages();
-	private final URI uri = new File(".").toURI();
 	private volatile ScriptEngine engine;
 	private volatile String prompt;
 	private	ScriptEngineManager manager;
@@ -84,11 +83,6 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	}
 
 	@Override
-	public URI getURI() {
-		return uri;
-	}
-
-	@Override
 	public String getPrompt() {
 		return prompt;
 	}
@@ -111,6 +105,11 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	@Override
 	public Frame getFrame(final Frame parent) {
 		return new ScriptShell(parent);
+	}
+
+	@Override
+	public boolean reuseFor(final URI that) {
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")

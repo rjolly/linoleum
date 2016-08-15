@@ -170,15 +170,26 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 	}
 
 	private Frame getFrame(final JDesktopPane desktop, final URI uri) {
+		Frame frame = null;
 		for (final JInternalFrame c : desktop.getAllFrames()) {
-			if (getName().equals(c.getName()) && c instanceof Frame) {
-				final Frame frame = (Frame)c;
-				if (uri == null?null == frame.getURI():uri.equals(frame.getURI())) {
-					return frame;
+			final String name = c.getName();
+			if (name != null && name.equals(getName()) && c instanceof Frame) {
+				final Frame f = (Frame)c;
+				if (f.reuseFor(uri)) {
+					frame = f;
+					break;
 				}
 			}
 		}
-		return getFrame();
+		if (frame == null) {
+			frame = getFrame();
+		}
+		return frame;
+	}
+
+	protected boolean reuseFor(final URI that) {
+		final URI uri = getURI();
+		return that == null?uri == null:uri == null?false:uri.equals(that);
 	}
 
 	@Override

@@ -90,12 +90,15 @@ public class FileManager extends Frame {
 	@Override
 	public void open() {
 		if (empty) {
-			final String str = prefs.get(getName() + ".home", "");
-			if (!str.isEmpty()) {
-				setURI(new File(str).toURI());
-			}
+			setURI(getHome());
 		}
 		thread.start();
+	}
+
+	@Override
+	public void close() {
+		closing = true;
+		thread.interrupt();
 	}
 
 	@Override
@@ -115,9 +118,12 @@ public class FileManager extends Frame {
 	}
 
 	@Override
-	protected void close() {
-		closing = true;
-		thread.interrupt();
+	public boolean reuseFor(final URI that) {
+		return getURI().equals(that == null?getHome():that);
+	}
+
+	private URI getHome() {
+		return new File(prefs.get(getName() + ".home", System.getProperty("user.home"))).toURI();
 	}
 
 	@SuppressWarnings("unchecked")
