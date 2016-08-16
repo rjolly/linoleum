@@ -1,20 +1,58 @@
 package linoleum.notepad;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.beans.*;
-import java.io.*;
-import java.net.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.net.URI;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.Files;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.logging.*;
-import javax.swing.*;
-import javax.swing.undo.*;
-import javax.swing.text.*;
-import javax.swing.event.*;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.Properties;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JInternalFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
+import javax.swing.JViewport;
+import javax.swing.KeyStroke;
+import javax.swing.SwingWorker;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.Segment;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
+import linoleum.application.FileChooser;
 
 @SuppressWarnings("serial")
 public class Notepad extends JPanel {
@@ -24,7 +62,7 @@ public class Notepad extends JPanel {
 
 	private static final String[] MENUBAR_KEYS = {"file", "edit", "debug"};
 	private static final String[] TOOLBAR_KEYS = {"new", "open", "save", "-", "cut", "copy", "paste"};
-	private static final String[] FILE_KEYS = {"new", "open", "save"};
+	private static final String[] FILE_KEYS = {"new", "open", "save", "saveAs", "-", "exit"};
 	private static final String[] EDIT_KEYS = {"cut", "copy", "paste", "-", "undo", "redo", "-", "find", "replace"};
 	private static final String[] DEBUG_KEYS = {"dump", "showElementTree"};
 
@@ -209,7 +247,6 @@ public class Notepad extends JPanel {
 	private ElementTreePanel elementTreePanel;
 	private Frame frame;
 	private int modified;
-	private Path parent;
 	private Path file;
 
 	private UndoableEditListener undoHandler = new UndoHandler();
@@ -251,6 +288,8 @@ public class Notepad extends JPanel {
 		new NewAction(),
 		new OpenAction(),
 		new SaveAction(),
+		new SaveAsAction(),
+		new ExitAction(),
 		new DefaultEditorKit.CutAction(),
 		new DefaultEditorKit.CopyAction(),
 		new DefaultEditorKit.PasteAction(),
@@ -262,7 +301,6 @@ public class Notepad extends JPanel {
 	};
 
 	class UndoAction extends AbstractAction {
-
 		public UndoAction() {
 			super("Undo");
 			setEnabled(false);
@@ -293,7 +331,6 @@ public class Notepad extends JPanel {
 	}
 
 	class RedoAction extends AbstractAction {
-
 		public RedoAction() {
 			super("Redo");
 			setEnabled(false);
@@ -323,7 +360,6 @@ public class Notepad extends JPanel {
 	}
 
 	class FindAction extends AbstractAction {
-
 		FindAction() {
 			super("find");
 		}
@@ -335,7 +371,6 @@ public class Notepad extends JPanel {
 	}
 
 	class ReplaceAction extends AbstractAction {
-
 		ReplaceAction() {
 			super("replace");
 		}
@@ -346,74 +381,7 @@ public class Notepad extends JPanel {
 		}
 	}
 
-	class OpenAction extends AbstractAction {
-
-		OpenAction() {
-			super("open");
-		}
-
-		@Override
-		public void actionPerformed(final ActionEvent e) {
-			if (parent == null) {
-				parent = Paths.get(".");
-			}
-			frame.getApplicationManager().open(parent.toUri());
-		}
-	}
-
-	public void open() {
-		if (file != null && Files.exists(file)) {
-			new FileLoader().execute();
-		} else {
-			editor.getDocument().addUndoableEditListener(undoHandler);
-			resetUndoManager();
-		}
-	}
-
-	public void setFile(final Path file) {
-		if (modified != 0) {
-			final int option = JOptionPane.showInternalConfirmDialog(frame, resources.getString("Warning"), resources.getString("WarningTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-			switch (option) {
-			case JOptionPane.OK_OPTION:
-				break;
-			default:
-				return;
-			}
-		}
-		final Document doc = editor.getReplaceDocument();
-		if (doc != null) {
-			doc.removeUndoableEditListener(undoHandler);
-		}
-		editor.setDocument(new Document());
-		if (file != null) {
-			parent = file.getParent();
-		}
-		this.file = file;
-	}
-
-	public Path getFile() {
-		return file;
-	}
-
-	class SaveAction extends AbstractAction {
-
-		SaveAction() {
-			super("save");
-		}
-
-		public void actionPerformed(final ActionEvent e) {
-			save();
-		}
-	}
-
-	private void save() {
-		new FileSaver().execute();
-		modified = 0;
-		update();
-	}
-
 	class NewAction extends AbstractAction {
-
 		NewAction() {
 			super("new");
 		}
@@ -423,11 +391,103 @@ public class Notepad extends JPanel {
 		}
 
 		public void actionPerformed(final ActionEvent e) {
-			setFile(null);
+			frame.closeDialog();
+			if (proceed()) {
+				setFile(null);
+				editor.getDocument().addUndoableEditListener(undoHandler);
+				resetUndoManager();
+				revalidate();
+			}
+		}
+	}
+
+	class OpenAction extends AbstractAction {
+		OpenAction() {
+			super("open");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			frame.closeDialog();
+			if (proceed()) {
+				final FileChooser chooser = frame.getFileChooser();
+				final int returnVal = chooser.showInternalOpenDialog(Notepad.this);
+				switch (returnVal) {
+				case JFileChooser.APPROVE_OPTION:
+					setFile(chooser.getSelectedFile().toPath());
+					open();
+					break;
+				default:
+				}
+			}
+		}
+	}
+
+	class SaveAction extends AbstractAction {
+		SaveAction() {
+			super("save");
+		}
+
+		public void actionPerformed(final ActionEvent e) {
+			save();
+		}
+	}
+
+	class SaveAsAction extends AbstractAction {
+		SaveAsAction() {
+			super("saveAs");
+		}
+
+		public void actionPerformed(final ActionEvent e) {
+			frame.closeDialog();
+			final FileChooser chooser = frame.getFileChooser();
+			final int returnVal = chooser.showInternalSaveDialog(Notepad.this);
+			switch (returnVal) {
+			case JFileChooser.APPROVE_OPTION:
+				file = chooser.getSelectedFile().toPath();
+				save();
+				break;
+			default:
+			}
+		}
+	}
+
+	class ExitAction extends AbstractAction {
+		ExitAction() {
+			super("exit");
+		}
+
+		public void actionPerformed(final ActionEvent e) {
+			frame.doDefaultCloseAction();
+		}
+	}
+
+	void setFile(final Path file) {
+		final Document doc = editor.getReplaceDocument();
+		if (doc != null) {
+			doc.removeUndoableEditListener(undoHandler);
+		}
+		editor.setDocument(new Document());
+		this.file = file;
+	}
+
+	Path getFile() {
+		return file;
+	}
+
+	void open() {
+		if (file != null && Files.exists(file)) {
+			new FileLoader().execute();
+		} else {
 			editor.getDocument().addUndoableEditListener(undoHandler);
 			resetUndoManager();
-			revalidate();
 		}
+	}
+
+	private void save() {
+		new FileSaver().execute();
+		modified = 0;
+		update();
 	}
 
 	private void update() {
@@ -439,25 +499,27 @@ public class Notepad extends JPanel {
 		getAction("save").setEnabled(file != null && modified != 0);
 	}
 
-	public void close() {
-		if (file != null && modified != 0) {
-			final int option = JOptionPane.showInternalConfirmDialog(frame, resources.getString("Question"), resources.getString("QuestionTitle"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+	boolean proceed() {
+		boolean c = true;
+		if (modified != 0) {
+			final int option = JOptionPane.showInternalConfirmDialog(frame, resources.getString("Warning"), resources.getString("WarningTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 			switch (option) {
-			case JOptionPane.YES_OPTION:
-				save();
+			case JOptionPane.OK_OPTION:
+				break;
+			default:
+				c = false;
 			}
 		}
+		return c;
 	}
 
 	class ShowElementTreeAction extends AbstractAction {
-
 		ShowElementTreeAction() {
 			super("showElementTree");
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			if (elementTreeFrame == null) {
-
 				// Create a frame containing an instance of
 				// ElementTreePanel.
 				try {
@@ -493,7 +555,6 @@ public class Notepad extends JPanel {
 
 		FileWorker(final int length) {
 			this.length = length;
-
 			// initialize the statusbar
 			status.removeAll();
 			final JProgressBar progress = new JProgressBar();
@@ -578,7 +639,6 @@ public class Notepad extends JPanel {
 		@Override
 		public Document doInBackground() {
 			try (final Writer out = Files.newBufferedWriter(file, Charset.defaultCharset())) {
-
 				// start writing
 				final Segment text = new Segment();
 				text.setPartialReturn(true);

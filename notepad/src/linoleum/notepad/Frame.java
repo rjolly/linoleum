@@ -2,15 +2,20 @@ package linoleum.notepad;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.beans.PropertyVetoException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import linoleum.application.FileChooser;
 
 public class Frame extends linoleum.application.Frame {
+	private final FileChooser chooser = new FileChooser();
 	private final Notepad notepad = new Notepad(this);
+	protected Frame parent;
 	private boolean found;
 
 	public Frame() {
@@ -26,6 +31,8 @@ public class Frame extends linoleum.application.Frame {
 		getContentPane().add("Center", notepad);
 		setJMenuBar(notepad.createMenubar());
 		setSize(500, 400);
+		chooser.setFileFilter(new FileNameExtensionFilter("Text", "txt"));
+		this.parent = (Frame) parent;
 	}
 
 	@Override
@@ -49,12 +56,6 @@ public class Frame extends linoleum.application.Frame {
 		return new Frame(parent);
 	}
 
-	@Override
-	public void close() {
-		jInternalFrame1.dispose();
-		notepad.close();
-	}
-
 	private void openDialog(final String title) {
 		if (jInternalFrame1.getDesktopPane() == null) {
 			getDesktopPane().add(jInternalFrame1);
@@ -74,18 +75,28 @@ public class Frame extends linoleum.application.Frame {
 		dialog.setLocation(point.x, point.y);
 	}
 
-	public void find() {
+	void find() {
 		openDialog("FindTitle");
 		jTextField2.setEnabled(false);
 		jButton2.setEnabled(false);
 		jButton3.setEnabled(false);
 	}
 
-	public void replace() {
+	void replace() {
 		openDialog("ReplaceTitle");
 		jTextField2.setEnabled(true);
 		jButton2.setEnabled(true);
 		jButton3.setEnabled(true);
+	}
+
+	void closeDialog() {
+		if (jInternalFrame1.isVisible()) {
+			jInternalFrame1.setVisible(false);
+		}
+	}
+
+	FileChooser getFileChooser() {
+		return parent == null?chooser:parent.chooser;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -196,6 +207,11 @@ public class Frame extends linoleum.application.Frame {
                         public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
                         }
                 });
+                addVetoableChangeListener(new java.beans.VetoableChangeListener() {
+                        public void vetoableChange(java.beans.PropertyChangeEvent evt)throws java.beans.PropertyVetoException {
+                                formVetoableChange(evt);
+                        }
+                });
 
                 pack();
         }// </editor-fold>//GEN-END:initComponents
@@ -237,10 +253,19 @@ public class Frame extends linoleum.application.Frame {
         }//GEN-LAST:event_jButton4ActionPerformed
 
         private void formInternalFrameIconified(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameIconified
-		if (jInternalFrame1.isVisible()) {
-			jInternalFrame1.setVisible(false);
-		}
+		closeDialog();
         }//GEN-LAST:event_formInternalFrameIconified
+
+        private void formVetoableChange(java.beans.PropertyChangeEvent evt)throws java.beans.PropertyVetoException {//GEN-FIRST:event_formVetoableChange
+		if (IS_CLOSED_PROPERTY.equals(evt.getPropertyName()) && (Boolean) evt.getNewValue()) {
+			closeDialog();
+			if (!notepad.proceed()) {
+				throw new PropertyVetoException("aborted", evt);
+			} else {
+				jInternalFrame1.setClosed(true);
+			}
+		}
+        }//GEN-LAST:event_formVetoableChange
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
