@@ -1,27 +1,38 @@
 package linoleum;
 
-import java.beans.PropertyVetoException;
-import java.io.File;
+import java.awt.Component;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.prefs.Preferences;
+import javax.swing.DefaultListModel;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import linoleum.application.FileChooser;
 import linoleum.application.Frame;
 import linoleum.application.OptionPanel;
 
 public class FileManager extends Frame {
+	private final Icon fileIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/file.gif"));
+	private final Icon directoryIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/directory.gif"));
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
-	private final FileChooser fileChooser = new FileChooser();
+	private final FileChooser chooser = new FileChooser();
+	private final DefaultListModel<Path> model = new DefaultListModel<>();
+	private final ListCellRenderer renderer = new Renderer();
 	private final Thread thread = new Thread() {
 		@Override
 		public void run() {
@@ -33,7 +44,7 @@ public class FileManager extends Frame {
 						for (final WatchEvent<?> event : key.pollEvents()) {
 							SwingUtilities.invokeLater(new Runnable() {
 								public void run() {
-									chooser.rescanCurrentDirectory();
+									rescan();
 								}
 							});
 						}
@@ -53,12 +64,33 @@ public class FileManager extends Frame {
 
 		private WatchKey register(final WatchService service) throws IOException {
 			final Path path = Paths.get(getURI());
-			setTitle(path.toFile().getName());
+			setTitle(path.getFileName().toString());
 			return path.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
 		}
 	};
 	private boolean closing;
-	private boolean empty = true;
+
+	private class Renderer extends JLabel implements ListCellRenderer {
+		public Renderer() {
+			setOpaque(true);
+		}
+
+		@Override
+		public Component getListCellRendererComponent(final JList list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+			if (isSelected) {
+				setBackground(list.getSelectionBackground());
+				setForeground(list.getSelectionForeground());
+			} else {
+				setBackground(list.getBackground());
+				setForeground(list.getForeground());
+			}
+			final Path path = (Path)value;
+			setIcon(Files.isDirectory(path)?directoryIcon:fileIcon);
+			setText(path.getFileName().toString());
+			setFont(list.getFont());
+			return this;
+		}
+	};
 
 	public FileManager() {
 		this(null);
@@ -68,8 +100,13 @@ public class FileManager extends Frame {
 		super(parent);
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
-		setMimeType("application/octet-stream");
-		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		setMimeType("application/octet-stream:application/java-archive:application/zip");
+		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	}
+
+	@Override
+	public Frame getFrame(final Frame parent) {
+		return new FileManager(parent);
 	}
 
 	@Override
@@ -89,9 +126,11 @@ public class FileManager extends Frame {
 
 	@Override
 	public void open() {
-		if (empty) {
+		final URI uri = getURI();
+		if (uri == null) {
 			setURI(getHome());
 		}
+		rescan();
 		thread.start();
 	}
 
@@ -101,29 +140,46 @@ public class FileManager extends Frame {
 		thread.interrupt();
 	}
 
-	@Override
-	public void setURI(final URI uri) {
-		chooser.setCurrentDirectory(Paths.get(uri).toFile());
-		empty = false;
+	private void rescan() {
+		model.clear();
+		final Path path = Paths.get(getURI());
+		Path files[] = listFiles(path).toArray(new Path[0]);
+		Arrays.sort(files, new Comparator<Path>() {
+			public int compare(final Path a, final Path b) {
+				boolean ac = Files.isDirectory(a);
+				boolean bc = Files.isDirectory(b);
+				return ac == bc?a.compareTo(b):ac?-1:1;
+			}
+		});
+		for (final Path entry : files) {
+			model.addElement(entry);
+		}
 	}
 
-	@Override
-	public URI getURI() {
-		return chooser.getCurrentDirectory().toURI();
+	public boolean canOpen(final Path entry) {
+		boolean c = true;
+		try {
+			if (Files.isHidden(entry)) {
+				c = false;
+			}
+		} catch (final IOException ex) {
+			ex.printStackTrace();
+		}
+		return c;
 	}
-
-	@Override
-	public Frame getFrame(final Frame parent) {
-		return new FileManager(parent);
-	}
-
+ 
 	@Override
 	public boolean reuseFor(final URI that) {
 		return getURI().equals(that == null?getHome():that);
 	}
 
 	private URI getHome() {
-		return new File(prefs.get(getName() + ".home", System.getProperty("user.home"))).toURI();
+		return Paths.get(prefs.get(getName() + ".home", System.getProperty("user.home"))).toUri();
+	}
+
+	private void open(final int index) {
+		final Path entry = model.getElementAt(index);
+		getApplicationManager().open(entry.toUri());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -134,7 +190,8 @@ public class FileManager extends Frame {
                 jLabel2 = new javax.swing.JLabel();
                 jTextField1 = new javax.swing.JTextField();
                 jButton1 = new javax.swing.JButton();
-                chooser = new javax.swing.JFileChooser();
+                jScrollPane1 = new javax.swing.JScrollPane();
+                jList1 = new javax.swing.JList();
 
                 optionPanel1.setFrame(this);
 
@@ -179,69 +236,54 @@ public class FileManager extends Frame {
                 setIconifiable(true);
                 setMaximizable(true);
                 setResizable(true);
+                setName("Files"); // NOI18N
 
-                chooser.setFileSelectionMode(javax.swing.JFileChooser.FILES_AND_DIRECTORIES);
-                chooser.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                chooserActionPerformed(evt);
+                jList1.setModel(model);
+                jList1.setCellRenderer(renderer);
+                jList1.setLayoutOrientation(javax.swing.JList.HORIZONTAL_WRAP);
+                jList1.setVisibleRowCount(-1);
+                jList1.addMouseListener(new java.awt.event.MouseAdapter() {
+                        public void mouseClicked(java.awt.event.MouseEvent evt) {
+                                jList1MouseClicked(evt);
                         }
                 });
-                chooser.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-                        public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                                chooserPropertyChange(evt);
-                        }
-                });
+                jScrollPane1.setViewportView(jList1);
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);
                 layout.setHorizontalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(chooser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
                 );
                 layout.setVerticalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(chooser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
                 );
 
                 pack();
         }// </editor-fold>//GEN-END:initComponents
 
-        private void chooserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooserActionPerformed
-		switch (evt.getActionCommand()) {
-		case JFileChooser.APPROVE_SELECTION:
-			final File file = chooser.getSelectedFile();
-			getApplicationManager().open(file.toURI());
-			break;
-		case JFileChooser.CANCEL_SELECTION:
-			try {
-				setClosed(true);
-			} catch (final PropertyVetoException e) {
-				e.printStackTrace();
-			}
-			break;
+        private void jList1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseClicked
+		if (evt.getClickCount() == 1) {
+			open(jList1.locationToIndex(evt.getPoint()));
 		}
-        }//GEN-LAST:event_chooserActionPerformed
-
-        private void chooserPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_chooserPropertyChange
-		if (JFileChooser.DIRECTORY_CHANGED_PROPERTY.equals(evt.getPropertyName())) {
-			thread.interrupt();
-		}
-        }//GEN-LAST:event_chooserPropertyChange
+        }//GEN-LAST:event_jList1MouseClicked
 
         private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-		final int returnVal = fileChooser.showInternalOpenDialog(optionPanel1);
+		final int returnVal = chooser.showInternalOpenDialog(optionPanel1);
 		switch (returnVal) {
 		case JFileChooser.APPROVE_OPTION:
-			jTextField1.setText(fileChooser.getSelectedFile().getPath());
+			jTextField1.setText(chooser.getSelectedFile().getPath());
 			break;
 		default:
 		}
         }//GEN-LAST:event_jButton1ActionPerformed
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
-        private javax.swing.JFileChooser chooser;
         private javax.swing.JButton jButton1;
         private javax.swing.JLabel jLabel2;
+        private javax.swing.JList jList1;
+        private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JTextField jTextField1;
         private linoleum.application.OptionPanel optionPanel1;
         // End of variables declaration//GEN-END:variables
