@@ -43,7 +43,8 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 	private URI uri;
 	private boolean ready;
 	protected final int index;
-	private final Collection<Integer> openFrames;
+	protected final Frame parent;
+	private final Collection<Integer> openFrames = new HashSet<Integer>();
 	private static final int offset = 30;
 
 	public Frame() {
@@ -57,14 +58,14 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 	public Frame(final Frame parent, final String title) {
 		super(title, true, true, true, true);
 		initComponents();
-		openFrames = parent == null?new HashSet<Integer>():parent.openFrames;
-		index = nextIndex();
+		index = parent == null?0:parent.nextIndex();
+		this.parent = parent;
 	}
 
 	public Frame(final Frame parent) {
 		initComponents();
-		openFrames = parent == null?new HashSet<Integer>():parent.openFrames;
-		index = nextIndex();
+		index = parent == null?0:parent.nextIndex();
+		this.parent = parent;
 	}
 
 	private int nextIndex() {
@@ -75,13 +76,17 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 		if (manager != null) {
 			manager.addClassPathListener(this);
 		}
-		openFrames.add(index);
+		if (parent != null) {
+			parent.openFrames.add(index);
+		}
 		open();
 	}
 
 	private void closeFrame() {
 		close();
-		openFrames.remove(index);
+		if (parent != null) {
+			parent.openFrames.remove(index);
+		}
 		if (manager != null) {
 			manager.removeClassPathListener(this);
 		}
