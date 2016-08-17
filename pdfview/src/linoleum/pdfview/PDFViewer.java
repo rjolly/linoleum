@@ -96,7 +96,7 @@ public class PDFViewer extends Frame {
 	protected void open() {
 		final URI uri = getURI();
 		if (uri != null) try {
-			final Path path = Paths.get(uri);
+			final Path path = Paths.get(uri).toRealPath();
 			if (path.getFileSystem() == FileSystems.getDefault()) {
 				openFile(path.toFile());
 			} else {

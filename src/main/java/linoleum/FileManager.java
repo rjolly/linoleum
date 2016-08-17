@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.prefs.Preferences;
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -72,7 +74,10 @@ public class FileManager extends Frame {
 		}
 
 		private WatchKey register(final WatchService service) throws IOException {
-			setTitle(path.getFileName().toString());
+			final Path name = path.getFileName();
+			if (name != null) {
+				setTitle(name.toString());
+			}
 			return path.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
 		}
 	};
@@ -139,7 +144,11 @@ public class FileManager extends Frame {
 	}
 
 	public void setURI(final URI uri) {
-		path = Paths.get(uri);
+		try {
+			path = Paths.get(uri).toRealPath();
+		} catch (final IOException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	@Override
@@ -153,15 +162,11 @@ public class FileManager extends Frame {
 			setURI(getHome());
 		}
 		fs = path.getFileSystem();
-		if(Files.isRegularFile(path)) {
+		if(Files.isRegularFile(path) && isJar()) {
 			final URI uri = path.toUri();
 			try {
 				fs = FileSystems.newFileSystem(new URI("jar", uri.toString(), null), env);
-				for (final Path entry : fs.getRootDirectories()) {
-					path = entry;
-					break;
-				}
-			} catch (final Exception ex) {
+			} catch (final URISyntaxException | IOException ex) {
 				ex.printStackTrace();
 			}
 		}
@@ -173,17 +178,17 @@ public class FileManager extends Frame {
 			}
 			coll.add(index);
 		}
-		if (fs == defaultfs) {
+		if (fs == defaultfs && Files.isDirectory(path)) {
 			thread.start();
 		} else {
-			setTitle(path.toString());
+			setTitle(getFileName().toString());
 		}
 	}
 
 	@Override
 	public void close() {
 		closing = true;
-		if (fs == defaultfs) {
+		if (fs == defaultfs && Files.isDirectory(path)) {
 			thread.interrupt();
 		}
 		if (fs != defaultfs && parent != null) {
@@ -202,7 +207,10 @@ public class FileManager extends Frame {
 
 	private void rescan() {
 		model.clear();
-		Path files[] = listFiles(path).toArray(new Path[0]);
+		Path files[] = new Path[0];
+		if (Files.isDirectory(path) || isJar()) {
+			files = listFiles(Files.isDirectory(path)?path:getRootDirectory()).toArray(files);
+		}
 		Arrays.sort(files, new Comparator<Path>() {
 			public int compare(final Path a, final Path b) {
 				boolean ac = Files.isDirectory(a);
@@ -214,19 +222,41 @@ public class FileManager extends Frame {
 			model.addElement(entry);
 		}
 	}
+ 
+	private boolean isJar() {
+		if (path.getFileSystem() == defaultfs) try {
+			final MimeType t = new MimeType(Files.probeContentType(path));
+			return t.match("application/java-archive") || t.match("application/zip");
+		} catch (final IOException | MimeTypeParseException ex) {
+			ex.printStackTrace();
+		}
+		return false;
+	}
 
+	private Path getRootDirectory() {
+		for (final Path entry : fs.getRootDirectories()) {
+			return entry;
+		}
+		return null;
+	}
+
+	private final Path getFileName() {
+		final int n = path.getNameCount();
+		return n > 0?path.getName(n - 1):path;
+	}
+
+	@Override
 	public boolean canOpen(final Path entry) {
-		boolean c = true;
 		try {
-			if (Files.isHidden(entry)) {
-				c = false;
+			if (!Files.isHidden(entry)) {
+				return true;
 			}
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
-		return c;
+		return false;
 	}
- 
+
 	@Override
 	public boolean reuseFor(final URI that) {
 		return getURI().equals(that == null?getHome():that);
@@ -237,8 +267,15 @@ public class FileManager extends Frame {
 	}
 
 	private void open(final int index) {
-		final Path entry = model.getElementAt(index);
-		getApplicationManager().open(entry.toUri());
+		if (index < 0) {
+		} else {
+			final Path entry = model.getElementAt(index);
+			try {
+				getApplicationManager().open(entry.toRealPath().toUri());
+			} catch (final IOException ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 
 	@SuppressWarnings("unchecked")

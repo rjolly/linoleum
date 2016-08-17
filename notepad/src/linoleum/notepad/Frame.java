@@ -3,6 +3,7 @@ package linoleum.notepad;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.beans.PropertyVetoException;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -42,7 +43,11 @@ public class Frame extends linoleum.application.Frame {
 
 	@Override
 	public void setURI(final URI uri) {
-		notepad.setFile(Paths.get(uri));
+		try {
+			notepad.setFile(Paths.get(uri).toRealPath());
+		} catch (final IOException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	@Override

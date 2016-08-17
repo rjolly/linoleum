@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.prefs.Preferences;
 import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 import javax.swing.Icon;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
@@ -216,16 +217,17 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 	}
 
 	protected boolean canOpen(final Path entry) {
-		boolean c = false;
 		try {
 			final MimeType t = new MimeType(Files.probeContentType(entry));
 			for (final String s : type.split(":")) {
-				c = c || t.match(s);
+				if (t.match(s)) {
+					return true;
+				}
 			}
-		} catch (final Exception ex) {
+		} catch (final IOException | MimeTypeParseException ex) {
 			ex.printStackTrace();
 		}
-		return c;
+		return false;
 	}
 
 	@Override

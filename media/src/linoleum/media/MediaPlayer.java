@@ -2,6 +2,7 @@ package linoleum.media;
 
 import java.awt.Component;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,9 +39,13 @@ public class MediaPlayer extends Frame {
 
 	@Override
 	public void setURI(final URI uri) {
-		final Path path = Paths.get(uri);
-		Arrays.sort(files = listFiles(path.getParent()).toArray(new Path[0]));
-		index = Arrays.binarySearch(files, path);
+		try {
+			final Path path = Paths.get(uri).toRealPath();
+			Arrays.sort(files = listFiles(path.getParent()).toArray(new Path[0]));
+			index = Arrays.binarySearch(files, path);
+		} catch (final IOException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	@Override
