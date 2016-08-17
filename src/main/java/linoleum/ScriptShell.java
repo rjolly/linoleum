@@ -94,9 +94,9 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 			engineReady.await();
 			Object tmp = engine.eval(cmd);
 			res = (tmp == null) ? null : tmp.toString();
-		} catch (InterruptedException ie) {
+		} catch (final InterruptedException ie) {
 			res = ie.getMessage();
-		} catch (ScriptException se) {
+		} catch (final ScriptException se) {
 			res = se.getMessage();
 		}
 		return res;
@@ -209,7 +209,9 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 				// load current user's initialization file
 				loadUserInitFile(new File("init." + extension));
 			}
-		} catch (final IOException e) {}
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	// set pre-defined global variables for script
@@ -226,8 +228,10 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		engine.put(ScriptEngine.FILENAME, url.getPath());
 		try (final InputStreamReader reader = new InputStreamReader(url.openStream())) {
 			engine.eval(reader);
-		} catch (final Exception ex) {
+		} catch (final IOException ex) {
 			ex.printStackTrace();
+		} catch (final ScriptException se) {
+			se.printStackTrace();
 		} finally {
 			engine.put(ScriptEngine.FILENAME, oldFilename);
 		}
@@ -241,8 +245,10 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		engine.put(ScriptEngine.FILENAME, file.getName());
 		try (final InputStreamReader reader = new FileReader(file)) {
 			engine.eval(reader);
-		} catch (final Exception ex) {
+		} catch (final IOException ex) {
 			ex.printStackTrace();
+		} catch (final ScriptException se) {
+			se.printStackTrace();
 		} finally {
 			engine.put(ScriptEngine.FILENAME, oldFilename);
 		}

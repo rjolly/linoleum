@@ -319,7 +319,7 @@ public class EditorPane extends JEditorPane {
 			// malformed parameter list, use charset we have
 		} catch (final NullPointerException e) {
 			// malformed parameter list, use charset we have
-		} catch (final Exception e) {
+		} catch (final RuntimeException e) {
 			// malformed parameter list, use charset we have; but complain
 			System.err.println("JEditorPane.getCharsetFromContentTypeParameters failed on: " + paramlist);
 			e.printStackTrace();

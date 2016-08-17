@@ -59,7 +59,9 @@ public class Packages {
 						put(new Package(file).getName(), file);
 					}
 				}
-			} catch (final IOException e) {}
+			} catch (final IOException e) {
+				e.printStackTrace();
+			}
 		}
 		if (tools.exists()) {
 			add(tools);
@@ -74,7 +76,9 @@ public class Packages {
 					}
 				}
 			}
-		} catch (final IOException e) {}
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
 		final File lib = new File("lib");
 		lib.mkdir();
 		if (lib.isDirectory()) {
@@ -98,7 +102,9 @@ public class Packages {
 		if (!pkg.isSourcesOrJavadoc() && !map.containsKey(name)) try {
 			((ClassLoader)ClassLoader.getSystemClassLoader()).addURL(file.toURI().toURL());
 			put(name, file);
-		} catch (final Exception e) {}
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void put(final String name, final File file) {

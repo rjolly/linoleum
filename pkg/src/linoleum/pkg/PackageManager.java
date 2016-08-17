@@ -1,6 +1,8 @@
 package linoleum.pkg;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.Arrays;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
@@ -42,7 +44,7 @@ public class PackageManager extends Frame {
 			} else {
 				ivy.configureDefault();
 			}
-		} catch (final Exception ex) {
+		} catch (final ParseException | IOException ex) {
 			ex.printStackTrace();
 		}
 	}
@@ -76,34 +78,34 @@ public class PackageManager extends Frame {
 		ivy.publish(mRID, Arrays.asList(pattern), resolver, options);
 	}
 
-	public void install(final String name, final String conf) throws Exception {
+	public void install(final String name, final String conf) {
 		install(name, conf, lib);
 	}
 
-	public void install(final String name, final String conf, final File dir) throws Exception {
+	public void install(final String name, final String conf, final File dir) {
 		final ModuleRevisionId mRID = ModuleRevisionId.parse(name);
 		final ResolveOptions resolveOptions = new ResolveOptions();
 		resolveOptions.setConfs(new String[] { conf });
-		final ResolveReport resolveReport = ivy.resolve(mRID, resolveOptions, true);
-		final ModuleDescriptor md = resolveReport.getModuleDescriptor();
-		final RetrieveOptions retrieveOptions = new RetrieveOptions();
-		retrieveOptions.setDestArtifactPattern(dir.getPath() + "/[artifact]-[revision](-[classifier]).[ext]");
-		final RetrieveReport retrieveReport = ivy.retrieve(md.getModuleRevisionId(), retrieveOptions);
-		for (final Object obj : retrieveReport.getCopiedFiles()) {
-			final File file = (File)obj;
-			if (file.getName().endsWith(".jar")) {
-				pkgs.add(file);
+		try {
+			final ResolveReport resolveReport = ivy.resolve(mRID, resolveOptions, true);
+			final ModuleDescriptor md = resolveReport.getModuleDescriptor();
+			final RetrieveOptions retrieveOptions = new RetrieveOptions();
+			retrieveOptions.setDestArtifactPattern(dir.getPath() + "/[artifact]-[revision](-[classifier]).[ext]");
+			final RetrieveReport retrieveReport = ivy.retrieve(md.getModuleRevisionId(), retrieveOptions);
+			for (final Object obj : retrieveReport.getCopiedFiles()) {
+				final File file = (File)obj;
+				if (file.getName().endsWith(".jar")) {
+					pkgs.add(file);
+				}
 			}
+			pkgs.commit(this);
+		} catch (final ParseException | IOException ex) {
+			ex.printStackTrace();
 		}
-		pkgs.commit(this);
 	}
 
 	private void install(final String organization, final String module, final String revision) {
-		try {
-			install(organization + "#" + module + ";" + revision, "default");
-		} catch (final Exception ex) {
-			ex.printStackTrace();
-		}
+		install(organization + "#" + module + ";" + revision, "default");
 	}
 
 	@Override

@@ -23,6 +23,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.beans.PropertyVetoException;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -39,6 +40,7 @@ import java.util.prefs.Preferences;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -204,7 +206,7 @@ public class ApplicationManager extends Frame {
 					}
 				}
 			}
-		} catch (final Exception ex) {
+		} catch (final IOException | MimeTypeParseException ex) {
 			ex.printStackTrace();
 		}
 		return name;

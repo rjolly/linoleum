@@ -13,6 +13,7 @@ import javax.media.ControllerEvent;
 import javax.media.ControllerListener;
 import javax.media.EndOfMediaEvent;
 import javax.media.Manager;
+import javax.media.MediaException;
 import javax.media.Player;
 import javax.media.Time;
 import javax.swing.Icon;
@@ -87,7 +88,7 @@ public class MediaPlayer extends Frame {
 						}
 					}
 				}, 0, 1000);
-			} catch (final Exception ex) {
+			} catch (final IOException | MediaException ex) {
 				ex.printStackTrace();
 			}
 		}

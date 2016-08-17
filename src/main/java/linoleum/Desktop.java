@@ -60,7 +60,9 @@ public class Desktop extends JFrame {
 		try {
 			final File file = new File(new File(System.getProperty("java.home")), "../docs/api/index.html").getCanonicalFile();
 			if (file.exists()) apps.open(file.toURI());
-		} catch (final IOException ex) {}
+		} catch (final IOException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	private void fullScreen() {
@@ -97,8 +99,8 @@ public class Desktop extends JFrame {
 		try {
 			final File dir = FileSystemView.getFileSystemView().getDefaultDirectory();
 			ImageIO.write(bi, "png", new File(dir, "screenshot.png"));
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
+		} catch (final IOException ex) {
+			ex.printStackTrace();
 		}
 	}
 

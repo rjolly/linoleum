@@ -7,6 +7,7 @@ import javax.vecmath.*;
 import java.awt.BorderLayout;
 import java.awt.GraphicsConfiguration;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import javax.swing.JPanel;
@@ -22,7 +23,7 @@ public class ObjLoad extends Frame {
     private final double creaseAngle = 60.0;
     private final String title = "3D Object Loader";
 
-    public BranchGroup createSceneGraph(final URL filename) throws Exception {
+    public BranchGroup createSceneGraph(final URL filename) throws IOException {
 	// Create the root of the branch graph
 	final BranchGroup objRoot = new BranchGroup();
 
@@ -151,7 +152,7 @@ public class ObjLoad extends Frame {
 			// Create the content branch and add it to the universe
 			final BranchGroup scene = createSceneGraph(filename);
 			univ.addBranchGraph(scene);
-		} catch (final Exception ex) {
+		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
 	}

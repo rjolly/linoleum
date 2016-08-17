@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
+import javax.swing.text.BadLocationException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import linoleum.application.FileChooser;
 
@@ -225,7 +226,7 @@ public class Frame extends linoleum.application.Frame {
 		try {
 			found = notepad.getEditor().findNext(jTextField1.getText(), true);
 			setSelected(true);
-		} catch (final Exception ex) {
+		} catch (final BadLocationException | PropertyVetoException ex) {
 			ex.printStackTrace();
 		}
         }//GEN-LAST:event_jButton1ActionPerformed
@@ -234,7 +235,7 @@ public class Frame extends linoleum.application.Frame {
 		if (found) try {
 			found = notepad.getEditor().replace(jTextField1.getText(), jTextField2.getText());
 			setSelected(true);
-		} catch (final Exception ex) {
+		} catch (final BadLocationException | PropertyVetoException ex) {
 			ex.printStackTrace();
 		}
         }//GEN-LAST:event_jButton2ActionPerformed
@@ -243,7 +244,7 @@ public class Frame extends linoleum.application.Frame {
 		try {
 			notepad.getEditor().replaceAll(jTextField1.getText(), jTextField2.getText());
 			setSelected(true);
-		} catch (final Exception ex) {
+		} catch (final BadLocationException | PropertyVetoException ex) {
 			ex.printStackTrace();
 		}
         }//GEN-LAST:event_jButton3ActionPerformed
@@ -252,7 +253,7 @@ public class Frame extends linoleum.application.Frame {
 		try {
 			jInternalFrame1.setVisible(false);
 			setSelected(true);
-		} catch (final Exception ex) {
+		} catch (final PropertyVetoException ex) {
 			ex.printStackTrace();
 		}
         }//GEN-LAST:event_jButton4ActionPerformed
