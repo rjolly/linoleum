@@ -3,6 +3,8 @@ package linoleum;
 import java.awt.Component;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,7 +14,11 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.prefs.Preferences;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
@@ -33,10 +39,11 @@ public class FileManager extends Frame {
 	private final FileChooser chooser = new FileChooser();
 	private final DefaultListModel<Path> model = new DefaultListModel<>();
 	private final ListCellRenderer renderer = new Renderer();
+	private final Map<String, ?> env = new HashMap<>();
 	private final Thread thread = new Thread() {
 		@Override
 		public void run() {
-			try (final WatchService service = FileSystems.getDefault().newWatchService()) {
+			try (final WatchService service = fs.newWatchService()) {
 				WatchKey key = register(service);
 				for (;;) {
 					try {
@@ -59,16 +66,22 @@ public class FileManager extends Frame {
 						}
 					}
 				}
-			} catch (final IOException e) {}
+			} catch (final IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 		private WatchKey register(final WatchService service) throws IOException {
-			final Path path = Paths.get(getURI());
 			setTitle(path.getFileName().toString());
 			return path.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
 		}
 	};
+	private final FileSystem defaultfs = FileSystems.getDefault();
+	private final Map<FileSystem, Collection<Integer>> openFrames = new HashMap<>();
+	protected FileManager parent;
 	private boolean closing;
+	private FileSystem fs;
+	private Path path;
 
 	private class Renderer extends JLabel implements ListCellRenderer {
 		public Renderer() {
@@ -102,6 +115,7 @@ public class FileManager extends Frame {
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
 		setMimeType("application/octet-stream:application/java-archive:application/zip");
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		this.parent = (FileManager) parent;
 	}
 
 	@Override
@@ -124,25 +138,70 @@ public class FileManager extends Frame {
 		prefs.put(getName() + ".home", jTextField1.getText());
 	}
 
+	public void setURI(final URI uri) {
+		path = Paths.get(uri);
+	}
+
+	@Override
+	public URI getURI() {
+		return path == null?null:path.toUri();
+	}
+
 	@Override
 	public void open() {
-		final URI uri = getURI();
-		if (uri == null) {
+		if (path == null) {
 			setURI(getHome());
 		}
+		fs = path.getFileSystem();
+		if(Files.isRegularFile(path)) {
+			final URI uri = path.toUri();
+			try {
+				fs = FileSystems.newFileSystem(new URI("jar", uri.toString(), null), env);
+				for (final Path entry : fs.getRootDirectories()) {
+					path = entry;
+					break;
+				}
+			} catch (final Exception ex) {
+				ex.printStackTrace();
+			}
+		}
 		rescan();
-		thread.start();
+		if (fs != defaultfs && parent != null) {
+			Collection<Integer> coll = parent.openFrames.get(fs);
+			if (coll == null) {
+				parent.openFrames.put(fs, coll = new HashSet<Integer>());
+			}
+			coll.add(index);
+		}
+		if (fs == defaultfs) {
+			thread.start();
+		} else {
+			setTitle(path.toString());
+		}
 	}
 
 	@Override
 	public void close() {
 		closing = true;
-		thread.interrupt();
+		if (fs == defaultfs) {
+			thread.interrupt();
+		}
+		if (fs != defaultfs && parent != null) {
+			Collection<Integer> coll = parent.openFrames.get(fs);
+			coll.remove(index);
+			if (coll.isEmpty()) {
+				parent.openFrames.remove(fs);
+				try {
+					fs.close();
+				} catch (final IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+		}
 	}
 
 	private void rescan() {
 		model.clear();
-		final Path path = Paths.get(getURI());
 		Path files[] = listFiles(path).toArray(new Path[0]);
 		Arrays.sort(files, new Comparator<Path>() {
 			public int compare(final Path a, final Path b) {
