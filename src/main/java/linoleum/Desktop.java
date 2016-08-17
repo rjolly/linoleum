@@ -135,6 +135,8 @@ public class Desktop extends JFrame {
                 fileMenu.setMnemonic('f');
                 fileMenu.setText("File");
 
+                openMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
+                openMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"))); // NOI18N
                 openMenuItem.setMnemonic('o');
                 openMenuItem.setText("Open");
                 openMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -144,6 +146,7 @@ public class Desktop extends JFrame {
                 });
                 fileMenu.add(openMenuItem);
 
+                exitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_W, java.awt.event.InputEvent.ALT_MASK | java.awt.event.InputEvent.CTRL_MASK));
                 exitMenuItem.setMnemonic('x');
                 exitMenuItem.setText("Exit");
                 exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -192,6 +195,7 @@ public class Desktop extends JFrame {
                 });
                 helpMenu.add(contentMenuItem);
 
+                aboutMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/About16.gif"))); // NOI18N
                 aboutMenuItem.setMnemonic('a');
                 aboutMenuItem.setText("About");
                 aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
