@@ -27,7 +27,8 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	private final Packages pkgs = Desktop.instance.getPackages();
 	private volatile ScriptEngine engine;
 	private volatile String prompt;
-	private	ScriptEngineManager manager;
+	private	ScriptEngineFactory factory;
+	protected ScriptShell parent;
 	private String extension;
 
 	public ScriptShell() {
@@ -38,16 +39,28 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		super(parent);
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
-		createScriptEngine();
-		setTitle(engine.getFactory().getLanguageName());
-		setContentPane(new ScriptShellPanel(this));
+		this.parent = (ScriptShell) parent;
+		if (parent == null) {
+			refresh();
+		} else {
+			createScriptEngine();
+			setTitle(engine.getFactory().getLanguageName());
+			setContentPane(new ScriptShellPanel(this));
+		}
 	}
 
 	private void refresh() {
 		model.removeAllElements();
-		manager = new ScriptEngineManager();
+		final ScriptEngineManager manager = new ScriptEngineManager();
+		final String language = prefs.get(getName() + ".language", "");
 		for (final ScriptEngineFactory sef : manager.getEngineFactories()) {
 			model.addElement(sef.getEngineName());
+			if (factory == null || language.equals(sef.getEngineName())) {
+				factory = sef;
+			}
+		}
+		if (factory == null) {
+			throw new RuntimeException("cannot load " + language + " factory");
 		}
 	}
 
@@ -181,22 +194,18 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
         private linoleum.application.OptionPanel optionPanel1;
         // End of variables declaration//GEN-END:variables
 
+	private ScriptEngineFactory getFactory() {
+		return parent == null?factory:parent.factory;
+	}
+
+	// create script engine
 	private void createScriptEngine() {
-		final String language = prefs.get(getName() + ".language", "");
-		refresh();
-		for (final ScriptEngineFactory sef : manager.getEngineFactories()) {
-			if (engine == null || language.equals(sef.getEngineName())) {
-				engine = sef.getScriptEngine();
-			}
-		}
-		if (engine == null) {
-			throw new RuntimeException("cannot load " + language + " engine");
-		}
+		engine = getFactory().getScriptEngine();
 		extension = engine.getFactory().getExtensions().get(0);
 		prompt = extension + ">";
 	}
 
-	// create and initialize script engine
+	// initialize script engine
 	private void initScriptEngine() {
 		// set pre-defined global variables
 		setGlobals();
