@@ -259,12 +259,12 @@ function exit(code) {
 
 function log(str) {
     Level = java.util.logging.Level;
-    var root = java.util.logging.Logger.getLogger("");
+    Logger = java.util.logging.Logger;
+    var root = Logger.getLogger("");
     var handlers = root.getHandlers();
     if (handlers.length > 0) {
 	var handler = handlers[0];
-	var level = handler.getLevel();
-	if (level > Level.CONFIG) {
+	if (handler.getLevel() > Level.CONFIG) {
 	    handler.setLevel(Level.CONFIG);
 	}
     }

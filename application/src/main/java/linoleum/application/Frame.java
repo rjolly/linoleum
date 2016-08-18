@@ -174,7 +174,11 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 		} else if (changed) {
 			frame.openFrame();
 		}
-		manager.select(frame);
+		frame.select();
+	}
+
+	public void select() {
+		manager.select(this);
 	}
 
 	private Frame getFrame(final JDesktopPane desktop, final URI uri) {

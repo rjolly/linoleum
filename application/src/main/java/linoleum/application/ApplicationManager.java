@@ -52,6 +52,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
+import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import linoleum.application.event.ClassPathListener;
@@ -267,6 +268,21 @@ public class ApplicationManager extends Frame {
 
 	@Override
 	public void open() {
+		(new SwingWorker<Object, Object>() {
+			@Override
+			public Object doInBackground() {
+				doOpen();
+				return null;
+			}
+
+			@Override
+			protected void done() {
+				load(pref);
+			}
+		}).execute();
+	}
+
+	public void doOpen() {
 		for (final JInternalFrame frame : ServiceLoader.load(JInternalFrame.class)) {
 			if (frame instanceof App) {
 				process((App)frame);
@@ -350,7 +366,6 @@ public class ApplicationManager extends Frame {
 				}
 			});
 		}
-		load(pref);
 	}
 
 	void select(final JInternalFrame frame) {
@@ -375,10 +390,6 @@ public class ApplicationManager extends Frame {
 		if (width < s.width || height < s.height) {
 			frame.setSize(width, height);
 		}
-	}
-
-	public void select() {
-		select(this);
 	}
 
 	private void process(final App app) {

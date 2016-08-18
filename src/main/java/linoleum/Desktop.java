@@ -43,8 +43,23 @@ public class Desktop extends JFrame {
 		return frame;
 	}
 
+	Frame getConsole() {
+		return console;
+	}
+
 	private void open() {
 		apps.select();
+		if (!contentMenuItem.isEnabled()) {
+			contentMenuItem.setEnabled(true);
+		}
+	}
+
+	private void console() {
+		if (consoleMenuItem.isSelected()) {
+			console.select();
+		} else {
+			console.doDefaultCloseAction();
+		}
 	}
 
 	private void about() {
@@ -110,6 +125,7 @@ public class Desktop extends JFrame {
 
                 desktopPane = new linoleum.DesktopPane();
                 frame = new linoleum.Background();
+                console = new linoleum.Console();
                 menuBar = new javax.swing.JMenuBar();
                 fileMenu = new javax.swing.JMenu();
                 openMenuItem = new javax.swing.JMenuItem();
@@ -117,6 +133,7 @@ public class Desktop extends JFrame {
                 viewMenu = new javax.swing.JMenu();
                 fullScreenMenuItem = new javax.swing.JCheckBoxMenuItem();
                 screenshotMenuItem = new javax.swing.JMenuItem();
+                consoleMenuItem = new javax.swing.JCheckBoxMenuItem();
                 helpMenu = new javax.swing.JMenu();
                 contentMenuItem = new javax.swing.JMenuItem();
                 aboutMenuItem = new javax.swing.JMenuItem();
@@ -131,6 +148,11 @@ public class Desktop extends JFrame {
                 frame.setVisible(true);
                 desktopPane.add(frame);
                 frame.setBounds(0, 0, 891, 531);
+
+                console.setApplicationManager(apps);
+                console.setVisible(false);
+                desktopPane.add(console);
+                console.setBounds(0, 0, 394, 277);
 
                 fileMenu.setMnemonic('f');
                 fileMenu.setText("File");
@@ -181,13 +203,23 @@ public class Desktop extends JFrame {
                 });
                 viewMenu.add(screenshotMenuItem);
 
+                consoleMenuItem.setText("Console");
+                consoleMenuItem.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                consoleMenuItemActionPerformed(evt);
+                        }
+                });
+                viewMenu.add(consoleMenuItem);
+
                 menuBar.add(viewMenu);
 
                 helpMenu.setMnemonic('h');
                 helpMenu.setText("Help");
 
+                contentMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Help16.gif"))); // NOI18N
                 contentMenuItem.setMnemonic('c');
                 contentMenuItem.setText("Contents");
+                contentMenuItem.setEnabled(false);
                 contentMenuItem.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                                 contentMenuItemActionPerformed(evt);
@@ -251,6 +283,10 @@ public class Desktop extends JFrame {
 		content();
         }//GEN-LAST:event_contentMenuItemActionPerformed
 
+        private void consoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_consoleMenuItemActionPerformed
+		console();
+        }//GEN-LAST:event_consoleMenuItemActionPerformed
+
 	public static void main(String args[]) {
 		/* Create and display the form */
 		java.awt.EventQueue.invokeLater(new Runnable() {
@@ -262,6 +298,8 @@ public class Desktop extends JFrame {
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JMenuItem aboutMenuItem;
+        private linoleum.Console console;
+        private javax.swing.JCheckBoxMenuItem consoleMenuItem;
         private javax.swing.JMenuItem contentMenuItem;
         private linoleum.DesktopPane desktopPane;
         private javax.swing.JMenuItem exitMenuItem;
