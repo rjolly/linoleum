@@ -36,6 +36,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Collections;
 import java.util.ServiceLoader;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
@@ -63,7 +64,9 @@ public class ApplicationManager extends Frame {
 	private final SortedMap<String, String> pref = new TreeMap<>();
 	private final SortedMap<String, List<String>> apps = new TreeMap<>();
 	private final DefaultListModel<App> model = new DefaultListModel<>();
+	private final List<String> names = new ArrayList<>(); 
 	private final List<OptionPanel> options = new ArrayList<>(); 
+	private final Logger logger = Logger.getLogger(getClass().getName());
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final ListCellRenderer renderer = new Renderer();
 	private final DefaultComboBoxModel<String> comboModel = new DefaultComboBoxModel<>();
@@ -171,45 +174,60 @@ public class ApplicationManager extends Frame {
 	}
 
 	public void open(final URI uri) {
-		open(getApplication(uri), uri);
+		String name = getApplication(uri);
+		if (name != null) {
+			open(name, uri);
+		} else {
+			final List<String> names = getApplications(uri);
+			if (names.size() > 0) {
+				open(names.get(0), uri);
+			}
+		}
 	}
 
-	private String getApplication(final URI uri) {
-		String name = null;
+	public String getApplication(final URI uri) {
 		final Path path = Paths.get(uri);
 		try {
 			final String str = Files.probeContentType(path);
-			if (apps.containsKey(str)) {
-				if (pref.containsKey(str)) {
-					name = pref.get(str);
-				} else {
-					final List<String> value = apps.get(str);
-					if (value.size() > 0) {
-						name = value.get(0);
-					}
-				}
-			} else {
-				final MimeType type = new MimeType(str);
-				for (final Map.Entry<String, List<String>> entry : apps.entrySet()) {
-					final String key = entry.getKey();
-					if (type.match(key)) {
-						if (pref.containsKey(key)) {
-							name = pref.get(key);
-							break;
-						} else {
-							final List<String> value = entry.getValue();
-							if (value.size() > 0) {
-								name = value.get(0);
-								break;
-							}
-						}
-					}
+			if (pref.containsKey(str)) {
+				return pref.get(str);
+			}
+			final MimeType type = new MimeType(str);
+			for (final Map.Entry<String, String> entry : pref.entrySet()) {
+				if (type.match(entry.getKey())) {
+					return entry.getValue();
 				}
 			}
 		} catch (final IOException | MimeTypeParseException ex) {
 			ex.printStackTrace();
 		}
-		return name;
+		return null;
+	}
+
+	public List<String> getApplications(final URI uri) {
+		final Path path = Paths.get(uri);
+		final List<String> names = new ArrayList<>();
+		try {
+			final String str = Files.probeContentType(path);
+			if (apps.containsKey(str)) {
+				names.addAll(apps.get(str));
+			}
+			final MimeType type = new MimeType(str);
+			for (final Map.Entry<String, List<String>> entry : apps.entrySet()) {
+				if (type.match(entry.getKey())) {
+					final List<String> s = new ArrayList(entry.getValue());
+					s.removeAll(names);
+					names.addAll(s);
+				}
+			}
+		} catch (final IOException | MimeTypeParseException ex) {
+			ex.printStackTrace();
+		}
+		return Collections.unmodifiableList(names);
+	}
+
+	public List<String> getApplications() {
+		return Collections.unmodifiableList(names);
 	}
 
 	public void open(final String name, final URI uri) {
@@ -366,9 +384,11 @@ public class ApplicationManager extends Frame {
 	private void process(final App app) {
 		final String name = app.getName();
 		if (!map.containsKey(name)) {
+			logger.config("Processing " + name);
 			map.put(name, app);
 			final String type = app.getMimeType();
 			if (type != null) {
+				names.add(name);
 				for (final String s : type.split(":")) {
 					List<String> list = apps.get(s);
 					if (list == null) {

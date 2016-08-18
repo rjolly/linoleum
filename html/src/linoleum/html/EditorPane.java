@@ -34,10 +34,10 @@ import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 
 public class EditorPane extends JEditorPane {
-	final Basic basic = new Basic();
-	final Map<String, String> map = new HashMap<>();
-	final CookieManager manager = new CookieManager();
-	final Logger logger = Logger.getLogger(getClass().getName());
+	private final Basic basic = new Basic();
+	private final Map<String, String> map = new HashMap<>();
+	private final CookieManager manager = new CookieManager();
+	private final Logger logger = Logger.getLogger(getClass().getName());
 
 	public void setPage(final URL page) throws IOException {
 		setPage(new FrameURL(page), null, false);
@@ -92,7 +92,7 @@ public class EditorPane extends JEditorPane {
 		return doc;
 	}
 
-	void read(InputStream in, final Document doc) throws IOException {
+	private void read(InputStream in, final Document doc) throws IOException {
 		if (! Boolean.TRUE.equals(doc.getProperty("IgnoreCharsetDirective"))) {
 			final int READ_LIMIT = 1024 * 10;
 			in = new BufferedInputStream(in, READ_LIMIT);
@@ -136,7 +136,7 @@ public class EditorPane extends JEditorPane {
 		}
 	}
 
-	InputStream getStream(final URL page, final PageLoader loader) throws IOException {
+	private InputStream getStream(final URL page, final PageLoader loader) throws IOException {
 		return getStream(page, loader, "");
 	}
 
@@ -178,7 +178,7 @@ public class EditorPane extends JEditorPane {
 		}
 	}
 
-	static class PageStream extends FilterInputStream {
+	private static class PageStream extends FilterInputStream {
 		private final PageLoader loader;
 		private int n;
 

@@ -1,6 +1,7 @@
 package linoleum;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -16,12 +17,15 @@ import java.nio.file.WatchService;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.prefs.Preferences;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
+import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -30,6 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
+import linoleum.application.ApplicationManager;
 import linoleum.application.FileChooser;
 import linoleum.application.Frame;
 import linoleum.application.OptionPanel;
@@ -87,6 +92,7 @@ public class FileManager extends Frame {
 	private boolean closing;
 	private FileSystem fs;
 	private Path path;
+	private int idx;
 
 	private class Renderer extends JLabel implements ListCellRenderer {
 		public Renderer() {
@@ -278,6 +284,64 @@ public class FileManager extends Frame {
 		}
 	}
 
+	private void refresh() {
+		final ApplicationManager mgr = getApplicationManager();
+		final List<String> apps = mgr.getApplications();
+		if (idx < 0) {
+		} else {
+			final Path entry = model.getElementAt(idx);
+			try {
+				final URI uri = entry.toRealPath().toUri();
+				final List<String> ss = new ArrayList<>();
+				final String s = mgr.getApplication(uri);
+				jPopupMenu1.removeAll();
+				boolean sep1 = false;
+				if (s != null) {
+					jPopupMenu1.add(new AbstractAction(s) {
+						@Override
+						public void actionPerformed(final ActionEvent evt) {
+							mgr.open(s, uri);
+						}
+					});
+					sep1 = true;
+				}
+				boolean sep2 = sep1;
+				for (final String str : mgr.getApplications(uri)) {
+					if (!str.equals(s)) {
+						if (sep2) {
+							jPopupMenu1.addSeparator();
+							sep2 = false;
+						}
+						jPopupMenu1.add(new AbstractAction(str) {
+							@Override
+							public void actionPerformed(final ActionEvent evt) {
+								mgr.open(str, uri);
+							}
+						});
+						ss.add(str);
+						sep1 = true;
+					}
+				}
+				for (final String str : mgr.getApplications()) {
+					if (!str.equals(s) && !ss.contains(str)) {
+						if (sep1) {
+							jPopupMenu1.addSeparator();
+							sep1 = false;
+						}
+						jPopupMenu1.add(new AbstractAction(str) {
+							@Override
+							public void actionPerformed(final ActionEvent evt) {
+								mgr.open(str, uri);
+							}
+						});
+					}
+				}
+			} catch (final IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
 	@SuppressWarnings("unchecked")
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
@@ -286,6 +350,7 @@ public class FileManager extends Frame {
                 jLabel2 = new javax.swing.JLabel();
                 jTextField1 = new javax.swing.JTextField();
                 jButton1 = new javax.swing.JButton();
+                jPopupMenu1 = new javax.swing.JPopupMenu();
                 jScrollPane1 = new javax.swing.JScrollPane();
                 jList1 = new javax.swing.JList();
 
@@ -324,6 +389,16 @@ public class FileManager extends Frame {
                                 .addContainerGap(49, Short.MAX_VALUE))
                 );
 
+                jPopupMenu1.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+                        public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {
+                                jPopupMenu1PopupMenuWillBecomeVisible(evt);
+                        }
+                        public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {
+                        }
+                        public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
+                        }
+                });
+
                 setClosable(true);
                 setIconifiable(true);
                 setMaximizable(true);
@@ -332,11 +407,17 @@ public class FileManager extends Frame {
 
                 jList1.setModel(model);
                 jList1.setCellRenderer(renderer);
+                jList1.setComponentPopupMenu(jPopupMenu1);
                 jList1.setLayoutOrientation(javax.swing.JList.HORIZONTAL_WRAP);
                 jList1.setVisibleRowCount(-1);
                 jList1.addMouseListener(new java.awt.event.MouseAdapter() {
                         public void mouseClicked(java.awt.event.MouseEvent evt) {
                                 jList1MouseClicked(evt);
+                        }
+                });
+                jList1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+                        public void mouseMoved(java.awt.event.MouseEvent evt) {
+                                jList1MouseMoved(evt);
                         }
                 });
                 jScrollPane1.setViewportView(jList1);
@@ -371,10 +452,19 @@ public class FileManager extends Frame {
 		}
         }//GEN-LAST:event_jButton1ActionPerformed
 
+        private void jPopupMenu1PopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_jPopupMenu1PopupMenuWillBecomeVisible
+		refresh();
+        }//GEN-LAST:event_jPopupMenu1PopupMenuWillBecomeVisible
+
+        private void jList1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseMoved
+		idx = jList1.locationToIndex(evt.getPoint());
+        }//GEN-LAST:event_jList1MouseMoved
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
         private javax.swing.JLabel jLabel2;
         private javax.swing.JList jList1;
+        private javax.swing.JPopupMenu jPopupMenu1;
         private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JTextField jTextField1;
         private linoleum.application.OptionPanel optionPanel1;
