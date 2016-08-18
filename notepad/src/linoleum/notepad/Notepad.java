@@ -1,9 +1,10 @@
 package linoleum.notepad;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
+import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -29,9 +30,9 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
@@ -42,6 +43,8 @@ import javax.swing.JToolBar;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.UndoableEditEvent;
@@ -86,6 +89,7 @@ public class Notepad extends JPanel {
 
 		// create the embedded JTextComponent
 		editor = new Editor();
+		editor.addCaretListener(caretListener);
 
 		// Add this as a listener for undoable edits.
 		editor.getDocument().addUndoableEditListener(undoHandler);
@@ -170,9 +174,13 @@ public class Notepad extends JPanel {
 		return null;
 	}
 
-	private Component createStatusbar() {
-		// need to do something reasonable here
-		status = new StatusBar();
+	private JPanel createStatusbar() {
+		status = new JPanel();
+                status.setLayout(new CardLayout());
+		label = new JLabel();
+		progress = new JProgressBar();
+                status.add(label, "label");
+                status.add(progress, "progress");
 		return status;
 	}
 
@@ -183,7 +191,7 @@ public class Notepad extends JPanel {
 		redoAction.update();
 	}
 
-	private Component createToolbar() {
+	private JToolBar createToolbar() {
 		toolbar = new JToolBar();
 		for (String toolKey: getToolBarKeys()) {
 			if (toolKey.equals("-")) {
@@ -242,14 +250,14 @@ public class Notepad extends JPanel {
 
 	private Editor editor;
 	private JToolBar toolbar;
-	private JComponent status;
+	private JPanel status;
+	private JLabel label;
+	private JProgressBar progress;
 	private JInternalFrame elementTreeFrame;
 	private ElementTreePanel elementTreePanel;
 	private Frame frame;
 	private int modified;
 	private Path file;
-
-	private UndoableEditListener undoHandler = new UndoHandler();
 	private UndoManager undo = new UndoManager();
 
 	public static final String imageSuffix = "Image";
@@ -258,28 +266,29 @@ public class Notepad extends JPanel {
 	public static final String tipSuffix = "Tooltip";
 	public static final String acceleratorSuffix = "Accelerator";
 
-	class UndoHandler implements UndoableEditListener {
-
+	private UndoableEditListener undoHandler = new UndoableEditListener() {
 		public void undoableEditHappened(UndoableEditEvent e) {
 			undo.addEdit(e.getEdit());
 			if (modified >= 0) modified += 1;
 			undoAction.update();
 			redoAction.update();
 		}
-	}
+	};
 
-	class StatusBar extends JComponent {
+	private CaretListener caretListener = new CaretListener() {
+		public void caretUpdate(final CaretEvent e) {
+			try {
+				final int pos = editor.getCaretPosition();
+				final int line = editor.getLineOfOffset(pos);
+				final int column = pos - editor.getLineStartOffset(line);
+				label.setText((line + 1) + "," + column);
+			} catch (final BadLocationException ex) {
+				ex.printStackTrace();
+			}
 
-		public StatusBar() {
-			super();
-			setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		}
+	};
 
-		@Override
-		public void paint(Graphics g) {
-			super.paint(g);
-		}
-	}
 	// --- action implementations -----------------------------------
 	private UndoAction undoAction = new UndoAction();
 	private RedoAction redoAction = new RedoAction();
@@ -550,14 +559,13 @@ public class Notepad extends JPanel {
 	}
 
 	abstract class FileWorker extends SwingWorker<Document, Object> {
+		final CardLayout layout = (CardLayout) status.getLayout();
 		final Document doc = editor.getReplaceDocument();
+		final Cursor cursor = editor.getCursor();
 		final int length;
 
 		FileWorker(final int length) {
 			this.length = length;
-			// initialize the statusbar
-			status.removeAll();
-			final JProgressBar progress = new JProgressBar();
 			addPropertyChangeListener(new PropertyChangeListener() {
 				public  void propertyChange(final PropertyChangeEvent evt) {
 					if ("progress".equals(evt.getPropertyName())) {
@@ -565,8 +573,8 @@ public class Notepad extends JPanel {
 					}
 				}
 			});
-			status.add(progress);
-			status.revalidate();
+			layout.show(status, "progress");
+			editor.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		}
 
 		void setNumber(final int n) {
@@ -577,9 +585,9 @@ public class Notepad extends JPanel {
 
 		@Override
 		public void done() {
-			// we are done... get rid of progressbar
-			status.removeAll();
-			status.revalidate();
+			editor.setCursor(cursor);
+			layout.show(status, "label");
+			progress.setValue(0);
 		}
 	}
 
