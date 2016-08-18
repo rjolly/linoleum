@@ -28,11 +28,12 @@ import linoleum.application.FileChooser;
 import linoleum.application.Frame;
 
 public class PDFViewer extends Frame {
-	public final static String TITLE = "SwingLabs PDF Viewer";
+	public static final String TITLE = "SwingLabs PDF Viewer";
 	private final Icon openIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"));
 	private final Action openAction = new OpenAction();
 	private final Action closeAction = new CloseAction();
 	private final FileChooser chooser = new FileChooser();
+	protected PDFViewer parent;
 	private int curpage = -1;
 	private PDFFile curFile;
 	private String docName;
@@ -47,6 +48,7 @@ public class PDFViewer extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
+			final FileChooser chooser = getFileChooser();
 			final int returnVal = chooser.showInternalOpenDialog(PDFViewer.this);
 			switch (returnVal) {
 			case JFileChooser.APPROVE_OPTION:
@@ -74,6 +76,10 @@ public class PDFViewer extends Frame {
 		}
 	}
 
+	private FileChooser getFileChooser() {
+		return parent == null?chooser:parent.chooser;
+	}
+
 	public PDFViewer() {
 		this(null);
 	}
@@ -82,6 +88,7 @@ public class PDFViewer extends Frame {
 		super(parent);
 		initComponents();
 		chooser.setFileFilter(new FileNameExtensionFilter("PDF Files", "pdf"));
+		this.parent = (PDFViewer) parent;
 		setMimeType("application/pdf");
 		setTitle(TITLE);
 		setEnabling();
