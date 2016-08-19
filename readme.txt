@@ -55,3 +55,9 @@ List of applications
   net.java.linoleum#media;1.2		Media Player (requires jmf)
   net.java.linoleum#pdfview;1.2		PDF viewer (may require jai in some cases)
 
+
+Useful libraries
+
+  org.bouncycastle#bcpg-jdk15;1.45	The Bouncy Castle Java API for handling the OpenPGP protocol
+  mstor#mstor;0.9.9			A JavaMail provider for persistent email storage
+
