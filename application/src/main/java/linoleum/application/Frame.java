@@ -38,10 +38,8 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JRootPane;
-import linoleum.application.event.ClassPathListener;
-import linoleum.application.event.ClassPathChangeEvent;
 
-public class Frame extends JInternalFrame implements App, ClassPathListener {
+public class Frame extends JInternalFrame {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private ApplicationManager manager;
 	private JMenuBar savedMenuBar;
@@ -50,6 +48,7 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 	private Icon icon;
 	private URI uri;
 	private boolean ready;
+	private boolean opened;
 	protected final int index;
 	protected final Frame parent;
 	private final Collection<Integer> openFrames = new HashSet<Integer>();
@@ -96,6 +95,7 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 
 	public void setApplicationManager(final ApplicationManager manager) {
 		this.manager = manager;
+		init();
 	}
 
 	public ApplicationManager getApplicationManager() {
@@ -116,7 +116,6 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 		this.icon = icon;
 	}
 
-	@Override
 	public Icon getIcon() {
 		return icon;
 	}
@@ -125,7 +124,6 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 		this.type = type;
 	}
 
-	@Override
 	public String getMimeType() {
 		return type;
 	}
@@ -138,45 +136,49 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 		return uri;
 	}
 
-	protected Frame getFrame() {
+	protected JInternalFrame getFrame() {
 		return getFrame(this);
 	}
 
-	protected Frame getFrame(final Frame parent) {
+	protected JInternalFrame getFrame(final Frame parent) {
 		return this;
 	}
 
-	public final void open(final ApplicationManager manager) {
-		open(manager, null);
-	}
-
-	public final void open(final ApplicationManager manager, final URI uri) {
+	public void open(final URI uri) {
 		final JDesktopPane desktop = manager.getDesktopPane();
-		final Frame frame = getFrame(desktop, uri);
-		final boolean changed = uri != null && !uri.equals(frame.getURI());
-		if (changed) {
-			frame.setURI(uri);
-		}
-		if (frame.getDesktopPane() == null) {
-			if (frame.manager == null) {
-				frame.manager = manager;
-				desktop.add(frame);
-			} else {
-				desktop.add(frame);
+		final JInternalFrame internal = getFrame(desktop, uri);
+		if (internal instanceof Frame) {
+			final Frame frame = (Frame) internal;
+			final boolean changed = uri != null && !uri.equals(frame.getURI());
+			if (changed) {
+				frame.setURI(uri);
+			}
+			if (frame.getDesktopPane() == null) {
+				if (!frame.opened) {
+					frame.manager = manager;
+					desktop.add(frame);
+				} else {
+					desktop.add(frame);
+					frame.openFrame();
+				}
+			} else if (changed) {
 				frame.openFrame();
 			}
-		} else if (changed) {
-			frame.openFrame();
+			frame.select();
+		} else {
+			if (internal.getDesktopPane() == null) {
+				desktop.add(internal);
+			}
+			manager.select(internal);
 		}
-		frame.select();
 	}
 
 	public void select() {
 		manager.select(this);
 	}
 
-	private Frame getFrame(final JDesktopPane desktop, final URI uri) {
-		Frame frame = null;
+	private JInternalFrame getFrame(final JDesktopPane desktop, final URI uri) {
+		JInternalFrame frame = null;
 		for (final JInternalFrame c : desktop.getAllFrames()) {
 			final String name = c.getName();
 			if (name != null && name.equals(getName()) && c instanceof Frame) {
@@ -228,9 +230,7 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 		return false;
 	}
 
-	@Override
-	public OptionPanel getOptionPanel() {
-		return null;
+	protected void init() {
 	}
 
 	protected void open() {
@@ -243,15 +243,6 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 	}
 
 	protected void save() {
-	}
-
-	@Override
-	public void classPathChanged(final ClassPathChangeEvent e) {
-	}
-
-	@Deprecated
-	public void open(final JDesktopPane desktop) {
-		desktop.add(this);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -301,6 +292,7 @@ public class Frame extends JInternalFrame implements App, ClassPathListener {
 		final int height = prefs.getInt(getName() + ".height", getHeight());
 		setBounds(x + offset * index, y + offset * index, width, height);
 		openFrame();
+		opened = true;
         }//GEN-LAST:event_formInternalFrameOpened
 
         private void formInternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosing

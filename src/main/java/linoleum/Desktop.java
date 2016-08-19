@@ -145,6 +145,7 @@ public class Desktop extends JFrame {
                         }
                 });
 
+                frame.setApplicationManager(apps);
                 frame.setVisible(true);
                 desktopPane.add(frame);
                 frame.setBounds(0, 0, 891, 531);

@@ -33,8 +33,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreePath;
+import linoleum.application.ApplicationManager;
 import linoleum.application.Frame;
-import linoleum.application.OptionPanel;
 
 public class SimpleClient extends Frame {
 	private final Icon composeIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail16.gif"));
@@ -59,7 +59,7 @@ public class SimpleClient extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			frame.open(getApplicationManager());
+			frame.open(null);
 		}
 	}
 
@@ -118,9 +118,9 @@ public class SimpleClient extends Frame {
 		});
 	}
 
-	public void compose(final String str) {
+	void compose(final String str) {
 		try {
-			frame.open(getApplicationManager(), new URI("mailto", str, null));
+			frame.open(new URI("mailto", str, null));
 		} catch (final URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -131,8 +131,10 @@ public class SimpleClient extends Frame {
 	}
 
 	@Override
-	public OptionPanel getOptionPanel() {
-		return optionPanel1;
+	public void init() {
+		final ApplicationManager manager = getApplicationManager();
+		frame.setApplicationManager(manager);
+		manager.addOptionPanel(optionPanel1);
 	}
 
 	@Override

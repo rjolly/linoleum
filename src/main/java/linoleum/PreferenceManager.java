@@ -4,11 +4,10 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import linoleum.application.Frame;
 import linoleum.application.OptionPanel;
+import linoleum.application.event.ClassPathListener;
 import linoleum.application.event.ClassPathChangeEvent;
 
 public class PreferenceManager extends Frame {
-	private final OptionPanel desktop = Desktop.instance.getBackgroundFrame().getOptionPanel();
-	private final OptionPanel console = Desktop.instance.getConsole().getOptionPanel();
 	private int current;
 	private boolean save;
 	private boolean ready;
@@ -20,10 +19,7 @@ public class PreferenceManager extends Frame {
 
 	@Override
 	public void open() {
-		jTabbedPane1.add(desktop);
-		jTabbedPane1.add(console);
-		final List<OptionPanel> list = getApplicationManager().getOptionPanels();
-		for(final OptionPanel panel : list) {
+		for(final OptionPanel panel : getApplicationManager().getOptionPanels()) {
 			jTabbedPane1.add(panel);
 		}
 		jTabbedPane1.setSelectedIndex(current);
@@ -52,8 +48,14 @@ public class PreferenceManager extends Frame {
 		return (OptionPanel) jTabbedPane1.getComponentAt(c);
 	}
 
-	public void classPathChanged(final ClassPathChangeEvent e) {
-		open();
+	@Override
+	public void init() {
+		getApplicationManager().addClassPathListener(new ClassPathListener() {
+			@Override
+			public void classPathChanged(final ClassPathChangeEvent e) {
+				open();
+			}
+		});
 	}
 
 	@SuppressWarnings("unchecked")

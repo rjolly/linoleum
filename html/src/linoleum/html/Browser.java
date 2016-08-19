@@ -22,7 +22,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.Document;
 import linoleum.application.Frame;
-import linoleum.application.OptionPanel;
 
 public class Browser extends Frame {
 	private final Icon goIcon = new ImageIcon(getClass().getResource("Go16.png"));
@@ -80,8 +79,8 @@ public class Browser extends Frame {
 	}
 
 	@Override
-	public OptionPanel getOptionPanel() {
-		return optionPanel1;
+	public void init() {
+		getApplicationManager().addOptionPanel(optionPanel1);
 	}
 
 	@Override

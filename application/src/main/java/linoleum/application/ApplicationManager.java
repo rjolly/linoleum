@@ -61,10 +61,10 @@ import linoleum.application.event.ClassPathChangeEvent;
 public class ApplicationManager extends Frame {
 	private final Icon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
 	private final List<ClassPathListener> listeners = new ArrayList<>();
-	private final Map<String, App> map = new HashMap<>();
+	private final Map<String, Frame> map = new HashMap<>();
 	private final SortedMap<String, String> pref = new TreeMap<>();
 	private final SortedMap<String, List<String>> apps = new TreeMap<>();
-	private final DefaultListModel<App> model = new DefaultListModel<>();
+	private final DefaultListModel<Frame> model = new DefaultListModel<>();
 	private final List<String> names = new ArrayList<>(); 
 	private final List<OptionPanel> options = new ArrayList<>(); 
 	private final Logger logger = Logger.getLogger(getClass().getName());
@@ -91,7 +91,7 @@ public class ApplicationManager extends Frame {
 				setBackground(list.getBackground());
 				setForeground(list.getForeground());
 			}
-			final App app = (App)value;
+			final Frame app = (Frame) value;
 			final Icon icon = app.getIcon();
 			setIcon(icon == null?defaultIcon:icon);
 			setText(app.getName());
@@ -103,15 +103,13 @@ public class ApplicationManager extends Frame {
 	public ApplicationManager() {
 		initComponents();
 		tableModel = (DefaultTableModel)jTable1.getModel();
-		setApplicationManager(this);
-		addClassPathListener(this);
-		addOptionPanel(this);
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
 			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
 				load(pref);
 			}
 		});
+		setApplicationManager(this);
 	}
 
 	private void load(final Map<String, String> pref) {
@@ -126,8 +124,19 @@ public class ApplicationManager extends Frame {
 	}
 
 	@Override
-	public OptionPanel getOptionPanel() {
-		return optionPanel1;
+	public void init() {
+		final ApplicationManager manager = getApplicationManager();
+		manager.addClassPathListener(new ClassPathListener() {
+			@Override
+			public void classPathChanged(final ClassPathChangeEvent e) {
+				open();
+			}
+		});
+		manager.addOptionPanel(optionPanel1);
+	}
+
+	public void addOptionPanel(final OptionPanel panel) {
+		options.add(panel);
 	}
 
 	public List<OptionPanel> getOptionPanels() {
@@ -147,7 +156,7 @@ public class ApplicationManager extends Frame {
 				return super.getTableCellEditorComponent(table, value, isSelected, row, column);
 			}
 		};
-	};
+	}
 
 	@Override
 	public void load() {
@@ -175,6 +184,7 @@ public class ApplicationManager extends Frame {
 		prefs.put(getName() + ".preferred", str.substring(1, str.length() - 1));
 	}
 
+	@Override
 	public void open(final URI uri) {
 		String name = getApplication(uri);
 		if (name != null) {
@@ -234,18 +244,16 @@ public class ApplicationManager extends Frame {
 
 	public void open(final String name, final URI uri) {
 		if (map.containsKey(name)) {
-			map.get(name).open(this, uri);
+			map.get(name).open(uri);
 		}
 	}
 
 	public void open(final String name) {
-		if (map.containsKey(name)) {
-			map.get(name).open(this);
-		}
+		open(name, null);
 	}
 
 	private void open(final int index) {
-		model.getElementAt(index).open(this);
+		model.getElementAt(index).open((URI) null);
 	}
 
 	public void addClassPathListener(final ClassPathListener listener) {
@@ -260,11 +268,6 @@ public class ApplicationManager extends Frame {
 		for (final ClassPathListener listener : listeners) {
 			listener.classPathChanged(evt);
 		}
-	}
-
-	@Override
-	public void classPathChanged(final ClassPathChangeEvent e) {
-		open();
 	}
 
 	@Override
@@ -285,48 +288,30 @@ public class ApplicationManager extends Frame {
 
 	public void doOpen() {
 		for (final JInternalFrame frame : ServiceLoader.load(JInternalFrame.class)) {
-			if (frame instanceof App) {
-				process((App)frame);
+			if (frame instanceof Frame) {
+				process((Frame) frame);
 			} else {
-				process(new App() {
+				process(new Frame() {
+					@Override
+					public JInternalFrame getFrame() {
+						return frame;
+					}
+
 					@Override
 					public String getName() {
 						final String name = frame.getName();
 						return name == null?frame.getClass().getSimpleName():name;
 					}
-
-					@Override
-					public Icon getIcon() {
-						return null;
-					}
-
-					@Override
-					public String getMimeType() {
-						return null;
-					}
-
-					@Override
-					public void open(final ApplicationManager manager, final URI uri) {
-						open(manager);
-					}
-
-					@Override
-					public void open(final ApplicationManager manager) {
-						if (frame.getDesktopPane() == null) {
-							manager.getDesktopPane().add(frame);
-						}
-						manager.select(frame);
-					}
-
-					@Override
-					public OptionPanel getOptionPanel() {
-						return null;
-					}
 				});
 			}
 		}
 		for (final Application app : ServiceLoader.load(Application.class)) {
-			process(new App() {
+			process(new Frame() {
+				@Override
+				public JInternalFrame getFrame() {
+					return app.open(getURI());
+				}
+
 				@Override
 				public String getName() {
 					return app.getName();
@@ -343,22 +328,9 @@ public class ApplicationManager extends Frame {
 				}
 
 				@Override
-				public void open(final ApplicationManager manager, final URI uri) {
-					final JInternalFrame frame = app.open(uri);
-					if (frame.getDesktopPane() == null) {
-						manager.getDesktopPane().add(frame);
-					}
-					manager.select(frame);
-				}
-
-				@Override
-				public void open(final ApplicationManager manager) {
-					open(manager, null);
-				}
-
-				@Override
-				public OptionPanel getOptionPanel() {
-					return null;
+				public void open(final URI uri) {
+					setURI(uri);
+					super.open(uri);
 				}
 			});
 		}
@@ -372,7 +344,9 @@ public class ApplicationManager extends Frame {
 			} else {
 				frame.setSelected(true);
 			}
-		} catch (final PropertyVetoException ex) {}
+		} catch (final PropertyVetoException ex) {
+			ex.printStackTrace();
+		}
 		final Dimension size = getDesktopPane().getSize();
 		final Dimension s = frame.getSize();
 		final Point p = frame.getLocation();
@@ -388,7 +362,7 @@ public class ApplicationManager extends Frame {
 		}
 	}
 
-	private void process(final App app) {
+	private void process(final Frame app) {
 		final String name = app.getName();
 		if (!map.containsKey(name)) {
 			logger.config("Processing " + name);
@@ -404,18 +378,8 @@ public class ApplicationManager extends Frame {
 					list.add(name);
 				}
 			}
-			if (app instanceof ClassPathListener) {
-				addClassPathListener((ClassPathListener) app);
-			}
 			model.addElement(app);
-			addOptionPanel(app);
-		}
-	}
-
-	private void addOptionPanel(final App app) {
-		final OptionPanel panel = app.getOptionPanel();
-		if (panel != null) {
-			options.add(panel);
+			app.setApplicationManager(this);
 		}
 	}
 

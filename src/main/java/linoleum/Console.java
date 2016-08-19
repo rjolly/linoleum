@@ -9,7 +9,6 @@ import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import linoleum.application.Frame;
-import linoleum.application.OptionPanel;
 
 public class Console extends Frame {
 	private final ConsolePanel panel = new ConsolePanel();
@@ -34,8 +33,8 @@ public class Console extends Frame {
 	}
 
 	@Override
-	public OptionPanel getOptionPanel() {
-		return optionPanel1;
+	public void init() {
+		getApplicationManager().addOptionPanel(optionPanel1);
 	}
 
 	@Override

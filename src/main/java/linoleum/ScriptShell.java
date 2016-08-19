@@ -9,6 +9,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.prefs.Preferences;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 import java.util.concurrent.CountDownLatch;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
@@ -17,7 +19,8 @@ import javax.script.ScriptException;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import linoleum.application.Frame;
-import linoleum.application.OptionPanel;
+import linoleum.application.ApplicationManager;
+import linoleum.application.event.ClassPathListener;
 import linoleum.application.event.ClassPathChangeEvent;
 
 public class ScriptShell extends Frame implements ScriptShellPanel.CommandProcessor {
@@ -28,6 +31,7 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	private volatile ScriptEngine engine;
 	private volatile String prompt;
 	private	ScriptEngineFactory factory;
+	private ScriptEngineManager manager;
 	protected ScriptShell parent;
 	private String extension;
 
@@ -40,21 +44,39 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
 		this.parent = (ScriptShell) parent;
-		if (parent == null) {
-			refresh();
-		} else {
-			createScriptEngine();
-			setTitle(engine.getFactory().getLanguageName());
-			setContentPane(new ScriptShellPanel(this));
-		}
+	}
+
+	@Override
+	public void init() {
+		final ApplicationManager manager = getApplicationManager();
+		manager.addClassPathListener(new ClassPathListener() {
+			@Override
+			public void classPathChanged(final ClassPathChangeEvent e) {
+				refresh();
+			}
+		});
+		manager.addOptionPanel(optionPanel1);
+		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
+			@Override
+			public void preferenceChange(final PreferenceChangeEvent evt) {
+				reload();
+			}
+		});
+		refresh();
 	}
 
 	private void refresh() {
 		model.removeAllElements();
-		final ScriptEngineManager manager = new ScriptEngineManager();
-		final String language = prefs.get(getName() + ".language", "");
+		manager = new ScriptEngineManager();
 		for (final ScriptEngineFactory sef : manager.getEngineFactories()) {
 			model.addElement(sef.getEngineName());
+		}
+		reload();
+	}
+
+	private void reload() {
+		final String language = prefs.get(getName() + ".language", "");
+		for (final ScriptEngineFactory sef : manager.getEngineFactories()) {
 			if (factory == null || language.equals(sef.getEngineName())) {
 				factory = sef;
 			}
@@ -62,16 +84,6 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		if (factory == null) {
 			throw new RuntimeException("cannot load " + language + " factory");
 		}
-	}
-
-	@Override
-	public void classPathChanged(final ClassPathChangeEvent e) {
-		refresh();
-	}
-
-	@Override
-	public OptionPanel getOptionPanel() {
-		return optionPanel1;
 	}
 
 	@Override
@@ -86,6 +98,9 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 
 	@Override
 	public void open() {
+		createScriptEngine();
+		setTitle(engine.getFactory().getLanguageName());
+		setContentPane(new ScriptShellPanel(this));
 		(new Thread() {
 			@Override
 			public void run() {

@@ -9,7 +9,6 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import linoleum.application.FileChooser;
 import linoleum.application.Frame;
-import linoleum.application.OptionPanel;
 
 public class Background extends Frame {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
@@ -27,8 +26,8 @@ public class Background extends Frame {
 	}
 
 	@Override
-	public OptionPanel getOptionPanel() {
-		return optionPanel1;
+	public void init() {
+		getApplicationManager().addOptionPanel(optionPanel1);
 	}
 
 	@Override

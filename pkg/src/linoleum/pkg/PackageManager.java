@@ -7,7 +7,7 @@ import java.util.Arrays;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 import linoleum.application.Frame;
-import linoleum.application.ApplicationManager;
+import linoleum.application.event.ClassPathListener;
 import linoleum.application.event.ClassPathChangeEvent;
 import linoleum.Desktop;
 import linoleum.Package;
@@ -109,8 +109,13 @@ public class PackageManager extends Frame {
 	}
 
 	@Override
-	public void classPathChanged(final ClassPathChangeEvent e) {
-		open();
+	public void init() {
+		getApplicationManager().addClassPathListener(new ClassPathListener() {
+			@Override
+			public void classPathChanged(final ClassPathChangeEvent e) {
+				open();
+			}
+		});
 	}
 
 	@SuppressWarnings("unchecked")
