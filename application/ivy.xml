@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:e="http://ant.apache.org/ivy/extra">
-    <info module="application" organisation="net.java.linoleum" revision="1.1">
+    <info module="application" organisation="net.java.linoleum" revision="1.2">
         <description homepage="http://linoleum.java.net/"/>
     </info>
     <configurations>

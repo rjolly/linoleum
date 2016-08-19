@@ -36,7 +36,7 @@ To build linoleum from itself, first clone the repository by external means (for
 
 To publish an application:
 
-- add net.java.linoleum#application;1.1 to your project's dependencies
+- add net.java.linoleum#application;1.2 to your project's dependencies
 - extend linoleum.application.Frame
 - make it available to the service loader in META-INF/services/javax.swing.JInternalFrame
 - publish your artifact in maven central
@@ -50,8 +50,8 @@ To use linoleum as your desktop environment in Linux:
 
 List of applications
 
-  net.java.linoleum#j3d;1.1		3D Object Loader (requires java3d)
+  net.java.linoleum#j3d;1.2		3D Object Loader (requires java3d)
   net.java.linoleum#jcterm;0.0.11	SSH2 Terminal Emulator in Pure Java
-  net.java.linoleum#media;1.1		Media Player (requires jmf)
-  net.java.linoleum#pdfview;1.1		PDF viewer (may require jai in some cases)
+  net.java.linoleum#media;1.2		Media Player (requires jmf)
+  net.java.linoleum#pdfview;1.2		PDF viewer (may require jai in some cases)
 

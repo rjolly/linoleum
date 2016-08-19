@@ -6,7 +6,7 @@
   <groupId>net.java.linoleum</groupId>
   <artifactId>j3d</artifactId>
   <packaging>jar</packaging>
-  <version>1.1</version>
+  <version>1.2</version>
   <url>http://linoleum.java.net/</url>
   <description>3D Object Loader.</description>
   <licenses>
@@ -39,7 +39,7 @@
     <dependency>
       <groupId>net.java.linoleum</groupId>
       <artifactId>application</artifactId>
-      <version>1.1</version>
+      <version>1.2</version>
     </dependency>
   </dependencies>
 </project>
