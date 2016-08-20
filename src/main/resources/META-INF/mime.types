@@ -1,6 +1,9 @@
 application/wavefront-obj obj
 application/pdf pdf PDF
+application/octet-stream bin
+application/java-archive jar
 application/mvr mvr
+application/zip zip
 audio/basic au snd
 audio/midi midi mid
 audio/mpeg mp3 mp2 mpa
