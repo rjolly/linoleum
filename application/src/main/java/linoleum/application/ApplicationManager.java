@@ -40,7 +40,6 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
-import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
@@ -62,8 +61,8 @@ public class ApplicationManager extends Frame {
 	private final Icon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
 	private final List<ClassPathListener> listeners = new ArrayList<>();
 	private final Map<String, Frame> map = new HashMap<>();
-	private final SortedMap<String, String> pref = new TreeMap<>();
-	private final SortedMap<String, List<String>> apps = new TreeMap<>();
+	private final SortedMap<MimeType, String> pref = new TreeMap<>();
+	private final SortedMap<MimeType, List<String>> apps = new TreeMap<>();
 	private final DefaultListModel<Frame> model = new DefaultListModel<>();
 	private final List<String> names = new ArrayList<>(); 
 	private final List<OptionPanel> options = new ArrayList<>(); 
@@ -98,7 +97,7 @@ public class ApplicationManager extends Frame {
 			setFont(list.getFont());
 			return this;
 		}
-	};
+	}
 
 	public ApplicationManager() {
 		initComponents();
@@ -112,13 +111,15 @@ public class ApplicationManager extends Frame {
 		setApplicationManager(this);
 	}
 
-	private void load(final Map<String, String> pref) {
+	private void load(final Map<MimeType, String> pref) {
 		pref.clear();
 		final String str = prefs.get(getName() + ".preferred", "");
 		for (final String entry : str.split(", ")) {
 			final String s[] = entry.split("=");
-			if (s.length > 1) {
-				pref.put(s[0], s[1]);
+			if (s.length > 1) try {
+				pref.put(new MimeType(s[0]), s[1]);
+			} catch (final MimeTypeParseException ex) {
+				ex.printStackTrace();
 			}
 		}
 	}
@@ -149,8 +150,8 @@ public class ApplicationManager extends Frame {
 			public Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int row, final int column) {
 				comboModel.removeAllElements();
 				comboModel.addElement(null);
-				final String str = (String) tableModel.getValueAt(row, 0);
-				for (final String name : apps.get(str)) {
+				final MimeType type = (MimeType) tableModel.getValueAt(row, 0);
+				for (final String name : apps.get(type)) {
 					comboModel.addElement(name);
 				}
 				return super.getTableCellEditorComponent(table, value, isSelected, row, column);
@@ -161,23 +162,23 @@ public class ApplicationManager extends Frame {
 	@Override
 	public void load() {
 		tableModel.setRowCount(0);
-		final SortedMap<String, String> pref = new TreeMap<>();
+		final SortedMap<MimeType, String> pref = new TreeMap<>();
 		load(pref);
-		for (final String str : apps.keySet()) {
-			tableModel.addRow(new Object[] {str, pref.get(str)});
+		for (final MimeType type : apps.keySet()) {
+			tableModel.addRow(new Object[] {type, pref.get(type)});
 		}
 	}
 
 	@Override
 	public void save() {
-		final SortedMap<String, String> pref = new TreeMap<>();
+		final SortedMap<MimeType, String> pref = new TreeMap<>();
 		for (int row = 0 ; row < tableModel.getRowCount() ; row++) {
-			final String str = (String) tableModel.getValueAt(row, 0);
+			final MimeType type = (MimeType) tableModel.getValueAt(row, 0);
 			final String name = (String) tableModel.getValueAt(row, 1);
 			if (name != null && !name.isEmpty()) {
-				pref.put(str, name);
+				pref.put(type, name);
 			} else {
-				pref.remove(str);
+				pref.remove(type);
 			}
 		}
 		final String str = pref.toString();
@@ -200,12 +201,11 @@ public class ApplicationManager extends Frame {
 	public String getApplication(final URI uri) {
 		final Path path = Paths.get(uri);
 		try {
-			final String str = Files.probeContentType(path);
-			if (pref.containsKey(str)) {
-				return pref.get(str);
+			final MimeType type = new MimeType(Files.probeContentType(path));
+			if (pref.containsKey(type)) {
+				return pref.get(type);
 			}
-			final MimeType type = new MimeType(str);
-			for (final Map.Entry<String, String> entry : pref.entrySet()) {
+			for (final Map.Entry<MimeType, String> entry : pref.entrySet()) {
 				if (type.match(entry.getKey())) {
 					return entry.getValue();
 				}
@@ -220,12 +220,11 @@ public class ApplicationManager extends Frame {
 		final Path path = Paths.get(uri);
 		final List<String> names = new ArrayList<>();
 		try {
-			final String str = Files.probeContentType(path);
-			if (apps.containsKey(str)) {
-				names.addAll(apps.get(str));
+			final MimeType type = new MimeType(Files.probeContentType(path));
+			if (apps.containsKey(type)) {
+				names.addAll(apps.get(type));
 			}
-			final MimeType type = new MimeType(str);
-			for (final Map.Entry<String, List<String>> entry : apps.entrySet()) {
+			for (final Map.Entry<MimeType, List<String>> entry : apps.entrySet()) {
 				if (type.match(entry.getKey())) {
 					final List<String> s = new ArrayList(entry.getValue());
 					s.removeAll(names);
@@ -367,15 +366,18 @@ public class ApplicationManager extends Frame {
 		if (!map.containsKey(name)) {
 			logger.config("Processing " + name);
 			map.put(name, app);
-			final String type = app.getMimeType();
-			if (type != null) {
+			final String str = app.getMimeType();
+			if (str != null) {
 				names.add(name);
-				for (final String s : type.split(":")) {
-					List<String> list = apps.get(s);
+				for (final String s : str.split(":")) try {
+					final MimeType type = new MimeType(s);
+					List<String> list = apps.get(type);
 					if (list == null) {
-						apps.put(s, list = new ArrayList<>());
+						apps.put(type, list = new ArrayList<>());
 					}
 					list.add(name);
+				} catch (final MimeTypeParseException ex) {
+					ex.printStackTrace();
 				}
 			}
 			model.addElement(app);
@@ -405,7 +407,7 @@ public class ApplicationManager extends Frame {
                         }
                 ) {
                         Class[] types = new Class [] {
-                                java.lang.String.class, java.lang.String.class
+                                linoleum.application.MimeType.class, java.lang.String.class
                         };
                         boolean[] canEdit = new boolean [] {
                                 false, true

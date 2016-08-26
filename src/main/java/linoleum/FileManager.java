@@ -227,7 +227,7 @@ public class FileManager extends Frame {
 			model.addElement(entry);
 		}
 	}
- 
+
 	private boolean isJar() {
 		if (path.getFileSystem() == defaultfs) try {
 			final MimeType t = new MimeType(Files.probeContentType(path));
@@ -285,16 +285,14 @@ public class FileManager extends Frame {
 
 	private void refresh() {
 		final ApplicationManager mgr = getApplicationManager();
-		final List<String> apps = mgr.getApplications();
 		if (idx < 0) {
 		} else {
 			final Path entry = model.getElementAt(idx);
 			try {
 				final URI uri = entry.toRealPath().toUri();
-				final List<String> ss = new ArrayList<>();
 				final String s = mgr.getApplication(uri);
 				jPopupMenu1.removeAll();
-				boolean sep1 = false;
+				boolean sep = false;
 				if (s != null) {
 					jPopupMenu1.add(new AbstractAction(s) {
 						@Override
@@ -302,30 +300,13 @@ public class FileManager extends Frame {
 							mgr.open(s, uri);
 						}
 					});
-					sep1 = true;
+					sep = true;
 				}
-				boolean sep2 = sep1;
 				for (final String str : mgr.getApplications(uri)) {
 					if (!str.equals(s)) {
-						if (sep2) {
+						if (sep) {
 							jPopupMenu1.addSeparator();
-							sep2 = false;
-						}
-						jPopupMenu1.add(new AbstractAction(str) {
-							@Override
-							public void actionPerformed(final ActionEvent evt) {
-								mgr.open(str, uri);
-							}
-						});
-						ss.add(str);
-						sep1 = true;
-					}
-				}
-				for (final String str : mgr.getApplications()) {
-					if (!str.equals(s) && !ss.contains(str)) {
-						if (sep1) {
-							jPopupMenu1.addSeparator();
-							sep1 = false;
+							sep = false;
 						}
 						jPopupMenu1.add(new AbstractAction(str) {
 							@Override
@@ -436,7 +417,7 @@ public class FileManager extends Frame {
         }// </editor-fold>//GEN-END:initComponents
 
         private void jList1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseClicked
-		if (evt.getClickCount() == 1) {
+		if (evt.getClickCount() == 2) {
 			open(jList1.locationToIndex(evt.getPoint()));
 		}
         }//GEN-LAST:event_jList1MouseClicked
