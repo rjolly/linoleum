@@ -233,6 +233,14 @@ function relativize(baseDir, file) {
     return new File(path);
 }
 
+function ln(from, to) {
+    var target = pathToFile(from);
+    if (to == undefined) {
+	to = target.getName();
+    }
+    Packages.linoleum.Tools.instance.mklink(pathToFile(to), target);
+}
+
 function wget(from, to) {
     var url = new java.net.URL(from);
     if (to == undefined) {
