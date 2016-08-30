@@ -143,7 +143,7 @@ public class PagePanel extends JPanel implements Scrollable, ImageObserver, Mous
 
 			// get the new image
 			currentImage = page.getImage(pageSize.width, pageSize.height,
-				useClip, this);
+				useClip, this, true, true);
 
 			// calculate the transform from screen to page space
 			currentXform = page.getInitialTransform(pageSize.width,
