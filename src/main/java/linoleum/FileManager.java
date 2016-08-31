@@ -283,15 +283,15 @@ public class FileManager extends Frame {
 		}
 	}
 
-	private void refresh() {
-		final ApplicationManager mgr = getApplicationManager();
+	private void prepare() {
+		jPopupMenu1.removeAll();
 		if (idx < 0) {
 		} else {
 			final Path entry = model.getElementAt(idx);
 			try {
 				final URI uri = entry.toRealPath().toUri();
+				final ApplicationManager mgr = getApplicationManager();
 				final String s = mgr.getApplication(uri);
-				jPopupMenu1.removeAll();
 				boolean sep = false;
 				if (s != null) {
 					jPopupMenu1.add(new AbstractAction(s) {
@@ -332,7 +332,7 @@ public class FileManager extends Frame {
                 jButton1 = new javax.swing.JButton();
                 jPopupMenu1 = new javax.swing.JPopupMenu();
                 jScrollPane1 = new javax.swing.JScrollPane();
-                jList1 = new javax.swing.JList();
+                jList1 = new linoleum.FileList();
 
                 optionPanel1.setFrame(this);
 
@@ -433,7 +433,7 @@ public class FileManager extends Frame {
         }//GEN-LAST:event_jButton1ActionPerformed
 
         private void jPopupMenu1PopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_jPopupMenu1PopupMenuWillBecomeVisible
-		refresh();
+		prepare();
         }//GEN-LAST:event_jPopupMenu1PopupMenuWillBecomeVisible
 
         private void jList1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseMoved
@@ -443,7 +443,7 @@ public class FileManager extends Frame {
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
         private javax.swing.JLabel jLabel2;
-        private javax.swing.JList jList1;
+        private linoleum.FileList jList1;
         private javax.swing.JPopupMenu jPopupMenu1;
         private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JTextField jTextField1;
