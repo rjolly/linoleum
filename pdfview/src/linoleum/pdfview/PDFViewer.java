@@ -48,15 +48,14 @@ public class PDFViewer extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			final FileChooser chooser = getFileChooser();
-			final int returnVal = chooser.showInternalOpenDialog(PDFViewer.this);
+			final int returnVal = parent.chooser.showInternalOpenDialog(PDFViewer.this);
 			switch (returnVal) {
 			case JFileChooser.APPROVE_OPTION:
 				final URI uri = getURI();
 				if (uri != null) {
 					close();
 				}
-				setURI(chooser.getSelectedFile().toURI());
+				setURI(parent.chooser.getSelectedFile().toURI());
 				open();
 				break;
 			default:
@@ -76,10 +75,6 @@ public class PDFViewer extends Frame {
 		}
 	}
 
-	private FileChooser getFileChooser() {
-		return parent == null?chooser:parent.chooser;
-	}
-
 	public PDFViewer() {
 		this(null);
 	}
@@ -88,7 +83,7 @@ public class PDFViewer extends Frame {
 		super(parent);
 		initComponents();
 		chooser.setFileFilter(new FileNameExtensionFilter("PDF Files", "pdf"));
-		this.parent = (PDFViewer) parent;
+		this.parent = (PDFViewer) super.parent;
 		setMimeType("application/pdf");
 		setTitle(TITLE);
 		setEnabling();

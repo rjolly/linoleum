@@ -226,7 +226,7 @@ public class ApplicationManager extends Frame {
 			}
 			for (final Map.Entry<MimeType, List<String>> entry : apps.entrySet()) {
 				if (type.match(entry.getKey())) {
-					final List<String> s = new ArrayList(entry.getValue());
+					final List<String> s = new ArrayList<>(entry.getValue());
 					s.removeAll(names);
 					names.addAll(s);
 				}
@@ -285,7 +285,8 @@ public class ApplicationManager extends Frame {
 		}).execute();
 	}
 
-	public void doOpen() {
+	@SuppressWarnings("deprecation")
+	private void doOpen() {
 		for (final JInternalFrame frame : ServiceLoader.load(JInternalFrame.class)) {
 			if (frame instanceof Frame) {
 				process((Frame) frame);

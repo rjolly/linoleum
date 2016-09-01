@@ -34,7 +34,7 @@ public class Frame extends linoleum.application.Frame {
 		setJMenuBar(notepad.createMenubar());
 		setSize(500, 400);
 		chooser.setFileFilter(new FileNameExtensionFilter("Text", "txt"));
-		this.parent = (Frame) parent;
+		this.parent = (Frame) super.parent;
 	}
 
 	@Override
@@ -102,7 +102,7 @@ public class Frame extends linoleum.application.Frame {
 	}
 
 	FileChooser getFileChooser() {
-		return parent == null?chooser:parent.chooser;
+		return parent.chooser;
 	}
 
 	@SuppressWarnings("unchecked")

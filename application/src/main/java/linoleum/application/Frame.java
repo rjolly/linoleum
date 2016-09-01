@@ -65,14 +65,14 @@ public class Frame extends JInternalFrame {
 	public Frame(final Frame parent, final String title) {
 		super(title, true, true, true, true);
 		initComponents();
-		index = parent == null?0:parent.nextIndex();
-		this.parent = parent;
+		this.parent = parent == null?this:parent;
+		index = this.parent.nextIndex();
 	}
 
 	public Frame(final Frame parent) {
 		initComponents();
-		index = parent == null?0:parent.nextIndex();
-		this.parent = parent;
+		this.parent = parent == null?this:parent;
+		index = this.parent.nextIndex();
 	}
 
 	private int nextIndex() {
@@ -80,17 +80,13 @@ public class Frame extends JInternalFrame {
 	}
 
 	private void openFrame() {
-		if (parent != null) {
-			parent.openFrames.add(index);
-		}
+		parent.openFrames.add(index);
 		open();
 	}
 
 	private void closeFrame() {
 		close();
-		if (parent != null) {
-			parent.openFrames.remove(index);
-		}
+		parent.openFrames.remove(index);
 	}
 
 	public void setApplicationManager(final ApplicationManager manager) {

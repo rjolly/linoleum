@@ -43,7 +43,7 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		super(parent);
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
-		this.parent = (ScriptShell) parent;
+		this.parent = (ScriptShell) super.parent;
 	}
 
 	@Override
@@ -209,13 +209,9 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
         private linoleum.application.OptionPanel optionPanel1;
         // End of variables declaration//GEN-END:variables
 
-	private ScriptEngineFactory getFactory() {
-		return parent == null?factory:parent.factory;
-	}
-
 	// create script engine
 	private void createScriptEngine() {
-		engine = getFactory().getScriptEngine();
+		engine = parent.factory.getScriptEngine();
 		extension = engine.getFactory().getExtensions().get(0);
 		prompt = extension + ">";
 	}

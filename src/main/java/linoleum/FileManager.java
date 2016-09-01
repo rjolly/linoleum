@@ -125,7 +125,7 @@ public class FileManager extends Frame {
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
 		setMimeType("application/octet-stream:application/java-archive:application/zip");
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		this.parent = (FileManager) parent;
+		this.parent = (FileManager) super.parent;
 	}
 
 	@Override
@@ -176,7 +176,7 @@ public class FileManager extends Frame {
 			}
 		}
 		rescan();
-		if (fs != defaultfs && parent != null) {
+		if (fs != defaultfs) {
 			Collection<Integer> coll = parent.openFrames.get(fs);
 			if (coll == null) {
 				parent.openFrames.put(fs, coll = new HashSet<Integer>());
@@ -196,7 +196,7 @@ public class FileManager extends Frame {
 		if (fs == defaultfs && Files.isDirectory(path)) {
 			thread.interrupt();
 		}
-		if (fs != defaultfs && parent != null) {
+		if (fs != defaultfs) {
 			Collection<Integer> coll = parent.openFrames.get(fs);
 			coll.remove(index);
 			if (coll.isEmpty()) {
