@@ -2,6 +2,8 @@ package linoleum;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -25,6 +27,7 @@ import java.util.HashSet;
 import java.util.prefs.Preferences;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
+import javax.swing.Action;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
@@ -32,6 +35,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import linoleum.application.ApplicationManager;
@@ -42,6 +46,8 @@ public class FileManager extends Frame {
 	private final Icon fileIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/file.gif"));
 	private final Icon directoryIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/directory.gif"));
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
+	private final Icon openIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"));
+	private final Action openLocationAction = new OpenLocationAction();
 	private final FileChooser chooser = new FileChooser();
 	private final DefaultListModel<Path> model = new DefaultListModel<>();
 	private final ListCellRenderer renderer = new Renderer();
@@ -92,6 +98,24 @@ public class FileManager extends Frame {
 	private FileSystem fs;
 	private Path path;
 	private int idx;
+
+	private class OpenLocationAction extends AbstractAction {
+		public OpenLocationAction() {
+			super("Open location...", openIcon);
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			final int returnVal = parent.chooser.showInternalOpenDialog(FileManager.this);
+			switch (returnVal) {
+			case JFileChooser.APPROVE_OPTION:
+				open(parent.chooser.getSelectedFile().toPath());
+				break;
+			default:
+			}
+		}
+	}
 
 	private class Renderer extends JLabel implements ListCellRenderer {
 		public Renderer() {
@@ -274,17 +298,21 @@ public class FileManager extends Frame {
 	private void open(final int index) {
 		if (index < 0) {
 		} else {
-			final Path entry = model.getElementAt(index);
-			try {
-				getApplicationManager().open(entry.toRealPath().toUri());
-			} catch (final IOException ex) {
-				ex.printStackTrace();
-			}
+			open(model.getElementAt(index));
+		}
+	}
+
+	private void open(final Path entry) {
+		try {
+			getApplicationManager().open(entry.toRealPath().toUri());
+		} catch (final IOException ex) {
+			ex.printStackTrace();
 		}
 	}
 
 	private void prepare() {
 		jPopupMenu1.removeAll();
+		jPopupMenu1.add(openLocationAction);
 		if (idx < 0) {
 		} else {
 			final Path entry = model.getElementAt(idx);
