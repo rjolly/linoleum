@@ -82,6 +82,7 @@ public class PDFViewer extends Frame {
 	public PDFViewer(final Frame parent) {
 		super(parent);
 		initComponents();
+		setIcon(new ImageIcon(getClass().getResource("reader.png")));
 		chooser.setFileFilter(new FileNameExtensionFilter("PDF Files", "pdf"));
 		this.parent = (PDFViewer) super.parent;
 		setMimeType("application/pdf");
