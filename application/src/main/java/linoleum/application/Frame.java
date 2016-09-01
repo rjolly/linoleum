@@ -241,6 +241,11 @@ public class Frame extends JInternalFrame {
 	protected void save() {
 	}
 
+	@Override
+	public String toString() {
+		return getName();
+	}
+
 	@SuppressWarnings("unchecked")
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {

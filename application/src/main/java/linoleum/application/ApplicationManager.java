@@ -252,7 +252,10 @@ public class ApplicationManager extends Frame {
 	}
 
 	private void open(final int index) {
-		model.getElementAt(index).open((URI) null);
+		if (index < 0) {
+		} else {
+			model.getElementAt(index).open((URI) null);
+		}
 	}
 
 	public void addClassPathListener(final ClassPathListener listener) {
