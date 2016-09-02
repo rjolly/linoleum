@@ -19,8 +19,6 @@ import java.nio.file.WatchService;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +33,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
@@ -47,7 +46,17 @@ public class FileManager extends Frame {
 	private final Icon directoryIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/directory.gif"));
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final Icon openIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"));
+	private final Icon cutIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Cut16.gif"));
+	private final Icon copyIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Copy16.gif"));
+	private final Icon pasteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Paste16.gif"));
+	private final Icon deleteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Delete16.gif"));
+	private final Action openAction = new OpenAction();
 	private final Action openLocationAction = new OpenLocationAction();
+	private final Action renameAction = new RenameAction();
+	private final Action cutAction = new CutAction();
+	private final Action copyAction = new CopyAction();
+	private final Action pasteAction = new PasteAction();
+	private final Action deleteAction = new DeleteAction();
 	private final FileChooser chooser = new FileChooser();
 	private final DefaultListModel<Path> model = new DefaultListModel<>();
 	private final ListCellRenderer renderer = new Renderer();
@@ -99,6 +108,19 @@ public class FileManager extends Frame {
 	private Path path;
 	private int idx;
 
+	private class OpenAction extends AbstractAction {
+		public OpenAction() {
+			super("Open");
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			open(jList1.getSelectedValue());
+			
+		}
+	}
+
 	private class OpenLocationAction extends AbstractAction {
 		public OpenLocationAction() {
 			super("Open location...", openIcon);
@@ -111,6 +133,66 @@ public class FileManager extends Frame {
 			switch (returnVal) {
 			case JFileChooser.APPROVE_OPTION:
 				open(parent.chooser.getSelectedFile().toPath());
+				break;
+			default:
+			}
+		}
+	}
+
+	private class RenameAction extends AbstractAction {
+		public RenameAction() {
+			super("Rename");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+		}
+	}
+
+	private class CutAction extends AbstractAction {
+		public CutAction() {
+			super("Cut", cutIcon);
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+		}
+	}
+
+	private class CopyAction extends AbstractAction {
+		public CopyAction() {
+			super("Copy", copyIcon);
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+		}
+	}
+
+	private class PasteAction extends AbstractAction {
+		public PasteAction() {
+			super("Paste", pasteIcon);
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+		}
+	}
+
+	private class DeleteAction extends AbstractAction {
+		public DeleteAction() {
+			super("Delete", deleteIcon);
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			final int option = JOptionPane.showInternalConfirmDialog(FileManager.this, "Delete ?", "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+			switch (option) {
+			case JOptionPane.OK_OPTION:
 				break;
 			default:
 			}
@@ -172,6 +254,7 @@ public class FileManager extends Frame {
 		prefs.put(getName() + ".home", jTextField1.getText());
 	}
 
+	@Override
 	public void setURI(final URI uri) {
 		try {
 			path = Paths.get(uri).toRealPath();
@@ -250,6 +333,7 @@ public class FileManager extends Frame {
 		for (final Path entry : files) {
 			model.addElement(entry);
 		}
+		prepare();
 	}
 
 	private boolean isJar() {
@@ -269,7 +353,7 @@ public class FileManager extends Frame {
 		return null;
 	}
 
-	private final Path getFileName() {
+	private Path getFileName() {
 		final int n = path.getNameCount();
 		return n > 0?path.getName(n - 1):path;
 	}
@@ -311,37 +395,50 @@ public class FileManager extends Frame {
 	}
 
 	private void prepare() {
+		jMenu3.removeAll();
 		jPopupMenu1.removeAll();
-		jPopupMenu1.add(openLocationAction);
-		if (idx < 0) {
+		final Path entry = jList1.getSelectedValue();
+		if (entry == null) {
+			openAction.setEnabled(false);
+			jMenu3.setEnabled(false);
+			renameAction.setEnabled(false);
+			deleteAction.setEnabled(false);
 		} else {
-			final Path entry = model.getElementAt(idx);
+			openAction.setEnabled(true);
+			jMenu3.setEnabled(true);
+			renameAction.setEnabled(true);
+			deleteAction.setEnabled(true);
 			try {
 				final URI uri = entry.toRealPath().toUri();
 				final ApplicationManager mgr = getApplicationManager();
 				final String s = mgr.getApplication(uri);
 				boolean sep = false;
 				if (s != null) {
-					jPopupMenu1.add(new AbstractAction(s) {
+					final Action action = new AbstractAction(s) {
 						@Override
 						public void actionPerformed(final ActionEvent evt) {
 							mgr.open(s, uri);
 						}
-					});
+					};
+					jMenu3.add(action);
+					jPopupMenu1.add(action);
 					sep = true;
 				}
 				for (final String str : mgr.getApplications(uri)) {
 					if (!str.equals(s)) {
 						if (sep) {
+							jMenu3.addSeparator();
 							jPopupMenu1.addSeparator();
 							sep = false;
 						}
-						jPopupMenu1.add(new AbstractAction(str) {
+						final Action action = new AbstractAction(str) {
 							@Override
 							public void actionPerformed(final ActionEvent evt) {
 								mgr.open(str, uri);
 							}
-						});
+						};
+						jMenu3.add(action);
+						jPopupMenu1.add(action);
 					}
 				}
 			} catch (final IOException ex) {
@@ -361,6 +458,19 @@ public class FileManager extends Frame {
                 jPopupMenu1 = new javax.swing.JPopupMenu();
                 jScrollPane1 = new javax.swing.JScrollPane();
                 jList1 = new linoleum.FileList();
+                jMenuBar1 = new javax.swing.JMenuBar();
+                jMenu1 = new javax.swing.JMenu();
+                jMenuItem1 = new javax.swing.JMenuItem();
+                jMenu3 = new javax.swing.JMenu();
+                jMenuItem2 = new javax.swing.JMenuItem();
+                jMenu2 = new javax.swing.JMenu();
+                jMenuItem3 = new javax.swing.JMenuItem();
+                jSeparator1 = new javax.swing.JPopupMenu.Separator();
+                jMenuItem4 = new javax.swing.JMenuItem();
+                jMenuItem5 = new javax.swing.JMenuItem();
+                jMenuItem6 = new javax.swing.JMenuItem();
+                jSeparator2 = new javax.swing.JPopupMenu.Separator();
+                jMenuItem7 = new javax.swing.JMenuItem();
 
                 optionPanel1.setFrame(this);
 
@@ -428,7 +538,48 @@ public class FileManager extends Frame {
                                 jList1MouseMoved(evt);
                         }
                 });
+                jList1.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+                        public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                                jList1ValueChanged(evt);
+                        }
+                });
                 jScrollPane1.setViewportView(jList1);
+
+                jMenu1.setText("File");
+
+                jMenuItem1.setAction(openAction);
+                jMenu1.add(jMenuItem1);
+
+                jMenu3.setText("Open with");
+                jMenu1.add(jMenu3);
+
+                jMenuItem2.setAction(openLocationAction);
+                jMenu1.add(jMenuItem2);
+
+                jMenuBar1.add(jMenu1);
+
+                jMenu2.setText("Edit");
+
+                jMenuItem3.setAction(renameAction);
+                jMenu2.add(jMenuItem3);
+                jMenu2.add(jSeparator1);
+
+                jMenuItem4.setAction(cutAction);
+                jMenu2.add(jMenuItem4);
+
+                jMenuItem5.setAction(copyAction);
+                jMenu2.add(jMenuItem5);
+
+                jMenuItem6.setAction(pasteAction);
+                jMenu2.add(jMenuItem6);
+                jMenu2.add(jSeparator2);
+
+                jMenuItem7.setAction(deleteAction);
+                jMenu2.add(jMenuItem7);
+
+                jMenuBar1.add(jMenu2);
+
+                setJMenuBar(jMenuBar1);
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);
@@ -460,7 +611,14 @@ public class FileManager extends Frame {
 		}
         }//GEN-LAST:event_jButton1ActionPerformed
 
+        private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
+		prepare();
+        }//GEN-LAST:event_jList1ValueChanged
+
         private void jPopupMenu1PopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_jPopupMenu1PopupMenuWillBecomeVisible
+		if (!jList1.isSelectedIndex(idx)) {
+			jList1.setSelectedIndex(idx);
+		}
 		prepare();
         }//GEN-LAST:event_jPopupMenu1PopupMenuWillBecomeVisible
 
@@ -472,8 +630,21 @@ public class FileManager extends Frame {
         private javax.swing.JButton jButton1;
         private javax.swing.JLabel jLabel2;
         private linoleum.FileList jList1;
+        private javax.swing.JMenu jMenu1;
+        private javax.swing.JMenu jMenu2;
+        private javax.swing.JMenu jMenu3;
+        private javax.swing.JMenuBar jMenuBar1;
+        private javax.swing.JMenuItem jMenuItem1;
+        private javax.swing.JMenuItem jMenuItem2;
+        private javax.swing.JMenuItem jMenuItem3;
+        private javax.swing.JMenuItem jMenuItem4;
+        private javax.swing.JMenuItem jMenuItem5;
+        private javax.swing.JMenuItem jMenuItem6;
+        private javax.swing.JMenuItem jMenuItem7;
         private javax.swing.JPopupMenu jPopupMenu1;
         private javax.swing.JScrollPane jScrollPane1;
+        private javax.swing.JPopupMenu.Separator jSeparator1;
+        private javax.swing.JPopupMenu.Separator jSeparator2;
         private javax.swing.JTextField jTextField1;
         private linoleum.application.OptionPanel optionPanel1;
         // End of variables declaration//GEN-END:variables

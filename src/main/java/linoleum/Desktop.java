@@ -39,14 +39,6 @@ public class Desktop extends JFrame {
 		return pkgs;
 	}
 
-	Frame getBackgroundFrame() {
-		return frame;
-	}
-
-	Frame getConsole() {
-		return console;
-	}
-
 	private void open() {
 		apps.select();
 		if (!contentMenuItem.isEnabled()) {
