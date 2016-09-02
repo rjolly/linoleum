@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
-    <info module="linoleum" organisation="net.java.linoleum" revision="1.2"/>
+    <info module="linoleum" organisation="net.java.linoleum" revision="1.2.1"/>
     <configurations>
         <conf name="default" extends="runtime,master"/>
         <conf name="master"/>
@@ -11,11 +11,11 @@
     </configurations>
     <dependencies>
         <dependency org="net.java.linoleum" name="jlfgr" rev="1_0" conf="runtime->default"/>
-        <dependency org="net.java.linoleum" name="application" rev="1.2" conf="compile->master"/>
+        <dependency org="net.java.linoleum" name="application" rev="1.2.1" conf="compile->master"/>
         <dependency org="net.java.linoleum" name="jcterm" rev="0.0.11" conf="runtime->default"/>
-        <dependency org="net.java.linoleum" name="notepad" rev="1.2" conf="runtime->default"/>
-        <dependency org="net.java.linoleum" name="html" rev="1.2" conf="runtime->default"/>
-        <dependency org="net.java.linoleum" name="mail" rev="1.2" conf="runtime->default"/>
-        <dependency org="net.java.linoleum" name="pkg" rev="1.2" conf="runtime->default"/>
+        <dependency org="net.java.linoleum" name="notepad" rev="1.2.1" conf="runtime->default"/>
+        <dependency org="net.java.linoleum" name="html" rev="1.2.1" conf="runtime->default"/>
+        <dependency org="net.java.linoleum" name="mail" rev="1.2.1" conf="runtime->default"/>
+        <dependency org="net.java.linoleum" name="pkg" rev="1.2.1" conf="runtime->default"/>
     </dependencies>
 </ivy-module>
