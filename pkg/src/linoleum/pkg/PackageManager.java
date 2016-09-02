@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Arrays;
+import javax.swing.ImageIcon;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 import linoleum.application.Frame;
@@ -33,6 +34,7 @@ public class PackageManager extends Frame {
 	public PackageManager() {
 		super("Packages");
 		initComponents();
+		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Jar24.gif")));
 		model = (DefaultTableModel)jTable1.getModel();
 		if (instance == null) {
 			instance = this;
