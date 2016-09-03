@@ -44,6 +44,7 @@ import linoleum.application.Frame;
 public class FileManager extends Frame {
 	private final Icon fileIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/file.gif"));
 	private final Icon directoryIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/directory.gif"));
+	private final Icon newFolderIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/newFolder.gif"));
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final Icon openIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"));
 	private final Icon cutIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Cut16.gif"));
@@ -52,10 +53,13 @@ public class FileManager extends Frame {
 	private final Icon deleteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Delete16.gif"));
 	private final Action openAction = new OpenAction();
 	private final Action openLocationAction = new OpenLocationAction();
+	private final Action closeAction = new CloseAction();
+	private final Action newFolderAction = new NewFolderAction();
 	private final Action renameAction = new RenameAction();
 	private final Action cutAction = new CutAction();
 	private final Action copyAction = new CopyAction();
 	private final Action pasteAction = new PasteAction();
+	private final Action pasteAsLinkAction = new PasteAsLinkAction();
 	private final Action deleteAction = new DeleteAction();
 	private final FileChooser chooser = new FileChooser();
 	private final DefaultListModel<Path> model = new DefaultListModel<>();
@@ -139,9 +143,34 @@ public class FileManager extends Frame {
 		}
 	}
 
+	private class CloseAction extends AbstractAction {
+		public CloseAction() {
+			super("Close");
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_MASK));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			doDefaultCloseAction();
+			
+		}
+	}
+
+	private class NewFolderAction extends AbstractAction {
+		public NewFolderAction() {
+			super("New folder", newFolderIcon);
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+		}
+	}
+
 	private class RenameAction extends AbstractAction {
 		public RenameAction() {
 			super("Rename");
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK));
 		}
 
 		@Override
@@ -175,6 +204,16 @@ public class FileManager extends Frame {
 		public PasteAction() {
 			super("Paste", pasteIcon);
 			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+		}
+	}
+
+	private class PasteAsLinkAction extends AbstractAction {
+		public PasteAsLinkAction() {
+			super("Paste as link");
 		}
 
 		@Override
@@ -463,12 +502,16 @@ public class FileManager extends Frame {
                 jMenuItem1 = new javax.swing.JMenuItem();
                 jMenu3 = new javax.swing.JMenu();
                 jMenuItem2 = new javax.swing.JMenuItem();
+                jSeparator3 = new javax.swing.JPopupMenu.Separator();
+                jMenuItem10 = new javax.swing.JMenuItem();
                 jMenu2 = new javax.swing.JMenu();
+                jMenuItem9 = new javax.swing.JMenuItem();
                 jMenuItem3 = new javax.swing.JMenuItem();
                 jSeparator1 = new javax.swing.JPopupMenu.Separator();
                 jMenuItem4 = new javax.swing.JMenuItem();
                 jMenuItem5 = new javax.swing.JMenuItem();
                 jMenuItem6 = new javax.swing.JMenuItem();
+                jMenuItem8 = new javax.swing.JMenuItem();
                 jSeparator2 = new javax.swing.JPopupMenu.Separator();
                 jMenuItem7 = new javax.swing.JMenuItem();
 
@@ -555,10 +598,17 @@ public class FileManager extends Frame {
 
                 jMenuItem2.setAction(openLocationAction);
                 jMenu1.add(jMenuItem2);
+                jMenu1.add(jSeparator3);
+
+                jMenuItem10.setAction(closeAction);
+                jMenu1.add(jMenuItem10);
 
                 jMenuBar1.add(jMenu1);
 
                 jMenu2.setText("Edit");
+
+                jMenuItem9.setAction(newFolderAction);
+                jMenu2.add(jMenuItem9);
 
                 jMenuItem3.setAction(renameAction);
                 jMenu2.add(jMenuItem3);
@@ -572,6 +622,9 @@ public class FileManager extends Frame {
 
                 jMenuItem6.setAction(pasteAction);
                 jMenu2.add(jMenuItem6);
+
+                jMenuItem8.setAction(pasteAsLinkAction);
+                jMenu2.add(jMenuItem8);
                 jMenu2.add(jSeparator2);
 
                 jMenuItem7.setAction(deleteAction);
@@ -635,16 +688,20 @@ public class FileManager extends Frame {
         private javax.swing.JMenu jMenu3;
         private javax.swing.JMenuBar jMenuBar1;
         private javax.swing.JMenuItem jMenuItem1;
+        private javax.swing.JMenuItem jMenuItem10;
         private javax.swing.JMenuItem jMenuItem2;
         private javax.swing.JMenuItem jMenuItem3;
         private javax.swing.JMenuItem jMenuItem4;
         private javax.swing.JMenuItem jMenuItem5;
         private javax.swing.JMenuItem jMenuItem6;
         private javax.swing.JMenuItem jMenuItem7;
+        private javax.swing.JMenuItem jMenuItem8;
+        private javax.swing.JMenuItem jMenuItem9;
         private javax.swing.JPopupMenu jPopupMenu1;
         private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JPopupMenu.Separator jSeparator1;
         private javax.swing.JPopupMenu.Separator jSeparator2;
+        private javax.swing.JPopupMenu.Separator jSeparator3;
         private javax.swing.JTextField jTextField1;
         private linoleum.application.OptionPanel optionPanel1;
         // End of variables declaration//GEN-END:variables

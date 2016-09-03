@@ -48,7 +48,9 @@ public class Tools {
 	}
 
 	public void mklink(final File link, final File target) throws IOException {
-		Files.createSymbolicLink(link.toPath(), target.toPath().toRealPath());
+		final Path s = target.toPath();
+		final Path d = link.toPath();
+		Files.createSymbolicLink(d, s.isAbsolute()?s:d.getParent().relativize(s));
 	}
 
 	public void copy(final File dir, final File files[], final File dest) throws IOException {
