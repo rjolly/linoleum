@@ -268,7 +268,7 @@ public class FileManager extends Frame {
 		super(parent);
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
-		setMimeType("application/octet-stream:application/java-archive:application/zip");
+		setMimeType("application/x-directory:application/java-archive:application/zip");
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		this.parent = (FileManager) super.parent;
 	}

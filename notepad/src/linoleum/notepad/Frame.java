@@ -28,7 +28,7 @@ public class Frame extends linoleum.application.Frame {
 		super(parent, Notepad.resources.getString("Title"));
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Edit24.gif")));
-		setMimeType("text/plain:text/*:*/*");
+		setMimeType("text/plain:text/*:application/octet-stream");
 		jInternalFrame1.pack();
 		getContentPane().add("Center", notepad);
 		setJMenuBar(notepad.createMenubar());

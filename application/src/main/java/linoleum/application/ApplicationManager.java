@@ -35,11 +35,13 @@ import java.util.HashMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.ServiceLoader;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
+import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
@@ -61,8 +63,19 @@ public class ApplicationManager extends Frame {
 	private final Icon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
 	private final List<ClassPathListener> listeners = new ArrayList<>();
 	private final Map<String, Frame> map = new HashMap<>();
-	private final SortedMap<MimeType, String> pref = new TreeMap<>();
-	private final SortedMap<MimeType, List<String>> apps = new TreeMap<>();
+	private final Comparator<MimeType> comparator = new Comparator<MimeType>() {
+		@Override
+		public int compare(final MimeType a, final MimeType b) {
+			final int p = a.getPrimaryType().compareTo(b.getPrimaryType());
+			return p != 0?p:compare(a.getSubType(), b.getSubType());
+		}
+
+		private int compare(final String a, final String b) {
+			return a.equals("*") && !b.equals("*")?1:!a.equals("*") && b.equals("*")?-1:a.compareTo(b);
+		}
+	};
+	private final SortedMap<MimeType, String> pref = new TreeMap<>(comparator);
+	private final SortedMap<MimeType, List<String>> apps = new TreeMap<>(comparator);
 	private final DefaultListModel<Frame> model = new DefaultListModel<>();
 	private final List<String> names = new ArrayList<>(); 
 	private final List<OptionPanel> options = new ArrayList<>(); 
@@ -162,7 +175,7 @@ public class ApplicationManager extends Frame {
 	@Override
 	public void load() {
 		tableModel.setRowCount(0);
-		final SortedMap<MimeType, String> pref = new TreeMap<>();
+		final SortedMap<MimeType, String> pref = new TreeMap<>(comparator);
 		load(pref);
 		for (final MimeType type : apps.keySet()) {
 			tableModel.addRow(new Object[] {type, pref.get(type)});
@@ -171,7 +184,7 @@ public class ApplicationManager extends Frame {
 
 	@Override
 	public void save() {
-		final SortedMap<MimeType, String> pref = new TreeMap<>();
+		final SortedMap<MimeType, String> pref = new TreeMap<>(comparator);
 		for (int row = 0 ; row < tableModel.getRowCount() ; row++) {
 			final MimeType type = (MimeType) tableModel.getValueAt(row, 0);
 			final String name = (String) tableModel.getValueAt(row, 1);
@@ -411,7 +424,7 @@ public class ApplicationManager extends Frame {
                         }
                 ) {
                         Class[] types = new Class [] {
-                                linoleum.application.MimeType.class, java.lang.String.class
+                                javax.activation.MimeType.class, java.lang.String.class
                         };
                         boolean[] canEdit = new boolean [] {
                                 false, true
