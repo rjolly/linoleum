@@ -3,10 +3,6 @@ package linoleum.mail;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -15,8 +11,6 @@ import java.util.Properties;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
-import javax.activation.CommandMap;
-import javax.activation.MailcapCommandMap;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
@@ -101,13 +95,6 @@ public class SimpleClient extends Frame {
 	public SimpleClient() {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("Mail24.png")));
-		try {
-			final File capfile = new File("simple.mailcap");
-			final InputStream is = capfile.isFile()?new FileInputStream(capfile):getClass().getResourceAsStream("simple.mailcap");
-			CommandMap.setDefaultCommandMap(new MailcapCommandMap(is));
-		} catch (final FileNotFoundException ex) {
-			ex.printStackTrace();
-		}
 		props.put("mail.mime.decodefilename", "true");
 		props.put("mstor.mbox.metadataStrategy", "none");
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
@@ -116,6 +103,7 @@ public class SimpleClient extends Frame {
 				open();
 			}
 		});
+		frame.setJMenuBar(getJMenuBar());
 	}
 
 	void compose(final String str) {
@@ -361,11 +349,11 @@ public class SimpleClient extends Frame {
                 getContentPane().setLayout(layout);
                 layout.setHorizontalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 76, Short.MAX_VALUE)
+                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE)
                 );
                 layout.setVerticalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE)
+                        .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
                 );
 
                 pack();

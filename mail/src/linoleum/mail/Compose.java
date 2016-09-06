@@ -105,6 +105,7 @@ public class Compose extends Frame {
                 setMaximizable(true);
                 setResizable(true);
 		setTitle("Untitled Message " + (index + 1));
+		setJMenuBar(this.parent.getJMenuBar());
 		this.session = session;
 
 		JPanel top = new JPanel();
