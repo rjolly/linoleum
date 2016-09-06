@@ -7,9 +7,7 @@ import java.net.MalformedURLException;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.HTMLFrameHyperlinkEvent;
-import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.ElementIterator;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.AttributeSet;
@@ -17,23 +15,8 @@ import javax.swing.text.Element;
 import javax.swing.JEditorPane;
 
 public class Document extends HTMLDocument {
-
-	public HTMLEditorKit.ParserCallback getReader(final int pos) {
-		final Object desc = getProperty(StreamDescriptionProperty);
-		if (desc instanceof URL) { 
-			setBase((URL)desc);
-		}
-		final Reader reader = new Reader(pos);
-		return reader;
-	}
-
-	public HTMLEditorKit.ParserCallback getReader(final int pos, final int popDepth, final int pushDepth, final HTML.Tag insertTag) {
-		final Object desc = getProperty(StreamDescriptionProperty);
-		if (desc instanceof URL) { 
-			setBase((URL)desc);
-		}
-		final Reader reader = new Reader(pos, popDepth, pushDepth, insertTag);
-		return reader;
+	public Document() {
+		super(new StyleSheet());
 	}
 
 	public void setFrames(final Map<String, URL> map, final JEditorPane panel) {
@@ -70,24 +53,5 @@ public class Document extends HTMLDocument {
 			}
 		}
 		return false;
-	}
-
-	public class Reader extends HTMLReader {
-
-		public Reader(final int offset) {
-			this(offset, 0, 0, null);
-		}
-
-		public Reader(final int offset, final int popDepth, final int pushDepth, final HTML.Tag insertTag) {
-			super(offset, popDepth, pushDepth, insertTag);
-			registerTag(HTML.Tag.HEAD, new EmptyAction());
-		}
-
-		class EmptyAction extends TagAction {
-
-			public void start(final HTML.Tag t, final MutableAttributeSet attr) {}
-
-			public void end(final HTML.Tag t) {}
-		}
 	}
 }

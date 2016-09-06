@@ -44,7 +44,6 @@ public class Browser extends Frame {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif")));
 		setMimeType("text/html");
-		update();
 		jEditorPane1.setEditorKitForContentType("text/html", new EditorKit());
 		jEditorPane1.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 		jTextField1.getDocument().addDocumentListener(new DocumentListener() {
@@ -67,6 +66,7 @@ public class Browser extends Frame {
 				}
 			}
 		});
+		update();
 	}
 
 	private void open(final String str) {
