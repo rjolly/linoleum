@@ -6,12 +6,14 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.io.InputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.Scrollable;
+import javax.swing.SwingConstants;
 
 public class ImagePanel extends JPanel implements Scrollable, MouseMotionListener {
 	private final BufferedImage image;
@@ -21,7 +23,9 @@ public class ImagePanel extends JPanel implements Scrollable, MouseMotionListene
 	private int y0;
 
 	public ImagePanel(final Path path, final boolean scaled) throws IOException {
-		image = ImageIO.read(Files.newInputStream(path));
+		try (final InputStream is = Files.newInputStream(path)) {
+			image = ImageIO.read(is);
+		}
 		addMouseMotionListener(this);
 		this.scaled = scaled;
 	}
@@ -51,7 +55,7 @@ public class ImagePanel extends JPanel implements Scrollable, MouseMotionListene
 
 	@Override
 	public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-		return 20;
+		return orientation == SwingConstants.HORIZONTAL?visibleRect.width:visibleRect.height;
 	}
 
 	@Override

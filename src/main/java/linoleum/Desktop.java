@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
-import javax.swing.filechooser.FileSystemView;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import linoleum.application.ApplicationManager;
@@ -109,8 +108,7 @@ public class Desktop extends JFrame {
 		final BufferedImage bi = new BufferedImage(getRootPane().getWidth(), getRootPane().getHeight(), BufferedImage.TYPE_INT_ARGB);
 		getRootPane().print(bi.createGraphics());
 		try {
-			final File dir = FileSystemView.getFileSystemView().getDefaultDirectory();
-			ImageIO.write(bi, "png", new File(dir, "screenshot.png"));
+			ImageIO.write(bi, "png", new File("screenshot.png"));
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}

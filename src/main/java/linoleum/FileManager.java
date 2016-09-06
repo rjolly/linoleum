@@ -415,7 +415,7 @@ public class FileManager extends Frame {
 	}
 
 	private URI getHome() {
-		return Paths.get(prefs.get(getName() + ".home", System.getProperty("user.home"))).toUri();
+		return Paths.get(prefs.get(getName() + ".home", "")).toUri();
 	}
 
 	private void open(final int index) {

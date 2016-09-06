@@ -312,7 +312,7 @@ public class Frame extends JInternalFrame {
         }//GEN-LAST:event_formInternalFrameDeactivated
 
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
-		if (isShowing()) {
+		if (isShowing() && !isMaximum()) {
 			final Component c = evt.getComponent();
 			prefs.putInt(getName() + ".x", c.getX() - offset * index);
 			prefs.putInt(getName() + ".y", c.getY() - offset * index);
@@ -320,7 +320,7 @@ public class Frame extends JInternalFrame {
         }//GEN-LAST:event_formComponentMoved
 
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-		if (isShowing()) {
+		if (isShowing() && !isMaximum()) {
 			final Component c = evt.getComponent();
 			prefs.putInt(getName() + ".width", c.getWidth());
 			prefs.putInt(getName() + ".height", c.getHeight());
