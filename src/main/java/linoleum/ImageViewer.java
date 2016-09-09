@@ -5,7 +5,6 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import javax.swing.JPanel;
 import linoleum.application.Frame;
 
 public class ImageViewer extends Frame {
@@ -40,14 +39,12 @@ public class ImageViewer extends Frame {
 	protected void open() {
 		if (index < files.length) {
 			final Path file = files[index];
-			JPanel panel = null;
 			try {
-				panel = new ImagePanel(file);
+				jScrollPane1.setViewportView(new ImagePanel(file, scaleButton.isSelected()));
+				setTitle(file.getFileName().toString());
 			} catch (final IOException ex) {
 				ex.printStackTrace();
 			}
-			jScrollPane1.setViewportView(panel);
-			setTitle(file.getFileName().toString());
 		}
 	}
 
@@ -66,6 +63,7 @@ public class ImageViewer extends Frame {
                 jScrollPane1 = new javax.swing.JScrollPane();
                 jPanel1 = new javax.swing.JPanel();
                 backButton = new javax.swing.JButton();
+                scaleButton = new javax.swing.JToggleButton();
                 forwardButton = new javax.swing.JButton();
 
                 setClosable(true);
@@ -81,6 +79,14 @@ public class ImageViewer extends Frame {
                         }
                 });
                 jPanel1.add(backButton);
+
+                scaleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Zoom16.gif"))); // NOI18N
+                scaleButton.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                scaleButtonActionPerformed(evt);
+                        }
+                });
+                jPanel1.add(scaleButton);
 
                 forwardButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/navigation/Forward16.gif"))); // NOI18N
                 forwardButton.addActionListener(new java.awt.event.ActionListener() {
@@ -118,10 +124,15 @@ public class ImageViewer extends Frame {
 		open();
         }//GEN-LAST:event_forwardButtonActionPerformed
 
+        private void scaleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scaleButtonActionPerformed
+		open();
+        }//GEN-LAST:event_scaleButtonActionPerformed
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton backButton;
         private javax.swing.JButton forwardButton;
         private javax.swing.JPanel jPanel1;
         private javax.swing.JScrollPane jScrollPane1;
+        private javax.swing.JToggleButton scaleButton;
         // End of variables declaration//GEN-END:variables
 }

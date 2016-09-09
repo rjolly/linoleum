@@ -11,29 +11,69 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
+import javax.swing.Scrollable;
 
-public class ImagePanel extends JPanel implements MouseMotionListener {
+public class ImagePanel extends JPanel implements Scrollable, MouseMotionListener {
 	private final BufferedImage image;
+	private final boolean scaled;
 	private Rectangle r0;
 	private int x0;
 	private int y0;
 
-	public ImagePanel(final Path path) throws IOException {
+	public ImagePanel(final Path path, final boolean scaled) throws IOException {
 		image = ImageIO.read(Files.newInputStream(path));
 		addMouseMotionListener(this);
+		this.scaled = scaled;
 	}
 
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(image.getWidth(), image.getHeight());
+		if (scaled) {
+			final int width = getParent().getWidth();
+			final int height = image.getHeight() * width / image.getWidth();
+			return new Dimension(width, height);
+		} else {
+			final int width = Math.max(getParent().getWidth(), image.getWidth());
+			final int height = Math.max(getParent().getHeight(), image.getHeight());
+			return new Dimension(width, height);
+		}
+	}
+
+	@Override
+	public Dimension getPreferredScrollableViewportSize() {
+		return getPreferredSize();
+	}
+
+	@Override
+	public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+		return 20;
+	}
+
+	@Override
+	public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+		return 20;
+	}
+
+	@Override
+	public boolean getScrollableTracksViewportWidth() {
+		return scaled;
+	}
+
+	@Override
+	public boolean getScrollableTracksViewportHeight() {
+		return false;
 	}
 
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		final int x = Math.max(getWidth() - image.getWidth(), 0) / 2;
-		final int y = Math.max(getHeight() - image.getHeight(), 0) / 2;
-		g.drawImage(image, x, y, null);
+		if (scaled) {
+			g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
+		} else {
+			final int x = (getWidth() - image.getWidth()) / 2;
+			final int y = (getHeight() - image.getHeight()) / 2;
+			g.drawImage(image, x, y, null);
+		}
 	}
 
 	@Override
