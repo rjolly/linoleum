@@ -190,8 +190,6 @@ public class ApplicationManager extends Frame {
 			final String name = (String) tableModel.getValueAt(row, 1);
 			if (name != null && !name.isEmpty()) {
 				pref.put(type, name);
-			} else {
-				pref.remove(type);
 			}
 		}
 		final String str = pref.toString();

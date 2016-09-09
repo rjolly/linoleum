@@ -47,7 +47,6 @@ public class Frame extends JInternalFrame {
 	private String type;
 	private Icon icon;
 	private URI uri;
-	private boolean ready;
 	private boolean opened;
 	protected final int index;
 	protected final Frame parent;
@@ -76,7 +75,11 @@ public class Frame extends JInternalFrame {
 	}
 
 	private int nextIndex() {
-		return openFrames.isEmpty()?0:Collections.max(openFrames) + 1;
+		int index = 0;
+		while (openFrames.contains(index)) {
+			index++;
+		}
+		return index;
 	}
 
 	private void openFrame() {
@@ -278,9 +281,6 @@ public class Frame extends JInternalFrame {
                         public void componentMoved(java.awt.event.ComponentEvent evt) {
                                 formComponentMoved(evt);
                         }
-                        public void componentShown(java.awt.event.ComponentEvent evt) {
-                                formComponentShown(evt);
-                        }
                 });
 
                 pack();
@@ -312,7 +312,7 @@ public class Frame extends JInternalFrame {
         }//GEN-LAST:event_formInternalFrameDeactivated
 
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
-		if (ready) {
+		if (isShowing()) {
 			final Component c = evt.getComponent();
 			prefs.putInt(getName() + ".x", c.getX() - offset * index);
 			prefs.putInt(getName() + ".y", c.getY() - offset * index);
@@ -320,16 +320,12 @@ public class Frame extends JInternalFrame {
         }//GEN-LAST:event_formComponentMoved
 
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-		if (ready) {
+		if (isShowing()) {
 			final Component c = evt.getComponent();
 			prefs.putInt(getName() + ".width", c.getWidth());
 			prefs.putInt(getName() + ".height", c.getHeight());
 		}
         }//GEN-LAST:event_formComponentResized
-
-        private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
-		ready = true;
-        }//GEN-LAST:event_formComponentShown
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         // End of variables declaration//GEN-END:variables
