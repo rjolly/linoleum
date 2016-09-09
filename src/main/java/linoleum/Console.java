@@ -23,13 +23,26 @@ public class Console extends Frame {
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
 			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
-				logger.setLevel(getLevel());
+				refresh();
 			}
 		});
 		model.addElement(Level.CONFIG);
 		model.addElement(Level.INFO);
 		model.addElement(Level.WARNING);
 		model.addElement(Level.SEVERE);
+		final Handler[] handlers = logger.getHandlers();
+		if (handlers.length > 0) {
+			final Handler handler = handlers[0];
+			if (handler.getLevel().intValue() > Level.CONFIG.intValue()) {
+				handler.setLevel(Level.CONFIG);
+			}
+		}
+		refresh();
+	}
+
+	private void refresh() {
+		logger.setLevel(getLevel());
+		setVisible(prefs.getBoolean(getName() + ".visible", false));
 	}
 
 	@Override
@@ -40,11 +53,13 @@ public class Console extends Frame {
 	@Override
 	public void load() {
 		model.setSelectedItem(getLevel());
+		jCheckBox1.setSelected(prefs.getBoolean(getName() + ".visible", false));
 	}
 
 	@Override
 	public void save() {
 		prefs.put(getName() + ".level", model.getSelectedItem().toString());
+		prefs.putBoolean(getName() + ".visible", jCheckBox1.isSelected());
 	}
 
 	private Level getLevel() {
@@ -54,14 +69,6 @@ public class Console extends Frame {
 	@Override
 	public void open() {
 		panel.init();
-		final Handler[] handlers = logger.getHandlers();
-		if (handlers.length > 0) {
-			final Handler handler = handlers[0];
-			if (handler.getLevel().intValue() > Level.CONFIG.intValue()) {
-				handler.setLevel(Level.CONFIG);
-			}
-		}
-		logger.setLevel(getLevel());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -71,6 +78,7 @@ public class Console extends Frame {
                 optionPanel1 = new linoleum.application.OptionPanel();
                 jLabel1 = new javax.swing.JLabel();
                 jComboBox1 = new javax.swing.JComboBox();
+                jCheckBox1 = new javax.swing.JCheckBox();
 
                 optionPanel1.setFrame(this);
 
@@ -83,28 +91,41 @@ public class Console extends Frame {
                         }
                 });
 
+                jCheckBox1.setText("Visible");
+                jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jCheckBox1ActionPerformed(evt);
+                        }
+                });
+
                 javax.swing.GroupLayout optionPanel1Layout = new javax.swing.GroupLayout(optionPanel1);
                 optionPanel1.setLayout(optionPanel1Layout);
                 optionPanel1Layout.setHorizontalGroup(
                         optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(optionPanel1Layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jComboBox1, 0, 295, Short.MAX_VALUE)
+                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                                                .addComponent(jLabel1)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jComboBox1, 0, 295, Short.MAX_VALUE))
+                                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                                                .addComponent(jCheckBox1)
+                                                .addGap(0, 0, Short.MAX_VALUE)))
                                 .addContainerGap())
                 );
                 optionPanel1Layout.setVerticalGroup(
                         optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, optionPanel1Layout.createSequentialGroup()
                                 .addContainerGap()
+                                .addComponent(jCheckBox1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel1)
                                         .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 );
 
-                setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
                 setIconifiable(true);
                 setMaximizable(true);
                 setResizable(true);
@@ -128,7 +149,12 @@ public class Console extends Frame {
 		optionPanel1.setDirty(true);
         }//GEN-LAST:event_jComboBox1ActionPerformed
 
+        private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+		optionPanel1.setDirty(true);
+        }//GEN-LAST:event_jCheckBox1ActionPerformed
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
+        private javax.swing.JCheckBox jCheckBox1;
         private javax.swing.JComboBox jComboBox1;
         private javax.swing.JLabel jLabel1;
         private linoleum.application.OptionPanel optionPanel1;

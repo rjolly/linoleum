@@ -1,8 +1,8 @@
 package linoleum;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
@@ -10,29 +10,35 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import linoleum.application.Frame;
 import linoleum.application.ApplicationManager;
 
 public class Desktop extends JFrame {
 	public static final Desktop instance = new Desktop();
+	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private static final String ABOUTMSG = "%s %s.%s \n \nJava desktop environment "
 		+ "and software distribution. \n \nWritten by \n  "
 		+ "%s";
 	private final ApplicationManager apps = new ApplicationManager();
 	private final Packages pkgs = new Packages(apps);
+	private final Console console = new Console();
 	private final GraphicsDevice devices[];
 	private Rectangle bounds;
+	private boolean full;
 
 	private Desktop() {
 		initComponents();
+		console.setApplicationManager(apps);
+		frame.setApplicationManager(apps);
 		frame.setLayer(0);
+		desktopPane.add(console);
 		desktopPane.add(apps);
 		devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
-		bounds = getBounds();
+		loadBounds();
 	}
 
 	public Packages getPackages() {
@@ -43,14 +49,6 @@ public class Desktop extends JFrame {
 		apps.select();
 		if (!contentMenuItem.isEnabled()) {
 			contentMenuItem.setEnabled(true);
-		}
-	}
-
-	private void console() {
-		if (consoleMenuItem.isSelected()) {
-			console.select();
-		} else {
-			console.doDefaultCloseAction();
 		}
 	}
 
@@ -74,9 +72,9 @@ public class Desktop extends JFrame {
 
 	private void fullScreen() {
 		dispose();
-                setUndecorated(fullScreenMenuItem.isSelected());
+		setUndecorated(full = fullScreenMenuItem.isSelected());
 		if (devices.length > 1) {
-			if (fullScreenMenuItem.isSelected()) {
+			if (full) {
 				bounds = getBounds();
 				setExtendedState(MAXIMIZED_BOTH);
 			} else {
@@ -84,11 +82,18 @@ public class Desktop extends JFrame {
 				setBounds(bounds);
 			}
 		} else {
-			final GraphicsConfiguration c = getGraphicsConfiguration();
-			final GraphicsDevice g = c.getDevice();
-			g.setFullScreenWindow(fullScreenMenuItem.isSelected()?this:null);
+			getGraphicsConfiguration().getDevice().setFullScreenWindow(full?this:null);
 		}
 		setVisible(true);
+	}
+
+	private void loadBounds() {
+		final int x = prefs.getInt(getName() + ".x", getX());
+		final int y = prefs.getInt(getName() + ".y", getY());
+		final int width = prefs.getInt(getName() + ".width", getWidth());
+		final int height = prefs.getInt(getName() + ".height", getHeight());
+		setBounds(x, y, width, height);
+		bounds = getBounds();
 	}
 
 	private void resize() {
@@ -117,7 +122,6 @@ public class Desktop extends JFrame {
 
                 desktopPane = new linoleum.DesktopPane();
                 frame = new linoleum.Background();
-                console = new linoleum.Console();
                 menuBar = new javax.swing.JMenuBar();
                 fileMenu = new javax.swing.JMenu();
                 openMenuItem = new javax.swing.JMenuItem();
@@ -125,27 +129,24 @@ public class Desktop extends JFrame {
                 viewMenu = new javax.swing.JMenu();
                 fullScreenMenuItem = new javax.swing.JCheckBoxMenuItem();
                 screenshotMenuItem = new javax.swing.JMenuItem();
-                consoleMenuItem = new javax.swing.JCheckBoxMenuItem();
                 helpMenu = new javax.swing.JMenu();
                 contentMenuItem = new javax.swing.JMenuItem();
                 aboutMenuItem = new javax.swing.JMenuItem();
 
                 setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+                setName("Desktop"); // NOI18N
                 addComponentListener(new java.awt.event.ComponentAdapter() {
                         public void componentResized(java.awt.event.ComponentEvent evt) {
                                 formComponentResized(evt);
                         }
+                        public void componentMoved(java.awt.event.ComponentEvent evt) {
+                                formComponentMoved(evt);
+                        }
                 });
 
-                frame.setApplicationManager(apps);
                 frame.setVisible(true);
                 desktopPane.add(frame);
                 frame.setBounds(0, 0, 891, 531);
-
-                console.setApplicationManager(apps);
-                console.setVisible(false);
-                desktopPane.add(console);
-                console.setBounds(0, 0, 394, 277);
 
                 fileMenu.setMnemonic('f');
                 fileMenu.setText("File");
@@ -195,14 +196,6 @@ public class Desktop extends JFrame {
                         }
                 });
                 viewMenu.add(screenshotMenuItem);
-
-                consoleMenuItem.setText("Console");
-                consoleMenuItem.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                consoleMenuItemActionPerformed(evt);
-                        }
-                });
-                viewMenu.add(consoleMenuItem);
 
                 menuBar.add(viewMenu);
 
@@ -269,6 +262,11 @@ public class Desktop extends JFrame {
         }//GEN-LAST:event_screenshotMenuItemActionPerformed
 
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
+		if (isShowing() && !full) {
+			final Component c = evt.getComponent();
+			prefs.putInt(getName() + ".width", c.getWidth());
+			prefs.putInt(getName() + ".height", c.getHeight());
+		}
 		resize();
         }//GEN-LAST:event_formComponentResized
 
@@ -276,9 +274,13 @@ public class Desktop extends JFrame {
 		content();
         }//GEN-LAST:event_contentMenuItemActionPerformed
 
-        private void consoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_consoleMenuItemActionPerformed
-		console();
-        }//GEN-LAST:event_consoleMenuItemActionPerformed
+        private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
+		if (isShowing() && !full) {
+			final Component c = evt.getComponent();
+			prefs.putInt(getName() + ".x", c.getX());
+			prefs.putInt(getName() + ".y", c.getY());
+		}
+        }//GEN-LAST:event_formComponentMoved
 
 	public static void main(String args[]) {
 		/* Create and display the form */
@@ -291,8 +293,6 @@ public class Desktop extends JFrame {
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JMenuItem aboutMenuItem;
-        private linoleum.Console console;
-        private javax.swing.JCheckBoxMenuItem consoleMenuItem;
         private javax.swing.JMenuItem contentMenuItem;
         private linoleum.DesktopPane desktopPane;
         private javax.swing.JMenuItem exitMenuItem;
