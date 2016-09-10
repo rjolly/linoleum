@@ -265,10 +265,10 @@ public class Frame extends linoleum.application.Frame {
         private void formVetoableChange(java.beans.PropertyChangeEvent evt)throws java.beans.PropertyVetoException {//GEN-FIRST:event_formVetoableChange
 		if (IS_CLOSED_PROPERTY.equals(evt.getPropertyName()) && (Boolean) evt.getNewValue()) {
 			closeDialog();
-			if (!notepad.proceed()) {
-				throw new PropertyVetoException("aborted", evt);
-			} else {
+			if (notepad.clean() || notepad.proceed("Warning")) {
 				jInternalFrame1.setClosed(true);
+			} else {
+				throw new PropertyVetoException("aborted", evt);
 			}
 		}
         }//GEN-LAST:event_formVetoableChange

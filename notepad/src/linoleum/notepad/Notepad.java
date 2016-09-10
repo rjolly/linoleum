@@ -401,7 +401,7 @@ public class Notepad extends JPanel {
 
 		public void actionPerformed(final ActionEvent e) {
 			frame.closeDialog();
-			if (proceed()) {
+			if (clean() || proceed("Warning")) {
 				setFile(null);
 				editor.getDocument().addUndoableEditListener(undoHandler);
 				resetUndoManager();
@@ -418,10 +418,9 @@ public class Notepad extends JPanel {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			frame.closeDialog();
-			if (proceed()) {
+			if (clean() || proceed("Warning")) {
 				final FileChooser chooser = frame.getFileChooser();
-				final int returnVal = chooser.showInternalOpenDialog(Notepad.this);
-				switch (returnVal) {
+				switch (chooser.showInternalOpenDialog(Notepad.this)) {
 				case JFileChooser.APPROVE_OPTION:
 					setFile(chooser.getSelectedFile().toPath());
 					open();
@@ -450,11 +449,9 @@ public class Notepad extends JPanel {
 		public void actionPerformed(final ActionEvent e) {
 			frame.closeDialog();
 			final FileChooser chooser = frame.getFileChooser();
-			final int returnVal = chooser.showInternalSaveDialog(Notepad.this);
-			switch (returnVal) {
+			switch (chooser.showInternalSaveDialog(Notepad.this)) {
 			case JFileChooser.APPROVE_OPTION:
-				file = chooser.getSelectedFile().toPath();
-				save();
+				save(chooser.getSelectedFile().toPath());
 				break;
 			default:
 			}
@@ -493,6 +490,13 @@ public class Notepad extends JPanel {
 		}
 	}
 
+	private void save(final Path file) {
+		if (!Files.exists(file) || file.equals(this.file) || proceed("Overwrite")) {
+			this.file = file;
+			save();
+		}
+	}
+
 	private void save() {
 		new FileSaver().execute();
 		modified = 0;
@@ -508,18 +512,17 @@ public class Notepad extends JPanel {
 		getAction("save").setEnabled(file != null && modified != 0);
 	}
 
-	boolean proceed() {
-		boolean c = true;
-		if (modified != 0) {
-			final int option = JOptionPane.showInternalConfirmDialog(frame, resources.getString("Warning"), resources.getString("WarningTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-			switch (option) {
-			case JOptionPane.OK_OPTION:
-				break;
-			default:
-				c = false;
-			}
+	boolean clean() {
+		return modified == 0;
+	}
+
+	boolean proceed(final String key) {
+		switch (JOptionPane.showInternalConfirmDialog(frame, resources.getString(key), resources.getString("WarningTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE)) {
+		case JOptionPane.OK_OPTION:
+			return true;
+		default:
 		}
-		return c;
+		return false;
 	}
 
 	class ShowElementTreeAction extends AbstractAction {
