@@ -1,24 +1,34 @@
 package linoleum;
 
 import java.awt.Component;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +42,7 @@ import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -39,6 +50,7 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 import linoleum.application.ApplicationManager;
 import linoleum.application.FileChooser;
 import linoleum.application.Frame;
@@ -109,6 +121,7 @@ public class FileManager extends Frame {
 	private boolean closing;
 	private FileSystem fs;
 	private boolean show;
+	private int action;
 	private Path path;
 	private int idx;
 
@@ -156,6 +169,10 @@ public class FileManager extends Frame {
 		}
 	}
 
+	private ActionEvent createActionEvent() {
+		return new ActionEvent(jList1, ActionEvent.ACTION_PERFORMED, null);
+	}
+
 	private class CutAction extends AbstractAction {
 		public CutAction() {
 			super("Cut", cutIcon);
@@ -164,6 +181,7 @@ public class FileManager extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
+			TransferHandler.getCutAction().actionPerformed(createActionEvent());
 		}
 	}
 
@@ -175,6 +193,7 @@ public class FileManager extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
+			TransferHandler.getCopyAction().actionPerformed(createActionEvent());
 		}
 	}
 
@@ -186,6 +205,7 @@ public class FileManager extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
+			TransferHandler.getPasteAction().actionPerformed(createActionEvent());
 		}
 	}
 
@@ -196,6 +216,8 @@ public class FileManager extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
+			parent.action = TransferHandler.LINK;
+			TransferHandler.getPasteAction().actionPerformed(createActionEvent());
 		}
 	}
 
@@ -260,6 +282,137 @@ public class FileManager extends Frame {
 		}
 	};
 
+	private class Handler extends TransferHandler {
+		@Override
+		public boolean canImport(final TransferHandler.TransferSupport support) {
+			return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public boolean importData(final TransferHandler.TransferSupport support) {
+			if (!canImport(support)) {
+				return false;
+			}
+			final List<Path> files;
+			final Transferable transferable = support.getTransferable();
+			try {
+				files = (List<Path>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+			} catch (final UnsupportedFlavorException e) {
+				return false;
+			} catch (final IOException e) {
+				return false;
+			}
+			final int action;
+			final Path recipient;
+			final FileList list = (FileList) support.getComponent();
+			if (support.isDrop()) {
+				action = support.getDropAction();
+				final JList.DropLocation dl = (JList.DropLocation) support.getDropLocation();
+				recipient = dl.isInsert()?path:getDirectory(list.getModel().getElementAt(dl.getIndex()));
+			} else {
+				action = parent.action;
+				recipient = list.isSelectionEmpty()?path:getDirectory(list.getSelectedValue());
+			}
+			for (final Path entry : files) {
+				final Path target = recipient.resolve(getFileName(entry).toString());
+				try {
+					switch (action) {
+					case COPY:
+						if (Files.isDirectory(entry)) {
+							copy(entry, target);
+						} else {
+							Files.copy(entry, target);
+						}
+						break;
+					case MOVE:
+						if (Files.isDirectory(entry)) {
+							copy(entry, target);
+							delete(entry);
+						} else {
+							Files.move(entry, target);
+						}
+						break;
+					case LINK:
+						Files.createSymbolicLink(target, entry.isAbsolute()?entry:recipient.isAbsolute()?entry.toAbsolutePath():recipient.relativize(entry));
+						break;
+					}
+				} catch (final IOException ex) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		@Override
+		public Transferable createTransferable(final JComponent c) {
+			return new FileTransferable(((FileList) c).getSelectedValuesList());
+		}
+
+		@Override
+		public int getSourceActions(final JComponent c) {
+			return MOVE | COPY | LINK;
+		}
+
+		@Override
+		public void exportDone(final JComponent c, final Transferable data, final int action) {
+			parent.action = action;
+		}
+	}
+
+	private Path getDirectory(final Path path) {
+		if (Files.isDirectory(path)) try {
+			return relativize(path.toRealPath());
+		} catch (final IOException ex) {
+			ex.printStackTrace();
+		}
+		return path.getParent();
+	}
+
+	private void copy(final Path source, final Path target) throws IOException {
+		Files.walkFileTree(source, EnumSet.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE, new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
+				final Path targetdir = target.resolve(source.relativize(dir));
+				try {
+					Files.copy(dir, targetdir);
+				} catch (final FileAlreadyExistsException e) {
+					 if (!Files.isDirectory(targetdir)) {
+						 throw e;
+					 }
+				}
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+				Files.copy(file, target.resolve(source.relativize(file)));
+				return FileVisitResult.CONTINUE;
+			}
+		});
+	}
+
+	private void delete(final Path start) throws IOException {
+		Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+				Files.delete(file);
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult postVisitDirectory(final Path dir, final IOException e) throws IOException {
+				if (e == null) {
+					Files.delete(dir);
+					return FileVisitResult.CONTINUE;
+				} else {
+					// directory iteration failed
+					throw e;
+				}
+			}
+		});
+	}
+
 	public FileManager() {
 		this(null);
 	}
@@ -267,6 +420,7 @@ public class FileManager extends Frame {
 	public FileManager(final Frame parent) {
 		super(parent);
 		initComponents();
+		jList1.setTransferHandler(new Handler());
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
 		setMimeType("application/x-directory:application/java-archive:application/zip");
 		Preferences.userNodeForPackage(ApplicationManager.class).addPreferenceChangeListener(new PreferenceChangeListener() {
@@ -306,10 +460,17 @@ public class FileManager extends Frame {
 	@Override
 	public void setURI(final URI uri) {
 		try {
-			path = Paths.get(uri).toRealPath();
+			path = relativize(Paths.get(uri).toRealPath());
+			fs = path.getFileSystem();
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	private Path relativize(final Path path) throws IOException {
+		final FileSystem fs = path.getFileSystem();
+		final Path user = Paths.get("").toRealPath();
+		return fs == defaultfs && path.startsWith(user)?user.relativize(path):path;
 	}
 
 	@Override
@@ -322,7 +483,6 @@ public class FileManager extends Frame {
 		if (path == null) {
 			setURI(getHome());
 		}
-		fs = path.getFileSystem();
 		if(Files.isRegularFile(path) && isJar()) {
 			final URI uri = path.toUri();
 			try {
@@ -597,6 +757,8 @@ public class FileManager extends Frame {
                 jList1.setModel(model);
                 jList1.setCellRenderer(renderer);
                 jList1.setComponentPopupMenu(jPopupMenu1);
+                jList1.setDragEnabled(true);
+                jList1.setDropMode(javax.swing.DropMode.ON_OR_INSERT);
                 jList1.setLayoutOrientation(javax.swing.JList.HORIZONTAL_WRAP);
                 jList1.setVisibleRowCount(-1);
                 jList1.addMouseListener(new java.awt.event.MouseAdapter() {
