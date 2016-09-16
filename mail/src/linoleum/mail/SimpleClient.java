@@ -100,7 +100,9 @@ public class SimpleClient extends Frame {
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
 			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
-				open();
+				if (evt.getKey().startsWith(name)) {
+					open();
+				}
 			}
 		});
 		frame.setJMenuBar(getJMenuBar());

@@ -59,7 +59,9 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
 			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
-				reload();
+				if (evt.getKey().startsWith(getName())) {
+					reload();
+				}
 			}
 		});
 		refresh();

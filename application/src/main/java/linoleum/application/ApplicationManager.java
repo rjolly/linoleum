@@ -118,7 +118,9 @@ public class ApplicationManager extends Frame {
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
 			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
-				load(pref);
+				if (evt.getKey().startsWith(getName())) {
+					load(pref);
+				}
 			}
 		});
 		setApplicationManager(this);

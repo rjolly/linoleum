@@ -19,7 +19,9 @@ public class Background extends Frame {
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
 			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
-				jLabel1.setIcon(getImage());
+				if (evt.getKey().startsWith(getName())) {
+					jLabel1.setIcon(getImage());
+				}
 			}
 		});
 		chooser.setFileFilter(new FileNameExtensionFilter("Images", "jpg", "gif", "png"));
