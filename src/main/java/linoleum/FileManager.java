@@ -56,12 +56,12 @@ public class FileManager extends Frame {
 	private final Action openAction = new OpenAction();
 	private final Action openLocationAction = new OpenLocationAction();
 	private final Action closeAction = new CloseAction();
-	private final Action newFolderAction = new NewFolderAction();
-	private final Action renameAction = new RenameAction();
 	private final Action cutAction = new CutAction();
 	private final Action copyAction = new CopyAction();
 	private final Action pasteAction = new PasteAction();
 	private final Action pasteAsLinkAction = new PasteAsLinkAction();
+	private final Action newFolderAction = new NewFolderAction();
+	private final Action renameAction = new RenameAction();
 	private final Action deleteAction = new DeleteAction();
 	private final FileChooser chooser = new FileChooser();
 	private final DefaultListModel<Path> model = new DefaultListModel<>();
@@ -156,28 +156,6 @@ public class FileManager extends Frame {
 		}
 	}
 
-	private class NewFolderAction extends AbstractAction {
-		public NewFolderAction() {
-			super("New folder", newFolderIcon);
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
-		}
-
-		@Override
-		public void actionPerformed(final ActionEvent e) {
-		}
-	}
-
-	private class RenameAction extends AbstractAction {
-		public RenameAction() {
-			super("Rename");
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK));
-		}
-
-		@Override
-		public void actionPerformed(final ActionEvent e) {
-		}
-	}
-
 	private class CutAction extends AbstractAction {
 		public CutAction() {
 			super("Cut", cutIcon);
@@ -214,6 +192,28 @@ public class FileManager extends Frame {
 	private class PasteAsLinkAction extends AbstractAction {
 		public PasteAsLinkAction() {
 			super("Paste as link");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+		}
+	}
+
+	private class NewFolderAction extends AbstractAction {
+		public NewFolderAction() {
+			super("New folder", newFolderIcon);
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+		}
+	}
+
+	private class RenameAction extends AbstractAction {
+		public RenameAction() {
+			super("Rename");
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK));
 		}
 
 		@Override
@@ -525,13 +525,13 @@ public class FileManager extends Frame {
                 jSeparator3 = new javax.swing.JPopupMenu.Separator();
                 jMenuItem10 = new javax.swing.JMenuItem();
                 jMenu2 = new javax.swing.JMenu();
-                jMenuItem9 = new javax.swing.JMenuItem();
-                jMenuItem3 = new javax.swing.JMenuItem();
-                jSeparator1 = new javax.swing.JPopupMenu.Separator();
                 jMenuItem4 = new javax.swing.JMenuItem();
                 jMenuItem5 = new javax.swing.JMenuItem();
                 jMenuItem6 = new javax.swing.JMenuItem();
                 jMenuItem8 = new javax.swing.JMenuItem();
+                jSeparator1 = new javax.swing.JPopupMenu.Separator();
+                jMenuItem9 = new javax.swing.JMenuItem();
+                jMenuItem3 = new javax.swing.JMenuItem();
                 jSeparator2 = new javax.swing.JPopupMenu.Separator();
                 jMenuItem7 = new javax.swing.JMenuItem();
                 jMenu4 = new javax.swing.JMenu();
@@ -643,13 +643,6 @@ public class FileManager extends Frame {
 
                 jMenu2.setText("Edit");
 
-                jMenuItem9.setAction(newFolderAction);
-                jMenu2.add(jMenuItem9);
-
-                jMenuItem3.setAction(renameAction);
-                jMenu2.add(jMenuItem3);
-                jMenu2.add(jSeparator1);
-
                 jMenuItem4.setAction(cutAction);
                 jMenu2.add(jMenuItem4);
 
@@ -661,6 +654,13 @@ public class FileManager extends Frame {
 
                 jMenuItem8.setAction(pasteAsLinkAction);
                 jMenu2.add(jMenuItem8);
+                jMenu2.add(jSeparator1);
+
+                jMenuItem9.setAction(newFolderAction);
+                jMenu2.add(jMenuItem9);
+
+                jMenuItem3.setAction(renameAction);
+                jMenu2.add(jMenuItem3);
                 jMenu2.add(jSeparator2);
 
                 jMenuItem7.setAction(deleteAction);
