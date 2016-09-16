@@ -437,13 +437,6 @@ public class FileManager extends Frame {
 		return Paths.get(prefs.get(getKey("home"), "")).toUri();
 	}
 
-	private void open(final int index) {
-		if (index < 0) {
-		} else {
-			open(model.getElementAt(index));
-		}
-	}
-
 	private void open(final Path entry) {
 		try {
 			getApplicationManager().open(entry.toRealPath().toUri());
@@ -455,8 +448,7 @@ public class FileManager extends Frame {
 	private void prepare() {
 		jMenu3.removeAll();
 		jPopupMenu1.removeAll();
-		final Path entry = jList1.getSelectedValue();
-		if (entry == null) {
+		if (jList1.isSelectionEmpty()) {
 			openAction.setEnabled(false);
 			jMenu3.setEnabled(false);
 			renameAction.setEnabled(false);
@@ -467,7 +459,7 @@ public class FileManager extends Frame {
 			renameAction.setEnabled(true);
 			deleteAction.setEnabled(true);
 			try {
-				final URI uri = entry.toRealPath().toUri();
+				final URI uri = jList1.getSelectedValue().toRealPath().toUri();
 				final ApplicationManager mgr = getApplicationManager();
 				final String s = mgr.getApplication(uri);
 				boolean sep = false;
@@ -698,8 +690,8 @@ public class FileManager extends Frame {
         }// </editor-fold>//GEN-END:initComponents
 
         private void jList1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseClicked
-		if (evt.getClickCount() == 2) {
-			open(jList1.locationToIndex(evt.getPoint()));
+		if (evt.getClickCount() == 2 && !jList1.isSelectionEmpty()) {
+			open(jList1.getSelectedValue());
 		}
         }//GEN-LAST:event_jList1MouseClicked
 
@@ -718,7 +710,7 @@ public class FileManager extends Frame {
         }//GEN-LAST:event_jList1ValueChanged
 
         private void jPopupMenu1PopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_jPopupMenu1PopupMenuWillBecomeVisible
-		if (!jList1.isSelectedIndex(idx)) {
+		if (idx > -1 && !jList1.isSelectedIndex(idx)) {
 			jList1.setSelectedIndex(idx);
 		}
 		prepare();
