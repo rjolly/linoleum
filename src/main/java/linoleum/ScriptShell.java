@@ -77,7 +77,7 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	}
 
 	private void reload() {
-		final String language = prefs.get(getName() + ".language", "");
+		final String language = prefs.get(getKey("language"), "");
 		for (final ScriptEngineFactory sef : manager.getEngineFactories()) {
 			if (factory == null || language.equals(sef.getEngineName())) {
 				factory = sef;
@@ -90,12 +90,12 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 
 	@Override
 	public void load() {
-		model.setSelectedItem(prefs.get(getName() + ".language", ""));
+		model.setSelectedItem(prefs.get(getKey("language"), ""));
 	}
 
 	@Override
 	public void save() {
-		prefs.put(getName() + ".language", (String) model.getSelectedItem());
+		prefs.put(getKey("language"), (String) model.getSelectedItem());
 	}
 
 	@Override

@@ -44,7 +44,7 @@ public class Console extends Frame {
 
 	private void refresh() {
 		logger.setLevel(getLevel());
-		setVisible(prefs.getBoolean(getName() + ".visible", false));
+		setVisible(prefs.getBoolean(getKey("visible"), false));
 	}
 
 	@Override
@@ -55,17 +55,17 @@ public class Console extends Frame {
 	@Override
 	public void load() {
 		model.setSelectedItem(getLevel());
-		jCheckBox1.setSelected(prefs.getBoolean(getName() + ".visible", false));
+		jCheckBox1.setSelected(prefs.getBoolean(getKey("visible"), false));
 	}
 
 	@Override
 	public void save() {
-		prefs.put(getName() + ".level", model.getSelectedItem().toString());
-		prefs.putBoolean(getName() + ".visible", jCheckBox1.isSelected());
+		prefs.put(getKey("level"), model.getSelectedItem().toString());
+		prefs.putBoolean(getKey("visible"), jCheckBox1.isSelected());
 	}
 
 	private Level getLevel() {
-		return Level.parse(prefs.get(getName() + ".level", Level.INFO.toString()));
+		return Level.parse(prefs.get(getKey("level"), Level.INFO.toString()));
 	}
 
 	@Override

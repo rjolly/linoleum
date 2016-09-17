@@ -27,7 +27,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreePath;
-import linoleum.application.ApplicationManager;
 import linoleum.application.Frame;
 
 public class SimpleClient extends Frame {
@@ -44,7 +43,7 @@ public class SimpleClient extends Frame {
 	private final Session session = Session.getInstance(props, auth);
 	private final Compose frame = new Compose(session);
 	private Folder folder;
-	static final String name = "Mail";
+	static SimpleClient instance;
 
 	private class ComposeAction extends AbstractAction {
 		public ComposeAction() {
@@ -100,11 +99,14 @@ public class SimpleClient extends Frame {
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
 			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
-				if (evt.getKey().startsWith(name)) {
+				if (evt.getKey().startsWith(getName())) {
 					open();
 				}
 			}
 		});
+		if (instance == null) {
+			instance = this;
+		}
 		frame.setJMenuBar(getJMenuBar());
 	}
 
@@ -122,36 +124,34 @@ public class SimpleClient extends Frame {
 
 	@Override
 	public void init() {
-		final ApplicationManager manager = getApplicationManager();
-		frame.setApplicationManager(manager);
-		manager.addOptionPanel(optionPanel1);
+		frame.setApplicationManager(getApplicationManager());
 	}
 
 	@Override
 	public void load() {
-		jTextField1.setText(prefs.get(name + ".url", ""));
-		jTextField2.setText(prefs.get(name + ".mailhost", ""));
-		jTextField3.setText(prefs.get(name + ".from", ""));
-		jTextField4.setText(prefs.get(name + ".record", "Sent"));
-		jCheckBox1.setSelected(prefs.getBoolean(name + ".debug", false));
+		jTextField1.setText(prefs.get(getKey("url"), ""));
+		jTextField2.setText(prefs.get(getKey("mailhost"), ""));
+		jTextField3.setText(prefs.get(getKey("from"), ""));
+		jTextField4.setText(prefs.get(getKey("record"), "Sent"));
+		jCheckBox1.setSelected(prefs.getBoolean(getKey("debug"), false));
 	}
 
 	@Override
 	public void save() {
-		prefs.put(name + ".url", jTextField1.getText());
-		prefs.put(name + ".mailhost", jTextField2.getText());
-		prefs.put(name + ".from", jTextField3.getText());
-		prefs.put(name + ".record", jTextField4.getText());
-		prefs.putBoolean(name + ".debug", jCheckBox1.isSelected());
+		prefs.put(getKey("url"), jTextField1.getText());
+		prefs.put(getKey("mailhost"), jTextField2.getText());
+		prefs.put(getKey("from"), jTextField3.getText());
+		prefs.put(getKey("record"), jTextField4.getText());
+		prefs.putBoolean(getKey("debug"), jCheckBox1.isSelected());
 	}
 
 	@Override
 	public void open() {
-		final String mailhost = prefs.get(name + ".mailhost", "");
+		final String mailhost = prefs.get(getKey("mailhost"), "");
 		if (!mailhost.isEmpty()) {
 			props.put("mail.smtp.host", mailhost);
 		}
-		final boolean debug = prefs.getBoolean(name + ".debug", false);
+		final boolean debug = prefs.getBoolean(getKey("debug"), false);
 		if (debug) {
 			session.setDebug(true);
 		}
@@ -159,7 +159,7 @@ public class SimpleClient extends Frame {
 		if (uri != null) {
 			open(uri.toString());
 		} else {
-			final String str = prefs.get(name + ".url", "");
+			final String str = prefs.get(getKey("url"), "");
 			if (!str.isEmpty()) {
 				open(str);
 			}
@@ -282,7 +282,7 @@ public class SimpleClient extends Frame {
                 setMaximizable(true);
                 setResizable(true);
                 setTitle("Simple JavaMail Client");
-                setName(name);
+                setName("Mail");
 
                 jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
                 jSplitPane1.setResizeWeight(0.4);

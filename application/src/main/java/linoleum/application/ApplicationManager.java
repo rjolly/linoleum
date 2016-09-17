@@ -128,7 +128,7 @@ public class ApplicationManager extends Frame {
 
 	private void load(final Map<MimeType, String> pref) {
 		pref.clear();
-		final String str = prefs.get(getName() + ".preferred", "");
+		final String str = prefs.get(getKey("preferred"), "");
 		for (final String entry : str.split(", ")) {
 			final String s[] = entry.split("=");
 			if (s.length > 1) try {
@@ -195,7 +195,7 @@ public class ApplicationManager extends Frame {
 			}
 		}
 		final String str = pref.toString();
-		prefs.put(getName() + ".preferred", str.substring(1, str.length() - 1));
+		prefs.put(getKey("preferred"), str.substring(1, str.length() - 1));
 	}
 
 	@Override

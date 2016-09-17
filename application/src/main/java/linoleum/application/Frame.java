@@ -244,6 +244,10 @@ public class Frame extends JInternalFrame {
 	protected void save() {
 	}
 
+	public String getKey(final String str) {
+		return getName() + "." + str;
+	}
+
 	@Override
 	public String toString() {
 		return getName();
@@ -287,10 +291,10 @@ public class Frame extends JInternalFrame {
         }// </editor-fold>//GEN-END:initComponents
 
         private void formInternalFrameOpened(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameOpened
-		final int x = prefs.getInt(getName() + ".x", getX());
-		final int y = prefs.getInt(getName() + ".y", getY());
-		final int width = prefs.getInt(getName() + ".width", getWidth());
-		final int height = prefs.getInt(getName() + ".height", getHeight());
+		final int x = prefs.getInt(getKey("x"), getX());
+		final int y = prefs.getInt(getKey("y"), getY());
+		final int width = prefs.getInt(getKey("width"), getWidth());
+		final int height = prefs.getInt(getKey("height"), getHeight());
 		setBounds(x + offset * index, y + offset * index, width, height);
 		openFrame();
 		opened = true;
@@ -314,16 +318,16 @@ public class Frame extends JInternalFrame {
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
 		if (isShowing() && !isMaximum()) {
 			final Component c = evt.getComponent();
-			prefs.putInt(getName() + ".x", c.getX() - offset * index);
-			prefs.putInt(getName() + ".y", c.getY() - offset * index);
+			prefs.putInt(getKey("x"), c.getX() - offset * index);
+			prefs.putInt(getKey("y"), c.getY() - offset * index);
 		}
         }//GEN-LAST:event_formComponentMoved
 
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
 		if (isShowing() && !isMaximum()) {
 			final Component c = evt.getComponent();
-			prefs.putInt(getName() + ".width", c.getWidth());
-			prefs.putInt(getName() + ".height", c.getHeight());
+			prefs.putInt(getKey("width"), c.getWidth());
+			prefs.putInt(getKey("height"), c.getHeight());
 		}
         }//GEN-LAST:event_formComponentResized
 

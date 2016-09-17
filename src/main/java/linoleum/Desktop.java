@@ -84,13 +84,18 @@ public class Desktop extends JFrame {
 			getGraphicsConfiguration().getDevice().setFullScreenWindow(full?this:null);
 		}
 		setVisible(true);
+		prefs.putBoolean(getKey("fullScreen"), full);
+	}
+
+	private boolean isFullScreen() {
+		return prefs.getBoolean(getKey("fullScreen"), true);
 	}
 
 	private void loadBounds() {
-		final int x = prefs.getInt(getName() + ".x", getX());
-		final int y = prefs.getInt(getName() + ".y", getY());
-		final int width = prefs.getInt(getName() + ".width", getWidth());
-		final int height = prefs.getInt(getName() + ".height", getHeight());
+		final int x = prefs.getInt(getKey("x"), getX());
+		final int y = prefs.getInt(getKey("y"), getY());
+		final int width = prefs.getInt(getKey("width"), getWidth());
+		final int height = prefs.getInt(getKey("height"), getHeight());
 		setBounds(x, y, width, height);
 		bounds = getBounds();
 	}
@@ -112,6 +117,10 @@ public class Desktop extends JFrame {
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	private String getKey(final String str) {
+		return getName() + "." + str;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -177,7 +186,7 @@ public class Desktop extends JFrame {
 
                 fullScreenMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.ALT_MASK | java.awt.event.InputEvent.CTRL_MASK));
                 fullScreenMenuItem.setMnemonic('f');
-                fullScreenMenuItem.setSelected(true);
+                fullScreenMenuItem.setSelected(isFullScreen());
                 fullScreenMenuItem.setText("Full screen");
                 fullScreenMenuItem.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -262,8 +271,8 @@ public class Desktop extends JFrame {
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
 		if (isShowing() && !full) {
 			final Component c = evt.getComponent();
-			prefs.putInt(getName() + ".width", c.getWidth());
-			prefs.putInt(getName() + ".height", c.getHeight());
+			prefs.putInt(getKey("width"), c.getWidth());
+			prefs.putInt(getKey("height"), c.getHeight());
 		}
 		resize();
         }//GEN-LAST:event_formComponentResized
@@ -275,8 +284,8 @@ public class Desktop extends JFrame {
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
 		if (isShowing() && !full) {
 			final Component c = evt.getComponent();
-			prefs.putInt(getName() + ".x", c.getX());
-			prefs.putInt(getName() + ".y", c.getY());
+			prefs.putInt(getKey("x"), c.getX());
+			prefs.putInt(getKey("y"), c.getY());
 		}
         }//GEN-LAST:event_formComponentMoved
 

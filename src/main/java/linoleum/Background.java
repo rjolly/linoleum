@@ -34,16 +34,16 @@ public class Background extends Frame {
 
 	@Override
 	public void load() {
-		jTextField1.setText(prefs.get(getName() + ".image", ""));
+		jTextField1.setText(prefs.get(getKey("image"), ""));
 	}
 
 	@Override
 	public void save() {
-		prefs.put(getName() + ".image", jTextField1.getText());
+		prefs.put(getKey("image"), jTextField1.getText());
 	}
 
 	private Icon getImage() {
-		final String str = prefs.get(getName() + ".image", "");
+		final String str = prefs.get(getKey("image"), "");
 		return !str.isEmpty()?new ImageIcon(str):new ImageIcon(getClass().getResource("Wave.png"));
 	}
 

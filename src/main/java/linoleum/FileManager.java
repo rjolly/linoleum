@@ -22,6 +22,8 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
@@ -109,6 +111,7 @@ public class FileManager extends Frame {
 	protected FileManager parent;
 	private boolean closing;
 	private FileSystem fs;
+	private boolean show;
 	private Path path;
 	private int idx;
 
@@ -269,6 +272,14 @@ public class FileManager extends Frame {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
 		setMimeType("application/x-directory:application/java-archive:application/zip");
+		Preferences.userNodeForPackage(ApplicationManager.class).addPreferenceChangeListener(new PreferenceChangeListener() {
+			@Override
+			public void preferenceChange(final PreferenceChangeEvent evt) {
+				if (evt.getKey().equals(getApplicationManager().getKey("preferred"))) {
+					prepare();
+				}
+			}
+		});
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		this.parent = (FileManager) super.parent;
 	}
@@ -285,12 +296,12 @@ public class FileManager extends Frame {
 
 	@Override
 	public void load() {
-		jTextField1.setText(prefs.get(getName() + ".home", ""));
+		jTextField1.setText(prefs.get(getKey("home"), ""));
 	}
 
 	@Override
 	public void save() {
-		prefs.put(getName() + ".home", jTextField1.getText());
+		prefs.put(getKey("home"), jTextField1.getText());
 	}
 
 	@Override
@@ -356,7 +367,12 @@ public class FileManager extends Frame {
 		}
 	}
 
+	private boolean isShowHidden() {
+		return prefs.getBoolean(getKey("showHidden"), false);
+	}
+
 	private void rescan() {
+		prefs.putBoolean(getKey("showHidden"), show = jCheckBoxMenuItem1.isSelected());
 		model.clear();
 		Path files[] = new Path[0];
 		if (Files.isDirectory(path) || isJar()) {
@@ -400,7 +416,7 @@ public class FileManager extends Frame {
 	@Override
 	public boolean canOpen(final Path entry) {
 		try {
-			if (!Files.isHidden(entry)) {
+			if (show || !Files.isHidden(entry)) {
 				return true;
 			}
 		} catch (final IOException ex) {
@@ -415,7 +431,7 @@ public class FileManager extends Frame {
 	}
 
 	private URI getHome() {
-		return Paths.get(prefs.get(getName() + ".home", "")).toUri();
+		return Paths.get(prefs.get(getKey("home"), "")).toUri();
 	}
 
 	private void open(final int index) {
@@ -514,6 +530,8 @@ public class FileManager extends Frame {
                 jMenuItem8 = new javax.swing.JMenuItem();
                 jSeparator2 = new javax.swing.JPopupMenu.Separator();
                 jMenuItem7 = new javax.swing.JMenuItem();
+                jMenu4 = new javax.swing.JMenu();
+                jCheckBoxMenuItem1 = new javax.swing.JCheckBoxMenuItem();
 
                 optionPanel1.setFrame(this);
 
@@ -632,6 +650,19 @@ public class FileManager extends Frame {
 
                 jMenuBar1.add(jMenu2);
 
+                jMenu4.setText("View");
+
+                jCheckBoxMenuItem1.setSelected(isShowHidden());
+                jCheckBoxMenuItem1.setText("Show hidden");
+                jCheckBoxMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jCheckBoxMenuItem1ActionPerformed(evt);
+                        }
+                });
+                jMenu4.add(jCheckBoxMenuItem1);
+
+                jMenuBar1.add(jMenu4);
+
                 setJMenuBar(jMenuBar1);
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -679,13 +710,19 @@ public class FileManager extends Frame {
 		idx = jList1.locationToIndex(evt.getPoint());
         }//GEN-LAST:event_jList1MouseMoved
 
+        private void jCheckBoxMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem1ActionPerformed
+		rescan();
+        }//GEN-LAST:event_jCheckBoxMenuItem1ActionPerformed
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
+        private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
         private javax.swing.JLabel jLabel2;
         private linoleum.FileList jList1;
         private javax.swing.JMenu jMenu1;
         private javax.swing.JMenu jMenu2;
         private javax.swing.JMenu jMenu3;
+        private javax.swing.JMenu jMenu4;
         private javax.swing.JMenuBar jMenuBar1;
         private javax.swing.JMenuItem jMenuItem1;
         private javax.swing.JMenuItem jMenuItem10;
