@@ -297,11 +297,13 @@ public class FileManager extends Frame {
 	@Override
 	public void load() {
 		jTextField1.setText(prefs.get(getKey("home"), ""));
+		jCheckBox1.setSelected(isShowHidden());
 	}
 
 	@Override
 	public void save() {
 		prefs.put(getKey("home"), jTextField1.getText());
+		prefs.putBoolean(getKey("showHidden"), jCheckBox1.isSelected());
 	}
 
 	@Override
@@ -372,7 +374,7 @@ public class FileManager extends Frame {
 	}
 
 	private void rescan() {
-		prefs.putBoolean(getKey("showHidden"), show = jCheckBoxMenuItem1.isSelected());
+		show = jCheckBoxMenuItem1.isSelected();
 		model.clear();
 		Path files[] = new Path[0];
 		if (Files.isDirectory(path) || isJar()) {
@@ -510,6 +512,7 @@ public class FileManager extends Frame {
                 jLabel2 = new javax.swing.JLabel();
                 jTextField1 = new javax.swing.JTextField();
                 jButton1 = new javax.swing.JButton();
+                jCheckBox1 = new javax.swing.JCheckBox();
                 jPopupMenu1 = new javax.swing.JPopupMenu();
                 jScrollPane1 = new javax.swing.JScrollPane();
                 jList1 = new linoleum.FileList();
@@ -544,17 +547,29 @@ public class FileManager extends Frame {
                         }
                 });
 
+                jCheckBox1.setText("Show hidden");
+                jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jCheckBox1ActionPerformed(evt);
+                        }
+                });
+
                 javax.swing.GroupLayout optionPanel1Layout = new javax.swing.GroupLayout(optionPanel1);
                 optionPanel1.setLayout(optionPanel1Layout);
                 optionPanel1Layout.setHorizontalGroup(
                         optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(optionPanel1Layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                                                .addComponent(jLabel2)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                                                .addComponent(jCheckBox1)
+                                                .addGap(0, 0, Short.MAX_VALUE)))
                                 .addContainerGap())
                 );
                 optionPanel1Layout.setVerticalGroup(
@@ -565,7 +580,9 @@ public class FileManager extends Frame {
                                         .addComponent(jLabel2)
                                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(jButton1))
-                                .addContainerGap(49, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jCheckBox1)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 );
 
                 jPopupMenu1.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
@@ -714,8 +731,13 @@ public class FileManager extends Frame {
 		rescan();
         }//GEN-LAST:event_jCheckBoxMenuItem1ActionPerformed
 
+        private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+		optionPanel1.setDirty(true);
+        }//GEN-LAST:event_jCheckBox1ActionPerformed
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
+        private javax.swing.JCheckBox jCheckBox1;
         private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
         private javax.swing.JLabel jLabel2;
         private linoleum.FileList jList1;
