@@ -99,10 +99,7 @@ public class FileManager extends Frame {
 		}
 
 		private WatchKey register(final WatchService service) throws IOException {
-			final Path name = path.getFileName();
-			if (name != null) {
-				setTitle(name.toString());
-			}
+			setTitle(getFileName().toString());
 			return path.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
 		}
 	};
@@ -257,7 +254,7 @@ public class FileManager extends Frame {
 			}
 			final Path path = (Path)value;
 			setIcon(Files.isDirectory(path)?directoryIcon:fileIcon);
-			setText(path.getFileName().toString());
+			setText(getFileName(path).toString());
 			setFont(list.getFont());
 			return this;
 		}
@@ -411,6 +408,10 @@ public class FileManager extends Frame {
 	}
 
 	private Path getFileName() {
+		return getFileName(path);
+	}
+
+	private Path getFileName(final Path path) {
 		final int n = path.getNameCount();
 		return n > 0?path.getName(n - 1):path;
 	}
