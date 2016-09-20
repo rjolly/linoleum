@@ -27,7 +27,6 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
 	private final CountDownLatch engineReady = new CountDownLatch(1);
-	private final Packages pkgs = Desktop.instance.getPackages();
 	private volatile ScriptEngine engine;
 	private volatile String prompt;
 	private	ScriptEngineFactory factory;
@@ -224,9 +223,9 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		setGlobals();
 		// load pre-defined initialization file
 		loadInitFile(ClassLoader.getSystemResource("com/sun/tools/script/shell/init." + extension));
-		final File home = pkgs.home;
-		loadUserInitFile(new File(home, "init." + extension));
 		try {
+			final File home = new File(System.getProperty("linoleum.home")).getCanonicalFile();
+			loadUserInitFile(new File(home, "init." + extension));
 			if (!Files.isSameFile(home.toPath(), Paths.get("."))) {
 				// load current user's initialization file
 				loadUserInitFile(new File("init." + extension));

@@ -21,8 +21,6 @@ public class Packages {
 	private final ApplicationManager apps;
 	private final Map<String, File> map = new HashMap<>();
 	private final SortedMap<String, File> installed = new TreeMap<>();
-	private final File tools = new File(new File(System.getProperty("java.home")), "../lib/tools.jar");
-	final File home;
 	private final FileFilter filter = new FileFilter() {
 		public boolean accept(final File file) {
 			return file.isFile() && file.getName().endsWith(".jar");
@@ -30,44 +28,56 @@ public class Packages {
 	};
 
 	Packages(final ApplicationManager apps) {
-		this.apps = apps;
 		final String extdirs[] = System.getProperty("java.ext.dirs").split(File.pathSeparator);
-		for (final String str : extdirs) {
-			final File dir = new File(str);
+		for (final String str : extdirs) try {
+			final File dir = new File(str).getCanonicalFile();
 			if (dir.isDirectory()) {
 				for (final File file : dir.listFiles(filter)) {
 					map.put(new Package(file).getName(), file);
 				}
 			}
+		} catch (final IOException e) {
+			e.printStackTrace();
 		}
 		final String classpath[] = System.getProperty("java.class.path").split(File.pathSeparator);
-		for (final String str : classpath) {
-			final File file = new File(str);
+		for (final String str : classpath) try {
+			final File file = new File(str).getCanonicalFile();
 			if (file.isFile() && file.getName().endsWith(".jar")) {
 				put(new Package(file).getName(), file);
 			}
+		} catch (final IOException e) {
+			e.printStackTrace();
 		}
-		if (classpath.length > 0) {
-			final File jar = new File(classpath[0]);
-			try {
-				final URL url = new URL("jar:" + jar.toURI().toURL() + "!/META-INF/MANIFEST.MF");
-				final Manifest manifest = new Manifest(url.openStream());
-				final String cp = (String)manifest.getMainAttributes().get(Attributes.Name.CLASS_PATH);
-				if (cp != null) for (final String str : cp.split(" ")) {
-					final File file = new File(jar.getParentFile(), str);
-					if (file.isFile() && file.getName().endsWith(".jar")) {
-						put(new Package(file).getName(), file);
-					}
+		if (classpath.length > 0) try {
+			final File jar = new File(classpath[0]).getCanonicalFile();
+			final URL url = new URL("jar:" + jar.toURI().toURL() + "!/META-INF/MANIFEST.MF");
+			final Manifest manifest = new Manifest(url.openStream());
+			final String cp = (String)manifest.getMainAttributes().get(Attributes.Name.CLASS_PATH);
+			if (cp != null) for (final String str : cp.split(" ")) {
+				final File file = new File(jar.getParentFile(), str).getCanonicalFile();
+				if (file.isFile() && file.getName().endsWith(".jar")) {
+					put(new Package(file).getName(), file);
 				}
-			} catch (final IOException e) {
-				e.printStackTrace();
 			}
+		} catch (final IOException e) {
+			e.printStackTrace();
 		}
-		if (tools.exists()) {
-			add(tools);
-		}
-		home = map.get("linoleum").getParentFile();
 		try {
+			final File home = new File(System.getProperty("java.home")).getParentFile().getCanonicalFile();
+			final File file = new File(home, "lib/tools.jar");
+			if (file.exists()) {
+				add(file);
+			}
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			String str = System.getProperty("linoleum.home");
+			if (str == null) {
+				str = map.get("linoleum").getParentFile().getCanonicalPath();
+				System.setProperty("linoleum.home", str);
+			}
+			final File home = new File(str).getCanonicalFile();
 			if (!Files.isSameFile(home.toPath(), Paths.get("."))) {
 				final File lib = new File(home, "lib");
 				if (lib.isDirectory()) {
@@ -86,6 +96,7 @@ public class Packages {
 				add(file);
 			}
 		}
+		this.apps = apps;
 	}
 
 	public Collection<File> installed() {

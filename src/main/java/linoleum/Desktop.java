@@ -62,8 +62,11 @@ public class Desktop extends JFrame {
 
 	private void content() {
 		try {
-			final File file = new File(new File(System.getProperty("java.home")), "../docs/api/index.html").getCanonicalFile();
-			if (file.exists()) apps.open(file.toURI());
+			final File home = new File(System.getProperty("java.home")).getParentFile().getCanonicalFile();
+			final File file = new File(home, "docs/api/index.html");
+			if (file.exists()) {
+				apps.open(file.toURI());
+			}
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
