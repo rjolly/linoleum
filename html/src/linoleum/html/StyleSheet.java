@@ -9,6 +9,7 @@ import javax.swing.text.html.CSS;
 public class StyleSheet extends javax.swing.text.html.StyleSheet {
 	private Class<?> cssValueClass;
 	private Class<?> fontSizeClass;
+	private Class<?> colorValueClass;
 	private Class<?> viewAttributeSetClass;
 	private Method getValueMethod;
 	private Method toStyleConstantsMethod;
@@ -21,6 +22,7 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 		try {
 			cssValueClass = Class.forName("javax.swing.text.html.CSS$CssValue");
 			fontSizeClass = Class.forName("javax.swing.text.html.CSS$FontSize");
+			colorValueClass = Class.forName("javax.swing.text.html.CSS$ColorValue");
 			viewAttributeSetClass = Class.forName("javax.swing.text.html.StyleSheet$ViewAttributeSet");
 
 			getValueMethod = fontSizeClass.getDeclaredMethod("getValue", AttributeSet.class, javax.swing.text.html.StyleSheet.class);
@@ -109,6 +111,9 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 
 		private Object doGetAttribute(final Object key) {
 			Object retValue = superGetAttribute(key);
+			if (key instanceof CSS.Attribute && isInstanceOf(colorValueClass, retValue)) {
+				return getModifiedValue(retValue, (CSS.Attribute) key);
+			}
 			if (retValue != null) {
 				return retValue;
 			}
@@ -147,6 +152,17 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 
 	private boolean isInstanceOf(final Class<?> clazz, final Object value) {
 		return value == null?false:clazz.isAssignableFrom(value.getClass());
+	}
+
+	private Object getModifiedValue(final Object value, final CSS.Attribute key) {
+		String str = value.toString();
+		if (str.startsWith("#") && str.length() == 4) {
+			final String r = str.substring(1, 2);
+			final String v = str.substring(2, 3);
+			final String b = str.substring(3, 4);
+			str = String.format("#%s%s%s%s%s%s", r, r, v, v, b, b);
+		}
+		return getInternalCSSValue(getCss(), key, str);
 	}
 
 	private Object getAbsoluteValue(final Object value, final AttributeSet attrs, final javax.swing.text.html.StyleSheet ss) {
