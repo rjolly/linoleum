@@ -209,10 +209,12 @@ public class SimpleClient extends Frame {
                 jMenuItem2 = new javax.swing.JMenuItem();
                 jMenuItem3 = new javax.swing.JMenuItem();
                 jMenuItem4 = new javax.swing.JMenuItem();
-                jMenu2 = new javax.swing.JMenu();
+                jSeparator1 = new javax.swing.JPopupMenu.Separator();
                 jMenuItem5 = new javax.swing.JMenuItem();
-                jMenu3 = new javax.swing.JMenu();
+                jMenu2 = new javax.swing.JMenu();
                 jMenuItem6 = new javax.swing.JMenuItem();
+                jMenu3 = new javax.swing.JMenu();
+                jMenuItem7 = new javax.swing.JMenuItem();
 
                 optionPanel1.setFrame(this);
 
@@ -326,22 +328,26 @@ public class SimpleClient extends Frame {
                 jMenuItem3.setAction(messageViewer.getReplyToAllAction());
                 jMenu1.add(jMenuItem3);
 
-                jMenuItem4.setAction(messageViewer.getDeleteAction());
+                jMenuItem4.setAction(messageViewer.getForwardAction());
                 jMenu1.add(jMenuItem4);
+                jMenu1.add(jSeparator1);
+
+                jMenuItem5.setAction(messageViewer.getDeleteAction());
+                jMenu1.add(jMenuItem5);
 
                 jMenuBar1.add(jMenu1);
 
                 jMenu2.setText("Folder");
 
-                jMenuItem5.setAction(expungeAction);
-                jMenu2.add(jMenuItem5);
+                jMenuItem6.setAction(expungeAction);
+                jMenu2.add(jMenuItem6);
 
                 jMenuBar1.add(jMenu2);
 
                 jMenu3.setText("Account");
 
-                jMenuItem6.setAction(settingsAction);
-                jMenu3.add(jMenuItem6);
+                jMenuItem7.setAction(settingsAction);
+                jMenu3.add(jMenuItem7);
 
                 jMenuBar1.add(jMenu3);
 
@@ -431,7 +437,9 @@ public class SimpleClient extends Frame {
         private javax.swing.JMenuItem jMenuItem4;
         private javax.swing.JMenuItem jMenuItem5;
         private javax.swing.JMenuItem jMenuItem6;
+        private javax.swing.JMenuItem jMenuItem7;
         private javax.swing.JScrollPane jScrollPane1;
+        private javax.swing.JPopupMenu.Separator jSeparator1;
         private javax.swing.JSplitPane jSplitPane1;
         private javax.swing.JSplitPane jSplitPane2;
         private javax.swing.JTextField jTextField1;

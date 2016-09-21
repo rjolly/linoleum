@@ -17,6 +17,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 	private final Icon deleteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Delete16.gif"));
 	private final Action replyAction = new ReplyAction();
 	private final Action replyToAllAction = new ReplyToAllAction();
+	private final Action forwardAction = new ForwardAction();
 	private final Action deleteAction = new DeleteAction();
 	private final Action structureAction = new StructureAction();
 	private SimpleClient client;
@@ -45,10 +46,30 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 		}
 	}
 
+	private class ForwardAction extends AbstractAction {
+		public ForwardAction() {
+			super("Forward");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			reply(false, true);
+		}
+	}
+
 	private void reply(final boolean all) {
+		reply(all, false);
+	}
+
+	private void reply(final boolean all, final boolean fw) {
 		try {
 			final MimeMessage msg = (MimeMessage) displayed;
 			final MimeMessage reply = (MimeMessage) msg.reply(all);
+			if (fw) {
+				reply.setSubject(reply.getSubject().replaceFirst("Re:", "Fw:"));
+				reply.setRecipients(Message.RecipientType.TO, new Address[0]);
+				reply.setRecipients(Message.RecipientType.CC, new Address[0]);
+			}
 			client.compose(params(reply));
 		} catch (final MessagingException me) {
 			me.printStackTrace();
@@ -66,7 +87,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 		append(bld, "references", mkString(msg.getHeader("References")));
 		append(bld, "subject", msg.getSubject());
 		final String str = bld.toString();
-		return mkUnicodeString(to) + (str.isEmpty()?"":"?") + str;
+		return (to == null?"":mkUnicodeString(to)) + (str.isEmpty()?"":"?") + str;
 	}
 
 	private StringBuilder append(final StringBuilder bld, final String key, final String value) {
@@ -138,6 +159,10 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 		return replyToAllAction;
 	}
 
+	public Action getForwardAction() {
+		return forwardAction;
+	}
+
 	public Action getDeleteAction() {
 		return deleteAction;
 	}
@@ -165,6 +190,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 			loadHeaders();
 			replyAction.setEnabled(true);
 			replyToAllAction.setEnabled(true);
+			forwardAction.setEnabled(true);
 			deleteAction.setEnabled(true);
 			structureAction.setEnabled(true);
 
@@ -174,6 +200,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 			headers.setText("");
 			replyAction.setEnabled(false);
 			replyToAllAction.setEnabled(false);
+			forwardAction.setEnabled(false);
 			deleteAction.setEnabled(false);
 			structureAction.setEnabled(false);
 		}
@@ -193,41 +220,38 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 		// setup what we want in our viewer
 		final StringBuffer sb = new StringBuffer();
 
-		// date
-		sb.append("Date: ");
 		try {
-			final Date duh = displayed.getSentDate();
-			if (duh != null) {
-				sb.append(duh.toString());
-			} else {
-				sb.append("Unknown");
+			// date
+			final Date date = displayed.getSentDate();
+			if (date != null) {
+				sb.append("Date: ");
+				sb.append(date.toString());
+				sb.append("\n");
 			}
-
-			sb.append("\n");
 
 			// from
-			sb.append("From: ");
 			Address[] adds = displayed.getFrom();
 			if (adds != null) {
+				sb.append("From: ");
 				sb.append(mkUnicodeString(adds));
+				sb.append("\n");
 			}
-			sb.append("\n");
 
 			// to
-			sb.append("To: ");
 			adds = displayed.getRecipients(Message.RecipientType.TO);
 			if (adds != null) {
+				sb.append("To: ");
 				sb.append(mkUnicodeString(adds));
+				sb.append("\n");
 			}
-			sb.append("\n");
 
 			// cc
-			sb.append("Cc: ");
 			adds = displayed.getRecipients(Message.RecipientType.CC);
 			if (adds != null) {
+				sb.append("Cc: ");
 				sb.append(mkUnicodeString(adds));
+				sb.append("\n");
 			}
-			sb.append("\n");
 
 			// subject
 			sb.append("Subject: ");
