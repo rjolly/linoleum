@@ -19,7 +19,7 @@ public class Background extends Frame {
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
 			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
-				if (evt.getKey().startsWith(getName())) {
+				if (evt.getKey().equals(getKey("image"))) {
 					jLabel1.setIcon(getImage());
 				}
 			}

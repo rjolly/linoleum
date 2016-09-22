@@ -23,7 +23,7 @@ public class Console extends Frame {
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
 			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
-				if (evt.getKey().startsWith(getName())) {
+				if (evt.getKey().equals(getKey("level")) || evt.getKey().equals(getKey("visible"))) {
 					refresh();
 				}
 			}

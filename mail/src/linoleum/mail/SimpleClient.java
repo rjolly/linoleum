@@ -99,7 +99,7 @@ public class SimpleClient extends Frame {
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
 			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
-				if (evt.getKey().startsWith(getName())) {
+				if (evt.getKey().equals(getKey("url")) || evt.getKey().equals(getKey("mailhost")) || evt.getKey().equals(getKey("from")) || evt.getKey().equals(getKey("record")) || evt.getKey().equals(getKey("debug"))) {
 					open();
 				}
 			}
