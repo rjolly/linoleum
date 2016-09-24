@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class FileTransferable implements Transferable {
-	private final DataFlavor flavors[] = new DataFlavor[] {DataFlavor.javaFileListFlavor};
+	private final DataFlavor flavors[] = new DataFlavor[] {DataFlavor.javaFileListFlavor, DataFlavor.stringFlavor};
 	private final List<Path> list;
 
 	public FileTransferable(final List<Path> list) {
@@ -22,14 +22,21 @@ public class FileTransferable implements Transferable {
 
 	@Override
 	public boolean isDataFlavorSupported(final DataFlavor flavor) {
-		return flavor == flavors[0];
+		return flavor == flavors[0] || flavor == flavors[1];
 	}
 
 	@Override
 	public Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-		if (!isDataFlavorSupported(flavor)) {
+		if (flavor == flavors[0]) {
+			return list;
+		} else if (flavor == flavors[1]) {
+			final StringBuilder builder = new StringBuilder();
+			for (final Path entry : list) {
+				builder.append(entry).append("\n");
+			}
+			return builder.toString();
+		} else {
 			throw new UnsupportedFlavorException(flavor);
 		}
-		return list;
 	}
 }

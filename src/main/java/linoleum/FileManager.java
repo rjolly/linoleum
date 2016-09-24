@@ -212,6 +212,7 @@ public class FileManager extends Frame {
 	private class PasteAsLinkAction extends AbstractAction {
 		public PasteAsLinkAction() {
 			super("Paste as link");
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.SHIFT_MASK | InputEvent.CTRL_MASK));
 		}
 
 		@Override
