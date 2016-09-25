@@ -1,6 +1,7 @@
 package linoleum;
 
 import java.awt.Component;
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -118,6 +119,7 @@ public class FileManager extends Frame {
 	private final FileSystem defaultfs = FileSystems.getDefault();
 	private final Map<FileSystem, Collection<Integer>> openFrames = new HashMap<>();
 	protected FileManager parent;
+	private FileManager source;
 	private boolean closing;
 	private FileSystem fs;
 	private boolean show;
@@ -217,7 +219,9 @@ public class FileManager extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			parent.action = TransferHandler.LINK;
+			if (parent.source != null) {
+				parent.source.action = TransferHandler.LINK;
+			}
 			TransferHandler.getPasteAction().actionPerformed(createActionEvent());
 		}
 	}
@@ -255,6 +259,18 @@ public class FileManager extends Frame {
 			final int option = JOptionPane.showInternalConfirmDialog(FileManager.this, "Delete ?", "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 			switch (option) {
 			case JOptionPane.OK_OPTION:
+				for (final Path entry : jList1.getSelectedValuesList()) {
+					try {
+						if (Files.isDirectory(entry)) {
+							delete(entry);
+						} else {
+							Files.delete(entry);
+						}
+					} catch (final IOException ex) {
+						ex.printStackTrace();
+					}
+				}
+				refresh();
 				break;
 			default:
 			}
@@ -312,7 +328,11 @@ public class FileManager extends Frame {
 				final JList.DropLocation dl = (JList.DropLocation) support.getDropLocation();
 				recipient = dl.isInsert()?path:getDirectory(list.getModel().getElementAt(dl.getIndex()));
 			} else {
-				action = parent.action;
+				if (parent.source != null) {
+					action = parent.source.action;
+				} else {
+					action = NONE;
+				}
 				recipient = list.isSelectionEmpty()?path:getDirectory(list.getSelectedValue());
 			}
 			for (final Path entry : files) {
@@ -342,6 +362,14 @@ public class FileManager extends Frame {
 					return false;
 				}
 			}
+			refresh();
+			if (!support.isDrop()) {
+				switch (action) {
+				case MOVE:
+					parent.source.refresh();
+					break;
+				}
+			}
 			return true;
 		}
 
@@ -356,9 +384,36 @@ public class FileManager extends Frame {
 		}
 
 		@Override
-		public void exportDone(final JComponent c, final Transferable data, final int action) {
-			parent.action = action;
+		public void exportToClipboard(final JComponent comp, final Clipboard clip, final int action) throws IllegalStateException {
+			if ((action == COPY || action == MOVE) && (getSourceActions(comp) & action) != 0) {
+				final Transferable t = createTransferable(comp);
+				if (t != null)  try {
+					clip.setContents(t, null);
+					done(action);
+					return;
+				} catch (final IllegalStateException ise) {
+					done(NONE);
+					throw ise;
+				}
+			}
+			done(NONE);
 		}
+
+		@Override
+		public void exportDone(final JComponent c, final Transferable data, final int action) {
+			refresh();
+		}
+	}
+
+	private void refresh() {
+		if (fs != defaultfs) {
+			rescan();
+		}
+	}
+
+	private void done(final int action) {
+		this.action = action;
+		parent.source = this;
 	}
 
 	private Path getDirectory(final Path path) {
@@ -374,7 +429,7 @@ public class FileManager extends Frame {
 		Files.walkFileTree(source, EnumSet.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE, new SimpleFileVisitor<Path>() {
 			@Override
 			public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
-				final Path targetdir = target.resolve(source.relativize(dir));
+				final Path targetdir = target.resolve(source.relativize(dir).toString());
 				try {
 					Files.copy(dir, targetdir);
 				} catch (final FileAlreadyExistsException e) {
@@ -387,7 +442,7 @@ public class FileManager extends Frame {
 
 			@Override
 			public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-				Files.copy(file, target.resolve(source.relativize(file)));
+				Files.copy(file, target.resolve(source.relativize(file).toString()));
 				return FileVisitResult.CONTINUE;
 			}
 		});
