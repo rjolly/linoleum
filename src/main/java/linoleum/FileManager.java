@@ -487,6 +487,7 @@ public class FileManager extends Frame {
 		});
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		this.parent = (FileManager) super.parent;
+		setURI(getHome());
 	}
 
 	@Override
@@ -529,14 +530,11 @@ public class FileManager extends Frame {
 
 	@Override
 	public URI getURI() {
-		return path == null?null:path.toUri();
+		return path.toUri();
 	}
 
 	@Override
 	public void open() {
-		if (path == null) {
-			setURI(getHome());
-		}
 		if(Files.isRegularFile(path) && isJar()) {
 			final URI uri = path.toUri();
 			try {
@@ -644,7 +642,12 @@ public class FileManager extends Frame {
 
 	@Override
 	public boolean reuseFor(final URI that) {
-		return getURI().equals(that == null?getHome():that);
+		try {
+			return Files.isSameFile(path, Paths.get(that == null?getHome():that));
+		} catch (final IOException ex) {
+			ex.printStackTrace();
+		}
+		return false;
 	}
 
 	private URI getHome() {
@@ -652,11 +655,7 @@ public class FileManager extends Frame {
 	}
 
 	private void open(final Path entry) {
-		try {
-			getApplicationManager().open(entry.toRealPath().toUri());
-		} catch (final IOException ex) {
-			ex.printStackTrace();
-		}
+		getApplicationManager().open(entry.toUri());
 	}
 
 	private void prepare() {
@@ -672,41 +671,37 @@ public class FileManager extends Frame {
 			jMenu3.setEnabled(true);
 			renameAction.setEnabled(true);
 			deleteAction.setEnabled(true);
-			try {
-				final URI uri = jList1.getSelectedValue().toRealPath().toUri();
-				final ApplicationManager mgr = getApplicationManager();
-				final String s = mgr.getApplication(uri);
-				boolean sep = false;
-				if (s != null) {
-					final Action action = new AbstractAction(s) {
+			final URI uri = jList1.getSelectedValue().toUri();
+			final ApplicationManager mgr = getApplicationManager();
+			final String s = mgr.getApplication(uri);
+			boolean sep = false;
+			if (s != null) {
+				final Action action = new AbstractAction(s) {
+					@Override
+					public void actionPerformed(final ActionEvent evt) {
+						mgr.open(s, uri);
+					}
+				};
+				jMenu3.add(action);
+				jPopupMenu1.add(action);
+				sep = true;
+			}
+			for (final String str : mgr.getApplications(uri)) {
+				if (!str.equals(s)) {
+					if (sep) {
+						jMenu3.addSeparator();
+						jPopupMenu1.addSeparator();
+						sep = false;
+					}
+					final Action action = new AbstractAction(str) {
 						@Override
 						public void actionPerformed(final ActionEvent evt) {
-							mgr.open(s, uri);
+							mgr.open(str, uri);
 						}
 					};
 					jMenu3.add(action);
 					jPopupMenu1.add(action);
-					sep = true;
 				}
-				for (final String str : mgr.getApplications(uri)) {
-					if (!str.equals(s)) {
-						if (sep) {
-							jMenu3.addSeparator();
-							jPopupMenu1.addSeparator();
-							sep = false;
-						}
-						final Action action = new AbstractAction(str) {
-							@Override
-							public void actionPerformed(final ActionEvent evt) {
-								mgr.open(str, uri);
-							}
-						};
-						jMenu3.add(action);
-						jPopupMenu1.add(action);
-					}
-				}
-			} catch (final IOException ex) {
-				ex.printStackTrace();
 			}
 		}
 	}

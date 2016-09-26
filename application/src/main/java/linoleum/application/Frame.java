@@ -148,7 +148,7 @@ public class Frame extends JInternalFrame {
 		final JInternalFrame internal = getFrame(desktop, uri);
 		if (internal instanceof Frame) {
 			final Frame frame = (Frame) internal;
-			final boolean changed = uri != null && !uri.equals(frame.getURI());
+			final boolean changed = uri != null && !frame.reuseFor(uri);
 			if (changed) {
 				frame.setURI(uri);
 			}
@@ -196,7 +196,7 @@ public class Frame extends JInternalFrame {
 
 	protected boolean reuseFor(final URI that) {
 		final URI uri = getURI();
-		return that == null?uri == null:uri == null?false:uri.equals(that);
+		return that == null?that == uri:that.equals(uri);
 	}
 
 	public final List<Path> listFiles(final Path path) {
