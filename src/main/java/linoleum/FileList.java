@@ -5,11 +5,18 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.nio.file.Path;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.ListModel;
 import javax.swing.text.Position;
 
 public class FileList extends JList<Path> {
+	private final Icon fileLinkIcon = new ImageIcon(getClass().getResource("file.png"));
+	private final Icon directoryLinkIcon = new ImageIcon(getClass().getResource("directory.png"));
+	private final Icon fileIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/file.gif"));
+	private final Icon directoryIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/directory.gif"));
+
 	public FileList() {
 		addMouseListener(new MouseAdapter() {
 			public void mouseClicked(final MouseEvent evt) {
@@ -23,6 +30,12 @@ public class FileList extends JList<Path> {
 				}
 			}
 		});
+	}
+
+	public Icon getFileIcon(final Path path) {
+		return Files.isDirectory(path)?
+				Files.isSymbolicLink(path)?directoryLinkIcon:directoryIcon:
+				Files.isSymbolicLink(path)?fileLinkIcon:fileIcon;
 	}
 
 	@Override

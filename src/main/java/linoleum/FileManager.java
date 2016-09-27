@@ -57,15 +57,13 @@ import linoleum.application.FileChooser;
 import linoleum.application.Frame;
 
 public class FileManager extends Frame {
-	private final Icon fileIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/file.gif"));
-	private final Icon directoryIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/directory.gif"));
-	private final Icon newFolderIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/newFolder.gif"));
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final Icon openIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"));
 	private final Icon cutIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Cut16.gif"));
 	private final Icon copyIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Copy16.gif"));
 	private final Icon pasteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Paste16.gif"));
 	private final Icon deleteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Delete16.gif"));
+	private final Icon newFolderIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/newFolder.gif"));
 	private final Action openAction = new OpenAction();
 	private final Action openLocationAction = new OpenLocationAction();
 	private final Action closeAction = new CloseAction();
@@ -292,7 +290,7 @@ public class FileManager extends Frame {
 				setForeground(list.getForeground());
 			}
 			final Path path = (Path)value;
-			setIcon(Files.isDirectory(path)?directoryIcon:fileIcon);
+			setIcon(((FileList) list).getFileIcon(path));
 			setText(getFileName(path).toString());
 			setFont(list.getFont());
 			return this;
