@@ -1,11 +1,17 @@
 package linoleum;
 
 import java.awt.Component;
+import java.awt.ComponentOrientation;
+import java.awt.Rectangle;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -48,10 +54,13 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import linoleum.application.ApplicationManager;
 import linoleum.application.FileChooser;
 import linoleum.application.Frame;
@@ -110,7 +119,7 @@ public class FileManager extends Frame {
 		}
 
 		private WatchKey register(final WatchService service) throws IOException {
-			setTitle(getFileName().toString());
+			setTitle(getFileName());
 			return path.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
 		}
 	};
@@ -232,6 +241,7 @@ public class FileManager extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
+			newFolder(getPath().resolve("New folder"));
 		}
 	}
 
@@ -243,6 +253,7 @@ public class FileManager extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
+			editFileName();
 		}
 	}
 
@@ -275,6 +286,77 @@ public class FileManager extends Frame {
 		}
 	}
 
+	private Path newFolderFile;
+	private Path editFile;
+
+	private final JTextField editCell = new JTextField();
+
+	private void applyEdit() {
+		if (editFile != null && Files.exists(editFile)) {
+			final String oldFileName = jList1.getFileName(editFile).toString();
+			final String newFileName = editCell.getText().trim();
+
+			if (!newFileName.equals(oldFileName)) try {
+				Files.move(editFile, editFile.resolveSibling(newFileName));
+				refresh();
+			} catch (final IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+		cancelEdit();
+	}
+
+	private void cancelEdit() {
+		if (editFile != null) {
+			editFile = null;
+			jList1.remove(editCell);
+			jList1.repaint();
+		}
+	}
+
+	private void editFileName() {
+		final int index = jList1.getSelectedIndex();
+		jList1.ensureIndexIsVisible(index);
+		editFile = jList1.getModel().getElementAt(index);
+		final Rectangle r = jList1.getCellBounds(index, index);
+		jList1.add(editCell);
+		editCell.setText(jList1.getFileName(editFile).toString());
+		final ComponentOrientation orientation = jList1.getComponentOrientation();
+		editCell.setComponentOrientation(orientation);
+
+		final Icon icon = jList1.getFileIcon(editFile);
+
+		// PENDING - grab padding (4) below from defaults table.
+		final int editX = icon == null ? 20 : icon.getIconWidth() + 4;
+
+		if (orientation.isLeftToRight()) {
+			editCell.setBounds(editX + r.x, r.y, r.width - editX, r.height);
+		} else {
+			editCell.setBounds(r.x, r.y, r.width - editX, r.height);
+		}
+		editCell.requestFocus();
+		editCell.selectAll();
+	}
+
+	private void newFolder(final Path path) {
+		try {
+			newFolderFile = Files.createDirectory(path);
+			refresh();
+		} catch (final IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	private void editNewFolder(final Path path) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				jList1.setSelectedValue(path, false);
+				editFileName();
+			}
+		});
+		newFolderFile = null;
+	}
+
 	private class Renderer extends JLabel implements ListCellRenderer {
 		public Renderer() {
 			setOpaque(true);
@@ -291,7 +373,7 @@ public class FileManager extends Frame {
 			}
 			final Path path = (Path)value;
 			setIcon(((FileList) list).getFileIcon(path));
-			setText(getFileName(path).toString());
+			setText(((FileList) list).getFileName(path).toString());
 			setFont(list.getFont());
 			return this;
 		}
@@ -324,17 +406,17 @@ public class FileManager extends Frame {
 			if (support.isDrop()) {
 				action = support.getDropAction();
 				final JList.DropLocation dl = (JList.DropLocation) support.getDropLocation();
-				recipient = dl.isInsert()?path:getDirectory(list.getModel().getElementAt(dl.getIndex()));
+				recipient = dl.isInsert()?getPath():getDirectory(list.getModel().getElementAt(dl.getIndex()));
 			} else {
 				if (parent.source != null) {
 					action = parent.source.action;
 				} else {
 					action = NONE;
 				}
-				recipient = list.isSelectionEmpty()?path:getDirectory(list.getSelectedValue());
+				recipient = list.isSelectionEmpty()?getPath():getDirectory(list.getSelectedValue());
 			}
 			for (final Path entry : files) {
-				final Path target = recipient.resolve(getFileName(entry).toString());
+				final Path target = recipient.resolve(list.getFileName(entry).toString());
 				try {
 					switch (action) {
 					case COPY:
@@ -471,6 +553,7 @@ public class FileManager extends Frame {
 		this(null);
 	}
 
+	@SuppressWarnings("deprecation")
 	public FileManager(final Frame parent) {
 		super(parent);
 		initComponents();
@@ -486,6 +569,36 @@ public class FileManager extends Frame {
 			}
 		});
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		editCell.setName("FileList.cellEditor");
+		editCell.addActionListener(new ActionListener() {
+			public void actionPerformed(final ActionEvent e) {
+				applyEdit();
+			}
+		});
+		editCell.addFocusListener(new FocusAdapter() {
+			public void focusLost(final FocusEvent e) {
+				if (!e.isTemporary()) {
+					applyEdit();
+				}
+			}
+		});
+		editCell.setNextFocusableComponent(jList1);
+		model.addListDataListener(new ListDataListener() {
+			public void contentsChanged(final ListDataEvent e) {
+			}
+			public void intervalAdded(final ListDataEvent e) {
+				final int i0 = e.getIndex0();
+				final int i1 = e.getIndex1();
+				if (i0 == i1) {
+					final Path path = model.getElementAt(i0);
+					if (path.equals(newFolderFile)) {
+						editNewFolder(path);
+					}
+				}
+			}
+			public void intervalRemoved(final ListDataEvent e) {
+			}
+		});
 		this.parent = (FileManager) super.parent;
 		setURI(getHome());
 	}
@@ -554,8 +667,12 @@ public class FileManager extends Frame {
 		if (fs == defaultfs && Files.isDirectory(path)) {
 			thread.start();
 		} else {
-			setTitle(getFileName().toString());
+			setTitle(getFileName());
 		}
+	}
+
+	private String getFileName() {
+		return jList1.getFileName(path).toString();
 	}
 
 	@Override
@@ -587,7 +704,7 @@ public class FileManager extends Frame {
 		model.clear();
 		Path files[] = new Path[0];
 		if (Files.isDirectory(path) || isJar()) {
-			files = listFiles(Files.isDirectory(path)?path:getRootDirectory()).toArray(files);
+			files = listFiles(getPath()).toArray(files);
 		}
 		Arrays.sort(files, new Comparator<Path>() {
 			public int compare(final Path a, final Path b) {
@@ -612,20 +729,15 @@ public class FileManager extends Frame {
 		return false;
 	}
 
+	private Path getPath() {
+		return Files.isDirectory(path)?path:getRootDirectory();
+	}
+
 	private Path getRootDirectory() {
 		for (final Path entry : fs.getRootDirectories()) {
 			return entry;
 		}
 		return null;
-	}
-
-	private Path getFileName() {
-		return getFileName(path);
-	}
-
-	private Path getFileName(final Path path) {
-		final int n = path.getNameCount();
-		return n > 0?path.getName(n - 1):path;
 	}
 
 	@Override

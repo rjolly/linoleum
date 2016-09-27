@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -38,6 +39,11 @@ public class FileList extends JList<Path> {
 				Files.isSymbolicLink(path)?fileLinkIcon:fileIcon;
 	}
 
+	public Path getFileName(final Path path) {
+		final int n = path.getNameCount();
+		return n > 0?path.getName(n - 1):path;
+	}
+
 	@Override
 	public int getNextMatch(final String prefix, final int startIndex, final Position.Bias bias) {
 		final ListModel<Path> model = getModel();
@@ -48,7 +54,7 @@ public class FileList extends JList<Path> {
 		// start search from the next element before/after the selected element
 		final boolean backwards = (bias == Position.Bias.Backward);
 		for (int i = startIndex; backwards ? i >= 0 : i < max; i += (backwards ?  -1 : 1)) {
-			final String filename = model.getElementAt(i).getFileName().toString();
+			final String filename = getFileName(model.getElementAt(i)).toString();
 			if (filename.regionMatches(true, 0, prefix, 0, prefix.length())) {
 				return i;
 			}
