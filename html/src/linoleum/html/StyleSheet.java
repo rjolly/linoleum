@@ -112,7 +112,10 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 		private Object doGetAttribute(final Object key) {
 			Object retValue = superGetAttribute(key);
 			if (key instanceof CSS.Attribute && isInstanceOf(colorValueClass, retValue)) {
-				return getModifiedValue(retValue, (CSS.Attribute) key);
+				return getModifiedColorValue(retValue, (CSS.Attribute) key);
+			}
+			if (key instanceof CSS.Attribute && isInstanceOf(fontSizeClass, retValue)) {
+				return getModifiedSizeValue(retValue, (CSS.Attribute) key);
 			}
 			if (retValue != null) {
 				return retValue;
@@ -154,13 +157,21 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 		return value == null?false:clazz.isAssignableFrom(value.getClass());
 	}
 
-	private Object getModifiedValue(final Object value, final CSS.Attribute key) {
+	private Object getModifiedColorValue(final Object value, final CSS.Attribute key) {
 		String str = value.toString();
 		if (str.startsWith("#") && str.length() == 4) {
 			final String r = str.substring(1, 2);
 			final String v = str.substring(2, 3);
 			final String b = str.substring(3, 4);
 			str = String.format("#%s%s%s%s%s%s", r, r, v, v, b, b);
+		}
+		return getInternalCSSValue(getCss(), key, str);
+	}
+
+	private Object getModifiedSizeValue(final Object value, final CSS.Attribute key) {
+		String str = value.toString();
+		if (str.endsWith("px")) {
+			str = str.substring(0, str.length() - 2) + "pt";
 		}
 		return getInternalCSSValue(getCss(), key, str);
 	}
