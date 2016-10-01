@@ -164,16 +164,18 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 			final String v = str.substring(2, 3);
 			final String b = str.substring(3, 4);
 			str = String.format("#%s%s%s%s%s%s", r, r, v, v, b, b);
+			return getInternalCSSValue(getCss(), key, str);
 		}
-		return getInternalCSSValue(getCss(), key, str);
+		return value;
 	}
 
 	private Object getModifiedSizeValue(final Object value, final CSS.Attribute key) {
 		String str = value.toString();
 		if (str.endsWith("px")) {
 			str = str.substring(0, str.length() - 2) + "pt";
+			return getInternalCSSValue(getCss(), key, str);
 		}
-		return getInternalCSSValue(getCss(), key, str);
+		return value;
 	}
 
 	private Object getAbsoluteValue(final Object value, final AttributeSet attrs, final javax.swing.text.html.StyleSheet ss) {

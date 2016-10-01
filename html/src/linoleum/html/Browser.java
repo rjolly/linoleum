@@ -44,6 +44,7 @@ public class Browser extends Frame {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif")));
 		setMimeType("text/html");
+		jEditorPane1.setFont(jEditorPane1.getFont().deriveFont(14.0f));
 		jEditorPane1.setEditorKitForContentType("text/html", new EditorKit());
 		jEditorPane1.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 		jTextField1.getDocument().addDocumentListener(new DocumentListener() {
