@@ -40,6 +40,8 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 			getAttributesMethod.setAccessible(true);
 
 			cssField.setAccessible(true);
+
+			css = (CSS) cssField.get(this);
 		} catch (final ReflectiveOperationException ex) {
 			ex.printStackTrace();
 		}
@@ -82,7 +84,7 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 		@Override
 		public Object getAttribute(final Object key) {
 			if (key instanceof StyleConstants) {
-				final Object cssKey = styleConstantsKeyToCSSKey(getCss(), (StyleConstants)key);
+				final Object cssKey = styleConstantsKeyToCSSKey((StyleConstants)key);
 				if (cssKey != null) {
 					final Object value = doGetAttribute(cssKey);
 					if (isInstanceOf(cssValueClass, value)) {
@@ -164,7 +166,7 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 			final String v = str.substring(2, 3);
 			final String b = str.substring(3, 4);
 			str = String.format("#%s%s%s%s%s%s", r, r, v, v, b, b);
-			return getInternalCSSValue(getCss(), key, str);
+			return getInternalCSSValue(key, str);
 		}
 		return value;
 	}
@@ -173,13 +175,13 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 		String str = value.toString();
 		if (str.endsWith("px")) {
 			str = str.substring(0, str.length() - 2) + "pt";
-			return getInternalCSSValue(getCss(), key, str);
+			return getInternalCSSValue(key, str);
 		}
 		return value;
 	}
 
 	private Object getAbsoluteValue(final Object value, final AttributeSet attrs, final javax.swing.text.html.StyleSheet ss) {
-		return getInternalCSSValue(getCss(), CSS.Attribute.FONT_SIZE, getValue(value, attrs, ss).toString());
+		return getInternalCSSValue(CSS.Attribute.FONT_SIZE, getValue(value, attrs, ss).toString());
 	}
 
 	private Integer getValue(final Object value, final AttributeSet attrs, final javax.swing.text.html.StyleSheet ss) {
@@ -202,7 +204,7 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 		return res;
 	}
 
-	private CSS.Attribute styleConstantsKeyToCSSKey(final CSS css, final StyleConstants sc) {
+	private CSS.Attribute styleConstantsKeyToCSSKey(final StyleConstants sc) {
 		CSS.Attribute res = null;
 		try {
 			res = (CSS.Attribute) styleConstantsKeyToCSSKeyMethod.invoke(css, sc);
@@ -212,7 +214,7 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 		return res;
 	}
 
-	private Object getInternalCSSValue(final CSS css, final CSS.Attribute key, final String value) {
+	private Object getInternalCSSValue(final CSS.Attribute key, final String value) {
 		Object res = null;
 		try {
 			res = getInternalCSSValueMethod.invoke(css, key, value);
@@ -220,15 +222,6 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 			ex.printStackTrace();
 		}
 		return res;
-	}
-
-	private CSS getCss() {
-		if (css == null) try {
-			css = (CSS) cssField.get(this);
-		} catch (final ReflectiveOperationException ex) {
-			ex.printStackTrace();
-		}
-		return css;
 	}
 
 	private CSS css;
