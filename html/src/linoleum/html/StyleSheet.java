@@ -122,38 +122,36 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 
 		private Object doGetAttribute(final Object key) {
 			final Object value = superGetAttribute(key);
-			if (key instanceof CSS.Attribute && isInstanceOf(colorValueClass, value)) {
-				String str = value.toString();
-				if (str.startsWith("#") && str.length() == 4) {
-					final String r = str.substring(1, 2);
-					final String v = str.substring(2, 3);
-					final String b = str.substring(3, 4);
-					str = String.format("#%s%s%s%s%s%s", r, r, v, v, b, b);
-					return getInternalCSSValue((CSS.Attribute) key, str);
-				}
-			}
-			if (key instanceof CSS.Attribute && isInstanceOf(fontSizeClass, value)) {
-				String str = value.toString();
-				if (str.endsWith("px")) {
-					str = str.substring(0, str.length() - 2) + "pt";
-					return getInternalCSSValue((CSS.Attribute) key, str);
-				}
-			}
-			if (value != null) {
-				return value;
-			}
 			if (key instanceof CSS.Attribute) {
-				if (((CSS.Attribute) key).isInherited()) {
-					final AttributeSet parent = getResolveParent();
-					if (parent != null) {
-						return getAttribute(parent, key);
+				if (isInstanceOf(colorValueClass, value)) {
+					String str = value.toString();
+					if (str.startsWith("#") && str.length() == 4) {
+						final String r = str.substring(1, 2);
+						final String v = str.substring(2, 3);
+						final String b = str.substring(3, 4);
+						str = String.format("#%s%s%s%s%s%s", r, r, v, v, b, b);
+						return getInternalCSSValue((CSS.Attribute) key, str);
+					}
+				} else if (isInstanceOf(fontSizeClass, value)) {
+					String str = value.toString();
+					if (str.endsWith("px")) {
+						str = str.substring(0, str.length() - 2) + "pt";
+						return getInternalCSSValue((CSS.Attribute) key, str);
+					}
+				} else if (value == null) {
+					if (((CSS.Attribute) key).isInherited()) {
+						final AttributeSet parent = getResolveParent();
+						if (parent != null) {
+							return getAttribute(parent, key);
+						}
 					}
 				}
+			} else if (key == StyleConstants.FontSize) {
+				if (value == null) {
+					return sizeMap[defaultFontSize];
+				}
 			}
-			if (key == StyleConstants.FontSize) {
-				return sizeMap[defaultFontSize];
-			}
-			return null;
+			return value;
 		}
 
 		private Object getAttribute(final AttributeSet parent, final Object key) {
