@@ -16,6 +16,8 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 	private Method styleConstantsKeyToCSSKeyMethod;
 	private Method getInternalCSSValueMethod;
 	private Method getAttributesMethod;
+	private Method getSizeMapMethod;
+	private Field defaultFontSizeField;
 	private Field cssField;
 
 	public StyleSheet() {
@@ -30,7 +32,9 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 			styleConstantsKeyToCSSKeyMethod = CSS.class.getDeclaredMethod("styleConstantsKeyToCSSKey", StyleConstants.class);
 			getInternalCSSValueMethod = CSS.class.getDeclaredMethod("getInternalCSSValue", CSS.Attribute.class, String.class);
 			getAttributesMethod = viewAttributeSetClass.getSuperclass().getDeclaredMethod("getAttributes");
+			getSizeMapMethod = javax.swing.text.html.StyleSheet.class.getDeclaredMethod("getSizeMap");
 
+			defaultFontSizeField = javax.swing.text.html.StyleSheet.class.getDeclaredField("DEFAULT_FONT_SIZE");
 			cssField = javax.swing.text.html.StyleSheet.class.getDeclaredField("css");
 
 			getValueMethod.setAccessible(true);
@@ -38,9 +42,14 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 			styleConstantsKeyToCSSKeyMethod.setAccessible(true);
 			getInternalCSSValueMethod.setAccessible(true);
 			getAttributesMethod.setAccessible(true);
+			getSizeMapMethod.setAccessible(true);
 
+			sizeMap = (int[]) getSizeMapMethod.invoke(this);
+
+			defaultFontSizeField.setAccessible(true);
 			cssField.setAccessible(true);
 
+			defaultFontSize = defaultFontSizeField.getInt(null);
 			css = (CSS) cssField.get(this);
 		} catch (final ReflectiveOperationException ex) {
 			ex.printStackTrace();
@@ -131,7 +140,7 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 					}
 				}
 			}
-			return key == StyleConstants.FontSize?14:null;
+			return key == StyleConstants.FontSize?sizeMap[defaultFontSize]:null;
 		}
 
 		@Override
@@ -224,5 +233,7 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 		return res;
 	}
 
+	private int sizeMap[];
+	private int defaultFontSize;
 	private CSS css;
 }
