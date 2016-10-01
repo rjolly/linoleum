@@ -13,7 +13,10 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
@@ -27,6 +30,7 @@ public class Browser extends Frame {
 	private final Icon goIcon = new ImageIcon(getClass().getResource("Go16.png"));
 	private final Icon stopIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
 	private final Icon reloadIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Refresh16.gif"));
+	private final DefaultComboBoxModel<Integer> model = new DefaultComboBoxModel<>(new Integer[] { 8, 10, 12, 14, 18, 24, 36 });
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private List<FrameURL> history = new ArrayList<>();
 	private PageLoader loader;
@@ -44,7 +48,15 @@ public class Browser extends Frame {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif")));
 		setMimeType("text/html");
-		jEditorPane1.setFont(jEditorPane1.getFont().deriveFont(14.0f));
+		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
+			@Override
+			public void preferenceChange(final PreferenceChangeEvent evt) {
+				if (evt.getKey().equals(getKey("fontSize"))) {
+					resize();
+				}
+			}
+		});
+		resize();
 		jEditorPane1.setEditorKitForContentType("text/html", new EditorKit());
 		jEditorPane1.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 		jTextField1.getDocument().addDocumentListener(new DocumentListener() {
@@ -86,12 +98,22 @@ public class Browser extends Frame {
 
 	@Override
 	public void load() {
-		jTextField2.setText(prefs.get(getName() + ".home", ""));
+		jTextField2.setText(prefs.get(getKey("home"), ""));
+		jComboBox1.setSelectedItem(getFontSize());
+	}
+
+	final int getFontSize() {
+		return prefs.getInt(getKey("fontSize"), jEditorPane1.getFont().getSize());
+	}
+
+	final void resize() {
+		jEditorPane1.setFont(jEditorPane1.getFont().deriveFont((float) getFontSize()));
 	}
 
 	@Override
 	public void save() {
-		prefs.put(getName() + ".home", jTextField2.getText());
+		prefs.put(getKey("home"), jTextField2.getText());
+		prefs.putInt(getKey("fontSize"), (Integer) jComboBox1.getSelectedItem());
 	}
 
 	@Override
@@ -235,6 +257,8 @@ public class Browser extends Frame {
                 optionPanel1 = new linoleum.application.OptionPanel();
                 jLabel2 = new javax.swing.JLabel();
                 jTextField2 = new javax.swing.JTextField();
+                jLabel3 = new javax.swing.JLabel();
+                jComboBox1 = new javax.swing.JComboBox();
                 jPanel3 = new javax.swing.JPanel();
                 jButton2 = new javax.swing.JButton();
                 jButton3 = new javax.swing.JButton();
@@ -258,15 +282,30 @@ public class Browser extends Frame {
 
                 jLabel2.setText("Home page :");
 
+                jLabel3.setText("Font size :");
+
+                jComboBox1.setModel(model);
+                jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jComboBox1ActionPerformed(evt);
+                        }
+                });
+
                 javax.swing.GroupLayout optionPanel1Layout = new javax.swing.GroupLayout(optionPanel1);
                 optionPanel1.setLayout(optionPanel1Layout);
                 optionPanel1Layout.setHorizontalGroup(
                         optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(optionPanel1Layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jLabel2)
+                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jLabel3)
+                                        .addComponent(jLabel2))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)
+                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)
+                                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 0, Short.MAX_VALUE)))
                                 .addContainerGap())
                 );
                 optionPanel1Layout.setVerticalGroup(
@@ -276,6 +315,10 @@ public class Browser extends Frame {
                                 .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel2)
                                         .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel3)
+                                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 );
 
@@ -404,13 +447,19 @@ public class Browser extends Frame {
 		getToolkit().getSystemClipboard().setContents(selection, selection);
         }//GEN-LAST:event_jMenuItem1ActionPerformed
 
+        private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+		optionPanel1.setDirty(true);
+        }//GEN-LAST:event_jComboBox1ActionPerformed
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
         private javax.swing.JButton jButton2;
         private javax.swing.JButton jButton3;
+        private javax.swing.JComboBox jComboBox1;
         private linoleum.html.EditorPane jEditorPane1;
         private javax.swing.JLabel jLabel1;
         private javax.swing.JLabel jLabel2;
+        private javax.swing.JLabel jLabel3;
         private javax.swing.JMenuItem jMenuItem1;
         private javax.swing.JPanel jPanel2;
         private javax.swing.JPanel jPanel3;
