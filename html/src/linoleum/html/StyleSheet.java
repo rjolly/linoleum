@@ -121,26 +121,48 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 		}
 
 		private Object doGetAttribute(final Object key) {
-			Object retValue = superGetAttribute(key);
-			if (key instanceof CSS.Attribute && isInstanceOf(colorValueClass, retValue)) {
-				return getModifiedColorValue(retValue, (CSS.Attribute) key);
+			final Object value = superGetAttribute(key);
+			if (key instanceof CSS.Attribute && isInstanceOf(colorValueClass, value)) {
+				String str = value.toString();
+				if (str.startsWith("#") && str.length() == 4) {
+					final String r = str.substring(1, 2);
+					final String v = str.substring(2, 3);
+					final String b = str.substring(3, 4);
+					str = String.format("#%s%s%s%s%s%s", r, r, v, v, b, b);
+					return getInternalCSSValue((CSS.Attribute) key, str);
+				}
 			}
-			if (key instanceof CSS.Attribute && isInstanceOf(fontSizeClass, retValue)) {
-				return getModifiedSizeValue(retValue, (CSS.Attribute) key);
+			if (key instanceof CSS.Attribute && isInstanceOf(fontSizeClass, value)) {
+				String str = value.toString();
+				if (str.endsWith("px")) {
+					str = str.substring(0, str.length() - 2) + "pt";
+					return getInternalCSSValue((CSS.Attribute) key, str);
+				}
 			}
-			if (retValue != null) {
-				return retValue;
+			if (value != null) {
+				return value;
 			}
 			if (key instanceof CSS.Attribute) {
 				if (((CSS.Attribute) key).isInherited()) {
 					final AttributeSet parent = getResolveParent();
 					if (parent != null) {
-						final Object value = parent.getAttribute(key);
-						return isInstanceOf(fontSizeClass, value)?getAbsoluteValue(value, parent, StyleSheet.this):value;
+						return getAttribute(parent, key);
 					}
 				}
 			}
-			return key == StyleConstants.FontSize?sizeMap[defaultFontSize]:null;
+			if (key == StyleConstants.FontSize) {
+				return sizeMap[defaultFontSize];
+			}
+			return null;
+		}
+
+		private Object getAttribute(final AttributeSet parent, final Object key) {
+			final Object value = parent.getAttribute(key);
+			if (isInstanceOf(fontSizeClass, value)) {
+				final String str = getValue(value, parent, StyleSheet.this).toString();
+				return getInternalCSSValue(CSS.Attribute.FONT_SIZE, str);
+			}
+			return value;
 		}
 
 		@Override
@@ -166,31 +188,6 @@ public class StyleSheet extends javax.swing.text.html.StyleSheet {
 
 	private boolean isInstanceOf(final Class<?> clazz, final Object value) {
 		return value == null?false:clazz.isAssignableFrom(value.getClass());
-	}
-
-	private Object getModifiedColorValue(final Object value, final CSS.Attribute key) {
-		String str = value.toString();
-		if (str.startsWith("#") && str.length() == 4) {
-			final String r = str.substring(1, 2);
-			final String v = str.substring(2, 3);
-			final String b = str.substring(3, 4);
-			str = String.format("#%s%s%s%s%s%s", r, r, v, v, b, b);
-			return getInternalCSSValue(key, str);
-		}
-		return value;
-	}
-
-	private Object getModifiedSizeValue(final Object value, final CSS.Attribute key) {
-		String str = value.toString();
-		if (str.endsWith("px")) {
-			str = str.substring(0, str.length() - 2) + "pt";
-			return getInternalCSSValue(key, str);
-		}
-		return value;
-	}
-
-	private Object getAbsoluteValue(final Object value, final AttributeSet attrs, final javax.swing.text.html.StyleSheet ss) {
-		return getInternalCSSValue(CSS.Attribute.FONT_SIZE, getValue(value, attrs, ss).toString());
 	}
 
 	private Integer getValue(final Object value, final AttributeSet attrs, final javax.swing.text.html.StyleSheet ss) {
