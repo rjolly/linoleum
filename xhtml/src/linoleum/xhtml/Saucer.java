@@ -11,8 +11,10 @@ public class Saucer extends Browser {
 
 	public Saucer(final Frame parent) {
 		super(parent);
-		setMimeType("application/xhtml+xml");
-		getEditorPane().setEditorKitForContentType("application/xml", new EditorKit());
+		setMimeType("text/html:application/xhtml+xml");
+		final EditorKit kit = new EditorKit();
+		getEditorPane().setEditorKitForContentType("text/xml", kit);
+		getEditorPane().setEditorKitForContentType("application/xml", kit);
 	}
 
 	@Override
