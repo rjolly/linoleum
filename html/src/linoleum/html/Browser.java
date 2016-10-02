@@ -27,7 +27,7 @@ import javax.swing.text.Document;
 import linoleum.application.Frame;
 
 public class Browser extends Frame {
-	private final Icon goIcon = new ImageIcon(getClass().getResource("Go16.png"));
+	private final Icon goIcon = new ImageIcon(getClass().getResource("/linoleum/html/Go16.png"));
 	private final Icon stopIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
 	private final Icon reloadIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Refresh16.gif"));
 	private final DefaultComboBoxModel<Integer> model = new DefaultComboBoxModel<>(new Integer[] { 8, 10, 12, 14, 18, 24, 36 });
@@ -80,6 +80,10 @@ public class Browser extends Frame {
 			}
 		});
 		update();
+	}
+
+	public JEditorPane getEditorPane() {
+		return jEditorPane1;
 	}
 
 	private void open(final String str) {

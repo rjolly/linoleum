@@ -1,6 +1,6 @@
 application/wavefront-obj obj
 application/pdf pdf PDF
-application/octet-stream bin
+application/xhtml+xml xhtml
 application/java-archive jar
 application/mvr mvr
 application/zip zip
