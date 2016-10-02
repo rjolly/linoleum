@@ -31,8 +31,13 @@ public class FileTransferable implements Transferable {
 			return list;
 		} else if (flavor == flavors[1]) {
 			final StringBuilder builder = new StringBuilder();
+			int n = 0;
 			for (final Path entry : list) {
-				builder.append(entry).append("\n");
+				if (n > 0) {
+					builder.append("\n");
+				}
+				builder.append(entry.toString().replace(entry.getFileSystem().getSeparator(), "/"));
+				n++;
 			}
 			return builder.toString();
 		} else {
