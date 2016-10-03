@@ -263,7 +263,7 @@ function open(name, app) {
 }
 
 function exit(code) {
-    frame.dispose();
+    frame.doDefaultCloseAction();
 }
 
 function log(str) {

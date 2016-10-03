@@ -126,7 +126,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 	private class DeleteAction extends AbstractAction {
 		public DeleteAction() {
 			super("Delete", deleteIcon);
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK | InputEvent.ALT_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
 		}
 
 		@Override
