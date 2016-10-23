@@ -26,6 +26,7 @@ public class Packages {
 			return file.isFile() && file.getName().endsWith(".jar");
 		}
 	};
+	private boolean changed;
 
 	Packages(final ApplicationManager apps) {
 		final String extdirs[] = System.getProperty("java.ext.dirs").split(File.pathSeparator);
@@ -74,8 +75,7 @@ public class Packages {
 		try {
 			String str = System.getProperty("linoleum.home");
 			if (str == null) {
-				str = map.get("linoleum").getParentFile().getCanonicalPath();
-				System.setProperty("linoleum.home", str);
+				System.setProperty("linoleum.home", str = map.get("linoleum").getParentFile().getCanonicalPath());
 			}
 			final File home = new File(str).getCanonicalFile();
 			if (!Files.isSameFile(home.toPath(), Paths.get("."))) {
@@ -104,15 +104,19 @@ public class Packages {
 	}
 
 	public void commit(final Object source) {
-		apps.fireClassPathChange(new ClassPathChangeEvent(source));
+		if (changed) {
+			apps.fireClassPathChange(new ClassPathChangeEvent(source));
+			changed = false;
+		}
 	}
 
 	public void add(final File file) {
 		final Package pkg = new Package(file);
 		final String name = pkg.getName();
 		if (!pkg.isSourcesOrJavadoc() && !map.containsKey(name)) try {
-			((ClassLoader)ClassLoader.getSystemClassLoader()).addURL(file.toURI().toURL());
+			((ClassLoader) ClassLoader.getSystemClassLoader()).addURL(file.toURI().toURL());
 			put(name, file);
+			changed = true;
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}

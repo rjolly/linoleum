@@ -6,8 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Files;
 import java.util.Arrays;
@@ -99,6 +97,8 @@ public class Tools {
 	}
 
 	public void run(final String name, final File dir, final String args[]) throws Exception {
-		Class.forName(name, true, new URLClassLoader(new URL[] {dir.toURI().toURL()})).getMethod("main", new Class[] {args.getClass()}).invoke(null, new Object[] {args});
+		pkgs.add(dir);
+		pkgs.commit(this);
+		Class.forName(name, true, ClassLoader.getSystemClassLoader()).getMethod("main", args.getClass()).invoke(null, (Object) args);
 	}
 }
