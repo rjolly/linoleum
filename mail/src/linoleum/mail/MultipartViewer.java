@@ -2,8 +2,8 @@ package linoleum.mail;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 import java.beans.*;
+import java.io.*;
 import javax.activation.*;
 import javax.mail.*;
 import javax.swing.JButton;
@@ -81,21 +81,17 @@ public class MultipartViewer extends JPanel implements Viewer {
 		}
 	}
 
-	private Component getComponent(final BodyPart bp) {
-		try {
-			final DataHandler dh = bp.getDataHandler();
-			final CommandInfo ci = dh.getCommand("view");
-			if (ci == null) {
-				throw new MessagingException("view command failed on: " + bp.getContentType());
-			}
-			final Object bean = dh.getBean(ci);
-			if (bean instanceof Component) {
-				return (Component)bean;
-			} else {
-				throw new MessagingException(bean == null?"bean is null, class " + ci.getCommandClass() + " , command " + ci.getCommandName():"bean is not a awt.Component" + bean.getClass());
-			}
-		} catch (final MessagingException me) {
-			return new Label(me.toString());
+	private Component getComponent(final BodyPart bp) throws MessagingException {
+		final DataHandler dh = bp.getDataHandler();
+		final CommandInfo ci = dh.getCommand("view");
+		if (ci == null) {
+			throw new MessagingException("view command failed on: " + bp.getContentType());
+		}
+		final Object bean = dh.getBean(ci);
+		if (bean instanceof Component) {
+			return (Component)bean;
+		} else {
+			throw new MessagingException(bean == null?"bean is null, class " + ci.getCommandClass() + " , command " + ci.getCommandName():"bean is not a awt.Component" + bean.getClass());
 		}
 	}
 
@@ -123,32 +119,37 @@ public class MultipartViewer extends JPanel implements Viewer {
 		}
 
 		public void actionPerformed(final ActionEvent e) {
-			(new SwingWorker<Object, Object>() {
-				Component comp;
-
-				@Override
-				public Object doInBackground() {
-					comp = getComponent(bp);
-					final ComponentFrame f = new ComponentFrame(comp, "Attachment");
-					final JInternalFrame frame = getFrame();
-					frame.getDesktopPane().add(f);
-					f.pack();
-					final Dimension s = f.getSize();
-					final Dimension size = frame.getSize();
-					final int width = Math.min(s.width, size.width);
-					final int height = Math.min(s.height, size.height);
-					f.setSize(width, height);
-					f.show();
-					return f;
+			(new SwingWorker<Component, Object>() {
+				public Component doInBackground() throws MessagingException {
+					return getComponent(bp);
 				}
 
 				@Override
 				protected void done() {
-					if (comp instanceof Viewer) {
-						((Viewer)comp).scrollToOrigin();
+					try {
+						display(get());
+					} catch (final Exception e) {
+						display(new Label(e.toString()));
 					}
 				}
+
 			}).execute();
+		}
+	}
+
+	private void display(final Component comp) {
+		final ComponentFrame f = new ComponentFrame(comp, "Attachment");
+		final JInternalFrame frame = getFrame();
+		frame.getDesktopPane().add(f);
+		f.pack();
+		final Dimension s = f.getSize();
+		final Dimension size = frame.getSize();
+		final int width = Math.min(s.width, size.width);
+		final int height = Math.min(s.height, size.height);
+		f.setSize(width, height);
+		f.show();
+		if (comp instanceof Viewer) {
+			((Viewer)comp).scrollToOrigin();
 		}
 	}
 

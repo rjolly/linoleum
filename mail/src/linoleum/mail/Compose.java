@@ -78,11 +78,9 @@ public class Compose extends Frame {
 		public void actionPerformed(final ActionEvent evt) {
 			try {
 				send();
-				try {
-					setClosed(true);
-				} catch (final PropertyVetoException e) {
-					e.printStackTrace();
-				}
+				setClosed(true);
+			} catch (final PropertyVetoException e) {
+				e.printStackTrace();
 			} catch (final MessagingException me) {
 				me.printStackTrace();
 			}

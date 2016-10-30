@@ -23,6 +23,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
@@ -70,7 +71,8 @@ public class SimpleClient extends Frame {
 				folderViewer.setFolder(folder);
 			} catch (final MessagingException me) {
 				me.printStackTrace();
-			}		}
+			}
+		}
 	}
 
 	private class SettingsAction extends AbstractAction {
@@ -110,12 +112,8 @@ public class SimpleClient extends Frame {
 		frame.setJMenuBar(getJMenuBar());
 	}
 
-	void compose(final String str) {
-		try {
-			frame.open(new URI("mailto", str, null));
-		} catch (final URISyntaxException e) {
-			e.printStackTrace();
-		}
+	void compose(final String str) throws URISyntaxException {
+		frame.open(new URI("mailto", str, null));
 	}
 
 	public FolderViewer getFolderViewer() {
@@ -168,19 +166,26 @@ public class SimpleClient extends Frame {
 
 	final void open(final String str) {
 		final URLName name = new URLName(str);
-		StoreTreeNode storenode = map.get(name);
-		if (storenode == null) {
-			try {
-				final Store store = session.getStore(name);
-				map.put(name, storenode = new StoreTreeNode(store));
-				model.insertNodeInto(storenode, root, root.getChildCount());
-			} catch (final NoSuchProviderException e) {
-				e.printStackTrace();
+		(new SwingWorker<StoreTreeNode, Object>() {
+			public StoreTreeNode doInBackground() throws NoSuchProviderException {
+				StoreTreeNode storenode = map.get(name);
+				if (storenode == null) {
+					final Store store = session.getStore(name);
+					map.put(name, storenode = new StoreTreeNode(store));
+					model.insertNodeInto(storenode, root, root.getChildCount());
+				}
+				return storenode;
 			}
-		}
-		if (storenode != null) {
-			jTree1.scrollPathToVisible(new TreePath(storenode.getPath()));
-		}
+
+			@Override
+			protected void done() {
+				try {
+					jTree1.scrollPathToVisible(new TreePath(get().getPath()));
+				} catch (final Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}).execute();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -393,7 +398,7 @@ public class SimpleClient extends Frame {
 			final Object o = path.getLastPathComponent();
 			if (o instanceof StoreTreeNode) {
 				try {
-					((StoreTreeNode)o).open();
+					((StoreTreeNode) o).open();
 				} catch (final MessagingException me) {
 					throw new ExpandVetoException(evt);
 				}
@@ -408,7 +413,7 @@ public class SimpleClient extends Frame {
 			if (o instanceof StoreTreeNode) {
 				try {
 					folderViewer.setFolder(null);
-					((StoreTreeNode)o).close();
+					((StoreTreeNode) o).close();
 				} catch (final MessagingException me) {
 					throw new ExpandVetoException(evt);
 				}

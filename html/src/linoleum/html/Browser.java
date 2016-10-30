@@ -182,7 +182,6 @@ public class Browser extends Frame {
 		private final FrameURL dest;
 		private final boolean force;
 		private final int delta;
-		private boolean success;
 
 		PageLoader(final FrameURL dest, final int delta, final boolean force) {
 			this.dest = dest;
@@ -200,26 +199,24 @@ public class Browser extends Frame {
 			jEditorPane1.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		}
 
-		public URL doInBackground() {
-			success = false;
-			try {
-				jEditorPane1.setPage(dest, this, force);
-				success = true;
-			} catch (final IOException ioe) {
-				ioe.printStackTrace();
-			}
-			return jEditorPane1.getPage();
+		public Boolean doInBackground() throws IOException {
+			jEditorPane1.setPage(dest, this, force);
+			return true;
 		}
 
 		public void done() {
-			if (success) {
-				jTextField1.setText(dest.getURL().toString());
-				setTitle((String)jEditorPane1.getDocument().getProperty(Document.TitleProperty));
-				if (current != null) {
-					record(dest, delta);
+			try {
+				if (get()) {
+					jTextField1.setText(dest.getURL().toString());
+					setTitle((String)jEditorPane1.getDocument().getProperty(Document.TitleProperty));
+					if (current != null) {
+						record(dest, delta);
+					}
+					current = dest;
+					reload = true;
 				}
-				current = dest;
-				reload = true;
+			} catch (final Exception e) {
+				e.printStackTrace();
 			}
 			// restore the original cursor
 			jEditorPane1.setCursor(cursor);

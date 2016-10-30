@@ -2,16 +2,17 @@ package linoleum.mail;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.util.Date;
+import javax.activation.*;
 import javax.mail.*;
 import javax.mail.internet.*;
-import javax.activation.*;
-import java.util.Date;
-import java.io.IOException;
 import javax.swing.Action;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
+import javax.swing.SwingWorker;
 
 public class MessageViewer extends javax.swing.JPanel implements Viewer {
 	private final Icon deleteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Delete16.gif"));
@@ -62,18 +63,27 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 	}
 
 	private void reply(final boolean all, final boolean fw) {
-		try {
-			final MimeMessage msg = (MimeMessage) displayed;
-			final MimeMessage reply = (MimeMessage) msg.reply(all);
-			if (fw) {
-				reply.setSubject(reply.getSubject().replaceFirst("Re:", "Fw:"));
-				reply.setRecipients(Message.RecipientType.TO, new Address[0]);
-				reply.setRecipients(Message.RecipientType.CC, new Address[0]);
+		(new SwingWorker<String, Object>() {
+			public String doInBackground() throws MessagingException {
+				final MimeMessage msg = (MimeMessage) displayed;
+				final MimeMessage reply = (MimeMessage) msg.reply(all);
+				if (fw) {
+					reply.setSubject(reply.getSubject().replaceFirst("Re:", "Fw:"));
+					reply.setRecipients(Message.RecipientType.TO, new Address[0]);
+					reply.setRecipients(Message.RecipientType.CC, new Address[0]);
+				}
+				return params(reply);
 			}
-			client.compose(params(reply));
-		} catch (final MessagingException me) {
-			me.printStackTrace();
-		}
+
+			@Override
+			public void done() {
+				try {
+					client.compose(get());
+				} catch (final Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}).execute();
 	}
 
 	private String params(final Message msg) throws MessagingException {
@@ -147,7 +157,11 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			System.out.println("\n" + getValue(Action.NAME));
-			dumpPart("", displayed);
+			try {
+				dumpPart("", displayed);
+			} catch (final MessagingException me) {
+				me.printStackTrace();
+			}
 		}
 	}
 
@@ -193,9 +207,20 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 			forwardAction.setEnabled(true);
 			deleteAction.setEnabled(true);
 			structureAction.setEnabled(true);
+			(new SwingWorker<Component, Object>() {
+				public Component doInBackground() throws MessagingException {
+					return getBodyComponent();
+				}
 
-			// add the main body
-			jPanel1.add(mainbody = getBodyComponent());
+				@Override
+				public void done() {
+					try {
+						display(get());
+					} catch (final Exception e) {
+						display(new Label(e.toString()));
+					}
+				}
+			}).execute();
 		} else {
 			headers.setText("");
 			replyAction.setEnabled(false);
@@ -204,7 +229,11 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 			deleteAction.setEnabled(false);
 			structureAction.setEnabled(false);
 		}
+	}
 
+	private void display(final Component comp) {
+		// add the main body
+		jPanel1.add(mainbody = comp);
 		invalidate();
 		validate();
 		scrollToOrigin();
@@ -263,24 +292,20 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 		}
 	}
 
-	private Component getBodyComponent() {
+	private Component getBodyComponent() throws MessagingException {
 		//------------
 		// now get a content viewer for the main type...
 		//------------
-		try {
-			final DataHandler dh = displayed.getDataHandler();
-			final CommandInfo ci = dh.getCommand("view");
-			if (ci == null) {
-				throw new MessagingException("view command failed on: " + displayed.getContentType());
-			}
-			final Object bean = dh.getBean(ci);
-			if (bean instanceof Component) {
-				return (Component)bean;
-			} else {
-				throw new MessagingException("bean is not a component: " + bean);
-			}
-		} catch (final MessagingException me) {
-			return new Label(me.toString());
+		final DataHandler dh = displayed.getDataHandler();
+		final CommandInfo ci = dh.getCommand("view");
+		if (ci == null) {
+			throw new MessagingException("view command failed on: " + displayed.getContentType());
+		}
+		final Object bean = dh.getBean(ci);
+		if (bean instanceof Component) {
+			return (Component)bean;
+		} else {
+			throw new MessagingException("bean is not a component: " + bean);
 		}
 	}
 
@@ -335,7 +360,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
                 );
         }// </editor-fold>//GEN-END:initComponents
 
-	private void dumpPart(final String prefix, final Part p) {
+	private void dumpPart(final String prefix, final Part p) throws MessagingException {
 		try {
 			System.out.println(prefix + "----------------");
 			System.out.println(prefix + "Content-Type: " + p.getContentType());
@@ -351,8 +376,6 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 					dumpPart(newpref, mp.getBodyPart(i));
 				}
 			}
-		} catch (final MessagingException e) {
-			e.printStackTrace();
 		} catch (final IOException ioex) {
 			System.out.println("Cannot get content" + ioex.getMessage());
 		}
