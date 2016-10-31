@@ -15,7 +15,7 @@ function load(str) {
 	var bstream = new BufferedInputStream(stream);
 	var reader = new BufferedReader(new InputStreamReader(bstream));
 	var oldFilename = engine.get(engine.FILENAME);
-	engine.put(engine.FILENAME, str);	
+	engine.put(engine.FILENAME, str);
 	try {
 		engine.eval(reader);
 	} finally {
@@ -291,4 +291,28 @@ function log(str) {
 	root.setLevel(Level.SEVERE);
 	break;
     }
+}
+
+// requires commons-io#commons-io;2.4
+
+function hexdump(path) {
+    System = java.lang.System;
+    Files = java.nio.file.Files;
+    HexDump = Packages.org.apache.commons.io.HexDump;
+    HexDump.dump(Files.readAllBytes(pathToFile(path).toPath()), 0, System.out, 0);
+}
+
+// requires com.googlecode.java-diff-utils#diffutils;1.3.0
+
+function diff(file1, file2) {
+    DiffUtils = Packages.difflib.DiffUtils;
+    IOUtils = Packages.org.apache.commons.io.IOUtils;
+    FileUtils = Packages.org.apache.commons.io.FileUtils;
+    file1 = pathToFile(file1);
+    file2 = pathToFile(file2);
+    var a = IOUtils.readLines(FileUtils.openInputStream(file1));
+    var b = IOUtils.readLines(FileUtils.openInputStream(file2));
+    var p = DiffUtils.diff(a, b);
+    var d = DiffUtils.generateUnifiedDiff(file1.getName(), file2.getName(), a, p, 3);
+    for (var i = 0; i < d.size(); i++) println(d.get(i));
 }
