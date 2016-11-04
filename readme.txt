@@ -58,6 +58,9 @@ List of applications
 
 Useful libraries
 
-  org.bouncycastle#bcpg-jdk15;1.45	The Bouncy Castle Java API for handling the OpenPGP protocol
-  mstor#mstor;0.9.9			A JavaMail provider for persistent email storage
+  org.bouncycastle#bcpg-jdk15;1.45			The Bouncy Castle Java API for handling the OpenPGP protocol
+  mstor#mstor;0.9.9					A JavaMail provider for persistent email storage
+  commons-io#commons-io;2.4				The Apache Commons IO library
+  com.googlecode.java-diff-utils#diffutils;1.3.0	The DiffUtils library for computing diffs in Java
+  org.scala-lang#scala-compiler;2.12.0			Script engine for the Scala Programming Language (requires Java 8)
 
