@@ -767,7 +767,11 @@ public class FileManager extends Frame {
 	}
 
 	private void open(final Path entry) {
-		getApplicationManager().open(entry.toUri());
+		try {
+			getApplicationManager().open(entry.toRealPath().toUri());
+		} catch (final IOException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	private void prepare() {
@@ -783,37 +787,41 @@ public class FileManager extends Frame {
 			jMenu3.setEnabled(true);
 			renameAction.setEnabled(true);
 			deleteAction.setEnabled(true);
-			final URI uri = jList1.getSelectedValue().toUri();
-			final ApplicationManager mgr = getApplicationManager();
-			final String s = mgr.getApplication(uri);
-			boolean sep = false;
-			if (s != null) {
-				final Action action = new AbstractAction(s) {
-					@Override
-					public void actionPerformed(final ActionEvent evt) {
-						mgr.open(s, uri);
-					}
-				};
-				jMenu3.add(action);
-				jPopupMenu1.add(action);
-				sep = true;
-			}
-			for (final String str : mgr.getApplications(uri)) {
-				if (!str.equals(s)) {
-					if (sep) {
-						jMenu3.addSeparator();
-						jPopupMenu1.addSeparator();
-						sep = false;
-					}
-					final Action action = new AbstractAction(str) {
+			try {
+				final URI uri = jList1.getSelectedValue().toRealPath().toUri();
+				final ApplicationManager mgr = getApplicationManager();
+				final String s = mgr.getApplication(uri);
+				boolean sep = false;
+				if (s != null) {
+					final Action action = new AbstractAction(s) {
 						@Override
 						public void actionPerformed(final ActionEvent evt) {
-							mgr.open(str, uri);
+							mgr.open(s, uri);
 						}
 					};
 					jMenu3.add(action);
 					jPopupMenu1.add(action);
+					sep = true;
 				}
+				for (final String str : mgr.getApplications(uri)) {
+					if (!str.equals(s)) {
+						if (sep) {
+							jMenu3.addSeparator();
+							jPopupMenu1.addSeparator();
+							sep = false;
+						}
+						final Action action = new AbstractAction(str) {
+							@Override
+							public void actionPerformed(final ActionEvent evt) {
+								mgr.open(str, uri);
+							}
+						};
+						jMenu3.add(action);
+						jPopupMenu1.add(action);
+					}
+				}
+			} catch (final IOException ex) {
+				ex.printStackTrace();
 			}
 		}
 	}
