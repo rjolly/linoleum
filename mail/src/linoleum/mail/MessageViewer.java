@@ -69,6 +69,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 				final MimeMessage reply = (MimeMessage) msg.reply(all);
 				if (fw) {
 					reply.setSubject(reply.getSubject().replaceFirst("Re:", "Fw:"));
+					reply.setReplyTo(reply.getRecipients(Message.RecipientType.TO));
 					reply.setRecipients(Message.RecipientType.TO, new Address[0]);
 					reply.setRecipients(Message.RecipientType.CC, new Address[0]);
 				}
@@ -89,9 +90,13 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 	private String params(final Message msg) throws MessagingException {
 		final Address to[] = msg.getRecipients(Message.RecipientType.TO);
 		final Address cc[] = msg.getRecipients(Message.RecipientType.CC);
+		final Address replyTo[] = msg.getReplyTo();
 		final StringBuilder bld = new StringBuilder();
 		if (cc != null) {
 			append(bld, "cc", mkUnicodeString(cc));
+		}
+		if (replyTo != null) {
+			append(bld, "replyTo", mkUnicodeString(replyTo));
 		}
 		append(bld, "inReplyTo", mkString(msg.getHeader("In-Reply-To")));
 		append(bld, "references", mkString(msg.getHeader("References")));

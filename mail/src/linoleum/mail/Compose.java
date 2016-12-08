@@ -41,6 +41,7 @@ public class Compose extends Frame {
 	private JTextField toField;
 	private JTextField ccField;
 	private JTextField bccField;
+	private JTextField replyToField;
 	private JTextField subField;
 	private JTextArea content;
 	private String inReplyTo[];
@@ -149,6 +150,9 @@ public class Compose extends Frame {
 						case "subject":
 							subField.setText(r[1]);
 							break;
+						case "replyTo":
+							replyToField.setText(r[1]);
+							break;
 						case "inReplyTo":
 							inReplyTo = r[1].split(",");
 							break;
@@ -179,6 +183,7 @@ public class Compose extends Frame {
 		final String to = toField.getText();
 		final String cc = ccField.getText();
 		final String bcc = bccField.getText();
+		final String replyTo = replyToField.getText();
 		final String subject = subField.getText();
 		final String text = content.getText();
 		final String url = prefs.get(SimpleClient.instance.getKey("url"), "");
@@ -195,6 +200,9 @@ public class Compose extends Frame {
 		}
 		if (!bcc.isEmpty()) {
 			msg.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(bcc, false));
+		}
+		if (!replyTo.isEmpty()) {
+			msg.setReplyTo(InternetAddress.parse(replyTo, false));
 		}
 		msg.setSubject(subject);
 		if (file != null) {
@@ -259,6 +267,8 @@ public class Compose extends Frame {
 		bccField = new JTextField(25);
 		p.add(bccLabel, "label");
 		p.add(bccField, "field");
+
+		replyToField = new JTextField(25);
 
 		final JLabel subLabel = new JLabel("Subj: ", JLabel.RIGHT);
 		subField = new JTextField(25);
