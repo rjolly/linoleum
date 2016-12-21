@@ -1,6 +1,7 @@
 package linoleum.mail;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.mail.*;
 
 public class StoreTreeNode extends DefaultMutableTreeNode {
@@ -17,44 +18,36 @@ public class StoreTreeNode extends DefaultMutableTreeNode {
 		return false;
 	}
 
-	public int getChildCount() {
-		if (folder == null) {
-			loadChildren();
-		}
-		return super.getChildCount();
-	}
-
 	public void close() throws MessagingException {
 		if (store.isConnected()) {
 			store.close();
 		}
 	}
 
-	public void open() throws MessagingException {
+	public void open(final DefaultTreeModel model) throws MessagingException  {
 		// connect to the Store if we need to
 		if (!store.isConnected()) {
 			store.connect();
+			if (folder == null) {
+				loadChildren(model);
+			}
 		}
 	}
 
-	protected void loadChildren() {
-		try {
-			// get the default folder, and list the
-			// subscribed folders on it
-			folder = store.getDefaultFolder();
-			// Folder[] sub = folder.listSubscribed();
-			Folder[] sub = folder.list();
+	private void loadChildren(final DefaultTreeModel model) throws MessagingException {
+		// get the default folder, and list the
+		// subscribed folders on it
+		folder = store.getDefaultFolder();
+		// Folder[] sub = folder.listSubscribed();
+		Folder[] sub = folder.list();
 
-			// add a FolderTreeNode for each Folder
-			int num = sub.length;
-			for(int i = 0; i < num; i++) {
-				FolderTreeNode node = new FolderTreeNode(sub[i]);
-				// we used insert here, since add() would make
-				// another recursive call to getChildCount();
-				insert(node, i);
-			}
-		} catch (MessagingException me) {
-			me.printStackTrace();
+		// add a FolderTreeNode for each Folder
+		int num = sub.length;
+		for(int i = 0; i < num; i++) {
+			FolderTreeNode node = new FolderTreeNode(sub[i]);
+			// we used insert here, since add() would make
+			// another recursive call to getChildCount();
+			model.insertNodeInto(node, this, i);
 		}
 	}
 

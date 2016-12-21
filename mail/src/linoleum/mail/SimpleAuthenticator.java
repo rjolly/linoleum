@@ -10,6 +10,7 @@ public class SimpleAuthenticator extends Authenticator {
 	JInternalFrame frame;
 	String username;
 	String password;
+	int result;
 
 	public SimpleAuthenticator(JInternalFrame f) {
 		this.frame = f;
@@ -48,7 +49,7 @@ public class SimpleAuthenticator extends Authenticator {
 		// XXX - for some reason using a JPanel here causes JOptionPane
 		// to display incorrectly, so we workaround the problem using
 		// an anonymous JComponent.
-		JComponent d = new JComponent() { };
+		final JComponent d = new JComponent() { };
 
 		GridBagLayout gb = new GridBagLayout();
 		GridBagConstraints c = new GridBagConstraints();
@@ -93,7 +94,15 @@ public class SimpleAuthenticator extends Authenticator {
 		} else {
 			username.requestFocus();
 		}
-		int result = JOptionPane.showInternalConfirmDialog(frame, d, "Login", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+		try {
+			SwingUtilities.invokeAndWait(new Runnable() {
+				public void run() {
+					result = JOptionPane.showInternalConfirmDialog(frame, d, "Login", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+				}
+			});
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
 		if (result == JOptionPane.OK_OPTION) {
 			return new PasswordAuthentication(username.getText(), password.getText());
 		} else {

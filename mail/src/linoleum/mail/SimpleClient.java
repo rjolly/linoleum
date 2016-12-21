@@ -26,7 +26,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreePath;
 import linoleum.application.Frame;
 
@@ -164,7 +163,7 @@ public class SimpleClient extends Frame {
 		}
 	}
 
-	final void open(final String str) {
+	private void open(final String str) {
 		final URLName name = new URLName(str);
 		(new SwingWorker<StoreTreeNode, Object>() {
 			public StoreTreeNode doInBackground() throws NoSuchProviderException {
@@ -397,11 +396,12 @@ public class SimpleClient extends Frame {
 		if (path != null) {
 			final Object o = path.getLastPathComponent();
 			if (o instanceof StoreTreeNode) {
-				try {
-					((StoreTreeNode) o).open();
-				} catch (final MessagingException me) {
-					throw new ExpandVetoException(evt);
-				}
+				(new SwingWorker<Object, Object>() {
+					public Object doInBackground() throws MessagingException  {
+						((StoreTreeNode) o).open(model);
+						return null;
+					}
+				}).execute();
 			}
 		}
         }//GEN-LAST:event_jTree1TreeWillExpand
@@ -411,12 +411,13 @@ public class SimpleClient extends Frame {
 		if (path != null) {
 			final Object o = path.getLastPathComponent();
 			if (o instanceof StoreTreeNode) {
-				try {
-					folderViewer.setFolder(null);
-					((StoreTreeNode) o).close();
-				} catch (final MessagingException me) {
-					throw new ExpandVetoException(evt);
-				}
+				(new SwingWorker<Object, Object>() {
+					public Object doInBackground() throws MessagingException {
+						folderViewer.setFolder(null);
+						((StoreTreeNode) o).close();
+						return null;
+					}
+				}).execute();
 			}
 		}
         }//GEN-LAST:event_jTree1TreeWillCollapse
