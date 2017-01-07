@@ -149,6 +149,9 @@ public class EditorPane extends JEditorPane {
 			}
 			conn.addRequestProperty("Authorization", map.get(host));
 		}
+		if (auth.equals("Forbidden")) {
+			conn.addRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0");
+		}
 		if (conn instanceof HttpURLConnection) {
 			final HttpURLConnection hconn = (HttpURLConnection) conn;
 			hconn.setInstanceFollowRedirects(false);
@@ -167,6 +170,9 @@ public class EditorPane extends JEditorPane {
 			}
 			if (auth.isEmpty() && response == HttpURLConnection.HTTP_UNAUTHORIZED) {
 				return getStream(page, loader, conn.getHeaderField("WWW-authenticate"));
+			}
+			if (auth.isEmpty() && response == HttpURLConnection.HTTP_FORBIDDEN) {
+				return getStream(page, loader, "Forbidden");
 			}
 		}
 		handleConnectionProperties(conn);
