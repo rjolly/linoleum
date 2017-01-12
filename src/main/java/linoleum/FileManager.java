@@ -98,7 +98,7 @@ public class FileManager extends Frame {
 						for (final WatchEvent<?> event : key.pollEvents()) {
 							SwingUtilities.invokeLater(new Runnable() {
 								public void run() {
-									rescan();
+									process(event);
 								}
 							});
 						}
@@ -115,6 +115,16 @@ public class FileManager extends Frame {
 				}
 			} catch (final IOException e) {
 				e.printStackTrace();
+			}
+		}
+
+		private void process(final WatchEvent<?> event) {
+			final Path entry = getPath().resolve((Path) event.context());
+			final WatchEvent.Kind kind = event.kind();
+			if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+				model.addElement(entry);
+			} else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
+				model.removeElement(entry);
 			}
 		}
 
