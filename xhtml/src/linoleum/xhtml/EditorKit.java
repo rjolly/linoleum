@@ -11,14 +11,7 @@ import javax.swing.text.html.HTML;
 import javax.swing.text.html.StyleSheet;
 
 public class EditorKit extends linoleum.html.EditorKit {
-	public static class Tag extends HTML.Tag {
-		public static final Tag MATH = new Tag("math");
-
-		public Tag(final String id) {
-			super(id);
-		}
-	}
-
+	public static final HTML.Tag MATH = new HTML.UnknownTag("math");
 	private final ViewFactory factory = new Factory();
 
 	@Override
@@ -41,9 +34,9 @@ public class EditorKit extends linoleum.html.EditorKit {
 			final AttributeSet attrs = elem.getAttributes();
 			final Object elementName = attrs.getAttribute(AbstractDocument.ElementNameAttribute);
 			final Object o = (elementName != null) ? null : attrs.getAttribute(StyleConstants.NameAttribute);
-			if (o instanceof Tag) {
-				final Tag kind = (Tag) o;
-				if (kind == Tag.MATH) {
+			if (o instanceof HTML.Tag) {
+				final HTML.Tag kind = (HTML.Tag) o;
+				if (MATH.equals(kind)) {
 					return new MathView(elem);
 				}
 			}

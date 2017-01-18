@@ -31,7 +31,20 @@ public class Document extends linoleum.html.Document {
 
 		public Reader(final int offset, final int popDepth, final int pushDepth, final HTML.Tag insertTag) {
 			super(offset, popDepth, pushDepth, insertTag);
-			registerTag(EditorKit.Tag.MATH, new SpecialAction());
+			registerTag(EditorKit.MATH, new ParagraphAction());
+		}
+
+		@Override
+		public void handleSimpleTag(final HTML.Tag t, final MutableAttributeSet a, final int pos) {
+			if (EditorKit.MATH.equals(t)) {
+				if (!"true".equals(a.getAttribute(HTML.Attribute.ENDTAG))) {
+					handleStartTag(t, a, pos);
+				} else {
+					handleEndTag(t, pos);
+				}
+			} else {
+				super.handleSimpleTag(t, a, pos);
+			}
 		}
 	}
 }
