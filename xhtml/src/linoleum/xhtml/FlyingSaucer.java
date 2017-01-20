@@ -42,7 +42,7 @@ public class FlyingSaucer extends Frame {
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
-                jScrollPane1 = new javax.swing.JScrollPane();
+                fSScrollPane1 = new org.xhtmlrenderer.simple.FSScrollPane();
                 xHTMLPanel1 = new org.xhtmlrenderer.simple.XHTMLPanel();
 
                 setClosable(true);
@@ -51,17 +51,17 @@ public class FlyingSaucer extends Frame {
                 setResizable(true);
                 setTitle("Flying Saucer");
 
-                jScrollPane1.setViewportView(xHTMLPanel1);
+                fSScrollPane1.setViewportView(xHTMLPanel1);
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);
                 layout.setHorizontalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
+                        .addComponent(fSScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
                 );
                 layout.setVerticalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
+                        .addComponent(fSScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
                 );
 
                 pack();
@@ -69,7 +69,7 @@ public class FlyingSaucer extends Frame {
 
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
-        private javax.swing.JScrollPane jScrollPane1;
+        private org.xhtmlrenderer.simple.FSScrollPane fSScrollPane1;
         private org.xhtmlrenderer.simple.XHTMLPanel xHTMLPanel1;
         // End of variables declaration//GEN-END:variables
 }
