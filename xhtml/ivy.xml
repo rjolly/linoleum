@@ -11,5 +11,6 @@
     </configurations>
     <dependencies>
         <dependency org="net.java.linoleum" name="html" rev="1.2.1" conf="compile->master;runtime->default"/>
+        <dependency org="org.xhtmlrenderer" name="flying-saucer-core" rev="9.0.9" conf="compile->master;runtime->default"/>
     </dependencies>
 </ivy-module>
