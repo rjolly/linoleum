@@ -3,9 +3,13 @@ package linoleum.xhtml;
 import java.net.URI;
 import java.net.URISyntaxException;
 import javax.swing.ImageIcon;
+import org.xhtmlrenderer.extend.ReplacedElementFactory;
+import org.xhtmlrenderer.swing.SwingReplacedElementFactory;
 import linoleum.application.Frame;
 
 public class FlyingSaucer extends Frame {
+	private final ChainedReplacedElementFactory cef = new ChainedReplacedElementFactory();
+
 	public FlyingSaucer() {
 		this(null);
 	}
@@ -15,6 +19,9 @@ public class FlyingSaucer extends Frame {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif")));
 		setMimeType("text/html:application/xhtml+xml");
+		cef.addFactory(new SwingReplacedElementFactory());
+		cef.addFactory(new SVGSalamanderReplacedElementFactory());
+		xHTMLPanel1.getSharedContext().setReplacedElementFactory(cef);
 	}
 
 	@Override
