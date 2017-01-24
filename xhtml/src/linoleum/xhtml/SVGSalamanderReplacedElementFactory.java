@@ -15,6 +15,8 @@ import org.xhtmlrenderer.util.XRLog;
 
 import javax.swing.*;
 import java.util.logging.Level;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.awt.*;
 
 public class SVGSalamanderReplacedElementFactory implements ReplacedElementFactory {
@@ -39,7 +41,7 @@ public class SVGSalamanderReplacedElementFactory implements ReplacedElementFacto
 			XRLog.general(Level.FINE, "Rendering embedded SVG via object tag from: " + path);
 			XRLog.general(Level.FINE, "Content is: " + content);
 			panel.setAntiAlias(true);
-			panel.setSvgResourcePath(path);
+			panel.setSvgURI(new URI(path));
 
 			int width = panel.getSVGWidth();
 			int height = panel.getSVGHeight();
@@ -61,7 +63,7 @@ public class SVGSalamanderReplacedElementFactory implements ReplacedElementFacto
 			panel.setSize(panel.getPreferredSize());
 
 			cc = panel;
-		} catch (final SVGException e) {
+		} catch (final URISyntaxException e) {
 			e.printStackTrace();
 			XRLog.general(Level.WARNING, "Could not replace SVG element; rendering failed" +
 					" in SVG renderer. Skipping and using blank JPanel.", e);
