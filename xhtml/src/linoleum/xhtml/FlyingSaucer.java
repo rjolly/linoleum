@@ -10,6 +10,10 @@ import linoleum.application.Frame;
 public class FlyingSaucer extends Frame {
 	private final ChainedReplacedElementFactory cef = new ChainedReplacedElementFactory();
 
+	static {
+		System.setProperty("xr.css.user-agent-default-css", "/linoleum/xhtml/");
+	}
+
 	public FlyingSaucer() {
 		this(null);
 	}
