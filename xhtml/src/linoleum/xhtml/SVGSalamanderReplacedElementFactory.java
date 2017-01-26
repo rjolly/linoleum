@@ -1,8 +1,7 @@
 package linoleum.xhtml;
 
-import com.kitfox.svg.SVGException;
-import com.kitfox.svg.app.beans.SVGPanel;
 import org.w3c.dom.Element;
+import org.w3c.dom.Document;
 import org.xhtmlrenderer.extend.FSCanvas;
 import org.xhtmlrenderer.extend.ReplacedElement;
 import org.xhtmlrenderer.extend.ReplacedElementFactory;
@@ -13,10 +12,12 @@ import org.xhtmlrenderer.simple.extend.FormSubmissionListener;
 import org.xhtmlrenderer.swing.SwingReplacedElement;
 import org.xhtmlrenderer.util.XRLog;
 
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
 import javax.swing.*;
 import java.util.logging.Level;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.awt.*;
 
 public class SVGSalamanderReplacedElementFactory implements ReplacedElementFactory {
@@ -26,7 +27,6 @@ public class SVGSalamanderReplacedElementFactory implements ReplacedElementFacto
 			final UserAgentCallback uac,
 			final int cssWidth,
 			final int cssHeight) {
-		final SVGPanel panel = new SVGPanel();
 		String content = null;
 		JComponent cc = null;
 		try {
@@ -36,35 +36,8 @@ public class SVGSalamanderReplacedElementFactory implements ReplacedElementFacto
 			}
 
 			content = getSVGElementContent(elem);
-
-			String path = elem.getAttribute("data");
-			XRLog.general(Level.FINE, "Rendering embedded SVG via object tag from: " + path);
-			XRLog.general(Level.FINE, "Content is: " + content);
-			panel.setAntiAlias(true);
-			panel.setSvgURI(new URI(path));
-
-			int width = panel.getSVGWidth();
-			int height = panel.getSVGHeight();
-
-			if ( cssWidth > 0 ) width = cssWidth;
-
-			if ( cssHeight > 0 ) height = cssHeight;
-
-			String val = elem.getAttribute("width");
-			if ( val != null && val.length() > 0 ) {
-				width = Integer.valueOf(val).intValue();
-			}
-			val = elem.getAttribute("height");
-			if ( val != null && val.length() > 0 ) {
-				height = Integer.valueOf(val).intValue();
-			}
-			panel.setScaleToFit(true);
-			panel.setPreferredSize(new Dimension(width, height));
-			panel.setSize(panel.getPreferredSize());
-
-			cc = panel;
-		} catch (final URISyntaxException e) {
-			e.printStackTrace();
+			cc = getJComponent(getSVGElementIcon(elem));
+		} catch (final Exception e) {
 			XRLog.general(Level.WARNING, "Could not replace SVG element; rendering failed" +
 					" in SVG renderer. Skipping and using blank JPanel.", e);
 			cc = getDefaultJComponent(content, cssWidth, cssHeight);
@@ -83,6 +56,21 @@ public class SVGSalamanderReplacedElementFactory implements ReplacedElementFacto
 		}
 	}
 
+	private Icon getSVGElementIcon(final Element elem) throws Exception {
+		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		final DocumentBuilder builder = factory.newDocumentBuilder();
+		final Document doc = builder.newDocument();
+		doc.appendChild(doc.importNode(elem, true));
+		final Image image = createImage(doc);
+		return new ImageIcon(image);
+	}
+
+	private Image createImage(final Document doc) throws Exception {
+		final MemoryTranscoder transcoder = new MemoryTranscoder();
+		transcoder.transcode(new TranscoderInput(doc), new TranscoderOutput());
+		return transcoder.getImage();
+	}
+
 	private String getSVGElementContent(final Element elem) {
 		if ( elem.getChildNodes().getLength() > 0 ) {
 			return elem.getFirstChild().getNodeValue();
@@ -92,13 +80,20 @@ public class SVGSalamanderReplacedElementFactory implements ReplacedElementFacto
 	}
 
 	private boolean isSVGEmbedded(final Element elem) {
-		return elem.getNodeName().equals("object") && elem.getAttribute("type").equals("image/svg+xml");
+		return elem.getNodeName().equals("svg");
 	}
 
 	private JComponent getDefaultJComponent(final String content, final int width, final int height) {
+		return getJComponent(new JLabel(content), width, height);
+	}
+
+	private JComponent getJComponent(final Icon content) {
+		return getJComponent(new JLabel(content), 0, 0);
+	}
+
+	private JComponent getJComponent(final JLabel comp, final int width, final int height) {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
-		JLabel comp = new JLabel(content);
 		panel.add(comp, BorderLayout.CENTER);
 		panel.setOpaque(false);
 		if ( width > 0 && height > 0 ) {
