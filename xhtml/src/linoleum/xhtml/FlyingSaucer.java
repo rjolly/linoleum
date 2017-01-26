@@ -24,6 +24,7 @@ public class FlyingSaucer extends Frame {
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif")));
 		setMimeType("text/html:application/xhtml+xml");
 		cef.addFactory(new SwingReplacedElementFactory());
+		cef.addFactory(new JEuclidReplacedElementFactory());
 		cef.addFactory(new SVGBatikReplacedElementFactory());
 		xHTMLPanel1.getSharedContext().setReplacedElementFactory(cef);
 	}

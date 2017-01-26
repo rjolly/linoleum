@@ -12,6 +12,7 @@
     <dependencies>
         <dependency org="net.java.linoleum" name="html" rev="1.2.1" conf="compile->master;runtime->default"/>
         <dependency org="org.xhtmlrenderer" name="flying-saucer-core" rev="9.0.9" conf="compile->master;runtime->default"/>
+        <dependency org="net.sourceforge.jeuclid" name="jeuclid-core" rev="3.1.9" conf="compile->master;runtime->default"/>
         <dependency org="org.apache.xmlgraphics" name="batik-transcoder" rev="1.7" conf="compile->master;runtime->default"/>
     </dependencies>
 </ivy-module>

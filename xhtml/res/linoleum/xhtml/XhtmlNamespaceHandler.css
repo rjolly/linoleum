@@ -200,6 +200,6 @@ form{
  margin: 0 0 1em 0;
 }
 
-svg {
+math, svg {
     display: inline-block;
 }
