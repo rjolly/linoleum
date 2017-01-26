@@ -20,7 +20,7 @@ import javax.swing.*;
 import java.util.logging.Level;
 import java.awt.*;
 
-public class SVGSalamanderReplacedElementFactory implements ReplacedElementFactory {
+public class SVGBatikReplacedElementFactory implements ReplacedElementFactory {
 	public ReplacedElement createReplacedElement(
 			final LayoutContext c,
 			final BlockBox box,
