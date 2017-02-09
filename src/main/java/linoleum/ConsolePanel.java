@@ -8,19 +8,18 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 
 public class ConsolePanel extends JPanel {
-	private boolean initialized;
-	private JTextArea editor;
+	private final JTextArea editor;
+	private final DocumentListener listener;
+	private final PipedOutputStream src = new PipedOutputStream();
+	private final PrintStream out = new PrintStream(src);
 	private boolean updating;
-	private DocumentListener listener;
+	private InputStream is;
 
-	PipedOutputStream src = new PipedOutputStream();
-	PrintStream out = new PrintStream(src);
-	InputStream is = null;
-
-	public ConsolePanel() {
+	public ConsolePanel(final boolean visible) {
 		try {
 			is = new PipedInputStream(src, 128);
-		} catch (IOException e) {}
+		} catch (final IOException e) {
+		}
 
 		setLayout(new BorderLayout());
 		this.editor = new JTextArea();
@@ -93,14 +92,10 @@ public class ConsolePanel extends JPanel {
 		hbox.add(button);
 		hbox.add(Box.createGlue());
 		add(hbox, BorderLayout.SOUTH);
-	}
-
-	void init() {
-		if (!initialized) {
+		if (visible) {
 			System.setIn(new BufferedInputStream(getInputStream()));
 			System.setOut(new PrintStream(new BufferedOutputStream(getOutputStream(), 128), true));
 			System.setErr(new PrintStream(new BufferedOutputStream(getOutputStream(), 128), true));
-			initialized = true;
 		}
 	}
 

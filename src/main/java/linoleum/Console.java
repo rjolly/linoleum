@@ -11,9 +11,9 @@ import javax.swing.ImageIcon;
 import linoleum.application.Frame;
 
 public class Console extends Frame {
-	private final ConsolePanel panel = new ConsolePanel();
-	private final DefaultComboBoxModel<Level> model = new DefaultComboBoxModel<>();
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
+	private final ConsolePanel panel = new ConsolePanel(prefs.getBoolean(getKey("visible"), false));
+	private final DefaultComboBoxModel<Level> model = new DefaultComboBoxModel<>();
 	private final Logger logger = Logger.getLogger("");
 
 	public Console() {
@@ -66,11 +66,6 @@ public class Console extends Frame {
 
 	private Level getLevel() {
 		return Level.parse(prefs.get(getKey("level"), Level.INFO.toString()));
-	}
-
-	@Override
-	public void open() {
-		panel.init();
 	}
 
 	@SuppressWarnings("unchecked")
