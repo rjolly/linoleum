@@ -37,6 +37,7 @@ import java.util.TreeMap;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.ServiceLoader;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferenceChangeEvent;
@@ -114,7 +115,7 @@ public class ApplicationManager extends Frame {
 
 	public ApplicationManager() {
 		initComponents();
-		tableModel = (DefaultTableModel)jTable1.getModel();
+		tableModel = (DefaultTableModel) jTable1.getModel();
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
 			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
@@ -296,6 +297,13 @@ public class ApplicationManager extends Frame {
 
 			@Override
 			protected void done() {
+				try {
+					get();
+				} catch (final InterruptedException ex) {
+					ex.printStackTrace();
+				} catch (final ExecutionException ex) {
+					ex.printStackTrace();
+				}
 				load(pref);
 			}
 		}).execute();
