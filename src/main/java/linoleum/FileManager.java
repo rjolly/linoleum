@@ -11,7 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -867,6 +866,8 @@ public class FileManager extends Frame {
                 jMenuItem7 = new javax.swing.JMenuItem();
                 jMenu4 = new javax.swing.JMenu();
                 jCheckBoxMenuItem1 = new javax.swing.JCheckBoxMenuItem();
+                jSeparator4 = new javax.swing.JPopupMenu.Separator();
+                jMenuItem11 = new javax.swing.JMenuItem();
 
                 optionPanel1.setFrame(this);
 
@@ -1011,6 +1012,16 @@ public class FileManager extends Frame {
                         }
                 });
                 jMenu4.add(jCheckBoxMenuItem1);
+                jMenu4.add(jSeparator4);
+
+                jMenuItem11.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F5, 0));
+                jMenuItem11.setText("Refresh");
+                jMenuItem11.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jMenuItem11ActionPerformed(evt);
+                        }
+                });
+                jMenu4.add(jMenuItem11);
 
                 jMenuBar1.add(jMenu4);
 
@@ -1069,6 +1080,10 @@ public class FileManager extends Frame {
 		optionPanel1.setDirty(true);
         }//GEN-LAST:event_jCheckBox1ActionPerformed
 
+        private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
+		rescan();
+        }//GEN-LAST:event_jMenuItem11ActionPerformed
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
         private javax.swing.JCheckBox jCheckBox1;
@@ -1082,6 +1097,7 @@ public class FileManager extends Frame {
         private javax.swing.JMenuBar jMenuBar1;
         private javax.swing.JMenuItem jMenuItem1;
         private javax.swing.JMenuItem jMenuItem10;
+        private javax.swing.JMenuItem jMenuItem11;
         private javax.swing.JMenuItem jMenuItem2;
         private javax.swing.JMenuItem jMenuItem3;
         private javax.swing.JMenuItem jMenuItem4;
@@ -1095,6 +1111,7 @@ public class FileManager extends Frame {
         private javax.swing.JPopupMenu.Separator jSeparator1;
         private javax.swing.JPopupMenu.Separator jSeparator2;
         private javax.swing.JPopupMenu.Separator jSeparator3;
+        private javax.swing.JPopupMenu.Separator jSeparator4;
         private javax.swing.JTextField jTextField1;
         private linoleum.application.OptionPanel optionPanel1;
         // End of variables declaration//GEN-END:variables
