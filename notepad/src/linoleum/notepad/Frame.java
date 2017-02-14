@@ -1,15 +1,11 @@
 package linoleum.notepad;
 
-import java.awt.Dimension;
-import java.awt.Point;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.swing.ImageIcon;
-import javax.swing.JInternalFrame;
-import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import linoleum.application.FileChooser;
@@ -29,7 +25,7 @@ public class Frame extends linoleum.application.Frame {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Edit24.gif")));
 		setMimeType("text/plain:text/*:application/octet-stream");
-		jInternalFrame1.pack();
+		dialog1.pack();
 		getContentPane().add("Center", notepad);
 		setJMenuBar(notepad.createMenubar());
 		setSize(500, 400);
@@ -63,22 +59,11 @@ public class Frame extends linoleum.application.Frame {
 	}
 
 	private void openDialog(final String title) {
-		if (jInternalFrame1.getDesktopPane() == null) {
-			getDesktopPane().add(jInternalFrame1);
-			setDialogLocation(jInternalFrame1);
-			jInternalFrame1.setLayer(2);
+		if (dialog1.getDesktopPane() == null) {
+			dialog1.setParent(this);
 		}
-		jInternalFrame1.setTitle(Notepad.resources.getString(title));
-		jInternalFrame1.setVisible(true);
-	}
-
-	private void setDialogLocation(final JInternalFrame dialog) {
-		final Dimension s = dialog.getSize();
-		final Dimension size = getSize();
-		final int x = (size.width - s.width) / 2;
-		final int y = (size.height - s.height) / 2;
-		final Point point = SwingUtilities.convertPoint(this, x, y, getDesktopPane());
-		dialog.setLocation(point.x, point.y);
+		dialog1.setTitle(Notepad.resources.getString(title));
+		dialog1.setVisible(true);
 	}
 
 	void find() {
@@ -96,8 +81,8 @@ public class Frame extends linoleum.application.Frame {
 	}
 
 	void closeDialog() {
-		if (jInternalFrame1.isVisible()) {
-			jInternalFrame1.setVisible(false);
+		if (dialog1.isVisible()) {
+			dialog1.setVisible(false);
 		}
 	}
 
@@ -109,7 +94,7 @@ public class Frame extends linoleum.application.Frame {
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
-                jInternalFrame1 = new javax.swing.JInternalFrame();
+                dialog1 = new linoleum.notepad.Dialog();
                 jLabel1 = new javax.swing.JLabel();
                 jTextField1 = new javax.swing.JTextField();
                 jLabel2 = new javax.swing.JLabel();
@@ -119,8 +104,8 @@ public class Frame extends linoleum.application.Frame {
                 jButton3 = new javax.swing.JButton();
                 jButton4 = new javax.swing.JButton();
 
-                jInternalFrame1.setClosable(true);
-                jInternalFrame1.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
+                dialog1.setClosable(true);
+                dialog1.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
 
                 jLabel1.setText("Find :");
 
@@ -154,18 +139,18 @@ public class Frame extends linoleum.application.Frame {
                         }
                 });
 
-                javax.swing.GroupLayout jInternalFrame1Layout = new javax.swing.GroupLayout(jInternalFrame1.getContentPane());
-                jInternalFrame1.getContentPane().setLayout(jInternalFrame1Layout);
-                jInternalFrame1Layout.setHorizontalGroup(
-                        jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jInternalFrame1Layout.createSequentialGroup()
+                javax.swing.GroupLayout dialog1Layout = new javax.swing.GroupLayout(dialog1.getContentPane());
+                dialog1.getContentPane().setLayout(dialog1Layout);
+                dialog1Layout.setHorizontalGroup(
+                        dialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(dialog1Layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(dialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(jTextField1)
                                         .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(jTextField2)
-                                        .addGroup(jInternalFrame1Layout.createSequentialGroup()
+                                        .addGroup(dialog1Layout.createSequentialGroup()
                                                 .addComponent(jButton1)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(jButton2)
@@ -175,9 +160,9 @@ public class Frame extends linoleum.application.Frame {
                                                 .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                 .addContainerGap())
                 );
-                jInternalFrame1Layout.setVerticalGroup(
-                        jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jInternalFrame1Layout.createSequentialGroup()
+                dialog1Layout.setVerticalGroup(
+                        dialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(dialog1Layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(jLabel1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -187,7 +172,7 @@ public class Frame extends linoleum.application.Frame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addGroup(dialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jButton1)
                                         .addComponent(jButton2)
                                         .addComponent(jButton3)
@@ -251,7 +236,7 @@ public class Frame extends linoleum.application.Frame {
 
         private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
 		try {
-			jInternalFrame1.setVisible(false);
+			dialog1.setVisible(false);
 			setSelected(true);
 		} catch (final PropertyVetoException ex) {
 			ex.printStackTrace();
@@ -266,7 +251,7 @@ public class Frame extends linoleum.application.Frame {
 		if (IS_CLOSED_PROPERTY.equals(evt.getPropertyName()) && (Boolean) evt.getNewValue()) {
 			closeDialog();
 			if (notepad.clean() || notepad.proceed("Warning")) {
-				jInternalFrame1.setClosed(true);
+				dialog1.setClosed(true);
 			} else {
 				throw new PropertyVetoException("aborted", evt);
 			}
@@ -278,7 +263,7 @@ public class Frame extends linoleum.application.Frame {
         private javax.swing.JButton jButton2;
         private javax.swing.JButton jButton3;
         private javax.swing.JButton jButton4;
-        private javax.swing.JInternalFrame jInternalFrame1;
+        private linoleum.notepad.Dialog dialog1;
         private javax.swing.JLabel jLabel1;
         private javax.swing.JLabel jLabel2;
         private javax.swing.JTextField jTextField1;

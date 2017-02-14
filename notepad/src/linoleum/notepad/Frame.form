@@ -2,7 +2,7 @@
 
 <Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JInternalFrameFormInfo">
   <NonVisualComponents>
-    <Container class="javax.swing.JInternalFrame" name="jInternalFrame1">
+    <Container class="linoleum.notepad.Dialog" name="dialog1">
       <Properties>
         <Property name="closable" type="boolean" value="true"/>
         <Property name="defaultCloseOperation" type="int" value="1"/>
