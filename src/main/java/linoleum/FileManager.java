@@ -1,5 +1,6 @@
 package linoleum;
 
+import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Rectangle;
@@ -626,12 +627,14 @@ public class FileManager extends Frame {
 	public void load() {
 		jTextField1.setText(prefs.get(getKey("home"), ""));
 		jCheckBox1.setSelected(isShowHidden());
+		jCheckBox2.setSelected(isShowDetails());
 	}
 
 	@Override
 	public void save() {
 		prefs.put(getKey("home"), jTextField1.getText());
 		prefs.putBoolean(getKey("showHidden"), jCheckBox1.isSelected());
+		prefs.putBoolean(getKey("showDetails"), jCheckBox2.isSelected());
 	}
 
 	@Override
@@ -708,7 +711,12 @@ public class FileManager extends Frame {
 		return prefs.getBoolean(getKey("showHidden"), false);
 	}
 
+	private boolean isShowDetails() {
+		return prefs.getBoolean(getKey("showDetails"), false);
+	}
+
 	private void rescan() {
+		((CardLayout) jPanel1.getLayout()).show(jPanel1, jCheckBoxMenuItem2.isSelected()?"table":"list");
 		show = jCheckBoxMenuItem1.isSelected();
 		model.clear();
 		Path files[] = new Path[0];
@@ -844,9 +852,13 @@ public class FileManager extends Frame {
                 jTextField1 = new javax.swing.JTextField();
                 jButton1 = new javax.swing.JButton();
                 jCheckBox1 = new javax.swing.JCheckBox();
+                jCheckBox2 = new javax.swing.JCheckBox();
                 jPopupMenu1 = new javax.swing.JPopupMenu();
+                jPanel1 = new javax.swing.JPanel();
                 jScrollPane1 = new javax.swing.JScrollPane();
                 jList1 = new linoleum.FileList();
+                jScrollPane2 = new javax.swing.JScrollPane();
+                jTable1 = new javax.swing.JTable();
                 jMenuBar1 = new javax.swing.JMenuBar();
                 jMenu1 = new javax.swing.JMenu();
                 jMenuItem1 = new javax.swing.JMenuItem();
@@ -866,6 +878,7 @@ public class FileManager extends Frame {
                 jMenuItem7 = new javax.swing.JMenuItem();
                 jMenu4 = new javax.swing.JMenu();
                 jCheckBoxMenuItem1 = new javax.swing.JCheckBoxMenuItem();
+                jCheckBoxMenuItem2 = new javax.swing.JCheckBoxMenuItem();
                 jSeparator4 = new javax.swing.JPopupMenu.Separator();
                 jMenuItem11 = new javax.swing.JMenuItem();
 
@@ -887,6 +900,13 @@ public class FileManager extends Frame {
                         }
                 });
 
+                jCheckBox2.setText("Show details");
+                jCheckBox2.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jCheckBox2ActionPerformed(evt);
+                        }
+                });
+
                 javax.swing.GroupLayout optionPanel1Layout = new javax.swing.GroupLayout(optionPanel1);
                 optionPanel1.setLayout(optionPanel1Layout);
                 optionPanel1Layout.setHorizontalGroup(
@@ -901,7 +921,9 @@ public class FileManager extends Frame {
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
                                         .addGroup(optionPanel1Layout.createSequentialGroup()
-                                                .addComponent(jCheckBox1)
+                                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(jCheckBox1)
+                                                        .addComponent(jCheckBox2))
                                                 .addGap(0, 0, Short.MAX_VALUE)))
                                 .addContainerGap())
                 );
@@ -915,6 +937,8 @@ public class FileManager extends Frame {
                                         .addComponent(jButton1))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jCheckBox1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jCheckBox2)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 );
 
@@ -933,6 +957,8 @@ public class FileManager extends Frame {
                 setMaximizable(true);
                 setResizable(true);
                 setName("Files"); // NOI18N
+
+                jPanel1.setLayout(new java.awt.CardLayout());
 
                 jList1.setModel(model);
                 jList1.setCellRenderer(renderer);
@@ -957,6 +983,44 @@ public class FileManager extends Frame {
                         }
                 });
                 jScrollPane1.setViewportView(jList1);
+
+                jPanel1.add(jScrollPane1, "list");
+
+                jTable1.setModel(new javax.swing.table.DefaultTableModel(
+                        new Object [][] {
+
+                        },
+                        new String [] {
+                                "Name", "Modified", "Type", "Size"
+                        }
+                ) {
+                        Class[] types = new Class [] {
+                                java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Long.class
+                        };
+                        boolean[] canEdit = new boolean [] {
+                                true, false, false, false
+                        };
+
+                        public Class getColumnClass(int columnIndex) {
+                                return types [columnIndex];
+                        }
+
+                        public boolean isCellEditable(int rowIndex, int columnIndex) {
+                                return canEdit [columnIndex];
+                        }
+                });
+                jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+                jTable1.setShowHorizontalLines(false);
+                jTable1.setShowVerticalLines(false);
+                jScrollPane2.setViewportView(jTable1);
+                if (jTable1.getColumnModel().getColumnCount() > 0) {
+                        jTable1.getColumnModel().getColumn(0).setPreferredWidth(150);
+                        jTable1.getColumnModel().getColumn(1).setPreferredWidth(100);
+                        jTable1.getColumnModel().getColumn(2).setPreferredWidth(125);
+                        jTable1.getColumnModel().getColumn(3).setPreferredWidth(75);
+                }
+
+                jPanel1.add(jScrollPane2, "table");
 
                 jMenu1.setText("File");
 
@@ -1012,6 +1076,15 @@ public class FileManager extends Frame {
                         }
                 });
                 jMenu4.add(jCheckBoxMenuItem1);
+
+                jCheckBoxMenuItem2.setSelected(isShowDetails());
+                jCheckBoxMenuItem2.setText("Show details");
+                jCheckBoxMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jCheckBoxMenuItem2ActionPerformed(evt);
+                        }
+                });
+                jMenu4.add(jCheckBoxMenuItem2);
                 jMenu4.add(jSeparator4);
 
                 jMenuItem11.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F5, 0));
@@ -1031,11 +1104,11 @@ public class FileManager extends Frame {
                 getContentPane().setLayout(layout);
                 layout.setHorizontalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 );
                 layout.setVerticalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)
                 );
 
                 pack();
@@ -1084,10 +1157,20 @@ public class FileManager extends Frame {
 		rescan();
         }//GEN-LAST:event_jMenuItem11ActionPerformed
 
+        private void jCheckBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
+		optionPanel1.setDirty(true);
+        }//GEN-LAST:event_jCheckBox2ActionPerformed
+
+        private void jCheckBoxMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem2ActionPerformed
+		rescan();
+        }//GEN-LAST:event_jCheckBoxMenuItem2ActionPerformed
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
         private javax.swing.JCheckBox jCheckBox1;
+        private javax.swing.JCheckBox jCheckBox2;
         private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
+        private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem2;
         private javax.swing.JLabel jLabel2;
         private linoleum.FileList jList1;
         private javax.swing.JMenu jMenu1;
@@ -1106,12 +1189,15 @@ public class FileManager extends Frame {
         private javax.swing.JMenuItem jMenuItem7;
         private javax.swing.JMenuItem jMenuItem8;
         private javax.swing.JMenuItem jMenuItem9;
+        private javax.swing.JPanel jPanel1;
         private javax.swing.JPopupMenu jPopupMenu1;
         private javax.swing.JScrollPane jScrollPane1;
+        private javax.swing.JScrollPane jScrollPane2;
         private javax.swing.JPopupMenu.Separator jSeparator1;
         private javax.swing.JPopupMenu.Separator jSeparator2;
         private javax.swing.JPopupMenu.Separator jSeparator3;
         private javax.swing.JPopupMenu.Separator jSeparator4;
+        private javax.swing.JTable jTable1;
         private javax.swing.JTextField jTextField1;
         private linoleum.application.OptionPanel optionPanel1;
         // End of variables declaration//GEN-END:variables
