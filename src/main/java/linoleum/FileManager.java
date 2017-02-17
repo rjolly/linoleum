@@ -31,10 +31,12 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -61,6 +63,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import javax.swing.table.DefaultTableModel;
 import linoleum.application.ApplicationManager;
 import linoleum.application.FileChooser;
 import linoleum.application.Frame;
@@ -122,9 +125,9 @@ public class FileManager extends Frame {
 			final Path entry = getPath().resolve((Path) event.context());
 			final WatchEvent.Kind kind = event.kind();
 			if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-				model.addElement(entry);
+				addEntry(entry);
 			} else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-				model.removeElement(entry);
+				removeEntry(entry);
 			}
 		}
 
@@ -135,6 +138,8 @@ public class FileManager extends Frame {
 	};
 	private final FileSystem defaultfs = FileSystems.getDefault();
 	private final Map<FileSystem, Collection<Integer>> openFrames = new HashMap<>();
+	private final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+	private final DefaultTableModel tableModel;
 	protected FileManager parent;
 	private FileManager source;
 	private boolean closing;
@@ -568,6 +573,8 @@ public class FileManager extends Frame {
 		super(parent);
 		initComponents();
 		jList1.setTransferHandler(new Handler());
+		tableModel = (DefaultTableModel) jTable1.getModel();
+		jTable1.putClientProperty("JTable.autoStartsEdit", false);
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
 		setMimeType("application/x-directory:application/java-archive:application/zip");
 		Preferences.userNodeForPackage(ApplicationManager.class).addPreferenceChangeListener(new PreferenceChangeListener() {
@@ -718,7 +725,7 @@ public class FileManager extends Frame {
 	private void rescan() {
 		((CardLayout) jPanel1.getLayout()).show(jPanel1, jCheckBoxMenuItem2.isSelected()?"table":"list");
 		show = jCheckBoxMenuItem1.isSelected();
-		model.clear();
+		clear();
 		Path files[] = new Path[0];
 		if (Files.isDirectory(path) || isJar()) {
 			files = listFiles(getPath()).toArray(files);
@@ -731,9 +738,34 @@ public class FileManager extends Frame {
 			}
 		});
 		for (final Path entry : files) {
-			model.addElement(entry);
+			addEntry(entry);
 		}
 		prepare();
+	}
+
+	private void clear() {
+		model.clear();
+		tableModel.setRowCount(0);
+	}
+
+	private void addEntry(final Path entry) {
+		model.addElement(entry);
+		try {
+			tableModel.addRow(new Object[] {jList1.getFileName(entry), format.format(new Date(Files.getLastModifiedTime(entry).toMillis())), Files.probeContentType(entry), Files.size(entry)});
+		} catch (final IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	private void removeEntry(final Path entry) {
+		model.removeElement(entry);
+		final Path path = jList1.getFileName(entry);
+		for (int i = 0 ; i < tableModel.getRowCount() ; i++) {
+			if (path.equals(tableModel.getValueAt(i, 0))) {
+				tableModel.removeRow(i);
+				break;
+			}
+		}
 	}
 
 	private boolean isJar() {
