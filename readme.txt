@@ -36,7 +36,7 @@ To build linoleum from itself, first clone the repository by external means (for
 
 To publish an application:
 
-- add net.java.linoleum#application;1.2.1 to your project's dependencies
+- add net.java.linoleum#application;1.3 to your project's dependencies
 - extend linoleum.application.Frame
 - make it available to the service loader in META-INF/services/javax.swing.JInternalFrame
 - publish your artifact in maven central
@@ -58,9 +58,10 @@ List of applications
 
 Useful libraries
 
-  org.bouncycastle#bcpg-jdk15;1.45			The Bouncy Castle Java API for handling the OpenPGP protocol
-  mstor#mstor;0.9.9					A JavaMail provider for persistent email storage
-  commons-io#commons-io;2.4				The Apache Commons IO library
+  com.github.rjolly#flying-saucer;9.0.9			XML/XHTML+MathML+SVG and CSS 2.1 browser in pure Java
   com.googlecode.java-diff-utils#diffutils;1.3.0	The DiffUtils library for computing diffs in Java
+  commons-io#commons-io;2.4				The Apache Commons IO library
+  mstor#mstor;0.9.9					A JavaMail provider for persistent email storage
+  org.bouncycastle#bcpg-jdk15;1.45			The Bouncy Castle Java API for handling the OpenPGP protocol
   org.scala-lang#scala-compiler;2.12.0			Script engine for the Scala Programming Language (requires Java 8)
 
