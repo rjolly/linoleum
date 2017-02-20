@@ -31,6 +31,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,6 +57,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
@@ -63,6 +65,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import linoleum.application.ApplicationManager;
 import linoleum.application.FileChooser;
@@ -89,6 +93,22 @@ public class FileManager extends Frame {
 	private final FileChooser chooser = new FileChooser();
 	private final DefaultListModel<Path> model = new DefaultListModel<>();
 	private final ListCellRenderer renderer = new Renderer();
+	private final TableCellRenderer tableRenderer = new DefaultTableCellRenderer() {
+		public Component getTableCellRendererComponent(final JTable table, final Object value, boolean isSelected, final boolean hasFocus, final int row, final int column) {
+			if (table.convertColumnIndexToModel(column) != 0) {
+				isSelected = false;
+			}
+			super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			setIcon(null);
+			if (value instanceof Path) {
+				setIcon(jList1.getFileIcon((Path) value));
+				setText(jList1.getFileName((Path) value).toString());
+			} else if (value instanceof FileTime) {
+				setText(format.format(new Date(((FileTime) value).toMillis())));
+			}
+			return this;
+		}
+	};
 	private final Map<String, ?> env = new HashMap<>();
 	private final Thread thread = new Thread() {
 		@Override
@@ -575,6 +595,8 @@ public class FileManager extends Frame {
 		jList1.setTransferHandler(new Handler());
 		tableModel = (DefaultTableModel) jTable1.getModel();
 		jTable1.putClientProperty("JTable.autoStartsEdit", false);
+		jTable1.setDefaultRenderer(Object.class, tableRenderer);
+		jTable1.setDefaultRenderer(Long.class, tableRenderer);
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
 		setMimeType("application/x-directory:application/java-archive:application/zip");
 		Preferences.userNodeForPackage(ApplicationManager.class).addPreferenceChangeListener(new PreferenceChangeListener() {
@@ -751,7 +773,7 @@ public class FileManager extends Frame {
 	private void addEntry(final Path entry) {
 		model.addElement(entry);
 		try {
-			tableModel.addRow(new Object[] {jList1.getFileName(entry), format.format(new Date(Files.getLastModifiedTime(entry).toMillis())), Files.probeContentType(entry), Files.size(entry)});
+			tableModel.addRow(new Object[] {entry, Files.getLastModifiedTime(entry), Files.probeContentType(entry), Files.size(entry)});
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
@@ -759,9 +781,8 @@ public class FileManager extends Frame {
 
 	private void removeEntry(final Path entry) {
 		model.removeElement(entry);
-		final Path path = jList1.getFileName(entry);
 		for (int i = 0 ; i < tableModel.getRowCount() ; i++) {
-			if (path.equals(tableModel.getValueAt(i, 0))) {
+			if (entry.equals(tableModel.getValueAt(i, 0))) {
 				tableModel.removeRow(i);
 				break;
 			}
