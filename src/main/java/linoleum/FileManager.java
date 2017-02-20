@@ -1018,6 +1018,7 @@ public class FileManager extends Frame {
 
                 jPanel1.add(jScrollPane1, "list");
 
+                jTable1.setFont(jList1.getFont());
                 jTable1.setModel(new javax.swing.table.DefaultTableModel(
                         new Object [][] {
 
@@ -1042,6 +1043,7 @@ public class FileManager extends Frame {
                         }
                 });
                 jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+                jTable1.setIntercellSpacing(new java.awt.Dimension(0, 0));
                 jTable1.setShowHorizontalLines(false);
                 jTable1.setShowVerticalLines(false);
                 jScrollPane2.setViewportView(jTable1);
