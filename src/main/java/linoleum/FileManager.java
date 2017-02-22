@@ -49,6 +49,7 @@ import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 import javax.swing.Action;
 import javax.swing.AbstractAction;
+import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -65,6 +66,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -107,6 +109,20 @@ public class FileManager extends Frame {
 				setText(format.format(new Date(((FileTime) value).toMillis())));
 			}
 			return this;
+		}
+	};
+	private final TableCellEditor editor = new DefaultCellEditor(new JTextField()) {
+		@Override
+		public Object getCellEditorValue() {
+			return getPath().resolve((String) super.getCellEditorValue());
+		}
+
+		public Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int row, final int column) {
+			final Component comp = super.getTableCellEditorComponent(table, value, isSelected, row, column);
+			if (value instanceof Path) {
+				((JTextField) comp).setText(jList1.getFileName((Path) value).toString());
+			}
+			return comp;
 		}
 	};
 	private final Map<String, ?> env = new HashMap<>();
@@ -597,6 +613,7 @@ public class FileManager extends Frame {
 		jTable1.putClientProperty("JTable.autoStartsEdit", false);
 		jTable1.setDefaultRenderer(Object.class, tableRenderer);
 		jTable1.setDefaultRenderer(Long.class, tableRenderer);
+		jTable1.setDefaultEditor(Object.class, editor);
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
 		setMimeType("application/x-directory:application/java-archive:application/zip");
 		Preferences.userNodeForPackage(ApplicationManager.class).addPreferenceChangeListener(new PreferenceChangeListener() {
