@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.EventObject;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +92,7 @@ public class FileManager extends Frame {
 	private final Action pasteAsLinkAction = new PasteAsLinkAction();
 	private final Action newFolderAction = new NewFolderAction();
 	private final Action renameAction = new RenameAction();
+	private final Action cancelSelectionAction = new CancelSelectionAction();
 	private final Action deleteAction = new DeleteAction();
 	private final FileChooser chooser = new FileChooser();
 	private final DefaultListModel<Path> model = new DefaultListModel<>();
@@ -114,7 +116,23 @@ public class FileManager extends Frame {
 	private final TableCellEditor editor = new DefaultCellEditor(new JTextField()) {
 		@Override
 		public Object getCellEditorValue() {
-			return getPath().resolve((String) super.getCellEditorValue());
+			return editFile.resolveSibling(((String) super.getCellEditorValue()).trim());
+		}
+
+		@Override
+		public boolean stopCellEditing() {
+			applyEdit(jList1.getFileName((Path) getCellEditorValue()).toString());
+			return true;
+		}
+
+		@Override
+		public void cancelCellEditing() {
+			cancelEdit();
+		}
+
+		@Override
+		public boolean isCellEditable(final EventObject anEvent) {
+			return editFile != null;
 		}
 
 		public Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int row, final int column) {
@@ -181,6 +199,7 @@ public class FileManager extends Frame {
 	private boolean closing;
 	private FileSystem fs;
 	private boolean show;
+	private boolean showDetails;
 	private int action;
 	private Path path;
 	private int idx;
@@ -308,6 +327,18 @@ public class FileManager extends Frame {
 		}
 	}
 
+	private class CancelSelectionAction extends AbstractAction {
+		public CancelSelectionAction() {
+			super("cancelSelection");
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			cancelEdit();
+		}
+	}
+
 	private class DeleteAction extends AbstractAction {
 		public DeleteAction() {
 			super("Delete", deleteIcon);
@@ -343,9 +374,12 @@ public class FileManager extends Frame {
 	private final JTextField editCell = new JTextField();
 
 	private void applyEdit() {
+		applyEdit(editCell.getText().trim());
+	}
+
+	private void applyEdit(final String newFileName) {
 		if (editFile != null && Files.exists(editFile)) {
 			final String oldFileName = jList1.getFileName(editFile).toString();
-			final String newFileName = editCell.getText().trim();
 
 			if (!newFileName.equals(oldFileName)) try {
 				Files.move(editFile, editFile.resolveSibling(newFileName));
@@ -358,35 +392,45 @@ public class FileManager extends Frame {
 	}
 
 	private void cancelEdit() {
-		if (editFile != null) {
-			editFile = null;
+		cancelSelectionAction.setEnabled(false);
+		editFile = null;
+		if (showDetails) {
+			jTable1.removeEditor();
+		} else {
 			jList1.remove(editCell);
 			jList1.repaint();
 		}
 	}
 
 	private void editFileName() {
-		final int index = jList1.getSelectedIndex();
-		jList1.ensureIndexIsVisible(index);
-		editFile = jList1.getModel().getElementAt(index);
-		final Rectangle r = jList1.getCellBounds(index, index);
-		jList1.add(editCell);
-		editCell.setText(jList1.getFileName(editFile).toString());
-		final ComponentOrientation orientation = jList1.getComponentOrientation();
-		editCell.setComponentOrientation(orientation);
-
-		final Icon icon = jList1.getFileIcon(editFile);
-
-		// PENDING - grab padding (4) below from defaults table.
-		final int editX = icon == null ? 20 : icon.getIconWidth() + 4;
-
-		if (orientation.isLeftToRight()) {
-			editCell.setBounds(editX + r.x, r.y, r.width - editX, r.height);
+		if (showDetails) {
+			final int n = jTable1.getSelectedRow();
+			editFile = (Path) jTable1.getValueAt(n, 0);
+			jTable1.editCellAt(n, 0);
 		} else {
-			editCell.setBounds(r.x, r.y, r.width - editX, r.height);
+			final int index = jList1.getSelectedIndex();
+			jList1.ensureIndexIsVisible(index);
+			editFile = jList1.getModel().getElementAt(index);
+			final Rectangle r = jList1.getCellBounds(index, index);
+			jList1.add(editCell);
+			editCell.setText(jList1.getFileName(editFile).toString());
+			final ComponentOrientation orientation = jList1.getComponentOrientation();
+			editCell.setComponentOrientation(orientation);
+
+			final Icon icon = jList1.getFileIcon(editFile);
+
+			// PENDING - grab padding (4) below from defaults table.
+			final int editX = icon == null ? 20 : icon.getIconWidth() + 4;
+
+			if (orientation.isLeftToRight()) {
+				editCell.setBounds(editX + r.x, r.y, r.width - editX, r.height);
+			} else {
+				editCell.setBounds(r.x, r.y, r.width - editX, r.height);
+			}
+			editCell.requestFocus();
+			editCell.selectAll();
 		}
-		editCell.requestFocus();
-		editCell.selectAll();
+		cancelSelectionAction.setEnabled(true);
 	}
 
 	private void newFolder(final Path path) {
@@ -402,6 +446,12 @@ public class FileManager extends Frame {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				jList1.setSelectedValue(path, false);
+				for (int i = 0 ; i < jTable1.getRowCount() ; i++) {
+					if (path.equals(jTable1.getValueAt(i, 0))) {
+						jTable1.setRowSelectionInterval(i, i);
+						break;
+					}
+				}
 				editFileName();
 			}
 		});
@@ -652,6 +702,12 @@ public class FileManager extends Frame {
 			public void intervalRemoved(final ListDataEvent e) {
 			}
 		});
+		cancelSelectionAction.setEnabled(false);
+		final String name = (String) cancelSelectionAction.getValue(Action.NAME);
+		final KeyStroke ks = (KeyStroke) cancelSelectionAction.getValue(Action.ACCELERATOR_KEY);
+		getActionMap().put(name, cancelSelectionAction);
+		getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(ks, name);
+		jTable1.getActionMap().put("cancel", cancelSelectionAction);
 		this.parent = (FileManager) super.parent;
 		setURI(getHome());
 	}
@@ -759,8 +815,9 @@ public class FileManager extends Frame {
 	}
 
 	private void rescan() {
-		((CardLayout) jPanel1.getLayout()).show(jPanel1, jCheckBoxMenuItem2.isSelected()?"table":"list");
 		show = jCheckBoxMenuItem1.isSelected();
+		showDetails = jCheckBoxMenuItem2.isSelected();
+		((CardLayout) jPanel1.getLayout()).show(jPanel1, showDetails?"table":"list");
 		clear();
 		Path files[] = new Path[0];
 		if (Files.isDirectory(path) || isJar()) {
