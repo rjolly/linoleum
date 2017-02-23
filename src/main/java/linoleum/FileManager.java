@@ -611,9 +611,6 @@ public class FileManager extends Frame {
 		jList1.setTransferHandler(new Handler());
 		tableModel = (DefaultTableModel) jTable1.getModel();
 		jTable1.putClientProperty("JTable.autoStartsEdit", false);
-		jTable1.setDefaultRenderer(Object.class, tableRenderer);
-		jTable1.setDefaultRenderer(Long.class, tableRenderer);
-		jTable1.setDefaultEditor(Object.class, editor);
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
 		setMimeType("application/x-directory:application/java-archive:application/zip");
 		Preferences.userNodeForPackage(ApplicationManager.class).addPreferenceChangeListener(new PreferenceChangeListener() {
@@ -1088,9 +1085,14 @@ public class FileManager extends Frame {
                 jScrollPane2.setViewportView(jTable1);
                 if (jTable1.getColumnModel().getColumnCount() > 0) {
                         jTable1.getColumnModel().getColumn(0).setPreferredWidth(150);
+                        jTable1.getColumnModel().getColumn(0).setCellEditor(editor);
+                        jTable1.getColumnModel().getColumn(0).setCellRenderer(tableRenderer);
                         jTable1.getColumnModel().getColumn(1).setPreferredWidth(100);
+                        jTable1.getColumnModel().getColumn(1).setCellRenderer(tableRenderer);
                         jTable1.getColumnModel().getColumn(2).setPreferredWidth(125);
+                        jTable1.getColumnModel().getColumn(2).setCellRenderer(tableRenderer);
                         jTable1.getColumnModel().getColumn(3).setPreferredWidth(75);
+                        jTable1.getColumnModel().getColumn(3).setCellRenderer(tableRenderer);
                 }
 
                 jPanel1.add(jScrollPane2, "table");

@@ -346,23 +346,33 @@
                   <TableColumnModel selectionModel="0">
                     <Column maxWidth="-1" minWidth="-1" prefWidth="150" resizable="true">
                       <Title/>
-                      <Editor/>
-                      <Renderer/>
+                      <Editor editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                        <Connection code="editor" type="code"/>
+                      </Editor>
+                      <Renderer editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                        <Connection code="tableRenderer" type="code"/>
+                      </Renderer>
                     </Column>
                     <Column maxWidth="-1" minWidth="-1" prefWidth="100" resizable="true">
                       <Title/>
                       <Editor/>
-                      <Renderer/>
+                      <Renderer editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                        <Connection code="tableRenderer" type="code"/>
+                      </Renderer>
                     </Column>
                     <Column maxWidth="-1" minWidth="-1" prefWidth="125" resizable="true">
                       <Title/>
                       <Editor/>
-                      <Renderer/>
+                      <Renderer editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                        <Connection code="tableRenderer" type="code"/>
+                      </Renderer>
                     </Column>
                     <Column maxWidth="-1" minWidth="-1" prefWidth="75" resizable="true">
                       <Title/>
                       <Editor/>
-                      <Renderer/>
+                      <Renderer editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                        <Connection code="tableRenderer" type="code"/>
+                      </Renderer>
                     </Column>
                   </TableColumnModel>
                 </Property>
