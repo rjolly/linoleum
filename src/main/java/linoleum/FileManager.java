@@ -69,6 +69,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import linoleum.application.ApplicationManager;
@@ -757,8 +758,17 @@ public class FileManager extends Frame {
 		return path.toUri();
 	}
 
+	private void fixNameColumnWidth(final int viewWidth) {
+		final TableColumn nameCol = jTable1.getColumnModel().getColumn(0);
+		final int tableWidth = jTable1.getPreferredSize().width;
+		if (tableWidth < viewWidth) {
+			nameCol.setPreferredWidth(nameCol.getPreferredWidth() + viewWidth - tableWidth);
+		}
+	}
+
 	@Override
 	public void open() {
+		fixNameColumnWidth(jScrollPane2.getViewport().getSize().width);
 		if(Files.isRegularFile(path) && isJar()) {
 			final URI uri = path.toUri();
 			try {
