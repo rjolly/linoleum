@@ -940,6 +940,18 @@ public class FileManager extends Frame {
 		return showDetails?(Path) jTable1.getValueAt(jTable1.getSelectedRow(), 0):jList1.getSelectedValue();
 	}
 
+	private boolean isSelectedIndex(final int n) {
+		return showDetails?jTable1.getSelectionModel().isSelectedIndex(n):jList1.isSelectedIndex(n);
+	}
+
+	private void setSelectedIndex(final int n) {
+		if (showDetails) {
+			jTable1.getSelectionModel().setSelectionInterval(n, n);
+		} else {
+			jList1.setSelectedIndex(n);
+		}
+	}
+
 	private void prepare() {
 		jMenu3.removeAll();
 		jPopupMenu1.removeAll();
@@ -1303,8 +1315,8 @@ public class FileManager extends Frame {
         }//GEN-LAST:event_jList1ValueChanged
 
         private void jPopupMenu1PopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_jPopupMenu1PopupMenuWillBecomeVisible
-		if (idx > -1 && !jList1.isSelectedIndex(idx)) {
-			jList1.setSelectedIndex(idx);
+		if (idx > -1 && !isSelectedIndex(idx)) {
+			setSelectedIndex(idx);
 		}
 		prepare();
         }//GEN-LAST:event_jPopupMenu1PopupMenuWillBecomeVisible
