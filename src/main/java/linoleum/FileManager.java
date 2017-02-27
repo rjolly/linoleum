@@ -1146,6 +1146,7 @@ public class FileManager extends Frame {
                         }
                 });
                 jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+                jTable1.setComponentPopupMenu(jPopupMenu1);
                 jTable1.setIntercellSpacing(new java.awt.Dimension(0, 0));
                 jTable1.setShowHorizontalLines(false);
                 jTable1.setShowVerticalLines(false);
