@@ -67,6 +67,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -213,7 +215,7 @@ public class FileManager extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			open(jList1.getSelectedValue());
+			open(getSelectedValue());
 			
 		}
 	}
@@ -662,6 +664,11 @@ public class FileManager extends Frame {
 		jList1.setTransferHandler(new Handler());
 		tableModel = (DefaultTableModel) jTable1.getModel();
 		jTable1.putClientProperty("JTable.autoStartsEdit", false);
+		jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(final ListSelectionEvent evt) {
+				prepare();
+			}
+		});
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
 		setMimeType("application/x-directory:application/java-archive:application/zip");
 		Preferences.userNodeForPackage(ApplicationManager.class).addPreferenceChangeListener(new PreferenceChangeListener() {
@@ -925,10 +932,18 @@ public class FileManager extends Frame {
 		}
 	}
 
+	private boolean isSelectionEmpty() {
+		return showDetails?jTable1.getSelectionModel().isSelectionEmpty():jList1.isSelectionEmpty();
+	}
+
+	private Path getSelectedValue() {
+		return showDetails?(Path) jTable1.getValueAt(jTable1.getSelectedRow(), 0):jList1.getSelectedValue();
+	}
+
 	private void prepare() {
 		jMenu3.removeAll();
 		jPopupMenu1.removeAll();
-		if (jList1.isSelectionEmpty()) {
+		if (isSelectionEmpty()) {
 			openAction.setEnabled(false);
 			jMenu3.setEnabled(false);
 			renameAction.setEnabled(false);
@@ -939,7 +954,7 @@ public class FileManager extends Frame {
 			renameAction.setEnabled(true);
 			deleteAction.setEnabled(true);
 			try {
-				final URI uri = jList1.getSelectedValue().toRealPath().toUri();
+				final URI uri = getSelectedValue().toRealPath().toUri();
 				final ApplicationManager mgr = getApplicationManager();
 				final String s = mgr.getApplication(uri);
 				boolean sep = false;
@@ -1258,8 +1273,8 @@ public class FileManager extends Frame {
         }// </editor-fold>//GEN-END:initComponents
 
         private void jList1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseClicked
-		if (evt.getClickCount() == 2 && !jList1.isSelectionEmpty()) {
-			open(jList1.getSelectedValue());
+		if (evt.getClickCount() == 2 && !isSelectionEmpty()) {
+			open(getSelectedValue());
 		}
         }//GEN-LAST:event_jList1MouseClicked
 
