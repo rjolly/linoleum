@@ -353,7 +353,7 @@ public class FileManager extends Frame {
 			final int option = JOptionPane.showInternalConfirmDialog(FileManager.this, "Delete ?", "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 			switch (option) {
 			case JOptionPane.OK_OPTION:
-				for (final Path entry : jList1.getSelectedValuesList()) {
+				for (final Path entry : getSelectedValuesList()) {
 					try {
 						if (Files.isDirectory(entry)) {
 							delete(entry);
@@ -952,6 +952,10 @@ public class FileManager extends Frame {
 		}
 	}
 
+	private List<Path> getSelectedValuesList() {
+		return showDetails?jTable1.getSelectedValuesList():jList1.getSelectedValuesList();
+	}
+
 	private void prepare() {
 		jMenu3.removeAll();
 		jPopupMenu1.removeAll();
@@ -1019,7 +1023,7 @@ public class FileManager extends Frame {
                 jScrollPane1 = new javax.swing.JScrollPane();
                 jList1 = new linoleum.FileList();
                 jScrollPane2 = new javax.swing.JScrollPane();
-                jTable1 = new javax.swing.JTable();
+                jTable1 = new linoleum.FileTable();
                 jMenuBar1 = new javax.swing.JMenuBar();
                 jMenu1 = new javax.swing.JMenu();
                 jMenuItem1 = new javax.swing.JMenuItem();
@@ -1387,7 +1391,7 @@ public class FileManager extends Frame {
         private javax.swing.JPopupMenu.Separator jSeparator2;
         private javax.swing.JPopupMenu.Separator jSeparator3;
         private javax.swing.JPopupMenu.Separator jSeparator4;
-        private javax.swing.JTable jTable1;
+        private linoleum.FileTable jTable1;
         private javax.swing.JTextField jTextField1;
         private linoleum.application.OptionPanel optionPanel1;
         // End of variables declaration//GEN-END:variables
