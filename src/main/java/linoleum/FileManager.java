@@ -1165,6 +1165,16 @@ public class FileManager extends Frame {
                 jTable1.setIntercellSpacing(new java.awt.Dimension(0, 0));
                 jTable1.setShowHorizontalLines(false);
                 jTable1.setShowVerticalLines(false);
+                jTable1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+                        public void mouseMoved(java.awt.event.MouseEvent evt) {
+                                jTable1MouseMoved(evt);
+                        }
+                });
+                jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+                        public void mouseClicked(java.awt.event.MouseEvent evt) {
+                                jTable1MouseClicked(evt);
+                        }
+                });
                 jScrollPane2.setViewportView(jTable1);
                 if (jTable1.getColumnModel().getColumnCount() > 0) {
                         jTable1.getColumnModel().getColumn(0).setPreferredWidth(150);
@@ -1322,6 +1332,16 @@ public class FileManager extends Frame {
         private void jCheckBoxMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem2ActionPerformed
 		rescan();
         }//GEN-LAST:event_jCheckBoxMenuItem2ActionPerformed
+
+        private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+		if (evt.getClickCount() == 2 && !isSelectionEmpty()) {
+			open(getSelectedValue());
+		}
+        }//GEN-LAST:event_jTable1MouseClicked
+
+        private void jTable1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseMoved
+		idx = jTable1.rowAtPoint(evt.getPoint());
+        }//GEN-LAST:event_jTable1MouseMoved
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
