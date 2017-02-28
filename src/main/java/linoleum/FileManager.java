@@ -86,6 +86,10 @@ public class FileManager extends Frame {
 	private final Icon pasteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Paste16.gif"));
 	private final Icon deleteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Delete16.gif"));
 	private final Icon newFolderIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/newFolder.gif"));
+	private final Icon fileLinkIcon = new ImageIcon(getClass().getResource("file.png"));
+	private final Icon directoryLinkIcon = new ImageIcon(getClass().getResource("directory.png"));
+	private final Icon fileIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/file.gif"));
+	private final Icon directoryIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/directory.gif"));
 	private final Action openAction = new OpenAction();
 	private final Action openLocationAction = new OpenLocationAction();
 	private final Action closeAction = new CloseAction();
@@ -108,8 +112,8 @@ public class FileManager extends Frame {
 			super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 			setIcon(null);
 			if (value instanceof Path) {
-				setIcon(jList1.getFileIcon((Path) value));
-				setText(jList1.getFileName((Path) value).toString());
+				setIcon(getFileIcon((Path) value));
+				setText(getFileName((Path) value));
 			} else if (value instanceof FileTime) {
 				setText(format.format(new Date(((FileTime) value).toMillis())));
 			}
@@ -124,7 +128,7 @@ public class FileManager extends Frame {
 
 		@Override
 		public boolean stopCellEditing() {
-			applyEdit(jList1.getFileName((Path) getCellEditorValue()).toString());
+			applyEdit(getFileName((Path) getCellEditorValue()));
 			return true;
 		}
 
@@ -141,7 +145,7 @@ public class FileManager extends Frame {
 		public Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int row, final int column) {
 			final Component comp = super.getTableCellEditorComponent(table, value, isSelected, row, column);
 			if (value instanceof Path) {
-				((JTextField) comp).setText(jList1.getFileName((Path) value).toString());
+				((JTextField) comp).setText(getFileName((Path) value));
 			}
 			return comp;
 		}
@@ -189,7 +193,7 @@ public class FileManager extends Frame {
 		}
 
 		private WatchKey register(final WatchService service) throws IOException {
-			setTitle(getFileName());
+			setTitle(getFileName(path));
 			return path.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
 		}
 	};
@@ -382,7 +386,7 @@ public class FileManager extends Frame {
 
 	private void applyEdit(final String newFileName) {
 		if (editFile != null && Files.exists(editFile)) {
-			final String oldFileName = jList1.getFileName(editFile).toString();
+			final String oldFileName = getFileName(editFile);
 
 			if (!newFileName.equals(oldFileName)) try {
 				Files.move(editFile, editFile.resolveSibling(newFileName));
@@ -416,11 +420,11 @@ public class FileManager extends Frame {
 			editFile = jList1.getModel().getElementAt(index);
 			final Rectangle r = jList1.getCellBounds(index, index);
 			jList1.add(editCell);
-			editCell.setText(jList1.getFileName(editFile).toString());
+			editCell.setText(getFileName(editFile));
 			final ComponentOrientation orientation = jList1.getComponentOrientation();
 			editCell.setComponentOrientation(orientation);
 
-			final Icon icon = jList1.getFileIcon(editFile);
+			final Icon icon = getFileIcon(editFile);
 
 			// PENDING - grab padding (4) below from defaults table.
 			final int editX = icon == null ? 20 : icon.getIconWidth() + 4;
@@ -471,8 +475,8 @@ public class FileManager extends Frame {
 				setForeground(list.getForeground());
 			}
 			final Path path = (Path)value;
-			setIcon(((FileList) list).getFileIcon(path));
-			setText(((FileList) list).getFileName(path).toString());
+			setIcon(getFileIcon(path));
+			setText(getFileName(path));
 			setFont(list.getFont());
 			return this;
 		}
@@ -515,7 +519,7 @@ public class FileManager extends Frame {
 				recipient = list.isSelectionEmpty()?getPath():getDirectory(list.getSelectedValue());
 			}
 			for (final Path entry : files) {
-				final Path target = recipient.resolve(list.getFileName(entry).toString());
+				final Path target = recipient.resolve(getFileName(entry));
 				try {
 					switch (action) {
 					case COPY:
@@ -659,7 +663,6 @@ public class FileManager extends Frame {
 		jList1.setTransferHandler(new Handler());
 		tableModel = (DefaultTableModel) jTable1.getModel();
 		jTable1.fixRowSorter();
-		jTable1.putClientProperty("JTable.autoStartsEdit", false);
 		jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(final ListSelectionEvent evt) {
 				prepare();
@@ -791,12 +794,19 @@ public class FileManager extends Frame {
 		if (fs == defaultfs && Files.isDirectory(path)) {
 			thread.start();
 		} else {
-			setTitle(getFileName());
+			setTitle(getFileName(path));
 		}
 	}
 
-	private String getFileName() {
-		return jList1.getFileName(path).toString();
+	static String getFileName(final Path path) {
+		final int n = path.getNameCount();
+		return (n > 0?path.getName(n - 1):path).toString();
+	}
+
+	private Icon getFileIcon(final Path path) {
+		return Files.isDirectory(path)?
+				Files.isSymbolicLink(path)?directoryLinkIcon:directoryIcon:
+				Files.isSymbolicLink(path)?fileLinkIcon:fileIcon;
 	}
 
 	@Override
