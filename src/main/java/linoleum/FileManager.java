@@ -449,12 +449,7 @@ public class FileManager extends Frame {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				jList1.setSelectedValue(path, false);
-				for (int i = 0 ; i < jTable1.getRowCount() ; i++) {
-					if (path.equals(jTable1.getValueAt(i, 0))) {
-						jTable1.setRowSelectionInterval(i, i);
-						break;
-					}
-				}
+				jTable1.setSelectedValue(path);
 				editFileName();
 			}
 		});
@@ -663,6 +658,7 @@ public class FileManager extends Frame {
 		initComponents();
 		jList1.setTransferHandler(new Handler());
 		tableModel = (DefaultTableModel) jTable1.getModel();
+		jTable1.fixRowSorter();
 		jTable1.putClientProperty("JTable.autoStartsEdit", false);
 		jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(final ListSelectionEvent evt) {
@@ -1162,7 +1158,7 @@ public class FileManager extends Frame {
                         }
                 ) {
                         Class[] types = new Class [] {
-                                java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Long.class
+                                java.nio.file.Path.class, java.nio.file.attribute.FileTime.class, java.lang.String.class, java.lang.Long.class
                         };
                         boolean[] canEdit = new boolean [] {
                                 true, false, false, false
