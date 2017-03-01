@@ -16,6 +16,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowSorter;
 import javax.swing.UIManager;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -118,6 +119,12 @@ public class FileTable extends JTable {
 				break;
 			}
 		}
+	}
+
+	void fixNameColumnWidth(final int viewWidth) {
+		final TableColumn nameCol = getColumnModel().getColumn(0);
+		final int tableWidth = getPreferredSize().width;
+		nameCol.setPreferredWidth(nameCol.getPreferredWidth() + viewWidth - tableWidth);
 	}
 
 	@SuppressWarnings("unchecked")

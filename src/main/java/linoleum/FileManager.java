@@ -69,9 +69,10 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import linoleum.application.ApplicationManager;
@@ -452,8 +453,7 @@ public class FileManager extends Frame {
 	private void editNewFolder(final Path path) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				jList1.setSelectedValue(path, false);
-				jTable1.setSelectedValue(path);
+				setSelectedValue(path);
 				editFileName();
 			}
 		});
@@ -662,6 +662,20 @@ public class FileManager extends Frame {
 		initComponents();
 		jList1.setTransferHandler(new Handler());
 		tableModel = (DefaultTableModel) jTable1.getModel();
+		tableModel.addTableModelListener(new TableModelListener() {
+			public void tableChanged(final TableModelEvent e) {
+				if (e.getType() == TableModelEvent.INSERT) {
+					final int i0 = e.getFirstRow();
+					final int i1 = e.getLastRow();
+					if (i0 == i1) {
+						final Path path = (Path) tableModel.getValueAt(i0, 0);
+						if (path.equals(newFolderFile)) {
+							editNewFolder(path);
+						}
+					}
+				}
+			}
+		});
 		jTable1.fixRowSorter();
 		jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(final ListSelectionEvent evt) {
@@ -764,17 +778,8 @@ public class FileManager extends Frame {
 		return path.toUri();
 	}
 
-	private void fixNameColumnWidth(final int viewWidth) {
-		final TableColumn nameCol = jTable1.getColumnModel().getColumn(0);
-		final int tableWidth = jTable1.getPreferredSize().width;
-		if (tableWidth < viewWidth) {
-			nameCol.setPreferredWidth(nameCol.getPreferredWidth() + viewWidth - tableWidth);
-		}
-	}
-
 	@Override
 	public void open() {
-		fixNameColumnWidth(jScrollPane2.getViewport().getSize().width);
 		if(Files.isRegularFile(path) && isJar()) {
 			final URI uri = path.toUri();
 			try {
@@ -856,30 +861,39 @@ public class FileManager extends Frame {
 		for (final Path entry : files) {
 			addEntry(entry);
 		}
+		if (showDetails) {
+			jScrollPane2.validate();
+			jTable1.fixNameColumnWidth(jScrollPane2.getViewport().getSize().width);
+		}
 		prepare();
 	}
 
 	private void clear() {
-		model.clear();
-		tableModel.setRowCount(0);
+		if (showDetails) {
+			tableModel.setRowCount(0);
+		} else {
+			model.clear();
+		}
 	}
 
 	private void addEntry(final Path entry) {
-		model.addElement(entry);
-		try {
+		if (showDetails) try {
 			tableModel.addRow(new Object[] {entry, Files.getLastModifiedTime(entry), Files.probeContentType(entry), Files.size(entry)});
 		} catch (final IOException ex) {
 			ex.printStackTrace();
+		} else {
+			model.addElement(entry);
 		}
 	}
 
 	private void removeEntry(final Path entry) {
-		model.removeElement(entry);
-		for (int i = 0 ; i < tableModel.getRowCount() ; i++) {
+		if (showDetails) for (int i = 0 ; i < tableModel.getRowCount() ; i++) {
 			if (entry.equals(tableModel.getValueAt(i, 0))) {
 				tableModel.removeRow(i);
 				break;
 			}
+		} else {
+			model.removeElement(entry);
 		}
 	}
 
@@ -944,6 +958,14 @@ public class FileManager extends Frame {
 
 	private Path getSelectedValue() {
 		return showDetails?(Path) jTable1.getValueAt(jTable1.getSelectedRow(), 0):jList1.getSelectedValue();
+	}
+
+	private void setSelectedValue(final Path path) {
+		if (showDetails) {
+			jTable1.setSelectedValue(path);
+		} else {
+			jList1.setSelectedValue(path, false);
+		}
 	}
 
 	private boolean isSelectedIndex(final int n) {
