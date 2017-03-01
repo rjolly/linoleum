@@ -103,8 +103,9 @@ public class FileManager extends Frame {
 	private final Action cancelSelectionAction = new CancelSelectionAction();
 	private final Action deleteAction = new DeleteAction();
 	private final FileChooser chooser = new FileChooser();
-	private final DefaultListModel<Path> model = new DefaultListModel<>();
 	private final ListCellRenderer renderer = new Renderer();
+	private final DefaultListModel<Path> model = new DefaultListModel<>();
+	private final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 	private final TableCellRenderer tableRenderer = new DefaultTableCellRenderer() {
 		public Component getTableCellRendererComponent(final JTable table, final Object value, boolean isSelected, final boolean hasFocus, final int row, final int column) {
 			if (table.convertColumnIndexToModel(column) != 0) {
@@ -200,7 +201,111 @@ public class FileManager extends Frame {
 	};
 	private final FileSystem defaultfs = FileSystems.getDefault();
 	private final Map<FileSystem, Collection<Integer>> openFrames = new HashMap<>();
-	private final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+	private final TransferHandler handler = new TransferHandler() {
+		@Override
+		public boolean canImport(final TransferHandler.TransferSupport support) {
+			return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public boolean importData(final TransferHandler.TransferSupport support) {
+			if (!canImport(support)) {
+				return false;
+			}
+			final List<Path> files;
+			final Transferable transferable = support.getTransferable();
+			try {
+				files = (List<Path>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+			} catch (final UnsupportedFlavorException e) {
+				return false;
+			} catch (final IOException e) {
+				return false;
+			}
+			final int action;
+			final Path recipient;
+			final FileList list = (FileList) support.getComponent();
+			if (support.isDrop()) {
+				action = support.getDropAction();
+				final JList.DropLocation dl = (JList.DropLocation) support.getDropLocation();
+				recipient = dl.isInsert()?getPath():getDirectory(list.getModel().getElementAt(dl.getIndex()));
+			} else {
+				if (parent.source != null) {
+					action = parent.source.action;
+				} else {
+					action = NONE;
+				}
+				recipient = list.isSelectionEmpty()?getPath():getDirectory(list.getSelectedValue());
+			}
+			for (final Path entry : files) {
+				final Path target = recipient.resolve(getFileName(entry));
+				try {
+					switch (action) {
+					case COPY:
+						if (Files.isDirectory(entry)) {
+							copy(entry, target);
+						} else {
+							Files.copy(entry, target);
+						}
+						break;
+					case MOVE:
+						if (Files.isDirectory(entry)) {
+							copy(entry, target);
+							delete(entry);
+						} else {
+							Files.move(entry, target);
+						}
+						break;
+					case LINK:
+						Files.createSymbolicLink(target, entry.isAbsolute()?entry:recipient.isAbsolute()?entry.toAbsolutePath():recipient.relativize(entry));
+						break;
+					}
+				} catch (final IOException ex) {
+					return false;
+				}
+			}
+			refresh();
+			if (!support.isDrop()) {
+				switch (action) {
+				case MOVE:
+					parent.source.refresh();
+					break;
+				}
+			}
+			return true;
+		}
+
+		@Override
+		public Transferable createTransferable(final JComponent c) {
+			return new FileTransferable(((FileList) c).getSelectedValuesList());
+		}
+
+		@Override
+		public int getSourceActions(final JComponent c) {
+			return MOVE | COPY | LINK;
+		}
+
+		@Override
+		public void exportToClipboard(final JComponent comp, final Clipboard clip, final int action) throws IllegalStateException {
+			if ((action == COPY || action == MOVE) && (getSourceActions(comp) & action) != 0) {
+				final Transferable t = createTransferable(comp);
+				if (t != null)  try {
+					clip.setContents(t, null);
+					done(action);
+					return;
+				} catch (final IllegalStateException ise) {
+					done(NONE);
+					throw ise;
+				}
+			}
+			done(NONE);
+		}
+
+		@Override
+		public void exportDone(final JComponent c, final Transferable data, final int action) {
+			refresh();
+		}
+	};
 	private final DefaultTableModel tableModel;
 	protected FileManager parent;
 	private FileManager source;
@@ -482,112 +587,6 @@ public class FileManager extends Frame {
 		}
 	};
 
-	private class Handler extends TransferHandler {
-		@Override
-		public boolean canImport(final TransferHandler.TransferSupport support) {
-			return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
-		}
-
-		@Override
-		@SuppressWarnings("unchecked")
-		public boolean importData(final TransferHandler.TransferSupport support) {
-			if (!canImport(support)) {
-				return false;
-			}
-			final List<Path> files;
-			final Transferable transferable = support.getTransferable();
-			try {
-				files = (List<Path>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
-			} catch (final UnsupportedFlavorException e) {
-				return false;
-			} catch (final IOException e) {
-				return false;
-			}
-			final int action;
-			final Path recipient;
-			final FileList list = (FileList) support.getComponent();
-			if (support.isDrop()) {
-				action = support.getDropAction();
-				final JList.DropLocation dl = (JList.DropLocation) support.getDropLocation();
-				recipient = dl.isInsert()?getPath():getDirectory(list.getModel().getElementAt(dl.getIndex()));
-			} else {
-				if (parent.source != null) {
-					action = parent.source.action;
-				} else {
-					action = NONE;
-				}
-				recipient = list.isSelectionEmpty()?getPath():getDirectory(list.getSelectedValue());
-			}
-			for (final Path entry : files) {
-				final Path target = recipient.resolve(getFileName(entry));
-				try {
-					switch (action) {
-					case COPY:
-						if (Files.isDirectory(entry)) {
-							copy(entry, target);
-						} else {
-							Files.copy(entry, target);
-						}
-						break;
-					case MOVE:
-						if (Files.isDirectory(entry)) {
-							copy(entry, target);
-							delete(entry);
-						} else {
-							Files.move(entry, target);
-						}
-						break;
-					case LINK:
-						Files.createSymbolicLink(target, entry.isAbsolute()?entry:recipient.isAbsolute()?entry.toAbsolutePath():recipient.relativize(entry));
-						break;
-					}
-				} catch (final IOException ex) {
-					return false;
-				}
-			}
-			refresh();
-			if (!support.isDrop()) {
-				switch (action) {
-				case MOVE:
-					parent.source.refresh();
-					break;
-				}
-			}
-			return true;
-		}
-
-		@Override
-		public Transferable createTransferable(final JComponent c) {
-			return new FileTransferable(((FileList) c).getSelectedValuesList());
-		}
-
-		@Override
-		public int getSourceActions(final JComponent c) {
-			return MOVE | COPY | LINK;
-		}
-
-		@Override
-		public void exportToClipboard(final JComponent comp, final Clipboard clip, final int action) throws IllegalStateException {
-			if ((action == COPY || action == MOVE) && (getSourceActions(comp) & action) != 0) {
-				final Transferable t = createTransferable(comp);
-				if (t != null)  try {
-					clip.setContents(t, null);
-					done(action);
-					return;
-				} catch (final IllegalStateException ise) {
-					done(NONE);
-					throw ise;
-				}
-			}
-			done(NONE);
-		}
-
-		@Override
-		public void exportDone(final JComponent c, final Transferable data, final int action) {
-			refresh();
-		}
-	}
-
 	private void refresh() {
 		if (fs != defaultfs) {
 			rescan();
@@ -660,7 +659,7 @@ public class FileManager extends Frame {
 	public FileManager(final Frame parent) {
 		super(parent);
 		initComponents();
-		jList1.setTransferHandler(new Handler());
+		jList1.setTransferHandler(handler);
 		tableModel = (DefaultTableModel) jTable1.getModel();
 		tableModel.addTableModelListener(new TableModelListener() {
 			public void tableChanged(final TableModelEvent e) {
