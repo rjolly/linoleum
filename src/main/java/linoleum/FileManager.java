@@ -224,18 +224,32 @@ public class FileManager extends Frame {
 			}
 			final int action;
 			final Path recipient;
-			final FileList list = (FileList) support.getComponent();
 			if (support.isDrop()) {
 				action = support.getDropAction();
-				final JList.DropLocation dl = (JList.DropLocation) support.getDropLocation();
-				recipient = dl.isInsert()?getPath():getDirectory(list.getModel().getElementAt(dl.getIndex()));
 			} else {
 				if (parent.source != null) {
 					action = parent.source.action;
 				} else {
 					action = NONE;
 				}
-				recipient = list.isSelectionEmpty()?getPath():getDirectory(list.getSelectedValue());
+			}
+			final Component comp = support.getComponent();
+			if (comp instanceof FileTable) {
+				final FileTable table = (FileTable) comp;
+				if (support.isDrop()) {
+					final JTable.DropLocation dl = (JTable.DropLocation) support.getDropLocation();
+					recipient = dl.isInsertRow() || dl.getColumn() > 0?getPath():getDirectory((Path) table.getValueAt(dl.getRow(), 0));
+				} else {
+					recipient = table.isSelectionEmpty()?getPath():getDirectory(table.getSelectedValue());
+				}
+			} else {
+				final FileList list = (FileList) comp;
+				if (support.isDrop()) {
+					final JList.DropLocation dl = (JList.DropLocation) support.getDropLocation();
+					recipient = dl.isInsert()?getPath():getDirectory(list.getModel().getElementAt(dl.getIndex()));
+				} else {
+					recipient = list.isSelectionEmpty()?getPath():getDirectory(list.getSelectedValue());
+				}
 			}
 			for (final Path entry : files) {
 				final Path target = recipient.resolve(getFileName(entry));
@@ -277,7 +291,7 @@ public class FileManager extends Frame {
 
 		@Override
 		public Transferable createTransferable(final JComponent c) {
-			return new FileTransferable(((FileList) c).getSelectedValuesList());
+			return new FileTransferable(c instanceof FileTable?((FileTable) c).getSelectedValuesList():((FileList) c).getSelectedValuesList());
 		}
 
 		@Override
@@ -660,6 +674,7 @@ public class FileManager extends Frame {
 		super(parent);
 		initComponents();
 		jList1.setTransferHandler(handler);
+		jTable1.setTransferHandler(handler);
 		tableModel = (DefaultTableModel) jTable1.getModel();
 		tableModel.addTableModelListener(new TableModelListener() {
 			public void tableChanged(final TableModelEvent e) {
@@ -952,11 +967,11 @@ public class FileManager extends Frame {
 	}
 
 	private boolean isSelectionEmpty() {
-		return showDetails?jTable1.getSelectionModel().isSelectionEmpty():jList1.isSelectionEmpty();
+		return showDetails?jTable1.isSelectionEmpty():jList1.isSelectionEmpty();
 	}
 
 	private Path getSelectedValue() {
-		return showDetails?(Path) jTable1.getValueAt(jTable1.getSelectedRow(), 0):jList1.getSelectedValue();
+		return showDetails?(Path) jTable1.getSelectedValue():jList1.getSelectedValue();
 	}
 
 	private void setSelectedValue(final Path path) {

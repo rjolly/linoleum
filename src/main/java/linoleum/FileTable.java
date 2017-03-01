@@ -112,6 +112,14 @@ public class FileTable extends JTable {
 		return selectedItems;
 	}
 
+	public boolean isSelectionEmpty() {
+		return getSelectionModel().isSelectionEmpty();
+	}
+
+	public Path getSelectedValue() {
+		return (Path) getValueAt(getSelectedRow(), 0);
+	}
+
 	public void setSelectedValue(final Path path) {
 		for (int i = 0 ; i < getRowCount() ; i++) {
 			if (path.equals(getValueAt(i, 0))) {
