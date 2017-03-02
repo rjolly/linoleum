@@ -96,11 +96,6 @@ public class Browser extends Frame {
 	}
 
 	@Override
-	public void init() {
-		getApplicationManager().addOptionPanel(optionPanel1);
-	}
-
-	@Override
 	public void load() {
 		jTextField2.setText(prefs.get(getKey("home"), ""));
 		jComboBox1.setSelectedItem(getFontSize());
@@ -279,8 +274,6 @@ public class Browser extends Frame {
                 });
                 jPopupMenu1.add(jMenuItem1);
 
-                optionPanel1.setFrame(this);
-
                 jLabel2.setText("Home page :");
 
                 jLabel3.setText("Font size :");
@@ -328,6 +321,7 @@ public class Browser extends Frame {
                 setMaximizable(true);
                 setResizable(true);
                 setTitle("Browser");
+                setOptionPanel(optionPanel1);
 
                 jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 0));
 

@@ -47,14 +47,12 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 
 	@Override
 	public void init() {
-		final ApplicationManager manager = getApplicationManager();
-		manager.addClassPathListener(new ClassPathListener() {
+		getApplicationManager().addClassPathListener(new ClassPathListener() {
 			@Override
 			public void classPathChanged(final ClassPathChangeEvent e) {
 				refresh();
 			}
 		});
-		manager.addOptionPanel(optionPanel1);
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
 			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
@@ -149,8 +147,6 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
                 jLabel2 = new javax.swing.JLabel();
                 jComboBox1 = new javax.swing.JComboBox();
 
-                optionPanel1.setFrame(this);
-
                 jLabel2.setText("Language :");
 
                 jComboBox1.setModel(model);
@@ -185,6 +181,7 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
                 setIconifiable(true);
                 setMaximizable(true);
                 setResizable(true);
+                setOptionPanel(optionPanel1);
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);

@@ -142,17 +142,15 @@ public class ApplicationManager extends Frame {
 
 	@Override
 	public void init() {
-		final ApplicationManager manager = getApplicationManager();
-		manager.addClassPathListener(new ClassPathListener() {
+		getApplicationManager().addClassPathListener(new ClassPathListener() {
 			@Override
 			public void classPathChanged(final ClassPathChangeEvent e) {
 				open();
 			}
 		});
-		manager.addOptionPanel(optionPanel1);
 	}
 
-	public void addOptionPanel(final OptionPanel panel) {
+	void addOptionPanel(final OptionPanel panel) {
 		options.add(panel);
 	}
 
@@ -421,8 +419,6 @@ public class ApplicationManager extends Frame {
                 jScrollPane1 = new javax.swing.JScrollPane();
                 jList1 = new javax.swing.JList();
 
-                optionPanel1.setFrame(this);
-
                 jTable1.setModel(new javax.swing.table.DefaultTableModel(
                         new Object [][] {
 
@@ -476,6 +472,7 @@ public class ApplicationManager extends Frame {
                 setResizable(true);
                 setTitle("Applications");
                 setName("Applications"); // NOI18N
+                setOptionPanel(optionPanel1);
 
                 jList1.setModel(model);
                 jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);

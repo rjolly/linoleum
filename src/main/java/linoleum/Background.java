@@ -28,11 +28,6 @@ public class Background extends Frame {
 	}
 
 	@Override
-	public void init() {
-		getApplicationManager().addOptionPanel(optionPanel1);
-	}
-
-	@Override
 	public void load() {
 		jTextField1.setText(prefs.get(getKey("image"), ""));
 	}
@@ -56,8 +51,6 @@ public class Background extends Frame {
                 jTextField1 = new javax.swing.JTextField();
                 jButton1 = new javax.swing.JButton();
                 jLabel1 = new javax.swing.JLabel();
-
-                optionPanel1.setFrame(this);
 
                 jLabel2.setText("Image :");
 
@@ -91,6 +84,8 @@ public class Background extends Frame {
                                         .addComponent(jButton1))
                                 .addContainerGap(49, Short.MAX_VALUE))
                 );
+
+                setOptionPanel(optionPanel1);
 
                 jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
                 jLabel1.setIcon(getImage());

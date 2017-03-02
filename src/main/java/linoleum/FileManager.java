@@ -753,11 +753,6 @@ public class FileManager extends Frame {
 	}
 
 	@Override
-	public void init() {
-		getApplicationManager().addOptionPanel(optionPanel1);
-	}
-
-	@Override
 	public void load() {
 		jTextField1.setText(prefs.get(getKey("home"), ""));
 		jCheckBox1.setSelected(isShowHidden());
@@ -1089,8 +1084,6 @@ public class FileManager extends Frame {
                 jSeparator4 = new javax.swing.JPopupMenu.Separator();
                 jMenuItem11 = new javax.swing.JMenuItem();
 
-                optionPanel1.setFrame(this);
-
                 jLabel2.setText("Home :");
 
                 jButton1.setText("Choose...");
@@ -1164,6 +1157,7 @@ public class FileManager extends Frame {
                 setMaximizable(true);
                 setResizable(true);
                 setName("Files"); // NOI18N
+                setOptionPanel(optionPanel1);
 
                 jPanel1.setLayout(new java.awt.CardLayout());
 

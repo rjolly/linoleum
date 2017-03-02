@@ -19,11 +19,6 @@
       </SubComponents>
     </Container>
     <Container class="linoleum.application.OptionPanel" name="optionPanel1">
-      <Properties>
-        <Property name="frame" type="linoleum.application.Frame" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="Form"/>
-        </Property>
-      </Properties>
 
       <Layout>
         <DimensionLayout dim="0">
@@ -96,6 +91,9 @@
     <Property name="maximizable" type="boolean" value="true"/>
     <Property name="resizable" type="boolean" value="true"/>
     <Property name="title" type="java.lang.String" value="Browser"/>
+    <Property name="optionPanel" type="linoleum.application.OptionPanel" editor="org.netbeans.modules.form.ComponentChooserEditor">
+      <ComponentRef name="optionPanel1"/>
+    </Property>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>

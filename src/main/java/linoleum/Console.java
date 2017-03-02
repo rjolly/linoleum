@@ -48,11 +48,6 @@ public class Console extends Frame {
 	}
 
 	@Override
-	public void init() {
-		getApplicationManager().addOptionPanel(optionPanel1);
-	}
-
-	@Override
 	public void load() {
 		model.setSelectedItem(getLevel());
 		jCheckBox1.setSelected(prefs.getBoolean(getKey("visible"), false));
@@ -76,8 +71,6 @@ public class Console extends Frame {
                 jLabel1 = new javax.swing.JLabel();
                 jComboBox1 = new javax.swing.JComboBox();
                 jCheckBox1 = new javax.swing.JCheckBox();
-
-                optionPanel1.setFrame(this);
 
                 jLabel1.setText("Log level :");
 
@@ -127,6 +120,7 @@ public class Console extends Frame {
                 setMaximizable(true);
                 setResizable(true);
                 setTitle("Console");
+                setOptionPanel(optionPanel1);
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);

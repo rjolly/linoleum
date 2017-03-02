@@ -27,11 +27,6 @@ public class Clock extends Frame {
 	}
 
 	@Override
-	public void init() {
-		getApplicationManager().addOptionPanel(optionPanel1);
-	}
-
-	@Override
 	public void load() {
 		jRadioButton1.setSelected(prefs.getBoolean(getKey("analog"), false));
 	}
@@ -50,8 +45,6 @@ public class Clock extends Frame {
                 jRadioButton2 = new javax.swing.JRadioButton();
                 buttonGroup1 = new javax.swing.ButtonGroup();
                 clockPanel1 = new linoleum.ClockPanel();
-
-                optionPanel1.setFrame(this);
 
                 buttonGroup1.add(jRadioButton1);
                 jRadioButton1.setText("Analog");
@@ -93,6 +86,7 @@ public class Clock extends Frame {
                 setClosable(true);
                 setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
                 setTitle("Clock");
+                setOptionPanel(optionPanel1);
                 addComponentListener(new java.awt.event.ComponentAdapter() {
                         public void componentShown(java.awt.event.ComponentEvent evt) {
                                 formComponentShown(evt);

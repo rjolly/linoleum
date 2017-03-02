@@ -42,6 +42,7 @@ import javax.swing.JRootPane;
 public class Frame extends JInternalFrame {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private ApplicationManager manager;
+	private OptionPanel optionPanel;
 	private JMenuBar savedMenuBar;
 	private JMenuBar menuBar;
 	private String type;
@@ -94,11 +95,23 @@ public class Frame extends JInternalFrame {
 
 	public void setApplicationManager(final ApplicationManager manager) {
 		this.manager = manager;
+		if (optionPanel != null) {
+			optionPanel.setFrame(this);
+			manager.addOptionPanel(optionPanel);
+		}
 		init();
 	}
 
 	public ApplicationManager getApplicationManager() {
 		return manager;
+	}
+
+	public void setOptionPanel(final OptionPanel optionPanel) {
+		this.optionPanel = optionPanel;
+	}
+
+	public OptionPanel getOptionPanel() {
+		return optionPanel;
 	}
 
 	@Override
