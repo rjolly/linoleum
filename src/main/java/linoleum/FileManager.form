@@ -316,6 +316,9 @@
           </SubComponents>
         </Container>
         <Container class="javax.swing.JScrollPane" name="jScrollPane2">
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jScrollPane2MouseClicked"/>
+          </Events>
           <AuxValues>
             <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
           </AuxValues>

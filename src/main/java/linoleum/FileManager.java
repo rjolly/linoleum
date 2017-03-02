@@ -1193,6 +1193,12 @@ public class FileManager extends Frame {
 
                 jPanel1.add(jScrollPane1, "list");
 
+                jScrollPane2.addMouseListener(new java.awt.event.MouseAdapter() {
+                        public void mouseClicked(java.awt.event.MouseEvent evt) {
+                                jScrollPane2MouseClicked(evt);
+                        }
+                });
+
                 jTable1.setAutoCreateRowSorter(true);
                 jTable1.setFont(jList1.getFont());
                 jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -1419,6 +1425,16 @@ public class FileManager extends Frame {
         private void jTable1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseMoved
 		idx = jTable1.rowAtPoint(evt.getPoint());
         }//GEN-LAST:event_jTable1MouseMoved
+
+        private void jScrollPane2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jScrollPane2MouseClicked
+		if (evt.getClickCount() == 1 && !evt.isControlDown() && !evt.isShiftDown()) {
+			jTable1.clearSelection();
+			final TableCellEditor editor = jTable1.getCellEditor();
+			if (editor != null) {
+				editor.stopCellEditing();
+			}
+		}
+        }//GEN-LAST:event_jScrollPane2MouseClicked
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
