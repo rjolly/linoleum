@@ -1344,6 +1344,14 @@ public class FileManager extends Frame {
         }// </editor-fold>//GEN-END:initComponents
 
         private void jList1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseClicked
+		if (evt.getClickCount() == 1 && !evt.isControlDown() && !evt.isShiftDown()) {
+			final int idx = jList1.locationToIndex(evt.getPoint());
+			if (idx > -1) {
+				setSelectedIndex(idx);
+			} else {
+				jList1.clearSelection();
+			}
+		}
 		if (evt.getClickCount() == 2 && !isSelectionEmpty()) {
 			open(getSelectedValue());
 		}
@@ -1395,6 +1403,14 @@ public class FileManager extends Frame {
         }//GEN-LAST:event_jCheckBoxMenuItem2ActionPerformed
 
         private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+		if (evt.getClickCount() == 1 && !evt.isControlDown() && !evt.isShiftDown()) {
+			final int idx = jTable1.rowAtPoint(evt.getPoint());
+			if (idx > -1) {
+				setSelectedIndex(idx);
+			} else {
+				jTable1.clearSelection();
+			}
+		}
 		if (evt.getClickCount() == 2 && !isSelectionEmpty()) {
 			open(getSelectedValue());
 		}

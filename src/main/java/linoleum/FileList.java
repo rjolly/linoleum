@@ -2,29 +2,12 @@ package linoleum;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.nio.file.Path;
 import javax.swing.JList;
 import javax.swing.ListModel;
 import javax.swing.text.Position;
 
 public class FileList extends JList<Path> {
-	public FileList() {
-		addMouseListener(new MouseAdapter() {
-			public void mouseClicked(final MouseEvent evt) {
-				if (evt.getClickCount() == 1 && !evt.isControlDown() && !evt.isShiftDown()) {
-					final int idx = locationToIndex(evt.getPoint());
-					if (idx > -1) {
-						setSelectedIndex(idx);
-					} else {
-						clearSelection();
-					}
-				}
-			}
-		});
-	}
-
 	@Override
 	public int getNextMatch(final String prefix, final int startIndex, final Position.Bias bias) {
 		final ListModel<Path> model = getModel();
