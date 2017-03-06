@@ -266,6 +266,11 @@ public class Frame extends JInternalFrame {
 		return getName();
 	}
 
+	private boolean isRecording() {
+		final Object obj = getDesktopPane().getClientProperty("DesktopPane.recording");
+		return obj instanceof Boolean?(Boolean) obj:false;
+	}
+
 	@SuppressWarnings("unchecked")
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
@@ -329,7 +334,7 @@ public class Frame extends JInternalFrame {
         }//GEN-LAST:event_formInternalFrameDeactivated
 
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
-		if (isShowing() && !isMaximum()) {
+		if (isShowing() && !isMaximum() && isRecording()) {
 			final Component c = evt.getComponent();
 			prefs.putInt(getKey("x"), c.getX() - offset * index);
 			prefs.putInt(getKey("y"), c.getY() - offset * index);
@@ -337,7 +342,7 @@ public class Frame extends JInternalFrame {
         }//GEN-LAST:event_formComponentMoved
 
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-		if (isShowing() && !isMaximum()) {
+		if (isShowing() && !isMaximum() && isRecording()) {
 			final Component c = evt.getComponent();
 			prefs.putInt(getKey("width"), c.getWidth());
 			prefs.putInt(getKey("height"), c.getHeight());
