@@ -14,11 +14,15 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.DefaultListModel;
 import javax.swing.KeyStroke;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import linoleum.application.Frame;
@@ -27,15 +31,47 @@ public class DesktopPane extends JDesktopPane {
 	public static final int DEFAULT_LAYER = 1;
 	public static final int DIALOG_LAYER = 2;
 	public static final int ICON_LAYER = 3;
+	private final Icon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
 	private final Action searchNextFrameAction = new SearchNextFrameAction();
 	private final Action searchPreviousFrameAction = new SearchPreviousFrameAction();
 	private final DefaultListModel<Frame> model = new DefaultListModel<>();
+	private final ListCellRenderer<Frame> renderer = new Renderer();
 	private final LayoutManager layout = new GridBagLayout();
 	private final JList<Frame> list = new JList<>();
 	private boolean recording;
 	private boolean searching;
 	private Background bkg;
 	private int index;
+
+	private class Renderer extends JLabel implements ListCellRenderer<Frame> {
+		public Renderer() {
+			setOpaque(true);
+			setHorizontalAlignment(CENTER);
+			setVerticalAlignment(CENTER);
+			setVerticalTextPosition(BOTTOM);
+			setHorizontalTextPosition(CENTER);
+		}
+
+		@Override
+		public Component getListCellRendererComponent(final JList<? extends Frame> list, final Frame value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+			if (isSelected) {
+				setBackground(list.getSelectionBackground());
+				setForeground(list.getSelectionForeground());
+			} else {
+				setBackground(list.getBackground());
+				setForeground(list.getForeground());
+			}
+			final Icon icon = value.getIcon();
+			setIcon(icon == null?defaultIcon:icon);
+			String str = value.getTitle();
+			if (str != null && str.length() > 16) {
+				str = str.substring(0, 13) + "...";
+			}
+			setText(str == null?"untitled":str);
+			setFont(list.getFont());
+			return this;
+		}
+	}
 
 	private int getKeyCode() {
 		return Desktop.isDesktopSupported()?KeyEvent.VK_A:KeyEvent.VK_ALT;
@@ -138,6 +174,12 @@ public class DesktopPane extends JDesktopPane {
 			}
 		});
 		list.setModel(model);
+		list.setCellRenderer(renderer);
+		list.setLayoutOrientation(JList.VERTICAL_WRAP);
+	}
+
+	private void update() {
+		list.setVisibleRowCount(Math.min(model.getSize(), 8));
 	}
 
 	@Override
@@ -150,6 +192,7 @@ public class DesktopPane extends JDesktopPane {
 				private void open() {
 					model.add(0, frame);
 					index = 0;
+					update();
 				}
 
 				@Override
@@ -166,6 +209,7 @@ public class DesktopPane extends JDesktopPane {
 				private void close() {
 					bkg.select();
 					index = -1;
+					update();
 				}
 
 				@Override
