@@ -1,5 +1,6 @@
 package linoleum;
 
+import java.beans.PropertyVetoException;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
@@ -25,6 +26,15 @@ public class Background extends Frame {
 			}
 		});
 		chooser.setFileFilter(new FileNameExtensionFilter("Images", "jpg", "gif", "png"));
+	}
+
+	@Override
+	public void select() {
+		try {
+			setSelected(true);
+		} catch (final PropertyVetoException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	@Override

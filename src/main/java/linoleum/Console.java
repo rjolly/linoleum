@@ -39,6 +39,10 @@ public class Console extends Frame {
 				handler.setLevel(Level.CONFIG);
 			}
 		}
+	}
+
+	@Override
+	public void init() {
 		refresh();
 	}
 

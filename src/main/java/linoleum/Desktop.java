@@ -31,11 +31,11 @@ public class Desktop extends JFrame {
 
 	private Desktop() {
 		initComponents();
-		console.setApplicationManager(apps);
-		frame.setApplicationManager(apps);
-		frame.setLayer(0);
 		desktopPane.add(console);
 		desktopPane.add(apps);
+		frame.setLayer(0);
+		frame.setApplicationManager(apps);
+		console.setApplicationManager(apps);
 		devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 		loadBounds();
 	}
