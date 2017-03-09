@@ -6,14 +6,15 @@ import java.awt.*;
 import javax.swing.*;
 
 @SuppressWarnings("deprecation")
-public class SimpleAuthenticator extends Authenticator {
-	JInternalFrame frame;
+public class SimpleAuthenticator extends Authenticator implements Runnable {
+	final JInternalFrame frame;
 	String username;
 	String password;
+	JComponent d;
 	int result;
 
-	public SimpleAuthenticator(JInternalFrame f) {
-		this.frame = f;
+	public SimpleAuthenticator(final JInternalFrame frame) {
+		this.frame = frame;
 	}
 
 	protected PasswordAuthentication getPasswordAuthentication() {
@@ -49,7 +50,7 @@ public class SimpleAuthenticator extends Authenticator {
 		// XXX - for some reason using a JPanel here causes JOptionPane
 		// to display incorrectly, so we workaround the problem using
 		// an anonymous JComponent.
-		final JComponent d = new JComponent() { };
+		d = new JComponent() { };
 
 		GridBagLayout gb = new GridBagLayout();
 		GridBagConstraints c = new GridBagConstraints();
@@ -94,12 +95,10 @@ public class SimpleAuthenticator extends Authenticator {
 		} else {
 			username.requestFocus();
 		}
-		try {
-			SwingUtilities.invokeAndWait(new Runnable() {
-				public void run() {
-					result = JOptionPane.showInternalConfirmDialog(frame, d, "Login", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-				}
-			});
+		if (SwingUtilities.isEventDispatchThread()) {
+			run();
+		} else try {
+			SwingUtilities.invokeAndWait(this);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
@@ -108,6 +107,10 @@ public class SimpleAuthenticator extends Authenticator {
 		} else {
 			return null;
 		}
+	}
+
+	public void run() {
+		result = JOptionPane.showInternalConfirmDialog(frame, d, "Login", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 	}
 
 	private Component constrain(Component cmp, GridBagLayout gb, GridBagConstraints c) {

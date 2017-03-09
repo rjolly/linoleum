@@ -35,13 +35,10 @@ public class SimpleClient extends Frame {
 	private final Action expungeAction = new ExpungeAction();
 	private final Action settingsAction = new SettingsAction();
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
-	private final SimpleAuthenticator auth = new SimpleAuthenticator(this);
-	private final Properties props = System.getProperties();
 	private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 	private final DefaultTreeModel model = new DefaultTreeModel(root);
 	private final Map<URLName, StoreTreeNode> map = new HashMap<>();
-	private final Session session = Session.getInstance(props, auth);
-	private final Compose frame = new Compose(session);
+	private final Session session = Session.getInstance(System.getProperties(), new SimpleAuthenticator(this));
 	private Folder folder;
 	static SimpleClient instance;
 
@@ -52,7 +49,7 @@ public class SimpleClient extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			frame.open(null);
+			getApplicationManager().open("Compose");
 		}
 	}
 
@@ -95,8 +92,8 @@ public class SimpleClient extends Frame {
 	public SimpleClient() {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("Mail24.png")));
-		props.put("mail.mime.decodefilename", "true");
-		props.put("mstor.mbox.metadataStrategy", "none");
+		session.getProperties().put("mail.mime.decodefilename", "true");
+		session.getProperties().put("mstor.mbox.metadataStrategy", "none");
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
 			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
@@ -108,20 +105,30 @@ public class SimpleClient extends Frame {
 		if (instance == null) {
 			instance = this;
 		}
-		frame.setJMenuBar(getJMenuBar());
+	}
+
+	public Session getSession() {
+		return session;
+	}
+
+	public String getFrom() {
+		return prefs.get(getKey("from"), "");
+	}
+
+	public String getURL() {
+		return prefs.get(getKey("url"), "");
+	}
+
+	public String getRecord() {
+		return prefs.get(getKey("record"), "");
 	}
 
 	void compose(final String str) throws URISyntaxException {
-		frame.open(new URI("mailto", str, null));
+		getApplicationManager().open("Compose", new URI("mailto", str, null));
 	}
 
 	public FolderViewer getFolderViewer() {
 		return folderViewer;
-	}
-
-	@Override
-	public void init() {
-		frame.setApplicationManager(getApplicationManager());
 	}
 
 	@Override
@@ -146,7 +153,7 @@ public class SimpleClient extends Frame {
 	public void open() {
 		final String mailhost = prefs.get(getKey("mailhost"), "");
 		if (!mailhost.isEmpty()) {
-			props.put("mail.smtp.host", mailhost);
+			session.getProperties().put("mail.smtp.host", mailhost);
 		}
 		final boolean debug = prefs.getBoolean(getKey("debug"), false);
 		if (debug) {

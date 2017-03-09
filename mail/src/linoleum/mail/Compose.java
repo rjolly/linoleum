@@ -47,7 +47,7 @@ public class Compose extends Frame {
 	private String inReplyTo[];
 	private String references[];
 	private File file;
-	private final Session session;
+	private final Session session = SimpleClient.instance.getSession();
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final FileChooser chooser = new FileChooser();
 
@@ -89,14 +89,10 @@ public class Compose extends Frame {
 	}
 
 	public Compose() {
-		this(Session.getInstance(System.getProperties()));
+		this(null);
 	}
 
-	public Compose(final Session session) {
-		this(session, null);
-	}
-
-	public Compose(final Session session, final Frame owner) {
+	public Compose(final Frame owner) {
 		super(owner);
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail24.gif")));
                 setClosable(true);
@@ -104,8 +100,7 @@ public class Compose extends Frame {
                 setMaximizable(true);
                 setResizable(true);
 		setTitle("Untitled Message " + (getIndex() + 1));
-		setJMenuBar(getOwner().getJMenuBar());
-		this.session = session;
+		setJMenuBar(SimpleClient.instance.getJMenuBar());
 
 		JPanel top = new JPanel();
 		top.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -127,7 +122,7 @@ public class Compose extends Frame {
 
 	@Override
 	public Frame getFrame(final Frame owner) {
-		return new Compose(session, owner);
+		return new Compose(owner);
 	}
 
 	@Override
@@ -179,15 +174,15 @@ public class Compose extends Frame {
 
 	private void send() throws MessagingException {
 		final Message msg = new MimeMessage(session);
-		final String from = prefs.get(SimpleClient.instance.getKey("from"), "");
+		final String from = SimpleClient.instance.getFrom();
 		final String to = toField.getText();
 		final String cc = ccField.getText();
 		final String bcc = bccField.getText();
 		final String replyTo = replyToField.getText();
 		final String subject = subField.getText();
 		final String text = content.getText();
-		final String url = prefs.get(SimpleClient.instance.getKey("url"), "");
-		final String record = prefs.get(SimpleClient.instance.getKey("record"), "");
+		final String url = SimpleClient.instance.getURL();
+		final String record = SimpleClient.instance.getRecord();
 
 		if (!from.isEmpty()) {
 			msg.setFrom(new InternetAddress(from));
