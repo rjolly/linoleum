@@ -49,13 +49,13 @@ public class Frame extends JInternalFrame {
 	private Icon icon;
 	private URI uri;
 	private boolean opened;
+	private Frame lastOpened;
 	@Deprecated
 	protected final int index;
 	private final Frame owner;
 	@Deprecated
 	protected final Frame parent;
 	private final Collection<Integer> openFrames = new HashSet<Integer>();
-	private static final int offset = 30;
 
 	public Frame() {
 		this((Frame) null);
@@ -322,11 +322,16 @@ public class Frame extends JInternalFrame {
         }// </editor-fold>//GEN-END:initComponents
 
         private void formInternalFrameOpened(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameOpened
-		final int x = prefs.getInt(getKey("x"), getX());
-		final int y = prefs.getInt(getKey("y"), getY());
-		final int width = prefs.getInt(getKey("width"), getWidth());
-		final int height = prefs.getInt(getKey("height"), getHeight());
-		setBounds(x + offset * index, y + offset * index, width, height);
+		if (getOwner().lastOpened == null) {
+			final int x = prefs.getInt(getKey("x"), getX());
+			final int y = prefs.getInt(getKey("y"), getY());
+			final int width = prefs.getInt(getKey("width"), getWidth());
+			final int height = prefs.getInt(getKey("height"), getHeight());
+			setBounds(x, y, width, height);
+		} else {
+			setBounds(getOwner().lastOpened.getBounds());
+		}
+		getOwner().lastOpened = this;
 		openFrame();
 		opened = true;
         }//GEN-LAST:event_formInternalFrameOpened
@@ -349,8 +354,8 @@ public class Frame extends JInternalFrame {
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
 		if (isShowing() && !isMaximum() && isRecording()) {
 			final Component c = evt.getComponent();
-			prefs.putInt(getKey("x"), c.getX() - offset * index);
-			prefs.putInt(getKey("y"), c.getY() - offset * index);
+			prefs.putInt(getKey("x"), c.getX());
+			prefs.putInt(getKey("y"), c.getY());
 		}
         }//GEN-LAST:event_formComponentMoved
 
