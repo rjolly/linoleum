@@ -8,8 +8,8 @@ public class Saucer extends Browser {
 		this(null);
 	}
 
-	public Saucer(final Frame parent) {
-		super(parent);
+	public Saucer(final Frame owner) {
+		super(owner);
 		setMimeType("text/html:application/xhtml+xml");
 		final javax.swing.text.EditorKit kit = new EditorKit();
 		getEditorPane().setEditorKitForContentType("text/xml", kit);
@@ -17,7 +17,7 @@ public class Saucer extends Browser {
 	}
 
 	@Override
-	public Frame getFrame(final Frame parent) {
-		return new Saucer(parent);
+	public Frame getFrame(final Frame owner) {
+		return new Saucer(owner);
 	}
 }

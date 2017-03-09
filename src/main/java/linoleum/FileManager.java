@@ -227,8 +227,8 @@ public class FileManager extends Frame {
 			if (support.isDrop()) {
 				action = support.getDropAction();
 			} else {
-				if (parent.source != null) {
-					action = parent.source.action;
+				if (getOwner().source != null) {
+					action = getOwner().source.action;
 				} else {
 					action = NONE;
 				}
@@ -282,7 +282,7 @@ public class FileManager extends Frame {
 			if (!support.isDrop()) {
 				switch (action) {
 				case MOVE:
-					parent.source.refresh();
+					getOwner().source.refresh();
 					break;
 				}
 			}
@@ -321,7 +321,6 @@ public class FileManager extends Frame {
 		}
 	};
 	private final DefaultTableModel tableModel;
-	protected FileManager parent;
 	private FileManager source;
 	private boolean closing;
 	private FileSystem fs;
@@ -352,10 +351,10 @@ public class FileManager extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			final int returnVal = parent.chooser.showInternalOpenDialog(FileManager.this);
+			final int returnVal = getOwner().chooser.showInternalOpenDialog(FileManager.this);
 			switch (returnVal) {
 			case JFileChooser.APPROVE_OPTION:
-				open(parent.chooser.getSelectedFile().toPath());
+				open(getOwner().chooser.getSelectedFile().toPath());
 				break;
 			default:
 			}
@@ -423,8 +422,8 @@ public class FileManager extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			if (parent.source != null) {
-				parent.source.action = TransferHandler.LINK;
+			if (getOwner().source != null) {
+				getOwner().source.action = TransferHandler.LINK;
 			}
 			TransferHandler.getPasteAction().actionPerformed(createActionEvent());
 		}
@@ -609,7 +608,7 @@ public class FileManager extends Frame {
 
 	private void done(final int action) {
 		this.action = action;
-		parent.source = this;
+		getOwner().source = this;
 	}
 
 	private Path getDirectory(final Path path) {
@@ -670,8 +669,8 @@ public class FileManager extends Frame {
 	}
 
 	@SuppressWarnings("deprecation")
-	public FileManager(final Frame parent) {
-		super(parent);
+	public FileManager(final Frame owner) {
+		super(owner);
 		initComponents();
 		jList1.setTransferHandler(handler);
 		jTable1.setTransferHandler(handler);
@@ -743,13 +742,17 @@ public class FileManager extends Frame {
 		getActionMap().put(name, cancelSelectionAction);
 		getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(ks, name);
 		jTable1.getActionMap().put("cancel", cancelSelectionAction);
-		this.parent = (FileManager) super.parent;
 		setURI(getHome());
 	}
 
 	@Override
-	public Frame getFrame(final Frame parent) {
-		return new FileManager(parent);
+	public FileManager getOwner() {
+		return (FileManager) super.getOwner();
+	}
+
+	@Override
+	public Frame getFrame(final Frame owner) {
+		return new FileManager(owner);
 	}
 
 	@Override
@@ -799,11 +802,11 @@ public class FileManager extends Frame {
 		}
 		rescan();
 		if (fs != defaultfs) {
-			Collection<Integer> coll = parent.openFrames.get(fs);
+			Collection<Integer> coll = getOwner().openFrames.get(fs);
 			if (coll == null) {
-				parent.openFrames.put(fs, coll = new HashSet<Integer>());
+				getOwner().openFrames.put(fs, coll = new HashSet<Integer>());
 			}
-			coll.add(index);
+			coll.add(getIndex());
 		}
 		if (fs == defaultfs && Files.isDirectory(path)) {
 			thread.start();
@@ -830,10 +833,10 @@ public class FileManager extends Frame {
 			thread.interrupt();
 		}
 		if (fs != defaultfs) {
-			Collection<Integer> coll = parent.openFrames.get(fs);
-			coll.remove(index);
+			Collection<Integer> coll = getOwner().openFrames.get(fs);
+			coll.remove(getIndex());
 			if (coll.isEmpty()) {
-				parent.openFrames.remove(fs);
+				getOwner().openFrames.remove(fs);
 				try {
 					fs.close();
 				} catch (final IOException ex) {

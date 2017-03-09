@@ -96,15 +96,15 @@ public class Compose extends Frame {
 		this(session, null);
 	}
 
-	public Compose(final Session session, final Frame parent) {
-		super(parent);
+	public Compose(final Session session, final Frame owner) {
+		super(owner);
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail24.gif")));
                 setClosable(true);
                 setIconifiable(true);
                 setMaximizable(true);
                 setResizable(true);
-		setTitle("Untitled Message " + (index + 1));
-		setJMenuBar(this.parent.getJMenuBar());
+		setTitle("Untitled Message " + (getIndex() + 1));
+		setJMenuBar(getOwner().getJMenuBar());
 		this.session = session;
 
 		JPanel top = new JPanel();
@@ -126,8 +126,8 @@ public class Compose extends Frame {
 	}
 
 	@Override
-	public Frame getFrame(final Frame parent) {
-		return new Compose(session, parent);
+	public Frame getFrame(final Frame owner) {
+		return new Compose(session, owner);
 	}
 
 	@Override

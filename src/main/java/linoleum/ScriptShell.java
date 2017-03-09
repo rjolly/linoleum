@@ -31,18 +31,21 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	private volatile String prompt;
 	private	ScriptEngineFactory factory;
 	private ScriptEngineManager manager;
-	protected ScriptShell parent;
 	private String extension;
 
 	public ScriptShell() {
 		this(null);
 	}
 
-	public ScriptShell(final Frame parent) {
-		super(parent);
+	public ScriptShell(final Frame owner) {
+		super(owner);
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
-		this.parent = (ScriptShell) super.parent;
+	}
+
+	@Override
+	public ScriptShell getOwner() {
+		return (ScriptShell) super.getOwner();
 	}
 
 	@Override
@@ -130,8 +133,8 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	}
 
 	@Override
-	public Frame getFrame(final Frame parent) {
-		return new ScriptShell(parent);
+	public Frame getFrame(final Frame owner) {
+		return new ScriptShell(owner);
 	}
 
 	@Override
@@ -209,7 +212,7 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 
 	// create script engine
 	private void createScriptEngine() {
-		engine = parent.factory.getScriptEngine();
+		engine = getOwner().factory.getScriptEngine();
 		extension = engine.getFactory().getExtensions().get(0);
 		prompt = extension + ">";
 	}

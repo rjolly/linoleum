@@ -43,8 +43,8 @@ public class Browser extends Frame {
 		this(null);
 	}
 
-	public Browser(final Frame parent) {
-		super(parent);
+	public Browser(final Frame owner) {
+		super(owner);
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif")));
 		setMimeType("text/html");
@@ -116,8 +116,8 @@ public class Browser extends Frame {
 	}
 
 	@Override
-	public Frame getFrame(final Frame parent) {
-		return new Browser(parent);
+	public Frame getFrame(final Frame owner) {
+		return new Browser(owner);
 	}
 
 	@Override
@@ -139,6 +139,7 @@ public class Browser extends Frame {
 		return null;
 	}
 
+	@Override
 	public void open() {
 		if (current == null) {
 			final String str = prefs.get(getName() + ".home", "");

@@ -33,7 +33,6 @@ public class PDFViewer extends Frame {
 	private final Action openAction = new OpenAction();
 	private final Action closeAction = new CloseAction();
 	private final FileChooser chooser = new FileChooser();
-	protected PDFViewer parent;
 	private int curpage = -1;
 	private PDFFile curFile;
 	private String docName;
@@ -48,14 +47,14 @@ public class PDFViewer extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			final int returnVal = parent.chooser.showInternalOpenDialog(PDFViewer.this);
+			final int returnVal = getOwner().chooser.showInternalOpenDialog(PDFViewer.this);
 			switch (returnVal) {
 			case JFileChooser.APPROVE_OPTION:
 				final URI uri = getURI();
 				if (uri != null) {
 					close();
 				}
-				setURI(parent.chooser.getSelectedFile().toURI());
+				setURI(getOwner().chooser.getSelectedFile().toURI());
 				open();
 				break;
 			default:
@@ -79,20 +78,24 @@ public class PDFViewer extends Frame {
 		this(null);
 	}
 
-	public PDFViewer(final Frame parent) {
-		super(parent);
+	public PDFViewer(final Frame owner) {
+		super(owner);
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("reader.png")));
 		chooser.setFileFilter(new FileNameExtensionFilter("PDF Files", "pdf"));
-		this.parent = (PDFViewer) super.parent;
 		setMimeType("application/pdf");
 		setTitle(TITLE);
 		setEnabling();
 	}
 
 	@Override
-	public Frame getFrame(final Frame parent) {
-		return new PDFViewer(parent);
+	public PDFViewer getOwner() {
+		return (PDFViewer) super.getOwner();
+	}
+
+	@Override
+	public Frame getFrame(final Frame owner) {
+		return new PDFViewer(owner);
 	}
 
 	@Override

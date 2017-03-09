@@ -49,7 +49,10 @@ public class Frame extends JInternalFrame {
 	private Icon icon;
 	private URI uri;
 	private boolean opened;
+	@Deprecated
 	protected final int index;
+	private final Frame owner;
+	@Deprecated
 	protected final Frame parent;
 	private final Collection<Integer> openFrames = new HashSet<Integer>();
 	private static final int offset = 30;
@@ -62,17 +65,27 @@ public class Frame extends JInternalFrame {
 		this(null, title);
 	}
 
-	public Frame(final Frame parent, final String title) {
+	public Frame(final Frame owner, final String title) {
 		super(title, true, true, true, true);
 		initComponents();
-		this.parent = parent == null?this:parent;
-		index = this.parent.nextIndex();
+		this.owner = owner;
+		parent = getOwner();
+		index = getOwner().nextIndex();
 	}
 
-	public Frame(final Frame parent) {
+	public Frame(final Frame owner) {
 		initComponents();
-		this.parent = parent == null?this:parent;
-		index = this.parent.nextIndex();
+		this.owner = owner;
+		parent = getOwner();
+		index = getOwner().nextIndex();
+	}
+
+	public Frame getOwner() {
+		return owner == null?this:owner;
+	}
+
+	public int getIndex() {
+		return index;
 	}
 
 	private int nextIndex() {
@@ -84,13 +97,13 @@ public class Frame extends JInternalFrame {
 	}
 
 	private void openFrame() {
-		parent.openFrames.add(index);
+		getOwner().openFrames.add(index);
 		open();
 	}
 
 	private void closeFrame() {
 		close();
-		parent.openFrames.remove(index);
+		getOwner().openFrames.remove(index);
 	}
 
 	public void setApplicationManager(final ApplicationManager manager) {
@@ -152,7 +165,7 @@ public class Frame extends JInternalFrame {
 		return getFrame(this);
 	}
 
-	protected JInternalFrame getFrame(final Frame parent) {
+	protected JInternalFrame getFrame(final Frame owner) {
 		return this;
 	}
 

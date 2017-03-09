@@ -35,7 +35,7 @@ public class PackageManager extends Frame {
 		super("Packages");
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Jar24.gif")));
-		model = (DefaultTableModel)jTable1.getModel();
+		model = (DefaultTableModel) jTable1.getModel();
 		if (instance == null) {
 			instance = this;
 		}
@@ -51,6 +51,7 @@ public class PackageManager extends Frame {
 		}
 	}
 
+	@Override
 	public void open() {
 		model.setRowCount(0);
 		for (final File file : pkgs.installed()) {
