@@ -96,6 +96,7 @@ public class Compose extends Frame {
 		super(owner);
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail24.gif")));
 		setFrameIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail16.gif")));
+		setScheme("mailto");
                 setClosable(true);
                 setIconifiable(true);
                 setMaximizable(true);

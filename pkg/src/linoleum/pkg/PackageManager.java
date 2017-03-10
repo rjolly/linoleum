@@ -2,6 +2,7 @@ package linoleum.pkg;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.text.ParseException;
 import java.util.Arrays;
 import javax.swing.ImageIcon;
@@ -34,6 +35,7 @@ public class PackageManager extends Frame {
 	public PackageManager() {
 		super("Packages");
 		initComponents();
+		setScheme("mvn");
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Jar24.gif")));
 		model = (DefaultTableModel) jTable1.getModel();
 		if (instance == null) {
@@ -57,6 +59,22 @@ public class PackageManager extends Frame {
 		for (final File file : pkgs.installed()) {
 			final Package pkg = new Package(file);
 			model.addRow(new Object[] {pkg.getName(), pkg.getVersion(), pkg.isSnapshot()});
+		}
+		final URI uri = getURI();
+		if (uri != null) {
+			final String str = uri.getSchemeSpecificPart();
+			if (str != null) {
+				final String s[] = str.split("/");
+				if (s.length > 0) {
+					jTextField1.setText(s[0]);
+				}
+				if (s.length > 1) {
+					jTextField2.setText(s[1]);
+				}
+				if (s.length > 2) {
+					jTextField3.setText(s[2]);
+				}
+			}
 		}
 	}
 

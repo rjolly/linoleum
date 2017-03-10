@@ -91,6 +91,7 @@ public class SimpleClient extends Frame {
 
 	public SimpleClient() {
 		initComponents();
+		setScheme("imap:imaps");
 		setIcon(new ImageIcon(getClass().getResource("Mail24.png")));
 		session.getProperties().put("mail.mime.decodefilename", "true");
 		session.getProperties().put("mstor.mbox.metadataStrategy", "none");
