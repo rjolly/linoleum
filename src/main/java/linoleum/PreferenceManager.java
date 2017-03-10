@@ -71,6 +71,7 @@ public class PreferenceManager extends Frame {
                 setMaximizable(true);
                 setResizable(true);
                 setTitle("Preferences");
+                setFrameIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Properties16.gif"))); // NOI18N
                 setName("Preferences"); // NOI18N
 
                 jButton1.setText("Ok");

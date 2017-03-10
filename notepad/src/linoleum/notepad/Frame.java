@@ -183,6 +183,7 @@ public class Frame extends linoleum.application.Frame {
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 );
 
+                setFrameIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Edit16.gif"))); // NOI18N
                 setName(Notepad.class.getSimpleName());
                 addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
                         public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {

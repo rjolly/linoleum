@@ -124,6 +124,7 @@ public class Console extends Frame {
                 setMaximizable(true);
                 setResizable(true);
                 setTitle("Console");
+                setFrameIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host16.gif"))); // NOI18N
                 setOptionPanel(optionPanel1);
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());

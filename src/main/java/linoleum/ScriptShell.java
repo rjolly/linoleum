@@ -184,6 +184,7 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
                 setIconifiable(true);
                 setMaximizable(true);
                 setResizable(true);
+                setFrameIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host16.gif"))); // NOI18N
                 setOptionPanel(optionPanel1);
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());

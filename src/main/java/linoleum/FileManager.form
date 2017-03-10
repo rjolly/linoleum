@@ -237,6 +237,9 @@
     <Property name="iconifiable" type="boolean" value="true"/>
     <Property name="maximizable" type="boolean" value="true"/>
     <Property name="resizable" type="boolean" value="true"/>
+    <Property name="frameIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+      <Image iconType="3" name="/toolbarButtonGraphics/general/Open16.gif"/>
+    </Property>
     <Property name="name" type="java.lang.String" value="Files" noResource="true"/>
     <Property name="optionPanel" type="linoleum.application.OptionPanel" editor="org.netbeans.modules.form.ComponentChooserEditor">
       <ComponentRef name="optionPanel1"/>

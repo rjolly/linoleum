@@ -175,6 +175,7 @@ public class MediaPlayer extends Frame {
                 setClosable(true);
                 setIconifiable(true);
                 setTitle("Media Player");
+                setFrameIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Movie16.gif"))); // NOI18N
 
                 jPanel1.setLayout(new java.awt.BorderLayout());
                 getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);

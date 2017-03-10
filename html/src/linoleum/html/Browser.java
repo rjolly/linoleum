@@ -322,6 +322,7 @@ public class Browser extends Frame {
                 setMaximizable(true);
                 setResizable(true);
                 setTitle("Browser");
+                setFrameIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent16.gif"))); // NOI18N
                 setOptionPanel(optionPanel1);
 
                 jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 0));

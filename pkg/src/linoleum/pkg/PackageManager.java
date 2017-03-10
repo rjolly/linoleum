@@ -136,6 +136,7 @@ public class PackageManager extends Frame {
                 jScrollPane1 = new javax.swing.JScrollPane();
                 jTable1 = new javax.swing.JTable();
 
+                setFrameIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Jar16.gif"))); // NOI18N
                 setName("Packages");
 
                 jLabel1.setText("Organization :");

@@ -106,6 +106,9 @@
     </Container>
   </NonVisualComponents>
   <Properties>
+    <Property name="frameIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+      <Image iconType="3" name="/toolbarButtonGraphics/general/Edit16.gif"/>
+    </Property>
     <Property name="name" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
       <Connection code="Notepad.class.getSimpleName()" type="code"/>
     </Property>

@@ -1159,6 +1159,7 @@ public class FileManager extends Frame {
                 setIconifiable(true);
                 setMaximizable(true);
                 setResizable(true);
+                setFrameIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"))); // NOI18N
                 setName("Files"); // NOI18N
                 setOptionPanel(optionPanel1);
 
