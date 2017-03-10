@@ -413,8 +413,11 @@ public class ApplicationManager extends Frame {
         private void initComponents() {
 
                 optionPanel1 = new linoleum.application.OptionPanel();
+                jTabbedPane1 = new javax.swing.JTabbedPane();
                 jScrollPane2 = new javax.swing.JScrollPane();
                 jTable1 = new javax.swing.JTable();
+                jScrollPane3 = new javax.swing.JScrollPane();
+                jTable2 = new javax.swing.JTable();
                 jComboBox1 = new javax.swing.JComboBox();
                 jScrollPane1 = new javax.swing.JScrollPane();
                 jList1 = new javax.swing.JList();
@@ -447,15 +450,47 @@ public class ApplicationManager extends Frame {
                         jTable1.getColumnModel().getColumn(1).setCellEditor(getEditor());
                 }
 
+                jTabbedPane1.addTab("Types", jScrollPane2);
+
+                jTable2.setModel(new javax.swing.table.DefaultTableModel(
+                        new Object [][] {
+
+                        },
+                        new String [] {
+                                "Scheme", "Name"
+                        }
+                ) {
+                        Class[] types = new Class [] {
+                                java.lang.String.class, java.lang.String.class
+                        };
+                        boolean[] canEdit = new boolean [] {
+                                false, true
+                        };
+
+                        public Class getColumnClass(int columnIndex) {
+                                return types [columnIndex];
+                        }
+
+                        public boolean isCellEditable(int rowIndex, int columnIndex) {
+                                return canEdit [columnIndex];
+                        }
+                });
+                jScrollPane3.setViewportView(jTable2);
+                if (jTable2.getColumnModel().getColumnCount() > 0) {
+                        jTable2.getColumnModel().getColumn(1).setCellEditor(getEditor());
+                }
+
+                jTabbedPane1.addTab("Schemes", jScrollPane3);
+
                 javax.swing.GroupLayout optionPanel1Layout = new javax.swing.GroupLayout(optionPanel1);
                 optionPanel1.setLayout(optionPanel1Layout);
                 optionPanel1Layout.setHorizontalGroup(
                         optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
                 );
                 optionPanel1Layout.setVerticalGroup(
                         optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
                 );
 
                 jComboBox1.setModel(comboModel);
@@ -515,7 +550,10 @@ public class ApplicationManager extends Frame {
         private javax.swing.JList jList1;
         private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JScrollPane jScrollPane2;
+        private javax.swing.JScrollPane jScrollPane3;
+        private javax.swing.JTabbedPane jTabbedPane1;
         private javax.swing.JTable jTable1;
+        private javax.swing.JTable jTable2;
         private linoleum.application.OptionPanel optionPanel1;
         // End of variables declaration//GEN-END:variables
 }

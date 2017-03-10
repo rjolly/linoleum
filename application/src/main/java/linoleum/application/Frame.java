@@ -46,6 +46,7 @@ public class Frame extends JInternalFrame {
 	private JMenuBar savedMenuBar;
 	private JMenuBar menuBar;
 	private String type;
+	private String scheme;
 	private Icon icon;
 	private URI uri;
 	private boolean opened;
@@ -151,6 +152,14 @@ public class Frame extends JInternalFrame {
 
 	public String getMimeType() {
 		return type;
+	}
+
+	public void setScheme(final String scheme) {
+		this.scheme = scheme;
+	}
+
+	public String getScheme() {
+		return scheme;
 	}
 
 	public void setURI(final URI uri) {
