@@ -7,13 +7,13 @@ import javax.swing.*;
 
 @SuppressWarnings("deprecation")
 public class SimpleAuthenticator extends Authenticator implements Runnable {
-	final JInternalFrame frame;
+	final SimpleClient frame;
 	String username;
 	String password;
 	JComponent d;
 	int result;
 
-	public SimpleAuthenticator(final JInternalFrame frame) {
+	public SimpleAuthenticator(final SimpleClient frame) {
 		this.frame = frame;
 	}
 
@@ -110,7 +110,7 @@ public class SimpleAuthenticator extends Authenticator implements Runnable {
 	}
 
 	public void run() {
-		result = JOptionPane.showInternalConfirmDialog(frame, d, "Login", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+		result = JOptionPane.showInternalConfirmDialog(frame.getDialogParent(), d, "Login", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 	}
 
 	private Component constrain(Component cmp, GridBagLayout gb, GridBagConstraints c) {

@@ -176,6 +176,7 @@ public class Compose extends Frame {
 
 	private void send() throws MessagingException {
 		final Message msg = new MimeMessage(session);
+		final String mailhost = SimpleClient.instance.getMailhost();
 		final String from = SimpleClient.instance.getFrom();
 		final String to = toField.getText();
 		final String cc = ccField.getText();
@@ -186,6 +187,9 @@ public class Compose extends Frame {
 		final String url = SimpleClient.instance.getURL();
 		final String record = SimpleClient.instance.getRecord();
 
+		if (!mailhost.isEmpty()) {
+			session.getProperties().put("mail.smtp.host", mailhost);
+		}
 		if (!from.isEmpty()) {
 			msg.setFrom(new InternetAddress(from));
 		} else {

@@ -81,7 +81,7 @@ public class SimpleClient extends Frame {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			optionPanel1.load();
-			final int result = JOptionPane.showInternalConfirmDialog(SimpleClient.this, optionPanel1, "Account settings", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+			final int result = JOptionPane.showInternalConfirmDialog(getDialogParent(), optionPanel1, "Account settings", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 			switch (result) {
 			case JOptionPane.OK_OPTION:
 				optionPanel1.save();
@@ -89,6 +89,13 @@ public class SimpleClient extends Frame {
 			default:
 			}
 		}
+	}
+
+	Frame getDialogParent() {
+		if (!isShowing()) {
+			open((URI) null);
+		}
+		return this;
 	}
 
 	public SimpleClient() {
@@ -103,8 +110,10 @@ public class SimpleClient extends Frame {
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
 			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
-				if (evt.getKey().equals(getKey("url")) || evt.getKey().equals(getKey("mailhost")) || evt.getKey().equals(getKey("from")) || evt.getKey().equals(getKey("record")) || evt.getKey().equals(getKey("debug"))) {
+				if (evt.getKey().equals(getKey("url"))) {
 					open();
+				} else if (evt.getKey().equals(getKey("debug")) && getDebug()) {
+					session.setDebug(true);
 				}
 			}
 		});
@@ -112,6 +121,14 @@ public class SimpleClient extends Frame {
 
 	public Session getSession() {
 		return session;
+	}
+
+	public boolean getDebug() {
+		return prefs.getBoolean(getKey("debug"), false);
+	}
+
+	public String getMailhost() {
+		return prefs.get(getKey("mailhost"), "");
 	}
 
 	public String getFrom() {
@@ -162,19 +179,11 @@ public class SimpleClient extends Frame {
 
 	@Override
 	public void open() {
-		final String mailhost = prefs.get(getKey("mailhost"), "");
-		if (!mailhost.isEmpty()) {
-			session.getProperties().put("mail.smtp.host", mailhost);
-		}
-		final boolean debug = prefs.getBoolean(getKey("debug"), false);
-		if (debug) {
-			session.setDebug(true);
-		}
 		final URI uri = getURI();
 		if (uri != null) {
 			open(uri.toString());
 		} else {
-			final String str = prefs.get(getKey("url"), "");
+			final String str = getURL();
 			if (!str.isEmpty()) {
 				open(str);
 			}
