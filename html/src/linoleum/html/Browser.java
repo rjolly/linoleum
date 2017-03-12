@@ -27,6 +27,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.Document;
+import linoleum.application.ApplicationManager;
 import linoleum.application.Frame;
 
 public class Browser extends Frame {
@@ -172,7 +173,16 @@ public class Browser extends Frame {
 	}
 
 	private void linkActivated(final HyperlinkEvent evt) {
-		open(FrameURL.create(current, evt), 1, false);
+		try {
+			final URI uri = url.toURI();
+			if (canOpen(uri)) {
+				open(FrameURL.create(current, evt), 1, false);
+			} else {
+				getApplicationManager().open(uri);
+			}
+		} catch (final URISyntaxException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	private void open(final int delta) {
@@ -260,6 +270,55 @@ public class Browser extends Frame {
 	private void update() {
 		jButton2.setEnabled(index > 0);
 		jButton3.setEnabled(index < history.size() - 1);
+	}
+
+	private void prepare() {
+		if (url == null) {
+			jLabel1.setText("");
+			jPopupMenu1.removeAll();
+		} else {
+			jLabel1.setText(url.toString());
+			boolean sep0 = false;
+			try {
+				final URI uri = url.toURI();
+				final ApplicationManager mgr = getApplicationManager();
+				final String s = mgr.getApplication(uri.getScheme());
+				boolean sep = false;
+				if (s != null) {
+					final Action action = new AbstractAction(s) {
+						@Override
+						public void actionPerformed(final ActionEvent evt) {
+							mgr.open(s, uri);
+						}
+					};
+					jPopupMenu1.add(action);
+					sep = true;
+				}
+				sep0 = sep;
+				for (final String str : mgr.getApplications(uri.getScheme())) {
+					if (!str.equals(s)) {
+						if (sep) {
+							jPopupMenu1.addSeparator();
+							sep = false;
+						}
+						final Action action = new AbstractAction(str) {
+							@Override
+							public void actionPerformed(final ActionEvent evt) {
+								mgr.open(str, uri);
+							}
+						};
+						jPopupMenu1.add(action);
+						sep0 = true;
+					}
+				}
+			} catch (final URISyntaxException ex) {
+				ex.printStackTrace();
+			}
+			if (sep0) {
+				jPopupMenu1.addSeparator();
+			}
+			jPopupMenu1.add(copyLinkLocationAction);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -430,13 +489,10 @@ public class Browser extends Frame {
 			linkActivated(evt);
 		} else if (evt.getEventType() == HyperlinkEvent.EventType.ENTERED) {
 			url = evt.getURL();
-			if (url != null) {
-				jLabel1.setText(url.toString());
-				jPopupMenu1.add(copyLinkLocationAction);
-			}
+			prepare();
 		} else if (evt.getEventType() == HyperlinkEvent.EventType.EXITED) {
-			jPopupMenu1.removeAll();
-			jLabel1.setText("");
+			url = null;
+			prepare();
 		}
         }//GEN-LAST:event_jEditorPane1HyperlinkUpdate
 

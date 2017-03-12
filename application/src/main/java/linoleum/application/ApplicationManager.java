@@ -285,7 +285,7 @@ public class ApplicationManager extends Frame {
 		return null;
 	}
 
-	private String getApplication(final String scheme) {
+	public String getApplication(final String scheme) {
 		if (spref.containsKey(scheme)) {
 			return spref.get(scheme);
 		}
@@ -325,7 +325,7 @@ public class ApplicationManager extends Frame {
 		return Collections.unmodifiableList(names);
 	}
 
-	private List<String> getApplications(final String scheme) {
+	public List<String> getApplications(final String scheme) {
 		final List<String> names = new ArrayList<>();
 		if (sapps.containsKey(scheme)) {
 			names.addAll(sapps.get(scheme));
