@@ -4,6 +4,7 @@ import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
@@ -16,6 +17,8 @@ import java.util.ArrayList;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
+import javax.swing.Action;
+import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -32,12 +35,25 @@ public class Browser extends Frame {
 	private final Icon reloadIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Refresh16.gif"));
 	private final DefaultComboBoxModel<Integer> model = new DefaultComboBoxModel<>(new Integer[] { 8, 10, 12, 14, 18, 24, 36 });
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
+	private final Action copyLinkLocationAction = new CopyLinkLocationAction();
 	private List<FrameURL> history = new ArrayList<>();
 	private PageLoader loader;
 	private FrameURL current;
 	private boolean reload;
 	private int index;
 	private URL url;
+
+	private class CopyLinkLocationAction extends AbstractAction {
+		public CopyLinkLocationAction() {
+			super("Copy link location");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			final StringSelection selection = new StringSelection(url.toString());
+			getToolkit().getSystemClipboard().setContents(selection, selection);
+		}
+	}
 
 	public Browser() {
 		this(null);
@@ -416,10 +432,10 @@ public class Browser extends Frame {
 			url = evt.getURL();
 			if (url != null) {
 				jLabel1.setText(url.toString());
-				((JEditorPane)evt.getSource()).setComponentPopupMenu(jPopupMenu1);
+				jPopupMenu1.add(copyLinkLocationAction);
 			}
 		} else if (evt.getEventType() == HyperlinkEvent.EventType.EXITED) {
-			((JEditorPane)evt.getSource()).setComponentPopupMenu(null);
+			jPopupMenu1.removeAll();
 			jLabel1.setText("");
 		}
         }//GEN-LAST:event_jEditorPane1HyperlinkUpdate

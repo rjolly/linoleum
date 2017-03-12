@@ -339,7 +339,6 @@ public class FileManager extends Frame {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			open(getSelectedValue());
-			
 		}
 	}
 
@@ -370,7 +369,6 @@ public class FileManager extends Frame {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			doDefaultCloseAction();
-			
 		}
 	}
 
