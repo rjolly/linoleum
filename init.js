@@ -1,12 +1,14 @@
+Tools = Packages.linoleum.Tools;
+PackageManager = Packages.linoleum.pkg.PackageManager;
+
 function install(pkg, conf, dir) {
-    var instance = Packages.linoleum.pkg.PackageManager.instance;
     if (conf == undefined) {
 	conf = "default";
     }
     if (dir == undefined) {
-	instance.install(pkg, conf);
+	PackageManager.instance.install(pkg, conf);
     } else {
-	instance.install(pkg, conf, pathToFile(dir));
+	PackageManager.instance.install(pkg, conf, pathToFile(dir));
     }
 }
 
@@ -33,12 +35,12 @@ function javac(srcDir, destDir) {
     if (destDir == undefined) {
 	destDir = srcDir;
     }
-    Packages.linoleum.Tools.instance.compile(fileset(srcDir, ".*\.java"), pathToFile(destDir), ["-source", "1.7", "-target", "1.7"]);
+    Tools.instance.compile(fileset(srcDir, ".*\.java"), pathToFile(destDir), ["-source", "1.7", "-target", "1.7"]);
 }
 
 function classpath() {
     var str = "";
-    var files = Packages.linoleum.Tools.instance.classpath();
+    var files = Tools.instance.classpath();
     for(i in files) str += relativize(new File("."), files[i]).getPath() + (i < files.length - 1 ? java.io.File.pathSeparator : "");
     return str;
 }
@@ -56,7 +58,7 @@ function javadoc(srcDir, destDir) {
 }
 
 function copy(src, dest, pattern) {
-    Packages.linoleum.Tools.instance.copy(pathToFile(src), fileset(src, pattern), pathToFile(dest));
+    Tools.instance.copy(pathToFile(src), fileset(src, pattern), pathToFile(dest));
 }
 
 function jar(dest, dir, pattern, manifest) {
@@ -64,9 +66,9 @@ function jar(dest, dir, pattern, manifest) {
 	dir = ".";
     }
     if (manifest == undefined) {
-	Packages.linoleum.Tools.instance.jar(pathToFile(dir), fileset(dir, pattern), pathToFile(dest));
+	Tools.instance.jar(pathToFile(dir), fileset(dir, pattern), pathToFile(dest));
     } else {
-	Packages.linoleum.Tools.instance.jar(pathToFile(dir), fileset(dir, pattern), pathToFile(dest), pathToFile(manifest));
+	Tools.instance.jar(pathToFile(dir), fileset(dir, pattern), pathToFile(dest), pathToFile(manifest));
     }
 }
 
@@ -74,7 +76,7 @@ function makepom(dest, source) {
     if (source == undefined) {
 	source = "ivy.xml";
     }
-    Packages.linoleum.pkg.PackageManager.instance.makepom(pathToFile(source), pathToFile(dest));
+    PackageManager.instance.makepom(pathToFile(source), pathToFile(dest));
 }
 
 function publish(dir, resolver, source) {
@@ -84,7 +86,7 @@ function publish(dir, resolver, source) {
     if (source == undefined) {
 	source = "ivy.xml";
     }
-    Packages.linoleum.pkg.PackageManager.instance.publish(pathToFile(source), pathToFile(dir), resolver);
+    PackageManager.instance.publish(pathToFile(source), pathToFile(dir), resolver);
 }
 
 function clean(dir) {
@@ -198,7 +200,7 @@ function run(name) {
     for (var i = 0; i < array.length; i++) {
 	array[i] = arguments[i+1];
     }
-    Packages.linoleum.Tools.instance.run(name, curDir, array);
+    Tools.instance.run(name, curDir, array);
 }
 
 function javap(name) {
@@ -238,7 +240,7 @@ function ln(from, to) {
     if (to == undefined) {
 	to = target.getName();
     }
-    Packages.linoleum.Tools.instance.mklink(pathToFile(to), target);
+    Tools.instance.mklink(pathToFile(to), target);
 }
 
 function wget(from, to) {
