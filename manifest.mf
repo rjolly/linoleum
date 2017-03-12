@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Implementation-Vendor: Raphael Jolly
 Implementation-Title: Linoleum
-Implementation-Version: 0
+Implementation-Version: 1
 Specification-Vendor: com.github.rjolly
 Specification-Title: linoleum
 Specification-Version: 1.3
 Main-Class: linoleum.Desktop
-Class-Path: lib/application-1.3.jar lib/jlfgr-1_0.jar
+Class-Path: lib/application-1.3.1.jar lib/jlfgr-1_0.jar
