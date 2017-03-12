@@ -251,7 +251,6 @@ public class Browser extends Frame {
         private void initComponents() {
 
                 jPopupMenu1 = new javax.swing.JPopupMenu();
-                jMenuItem1 = new javax.swing.JMenuItem();
                 optionPanel1 = new linoleum.application.OptionPanel();
                 jLabel2 = new javax.swing.JLabel();
                 jTextField2 = new javax.swing.JTextField();
@@ -267,14 +266,6 @@ public class Browser extends Frame {
                 jPanel2 = new javax.swing.JPanel();
                 jLabel1 = new javax.swing.JLabel();
                 jProgressBar1 = new javax.swing.JProgressBar();
-
-                jMenuItem1.setText("Copy link location");
-                jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                jMenuItem1ActionPerformed(evt);
-                        }
-                });
-                jPopupMenu1.add(jMenuItem1);
 
                 jLabel2.setText("Home page :");
 
@@ -361,6 +352,7 @@ public class Browser extends Frame {
                 });
 
                 jEditorPane1.setEditable(false);
+                jEditorPane1.setComponentPopupMenu(jPopupMenu1);
                 jEditorPane1.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
                         public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
                                 jEditorPane1HyperlinkUpdate(evt);
@@ -440,11 +432,6 @@ public class Browser extends Frame {
 		open(1);
         }//GEN-LAST:event_jButton3ActionPerformed
 
-        private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-		final StringSelection selection = new StringSelection(url.toString());
-		getToolkit().getSystemClipboard().setContents(selection, selection);
-        }//GEN-LAST:event_jMenuItem1ActionPerformed
-
         private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
 		optionPanel1.setDirty(true);
         }//GEN-LAST:event_jComboBox1ActionPerformed
@@ -458,7 +445,6 @@ public class Browser extends Frame {
         private javax.swing.JLabel jLabel1;
         private javax.swing.JLabel jLabel2;
         private javax.swing.JLabel jLabel3;
-        private javax.swing.JMenuItem jMenuItem1;
         private javax.swing.JPanel jPanel2;
         private javax.swing.JPanel jPanel3;
         private javax.swing.JPopupMenu jPopupMenu1;
