@@ -46,10 +46,10 @@ public class Compose extends Frame {
 	private JTextArea content;
 	private String inReplyTo[];
 	private String references[];
-	private File file;
-	private final Session session = SimpleClient.instance.getSession();
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
-	private final FileChooser chooser = new FileChooser();
+	private final FileChooser chooser = SimpleClient.instance.getFileChooser();
+	private final Session session = SimpleClient.instance.getSession();
+	private File file;
 
 	private class AttachAction extends AbstractAction {
 		public AttachAction() {

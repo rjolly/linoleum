@@ -27,6 +27,7 @@ import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import linoleum.application.FileChooser;
 import linoleum.application.Frame;
 
 public class SimpleClient extends Frame {
@@ -39,6 +40,7 @@ public class SimpleClient extends Frame {
 	private final DefaultTreeModel model = new DefaultTreeModel(root);
 	private final Map<URLName, StoreTreeNode> map = new HashMap<>();
 	private final Session session = Session.getInstance(System.getProperties(), new SimpleAuthenticator(this));
+	private final FileChooser chooser = new FileChooser();
 	private Folder folder;
 	static SimpleClient instance;
 
@@ -90,6 +92,9 @@ public class SimpleClient extends Frame {
 	}
 
 	public SimpleClient() {
+		if (instance == null) {
+			instance = this;
+		}
 		initComponents();
 		setScheme("imap:imaps");
 		setIcon(new ImageIcon(getClass().getResource("Mail24.png")));
@@ -103,9 +108,6 @@ public class SimpleClient extends Frame {
 				}
 			}
 		});
-		if (instance == null) {
-			instance = this;
-		}
 	}
 
 	public Session getSession() {
@@ -125,11 +127,19 @@ public class SimpleClient extends Frame {
 	}
 
 	void compose(final String str) throws URISyntaxException {
-		getApplicationManager().open("Compose", new URI("mailto", str, null));
+		getApplicationManager().open(new URI("mailto", str, null));
 	}
 
 	public FolderViewer getFolderViewer() {
 		return folderViewer;
+	}
+
+	public MessageViewer getMessageViewer() {
+		return messageViewer;
+	}
+
+	FileChooser getFileChooser() {
+		return chooser;
 	}
 
 	@Override
@@ -213,8 +223,8 @@ public class SimpleClient extends Frame {
                 jSplitPane2 = new javax.swing.JSplitPane();
                 jScrollPane1 = new javax.swing.JScrollPane();
                 jTree1 = new javax.swing.JTree();
-                folderViewer = new linoleum.mail.FolderViewer();
                 messageViewer = new linoleum.mail.MessageViewer();
+                folderViewer = new linoleum.mail.FolderViewer();
                 jMenuBar1 = new javax.swing.JMenuBar();
                 jMenu1 = new javax.swing.JMenu();
                 jMenuItem1 = new javax.swing.JMenuItem();
@@ -299,9 +309,9 @@ public class SimpleClient extends Frame {
                 setName("Mail");
 
                 jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-                jSplitPane1.setResizeWeight(0.4);
+                jSplitPane1.setResizeWeight(0.3);
 
-                jSplitPane2.setResizeWeight(0.4);
+                jSplitPane2.setResizeWeight(0.5);
 
                 jTree1.setModel(model);
                 jTree1.addTreeWillExpandListener(new javax.swing.event.TreeWillExpandListener() {
@@ -321,12 +331,10 @@ public class SimpleClient extends Frame {
 
                 jSplitPane2.setLeftComponent(jScrollPane1);
 
-                folderViewer.setMv(messageViewer);
                 jSplitPane2.setRightComponent(folderViewer);
 
                 jSplitPane1.setTopComponent(jSplitPane2);
 
-                messageViewer.setClient(this);
                 jSplitPane1.setBottomComponent(messageViewer);
 
                 jMenu1.setText("Message");
@@ -435,7 +443,6 @@ public class SimpleClient extends Frame {
         }//GEN-LAST:event_jCheckBox1ActionPerformed
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
-        private linoleum.mail.FolderViewer folderViewer;
         private javax.swing.JCheckBox jCheckBox1;
         private javax.swing.JLabel jLabel1;
         private javax.swing.JLabel jLabel2;
@@ -462,6 +469,7 @@ public class SimpleClient extends Frame {
         private javax.swing.JTextField jTextField4;
         private javax.swing.JTree jTree1;
         private linoleum.mail.MessageViewer messageViewer;
+        private linoleum.mail.FolderViewer folderViewer;
         private linoleum.application.OptionPanel optionPanel1;
         // End of variables declaration//GEN-END:variables
 }

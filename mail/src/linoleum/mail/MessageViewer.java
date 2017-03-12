@@ -21,7 +21,6 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 	private final Action forwardAction = new ForwardAction();
 	private final Action deleteAction = new DeleteAction();
 	private final Action structureAction = new StructureAction();
-	private SimpleClient client;
 	private Message displayed;
 	private Component mainbody;
 
@@ -79,7 +78,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 			@Override
 			public void done() {
 				try {
-					client.compose(get());
+					SimpleClient.instance.compose(get());
 				} catch (final Exception e) {
 					e.printStackTrace();
 				}
@@ -147,7 +146,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			try {
-				client.getFolderViewer().getModel().delete(displayed);
+				SimpleClient.instance.getFolderViewer().getModel().delete(displayed);
 			} catch (final MessagingException me) {
 				me.printStackTrace();
 			}
@@ -186,17 +185,9 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 		return deleteAction;
 	}
 
-	public Action getStructureAction() {
-		return structureAction;
-	}
-
 	public MessageViewer() {
 		initComponents();
 		setMessage(null);
-	}
-
-	public void setClient(final SimpleClient client) {
-		this.client = client;
 	}
 
 	public final void setMessage(final Message what) {
@@ -341,7 +332,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 
                 jPanel1.setLayout(new java.awt.CardLayout());
 
-                jButton5.setAction(getStructureAction());
+                jButton5.setAction(structureAction);
                 jButton5.setText("Structure");
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);

@@ -59,7 +59,7 @@
     <Component class="javax.swing.JButton" name="jButton5">
       <Properties>
         <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="getStructureAction()" type="code"/>
+          <Connection code="structureAction" type="code"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Structure"/>
       </Properties>

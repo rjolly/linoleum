@@ -7,7 +7,7 @@ import javax.swing.event.ListSelectionListener;
 
 public class FolderViewer extends javax.swing.JPanel {
 	private final FolderModel model = new FolderModel();
-	private MessageViewer mv;
+	private MessageViewer mv = SimpleClient.instance.getMessageViewer();
 
 	public FolderModel getModel() {
 		return model;
@@ -17,12 +17,22 @@ public class FolderViewer extends javax.swing.JPanel {
 		initComponents();
 
 		// find out what is pressed
-		table.getSelectionModel().addListSelectionListener(new FolderPressed());
+		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(final ListSelectionEvent e) {
+				if (model != null && !e.getValueIsAdjusting()) {
+					final ListSelectionModel lm = (ListSelectionModel) e.getSource();
+					final int which = lm.getMaxSelectionIndex();
+					if (which != -1) {
+						// get the message and display it
+						final Message msg = model.getMessage(which);
+						mv.setMessage(msg);
+					}
+				}
+			}
+		});
+		table.getColumnModel().getColumn(3).setMinWidth(55);
+		table.getColumnModel().getColumn(3).setMaxWidth(55);
 		table.setShowGrid(false);
-	}
-
-	public void setMv(final MessageViewer mv) {
-		this.mv = mv;
 	}
 
 	public void setFolder(final Folder what) throws MessagingException {
@@ -46,7 +56,7 @@ public class FolderViewer extends javax.swing.JPanel {
                 scrollpane = new javax.swing.JScrollPane();
                 table = new javax.swing.JTable();
 
-                table.setModel(getModel());
+                table.setModel(model);
                 scrollpane.setViewportView(table);
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -60,20 +70,6 @@ public class FolderViewer extends javax.swing.JPanel {
                         .addComponent(scrollpane, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
                 );
         }// </editor-fold>//GEN-END:initComponents
-
-	class FolderPressed implements ListSelectionListener {
-		public void valueChanged(final ListSelectionEvent e) {
-			if (model != null && !e.getValueIsAdjusting()) {
-				final ListSelectionModel lm = (ListSelectionModel) e.getSource();
-				final int which = lm.getMaxSelectionIndex();
-				if (which != -1) {
-					// get the message and display it
-					final Message msg = model.getMessage(which);
-					mv.setMessage(msg);
-				}
-			}
-		}
-	}
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JScrollPane scrollpane;

@@ -34,13 +34,13 @@ public class PackageManager extends Frame {
 
 	public PackageManager() {
 		super("Packages");
+		if (instance == null) {
+			instance = this;
+		}
 		initComponents();
 		setScheme("mvn");
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Jar24.gif")));
 		model = (DefaultTableModel) jTable1.getModel();
-		if (instance == null) {
-			instance = this;
-		}
 		final File settings = new File("ivysettings.xml");
 		try {
 			if (settings.exists()) {
@@ -153,9 +153,10 @@ public class PackageManager extends Frame {
                 jSeparator1 = new javax.swing.JSeparator();
                 jScrollPane1 = new javax.swing.JScrollPane();
                 jTable1 = new javax.swing.JTable();
+                jButton2 = new javax.swing.JButton();
 
                 setFrameIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Jar16.gif"))); // NOI18N
-                setName("Packages");
+                setName("Packages"); // NOI18N
 
                 jLabel1.setText("Organization :");
 
@@ -172,6 +173,7 @@ public class PackageManager extends Frame {
 
                 jTable1.setModel(new javax.swing.table.DefaultTableModel(
                         new Object [][] {
+
                         },
                         new String [] {
                                 "Name", "Version", "Snapshot"
@@ -195,6 +197,13 @@ public class PackageManager extends Frame {
                 jTable1.getTableHeader().setReorderingAllowed(false);
                 jScrollPane1.setViewportView(jTable1);
 
+                jButton2.setText("Clear");
+                jButton2.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jButton2ActionPerformed(evt);
+                        }
+                });
+
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);
                 layout.setHorizontalGroup(
@@ -211,6 +220,8 @@ public class PackageManager extends Frame {
                                         .addComponent(jTextField3)
                                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                                 .addGap(0, 0, Short.MAX_VALUE)
+                                                .addComponent(jButton2)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(jButton1))
                                         .addComponent(jScrollPane1))
                                 .addContainerGap())
@@ -231,7 +242,9 @@ public class PackageManager extends Frame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton1)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jButton1)
+                                        .addComponent(jButton2))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -258,8 +271,16 @@ public class PackageManager extends Frame {
 		}).execute();
         }//GEN-LAST:event_jButton1ActionPerformed
 
+        private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+		setURI(null);
+		jTextField1.setText("");
+		jTextField2.setText("");
+		jTextField3.setText("");
+        }//GEN-LAST:event_jButton2ActionPerformed
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
+        private javax.swing.JButton jButton2;
         private javax.swing.JLabel jLabel1;
         private javax.swing.JLabel jLabel2;
         private javax.swing.JLabel jLabel3;
