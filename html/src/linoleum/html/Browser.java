@@ -12,8 +12,12 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLStreamHandler;
+import java.net.URLStreamHandlerFactory;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
@@ -43,6 +47,19 @@ public class Browser extends Frame {
 	private boolean reload;
 	private int index;
 	private URL url;
+	private static final String protocols[] = new String[] {"mvn", "imap", "imaps"};
+
+	static {
+		URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
+			public URLStreamHandler createURLStreamHandler(final String protocol) {
+				return Arrays.asList(protocols).contains(protocol)?new URLStreamHandler() {
+					public URLConnection openConnection(final URL u) {
+						return null;
+					}
+				}:null;
+			}
+		});
+	}
 
 	private class CopyLinkLocationAction extends AbstractAction {
 		public CopyLinkLocationAction() {
@@ -175,7 +192,7 @@ public class Browser extends Frame {
 	private void linkActivated(final HyperlinkEvent evt) {
 		try {
 			final URI uri = url.toURI();
-			if (canOpen(uri)) {
+			if (canOpen(stripped(uri))) {
 				open(FrameURL.create(current, evt), 1, false);
 			} else {
 				getApplicationManager().open(uri);
@@ -183,6 +200,10 @@ public class Browser extends Frame {
 		} catch (final URISyntaxException ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	private URI stripped(final URI uri) throws URISyntaxException {
+		return uri.isOpaque()?new URI(uri.getScheme(), uri.getSchemeSpecificPart(), null):new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null);
 	}
 
 	private void open(final int delta) {
@@ -273,16 +294,16 @@ public class Browser extends Frame {
 	}
 
 	private void prepare() {
+		jPopupMenu1.removeAll();
 		if (url == null) {
 			jLabel1.setText("");
-			jPopupMenu1.removeAll();
 		} else {
 			jLabel1.setText(url.toString());
 			boolean sep0 = false;
 			try {
 				final URI uri = url.toURI();
 				final ApplicationManager mgr = getApplicationManager();
-				final String s = mgr.getApplication(uri.getScheme());
+				final String s = mgr.getApplication(stripped(uri));
 				boolean sep = false;
 				if (s != null) {
 					final Action action = new AbstractAction(s) {
@@ -295,7 +316,7 @@ public class Browser extends Frame {
 					sep = true;
 				}
 				sep0 = sep;
-				for (final String str : mgr.getApplications(uri.getScheme())) {
+				for (final String str : mgr.getApplications(stripped(uri))) {
 					if (!str.equals(s)) {
 						if (sep) {
 							jPopupMenu1.addSeparator();
@@ -427,7 +448,6 @@ public class Browser extends Frame {
                 });
 
                 jEditorPane1.setEditable(false);
-                jEditorPane1.setComponentPopupMenu(jPopupMenu1);
                 jEditorPane1.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
                         public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {
                                 jEditorPane1HyperlinkUpdate(evt);
@@ -485,9 +505,13 @@ public class Browser extends Frame {
         }//GEN-LAST:event_jTextField1ActionPerformed
 
         private void jEditorPane1HyperlinkUpdate(javax.swing.event.HyperlinkEvent evt) {//GEN-FIRST:event_jEditorPane1HyperlinkUpdate
+		if (jPopupMenu1.isShowing()) {
+			return;
+		}
 		if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 			linkActivated(evt);
 		} else if (evt.getEventType() == HyperlinkEvent.EventType.ENTERED) {
+			((JEditorPane) evt.getSource()).setComponentPopupMenu(jPopupMenu1);
 			url = evt.getURL();
 			prepare();
 		} else if (evt.getEventType() == HyperlinkEvent.EventType.EXITED) {

@@ -4,20 +4,23 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 import java.io.*;
+import java.net.*;
 import javax.activation.*;
 import javax.mail.*;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import linoleum.application.ApplicationManager;
 import linoleum.application.FileChooser;
 
 public class MultipartViewer extends JPanel implements Viewer {
 	final JPanel p = new JPanel(new GridBagLayout());
+	final ApplicationManager apps = SimpleClient.instance.getApplicationManager();
 	final FileChooser chooser = SimpleClient.instance.getFileChooser();
 	final JScrollPane scp = new JScrollPane(p);
 	final JSplitPane sp = new JSplitPane();
@@ -71,13 +74,14 @@ public class MultipartViewer extends JPanel implements Viewer {
 			// for each one we create a button with the content type
 			for(int i = 1; i < count; i++) { // we skip the first one 
 				final BodyPart curr = mp.getBodyPart(i);
-				String label = null;
-				if (label == null) label = curr.getFileName();
+				final String filename = curr.getFileName();
+				String label = filename;
+
 				if (label == null) label = curr.getDescription();
 				if (label == null) label = curr.getContentType();
 
 				final JButton button = new JButton(label);
-				button.addActionListener(new AttachmentViewer(curr));
+				button.addActionListener(new AttachmentViewer(curr, filename));
 				p.add(button, gc);
 			}
 		} catch(final MessagingException me) {
@@ -117,13 +121,16 @@ public class MultipartViewer extends JPanel implements Viewer {
 
 	class AttachmentViewer implements ActionListener {
 		final BodyPart bp;
+		final String filename;
 
-		public AttachmentViewer(final BodyPart part) {
+		public AttachmentViewer(final BodyPart part, final String filename) {
 			bp = part;
+			this.filename = filename;
 		}
 
 		public void actionPerformed(final ActionEvent e) {
 			final File file;
+			chooser.setSelectedFile(new File(filename == null?"":filename));
 			final int returnVal = chooser.showInternalSaveDialog(MultipartViewer.this);
 			switch (returnVal) {
 			case JFileChooser.APPROVE_OPTION:
@@ -132,34 +139,37 @@ public class MultipartViewer extends JPanel implements Viewer {
 			default:
 				file = null;
 			}
-			if (file == null) (new SwingWorker<Component, Object>() {
-				public Component doInBackground() throws MessagingException {
-					return getComponent(bp);
-				}
-
-				@Override
-				protected void done() {
-					try {
-						display(get());
-					} catch (final Exception e) {
-						display(new Label(e.toString()));
-					}
-				}
-
-			}).execute(); else SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
+			if (file != null && (!file.exists() || proceed())) (new SwingWorker<URI, Object>() {
+				public URI doInBackground() throws Exception {
 					try (final InputStream is = bp.getDataHandler().getInputStream(); final OutputStream os = new FileOutputStream(file)) {
 						final byte buffer[] = new byte[4096];
 						int n;
 						while ((n = is.read(buffer)) != -1) {
 							os.write(buffer, 0, n);
 						}
+					}
+					return file.toPath().toUri();
+				}
+
+				@Override
+				protected void done() {
+					try {
+						apps.open(get());
 					} catch (final Exception e) {
 						e.printStackTrace();
 					}
 				}
-			});
+			}).execute();
 		}
+	}
+
+	private boolean proceed() {
+		switch (JOptionPane.showInternalConfirmDialog(this, "File exists. Overwrite ?", "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE)) {
+		case JOptionPane.OK_OPTION:
+			return true;
+		default:
+		}
+		return false;
 	}
 
 	private void display(final Component comp) {

@@ -2,7 +2,6 @@ package linoleum.mail;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -58,6 +57,7 @@ public class Compose extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent evt) {
+			chooser.setSelectedFile(new File(""));
 			final int returnVal = chooser.showInternalOpenDialog(Compose.this);
 			switch (returnVal) {
 			case JFileChooser.APPROVE_OPTION:
@@ -79,9 +79,7 @@ public class Compose extends Frame {
 		public void actionPerformed(final ActionEvent evt) {
 			try {
 				send();
-				setClosed(true);
-			} catch (final PropertyVetoException e) {
-				e.printStackTrace();
+				doDefaultCloseAction();
 			} catch (final MessagingException me) {
 				me.printStackTrace();
 			}
@@ -175,7 +173,6 @@ public class Compose extends Frame {
 	}
 
 	private void send() throws MessagingException {
-		final Message msg = new MimeMessage(session);
 		final String mailhost = SimpleClient.instance.getMailhost();
 		final String from = SimpleClient.instance.getFrom();
 		final String to = toField.getText();
@@ -190,6 +187,7 @@ public class Compose extends Frame {
 		if (!mailhost.isEmpty()) {
 			session.getProperties().put("mail.smtp.host", mailhost);
 		}
+		final Message msg = new MimeMessage(session);
 		if (!from.isEmpty()) {
 			msg.setFrom(new InternetAddress(from));
 		} else {
