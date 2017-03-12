@@ -198,8 +198,15 @@ public class ApplicationManager extends Frame {
 			public Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int row, final int column) {
 				comboModel.removeAllElements();
 				comboModel.addElement(null);
-				final MimeType type = (MimeType) tableModel.getValueAt(row, 0);
-				for (final String name : apps.get(type)) {
+				final List<String> names = new ArrayList<>();
+				if (table == jTable1) {
+					final MimeType type = (MimeType) tableModel.getValueAt(row, 0);
+					names.addAll(apps.get(type));
+				} else if (table == jTable2) {
+					final String scheme = (String) schemeTableModel.getValueAt(row, 0);
+					names.addAll(sapps.get(scheme));
+				}
+				for (final String name : names) {
 					comboModel.addElement(name);
 				}
 				return super.getTableCellEditorComponent(table, value, isSelected, row, column);
