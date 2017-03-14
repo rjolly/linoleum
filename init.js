@@ -318,3 +318,11 @@ function diff(file1, file2) {
     var d = DiffUtils.generateUnifiedDiff(file1.getName(), file2.getName(), a, p, 3);
     for (var i = 0; i < d.size(); i++) println(d.get(i));
 }
+
+// requires org.eclipse.jgit#org.eclipse.jgit;3.4.0.201406110918-r
+
+function git() {
+    Git = Packages.org.eclipse.jgit.api.Git
+    FileRepository = Packages.org.eclipse.jgit.internal.storage.file.FileRepository
+    return new Git(new FileRepository(pathToFile(".git")))
+}

@@ -295,51 +295,46 @@ public class Browser extends Frame {
 
 	private void prepare() {
 		jPopupMenu1.removeAll();
-		if (url == null) {
-			jLabel1.setText("");
-		} else {
-			jLabel1.setText(url.toString());
-			boolean sep0 = false;
-			try {
-				final URI uri = url.toURI();
-				final ApplicationManager mgr = getApplicationManager();
-				final String s = mgr.getApplication(stripped(uri));
-				boolean sep = false;
-				if (s != null) {
-					final Action action = new AbstractAction(s) {
+		boolean sep0 = false;
+		try {
+			final URI uri = url.toURI();
+			final ApplicationManager mgr = getApplicationManager();
+			final String s = mgr.getApplication(stripped(uri));
+			boolean sep = false;
+			if (s != null) {
+				final Action action = new AbstractAction(s) {
+					@Override
+					public void actionPerformed(final ActionEvent evt) {
+						mgr.open(s, uri);
+					}
+				};
+				jPopupMenu1.add(action);
+				sep = true;
+			}
+			sep0 = sep;
+			for (final String str : mgr.getApplications(stripped(uri))) {
+				if (!str.equals(s)) {
+					if (sep) {
+						jPopupMenu1.addSeparator();
+						sep = false;
+					}
+					final Action action = new AbstractAction(str) {
 						@Override
 						public void actionPerformed(final ActionEvent evt) {
-							mgr.open(s, uri);
+							mgr.open(str, uri);
 						}
 					};
 					jPopupMenu1.add(action);
-					sep = true;
+					sep0 = true;
 				}
-				sep0 = sep;
-				for (final String str : mgr.getApplications(stripped(uri))) {
-					if (!str.equals(s)) {
-						if (sep) {
-							jPopupMenu1.addSeparator();
-							sep = false;
-						}
-						final Action action = new AbstractAction(str) {
-							@Override
-							public void actionPerformed(final ActionEvent evt) {
-								mgr.open(str, uri);
-							}
-						};
-						jPopupMenu1.add(action);
-						sep0 = true;
-					}
-				}
-			} catch (final URISyntaxException ex) {
-				ex.printStackTrace();
 			}
-			if (sep0) {
-				jPopupMenu1.addSeparator();
-			}
-			jPopupMenu1.add(copyLinkLocationAction);
+		} catch (final URISyntaxException ex) {
+			ex.printStackTrace();
 		}
+		if (sep0) {
+			jPopupMenu1.addSeparator();
+		}
+		jPopupMenu1.add(copyLinkLocationAction);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -362,6 +357,16 @@ public class Browser extends Frame {
                 jPanel2 = new javax.swing.JPanel();
                 jLabel1 = new javax.swing.JLabel();
                 jProgressBar1 = new javax.swing.JProgressBar();
+
+                jPopupMenu1.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+                        public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
+                        }
+                        public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {
+                        }
+                        public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {
+                                jPopupMenu1PopupMenuWillBecomeVisible(evt);
+                        }
+                });
 
                 jLabel2.setText("Home page :");
 
@@ -513,10 +518,12 @@ public class Browser extends Frame {
 		} else if (evt.getEventType() == HyperlinkEvent.EventType.ENTERED) {
 			((JEditorPane) evt.getSource()).setComponentPopupMenu(jPopupMenu1);
 			url = evt.getURL();
-			prepare();
+			if (url != null) {
+				jLabel1.setText(url.toString());
+			}
 		} else if (evt.getEventType() == HyperlinkEvent.EventType.EXITED) {
 			url = null;
-			prepare();
+			jLabel1.setText("");
 		}
         }//GEN-LAST:event_jEditorPane1HyperlinkUpdate
 
@@ -531,6 +538,10 @@ public class Browser extends Frame {
         private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
 		optionPanel1.setDirty(true);
         }//GEN-LAST:event_jComboBox1ActionPerformed
+
+        private void jPopupMenu1PopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_jPopupMenu1PopupMenuWillBecomeVisible
+		prepare();
+        }//GEN-LAST:event_jPopupMenu1PopupMenuWillBecomeVisible
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;

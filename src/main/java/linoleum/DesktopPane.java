@@ -207,8 +207,7 @@ public class DesktopPane extends JDesktopPane {
 				}
 
 				private void close() {
-					bkg.select();
-					index = -1;
+					index = 0;
 					update();
 				}
 
