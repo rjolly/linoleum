@@ -1,5 +1,6 @@
 linoleum.ScriptShell
 linoleum.FileManager
+linoleum.DownloadManager
 linoleum.PreferenceManager
 linoleum.ImageViewer
 linoleum.Clock
