@@ -216,6 +216,14 @@ public class Browser extends Frame {
 		}
 		if (loader == null) {
 			loader = new PageLoader(url, delta, force);
+			loader.addPropertyChangeListener(new PropertyChangeListener() {
+				public  void propertyChange(final PropertyChangeEvent evt) {
+					if ("progress".equals(evt.getPropertyName())) {
+						jProgressBar1.setValue((Integer) evt.getNewValue());
+					}
+				}
+			});
+
 			loader.execute();
 		}
 	}
@@ -231,13 +239,6 @@ public class Browser extends Frame {
 			this.dest = dest;
 			this.delta = delta;
 			this.force = force;
-			addPropertyChangeListener(new PropertyChangeListener() {
-				public  void propertyChange(final PropertyChangeEvent evt) {
-					if ("progress".equals(evt.getPropertyName())) {
-						jProgressBar1.setValue((Integer)evt.getNewValue());
-					}
-				}
-			});
 			jButton1.setIcon(stopIcon);
 			layout.show(jPanel2, "progressBar");
 			jEditorPane1.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
