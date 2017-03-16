@@ -6,29 +6,46 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.MalformedURLException;
+import java.util.Collections;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
+import javax.swing.SwingWorker;
+import linoleum.application.FileChooser;
 import linoleum.application.Frame;
 
 public class DownloadManager extends Frame {
 	private final Icon deleteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Delete16.gif"));
-	private final DefaultListModel<URL> model = new DefaultListModel<>();
+	private final DefaultListModel<FileLoader> model = new DefaultListModel<>();
 	private final ListCellRenderer renderer = new Renderer();
+	private final FileChooser chooser = new FileChooser();
 	private final Action closeAction = new CloseAction();
+	private final Action cancelAction = new CancelAction();
+	private final Action clearCompletedAction = new ClearCompletedAction();
+	private final Action copyLinkAddressAction = new CopyLinkAddressAction();
 	private final Action deleteAction = new DeleteAction();
+	private FileLoader loader;
 
 	private class Renderer extends JPanel implements ListCellRenderer {
 		final JLabel label = new JLabel();
@@ -55,8 +72,61 @@ public class DownloadManager extends Frame {
 				setForeground(list.getForeground());
 			}
 			label.setFont(list.getFont());
-			label.setText(new File(((URL) value).getPath()).getName());
+			final FileLoader loader = (FileLoader) value;
+			label.setText(loader.getName());
+			loader.addPropertyChangeListener(new PropertyChangeListener() {
+				public  void propertyChange(final PropertyChangeEvent evt) {
+					if ("progress".equals(evt.getPropertyName())) {
+						progress.setValue((Integer) evt.getNewValue());
+					}
+				}
+			});
 			return this;
+		}
+	}
+
+	private class FileLoader extends SwingWorker<File, Object> {
+		private final URL location;
+		private final File file;
+	
+		FileLoader(final URL location, final File file) {
+			this.location = location;
+			this.file = file;
+		}
+
+		public String getLocation() {
+			return location.toString();
+		}
+
+		public String getName() {
+			return file.getName();
+		}
+
+		public File doInBackground() throws IOException {
+			final URLConnection conn = location.openConnection();
+			final long length = conn.getContentLengthLong();
+			try (final InputStream is = conn.getInputStream(); final OutputStream os = new FileOutputStream(file)) {
+				final byte buffer[] = new byte[4096];
+				long l = 0;
+				int n = 0;
+				while ((n = is.read(buffer)) != -1) {
+					os.write(buffer, 0, n);
+					l += n;
+					if (length > 0) {
+						setProgress(Long.valueOf(100 * l / length).intValue());
+					}
+				}
+			}
+			return file;
+		}
+
+		@Override
+		protected void done() {
+			try {
+				get();
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -72,6 +142,46 @@ public class DownloadManager extends Frame {
 		}
 	}
 
+	private class CancelAction extends AbstractAction {
+		public CancelAction() {
+			super("Cancel");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			loader.cancel(true);
+			prepare();
+		}
+	}
+
+	private class ClearCompletedAction extends AbstractAction {
+		public ClearCompletedAction() {
+			super("Clear completed");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			for (final FileLoader loader : Collections.list(model.elements())) {
+				if (loader.isDone()) {
+					model.removeElement(loader);
+				}
+			}
+			prepare();
+		}
+	}
+
+	private class CopyLinkAddressAction extends AbstractAction {
+		public CopyLinkAddressAction() {
+			super("Copy link address");
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			final String str = loader.getLocation();
+		}
+	}
+
 	private class DeleteAction extends AbstractAction {
 		public DeleteAction() {
 			super("Delete", deleteIcon);
@@ -80,24 +190,27 @@ public class DownloadManager extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			model.remove(jList1.getSelectedIndex());
+			model.removeElement(loader);
+			prepare();
 		}
 	}
 
 	public DownloadManager() {
 		initComponents();
-		jMenu1.add(closeAction);
-		jMenu2.add(deleteAction);
 		setScheme("ftp:http:https");
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Import24.gif")));
+		jMenu1.add(closeAction);
+		jMenu2.add(cancelAction);
+		jMenu2.add(clearCompletedAction);
+		jMenu2.add(copyLinkAddressAction);
+		jMenu2.add(deleteAction);
 	}
 
 	@Override
 	public void open() {
 		final URI uri = getURI();
 		if (uri != null) try {
-			final URL url = uri.toURL();
-			jTextField1.setText(url.toString());
+			jTextField1.setText(uri.toURL().toString());
 		} catch (final MalformedURLException ex) {
 			ex.printStackTrace();
 		}
@@ -115,15 +228,50 @@ public class DownloadManager extends Frame {
 
 	private void start() {
 		try {
-			final URL url = new URL(jTextField1.getText());
-			model.addElement(url);
+			final URL location = new URL(jTextField1.getText());
+			final File file = getFile(new File(location.getPath()).getName());
+			if (file != null && (!file.exists() || proceed())) {
+				final FileLoader loader = new FileLoader(location, file);
+				model.addElement(loader);
+				loader.execute();
+			}
 		} catch (final MalformedURLException ex) {
 			ex.printStackTrace();
 		}
 	}
 
+	private File getFile(final String filename) {
+		chooser.setSelectedFile(new File(filename));
+		final int returnVal = chooser.showInternalSaveDialog(this);
+		switch (returnVal) {
+		case JFileChooser.APPROVE_OPTION:
+			return chooser.getSelectedFile();
+		default:
+		}
+		return null;
+	}
+
+	private boolean proceed() {
+		switch (JOptionPane.showInternalConfirmDialog(this, "File exists. Overwrite ?", "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE)) {
+		case JOptionPane.OK_OPTION:
+			return true;
+		default:
+		}
+		return false;
+	}
+
 	private void prepare() {
-		deleteAction.setEnabled(!jList1.isSelectionEmpty());
+		if (jList1.isSelectionEmpty()) {
+			loader = null;
+			cancelAction.setEnabled(false);
+			deleteAction.setEnabled(false);
+			copyLinkAddressAction.setEnabled(false);
+		} else {
+			loader = (FileLoader) jList1.getSelectedValue();
+			cancelAction.setEnabled(!loader.isDone());
+			deleteAction.setEnabled(loader.isDone());
+			copyLinkAddressAction.setEnabled(true);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
