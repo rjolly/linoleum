@@ -78,6 +78,18 @@ public class PackageManager extends Frame {
 		}
 	}
 
+	@Override
+	public void close() {
+		clear();
+	}
+
+	private void clear() {
+		setURI(null);
+		jTextField1.setText("");
+		jTextField2.setText("");
+		jTextField3.setText("");
+	}
+
 	public void makepom(final File source, final File pom) throws Exception {
 		final ResolveReport resolveReport = ivy.resolve(source);
 		final ModuleDescriptor md = resolveReport.getModuleDescriptor();
@@ -272,10 +284,7 @@ public class PackageManager extends Frame {
         }//GEN-LAST:event_jButton1ActionPerformed
 
         private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-		setURI(null);
-		jTextField1.setText("");
-		jTextField2.setText("");
-		jTextField3.setText("");
+		clear();
         }//GEN-LAST:event_jButton2ActionPerformed
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
