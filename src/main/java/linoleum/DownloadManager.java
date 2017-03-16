@@ -312,6 +312,7 @@ public class DownloadManager extends Frame {
                 });
 
                 jList1.setModel(model);
+                jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
                 jList1.setCellRenderer(renderer);
                 jList1.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
                         public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
