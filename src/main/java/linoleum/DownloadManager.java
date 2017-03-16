@@ -3,22 +3,32 @@ package linoleum;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.net.MalformedURLException;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.DefaultListModel;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import linoleum.application.Frame;
 
 public class DownloadManager extends Frame {
+	private final Icon deleteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Delete16.gif"));
 	private final DefaultListModel<URL> model = new DefaultListModel<>();
 	private final ListCellRenderer renderer = new Renderer();
+	private final Action closeAction = new CloseAction();
+	private final Action deleteAction = new DeleteAction();
 
 	private class Renderer extends JPanel implements ListCellRenderer {
 		final JLabel label = new JLabel();
@@ -50,8 +60,34 @@ public class DownloadManager extends Frame {
 		}
 	}
 
+	private class CloseAction extends AbstractAction {
+		public CloseAction() {
+			super("Close");
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_MASK));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			doDefaultCloseAction();
+		}
+	}
+
+	private class DeleteAction extends AbstractAction {
+		public DeleteAction() {
+			super("Delete", deleteIcon);
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			model.remove(jList1.getSelectedIndex());
+		}
+	}
+
 	public DownloadManager() {
 		initComponents();
+		jMenu1.add(closeAction);
+		jMenu2.add(deleteAction);
 		setScheme("ftp:http:https");
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Import24.gif")));
 	}
@@ -86,6 +122,10 @@ public class DownloadManager extends Frame {
 		}
 	}
 
+	private void prepare() {
+		deleteAction.setEnabled(!jList1.isSelectionEmpty());
+	}
+
 	@SuppressWarnings("unchecked")
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
@@ -97,6 +137,9 @@ public class DownloadManager extends Frame {
                 jList1 = new javax.swing.JList();
                 jSeparator1 = new javax.swing.JSeparator();
                 jLabel1 = new javax.swing.JLabel();
+                jMenuBar1 = new javax.swing.JMenuBar();
+                jMenu1 = new javax.swing.JMenu();
+                jMenu2 = new javax.swing.JMenu();
 
                 setClosable(true);
                 setIconifiable(true);
@@ -106,7 +149,7 @@ public class DownloadManager extends Frame {
                 setFrameIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Import16.gif"))); // NOI18N
                 setName("Downloads"); // NOI18N
 
-                jButton1.setText("Download");
+                jButton1.setText("Start");
                 jButton1.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                                 jButton1ActionPerformed(evt);
@@ -122,9 +165,22 @@ public class DownloadManager extends Frame {
 
                 jList1.setModel(model);
                 jList1.setCellRenderer(renderer);
+                jList1.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+                        public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                                jList1ValueChanged(evt);
+                        }
+                });
                 jScrollPane1.setViewportView(jList1);
 
                 jLabel1.setText("Location :");
+
+                jMenu1.setText("File");
+                jMenuBar1.add(jMenu1);
+
+                jMenu2.setText("Edit");
+                jMenuBar1.add(jMenu2);
+
+                setJMenuBar(jMenuBar1);
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);
@@ -160,7 +216,7 @@ public class DownloadManager extends Frame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 148, Short.MAX_VALUE)
                                 .addContainerGap())
                 );
 
@@ -175,12 +231,19 @@ public class DownloadManager extends Frame {
 		start();
         }//GEN-LAST:event_jButton1ActionPerformed
 
+        private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
+		prepare();
+        }//GEN-LAST:event_jList1ValueChanged
+
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JButton jButton1;
         private javax.swing.JButton jButton2;
         private javax.swing.JLabel jLabel1;
         private javax.swing.JList jList1;
+        private javax.swing.JMenu jMenu1;
+        private javax.swing.JMenu jMenu2;
+        private javax.swing.JMenuBar jMenuBar1;
         private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JSeparator jSeparator1;
         private javax.swing.JTextField jTextField1;
