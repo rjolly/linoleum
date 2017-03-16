@@ -1,12 +1,17 @@
 package linoleum;
 
 import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.net.MalformedURLException;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.ListCellRenderer;
 import linoleum.application.Frame;
@@ -15,7 +20,21 @@ public class DownloadManager extends Frame {
 	private final DefaultListModel<URL> model = new DefaultListModel<>();
 	private final ListCellRenderer renderer = new Renderer();
 
-	private class Renderer extends JProgressBar implements ListCellRenderer {
+	private class Renderer extends JPanel implements ListCellRenderer {
+		final JLabel label = new JLabel();
+		final JProgressBar progress = new JProgressBar();
+
+		Renderer() {
+			setLayout(new GridBagLayout());
+			final GridBagConstraints c = new GridBagConstraints();
+			c.gridx = 0;
+			c.gridy = GridBagConstraints.RELATIVE;
+			c.fill = GridBagConstraints.HORIZONTAL;
+			c.weightx = 1.0;
+			add(label, c);
+			add(progress, c);
+		}
+
 		@Override
 		public Component getListCellRendererComponent(final JList list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
 			if (isSelected) {
@@ -25,7 +44,8 @@ public class DownloadManager extends Frame {
 				setBackground(list.getBackground());
 				setForeground(list.getForeground());
 			}
-			setFont(list.getFont());
+			label.setFont(list.getFont());
+			label.setText(new File(((URL) value).getPath()).getName());
 			return this;
 		}
 	}
