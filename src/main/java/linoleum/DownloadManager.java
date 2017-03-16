@@ -42,6 +42,24 @@ public class DownloadManager extends Frame {
 		if (uri != null) try {
 			final URL url = uri.toURL();
 			jTextField1.setText(url.toString());
+		} catch (final MalformedURLException ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	@Override
+	public void close() {
+		clear();
+	}
+
+	private void clear() {
+		setURI(null);
+		jTextField1.setText("");
+	}
+
+	private void start() {
+		try {
+			final URL url = new URL(jTextField1.getText());
 			model.addElement(url);
 		} catch (final MalformedURLException ex) {
 			ex.printStackTrace();
@@ -130,12 +148,11 @@ public class DownloadManager extends Frame {
         }// </editor-fold>//GEN-END:initComponents
 
         private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-		setURI(null);
-		jTextField1.setText("");
+		clear();
         }//GEN-LAST:event_jButton2ActionPerformed
 
         private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-
+		start();
         }//GEN-LAST:event_jButton1ActionPerformed
 
 
