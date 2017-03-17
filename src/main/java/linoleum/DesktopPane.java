@@ -23,6 +23,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import linoleum.application.Frame;
@@ -32,16 +33,17 @@ public class DesktopPane extends JDesktopPane {
 	public static final int DIALOG_LAYER = 2;
 	public static final int ICON_LAYER = 3;
 	private final Icon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
-	private final Action searchNextFrameAction = new SearchNextFrameAction();
-	private final Action searchPreviousFrameAction = new SearchPreviousFrameAction();
 	private final DefaultListModel<Frame> model = new DefaultListModel<>();
 	private final ListCellRenderer<Frame> renderer = new Renderer();
 	private final LayoutManager layout = new GridBagLayout();
 	private final JList<Frame> list = new JList<>();
+	private final InputMap inputMap = list.getInputMap();
+	private final int keyCode = Desktop.isDesktopSupported()?KeyEvent.VK_A:KeyEvent.VK_TAB;
+	private final Action selectAction = new SelectAction();
 	private boolean recording;
 	private boolean searching;
+	private boolean selecting;
 	private Background bkg;
-	private int index;
 
 	private class Renderer extends JLabel implements ListCellRenderer<Frame> {
 		public Renderer() {
@@ -67,45 +69,23 @@ public class DesktopPane extends JDesktopPane {
 			if (str != null && str.length() > 16) {
 				str = str.substring(0, 13) + "...";
 			}
-			setText(str == null?"untitled":str);
+			setText(str);
 			setFont(list.getFont());
 			return this;
 		}
 	}
 
-	private int getKeyCode() {
-		return Desktop.isDesktopSupported()?KeyEvent.VK_A:KeyEvent.VK_ALT;
-	}
-
-	private class SearchNextFrameAction extends AbstractAction {
-		public SearchNextFrameAction() {
-			super("searchNextFrame");
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(getKeyCode(), InputEvent.ALT_DOWN_MASK));
+	private class SelectAction extends AbstractAction {
+		public SelectAction() {
+			super("select");
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(keyCode, InputEvent.ALT_MASK));
 		}
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			index++;
-			if (index == model.getSize()) {
-				index = 0;
+			if (!selecting) {
+				select();
 			}
-			select();
-		}
-	}
-
-	private class SearchPreviousFrameAction extends AbstractAction {
-		public SearchPreviousFrameAction() {
-			super("searchPreviousFrame");
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(getKeyCode(), InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK));
-		}
-
-		@Override
-		public void actionPerformed(final ActionEvent e) {
-			index--;
-			if (index == -1) {
-				index = model.getSize() - 1;
-			}
-			select();
 		}
 	}
 
@@ -118,31 +98,40 @@ public class DesktopPane extends JDesktopPane {
 			comp.add(list);
 			comp.setVisible(true);
 		}
-		if (index > -1 && index < model.getSize()) {
-			list.setSelectedIndex(index);
+		list.requestFocus();
+		if (1 < model.getSize()) {
+			list.setSelectedIndex(1);
+		} else if (0 < model.getSize()) {
+			list.setSelectedIndex(0);
 		}
+		selecting = true;
 	}
 
 	private void commit() {
 		final JComponent comp = (JComponent) getRootPane().getGlassPane();
 		comp.setVisible(false);
 		comp.remove(list);
+		final Frame frame = list.getSelectedValue();
+		final int index = list.getSelectedIndex();
 		if (index > -1 && index < model.getSize()) {
-			final Frame frame = model.get(index);
 			model.removeElementAt(index);
+		}
+		if (frame != null) {
 			model.add(0, frame);
 			frame.select();
 		}
-		index = 0;
+		selecting = false;
 	}
 
 	public DesktopPane() {
-		final ActionMap actionMap = getActionMap();
-		final InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-		inputMap.put((KeyStroke) searchNextFrameAction.getValue(Action.ACCELERATOR_KEY), searchNextFrameAction.getValue(Action.NAME));
-		actionMap.put(searchNextFrameAction.getValue(Action.NAME), searchNextFrameAction);
-		inputMap.put((KeyStroke) searchPreviousFrameAction.getValue(Action.ACCELERATOR_KEY), searchPreviousFrameAction.getValue(Action.NAME));
-		actionMap.put(searchPreviousFrameAction.getValue(Action.NAME), searchPreviousFrameAction);
+		getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put((KeyStroke) selectAction.getValue(Action.ACCELERATOR_KEY), selectAction.getValue(Action.NAME));
+		getActionMap().put(selectAction.getValue(Action.NAME), selectAction);
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)));
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)));
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)));
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0)));
+		inputMap.put(KeyStroke.getKeyStroke(keyCode, InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)));
+		inputMap.put(KeyStroke.getKeyStroke(keyCode, InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)));
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
 			public boolean dispatchKeyEvent(final KeyEvent e) {
 				final boolean state;
@@ -176,6 +165,7 @@ public class DesktopPane extends JDesktopPane {
 		list.setModel(model);
 		list.setCellRenderer(renderer);
 		list.setLayoutOrientation(JList.VERTICAL_WRAP);
+		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	}
 
 	private void update() {
@@ -189,43 +179,34 @@ public class DesktopPane extends JDesktopPane {
 		} else if (comp instanceof Frame) {
 			final Frame frame = (Frame) comp;
 			frame.addInternalFrameListener(new InternalFrameAdapter() {
-				private void open() {
-					model.add(0, frame);
-					index = 0;
-					update();
-				}
-
 				@Override
 				public void internalFrameOpened(final InternalFrameEvent e) {
-					open();
+					model.add(0, frame);
+					update();
 				}
 
 				@Override
 				public void internalFrameActivated(final InternalFrameEvent e) {
 					model.removeElement(frame);
-					open();
-				}
-
-				private void close() {
-					index = 0;
+					model.add(0, frame);
 					update();
 				}
 
 				@Override
 				public void internalFrameClosing(final InternalFrameEvent e) {
 					model.removeElement(frame);
-					close();
+					update();
 				}
 
 				@Override
 				public void internalFrameClosed(final InternalFrameEvent e) {
 					model.removeElement(frame);
-					close();
+					update();
 				}
 
 				@Override
 				public void internalFrameIconified(final InternalFrameEvent e) {
-					close();
+					update();
 				}
 			});
 		}
