@@ -210,25 +210,7 @@ public class DownloadManager extends Frame {
 	public void open() {
 		final URI uri = getURI();
 		if (uri != null) try {
-			jTextField1.setText(uri.toURL().toString());
-		} catch (final MalformedURLException ex) {
-			ex.printStackTrace();
-		}
-	}
-
-	@Override
-	public void close() {
-		clear();
-	}
-
-	private void clear() {
-		setURI(null);
-		jTextField1.setText("");
-	}
-
-	private void start() {
-		try {
-			final URL location = new URL(jTextField1.getText());
+			final URL location = uri.toURL();
 			final File file = getFile(new File(location.getPath()).getName());
 			if (file != null && (!file.exists() || proceed())) {
 				final FileLoader loader = new FileLoader(location, file);
@@ -238,6 +220,11 @@ public class DownloadManager extends Frame {
 		} catch (final MalformedURLException ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	@Override
+	public void close() {
+		setURI(null);
 	}
 
 	private File getFile(final String filename) {
@@ -278,13 +265,8 @@ public class DownloadManager extends Frame {
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
-                jTextField1 = new javax.swing.JTextField();
-                jButton1 = new javax.swing.JButton();
-                jButton2 = new javax.swing.JButton();
                 jScrollPane1 = new javax.swing.JScrollPane();
                 jList1 = new javax.swing.JList();
-                jSeparator1 = new javax.swing.JSeparator();
-                jLabel1 = new javax.swing.JLabel();
                 jMenuBar1 = new javax.swing.JMenuBar();
                 jMenu1 = new javax.swing.JMenu();
                 jMenu2 = new javax.swing.JMenu();
@@ -297,20 +279,6 @@ public class DownloadManager extends Frame {
                 setFrameIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Import16.gif"))); // NOI18N
                 setName("Downloads"); // NOI18N
 
-                jButton1.setText("Start");
-                jButton1.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                jButton1ActionPerformed(evt);
-                        }
-                });
-
-                jButton2.setText("Clear");
-                jButton2.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                jButton2ActionPerformed(evt);
-                        }
-                });
-
                 jList1.setModel(model);
                 jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
                 jList1.setCellRenderer(renderer);
@@ -320,8 +288,6 @@ public class DownloadManager extends Frame {
                         }
                 });
                 jScrollPane1.setViewportView(jList1);
-
-                jLabel1.setText("Location :");
 
                 jMenu1.setText("File");
                 jMenuBar1.add(jMenu1);
@@ -337,48 +303,19 @@ public class DownloadManager extends Frame {
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
-                                        .addComponent(jTextField1)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                .addGap(0, 0, Short.MAX_VALUE)
-                                                .addComponent(jButton2)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jButton1))
-                                        .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jLabel1)
-                                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
                                 .addContainerGap())
                 );
                 layout.setVerticalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jButton1)
-                                        .addComponent(jButton2))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 148, Short.MAX_VALUE)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
                                 .addContainerGap())
                 );
 
                 pack();
         }// </editor-fold>//GEN-END:initComponents
-
-        private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-		clear();
-        }//GEN-LAST:event_jButton2ActionPerformed
-
-        private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-		start();
-        }//GEN-LAST:event_jButton1ActionPerformed
 
         private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
 		prepare();
@@ -386,15 +323,10 @@ public class DownloadManager extends Frame {
 
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
-        private javax.swing.JButton jButton1;
-        private javax.swing.JButton jButton2;
-        private javax.swing.JLabel jLabel1;
         private javax.swing.JList jList1;
         private javax.swing.JMenu jMenu1;
         private javax.swing.JMenu jMenu2;
         private javax.swing.JMenuBar jMenuBar1;
         private javax.swing.JScrollPane jScrollPane1;
-        private javax.swing.JSeparator jSeparator1;
-        private javax.swing.JTextField jTextField1;
         // End of variables declaration//GEN-END:variables
 }
