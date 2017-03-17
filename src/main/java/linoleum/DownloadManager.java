@@ -31,11 +31,14 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.TransferHandler;
 import linoleum.application.FileChooser;
 import linoleum.application.Frame;
 
 public class DownloadManager extends Frame {
+	private final Icon copyIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Copy16.gif"));
 	private final Icon deleteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Delete16.gif"));
 	private final DefaultListModel<FileLoader> model = new DefaultListModel<>();
 	private final ListCellRenderer renderer = new Renderer();
@@ -60,6 +63,7 @@ public class DownloadManager extends Frame {
 			c.weightx = 1.0;
 			add(label, c);
 			add(progress, c);
+			progress.setStringPainted(true);
 		}
 
 		@Override
@@ -73,7 +77,7 @@ public class DownloadManager extends Frame {
 			}
 			label.setFont(list.getFont());
 			final FileLoader loader = (FileLoader) value;
-			label.setText(loader.getName());
+			label.setText(loader.getFile().getName());
 			loader.addPropertyChangeListener(new PropertyChangeListener() {
 				public  void propertyChange(final PropertyChangeEvent evt) {
 					if ("progress".equals(evt.getPropertyName())) {
@@ -94,12 +98,12 @@ public class DownloadManager extends Frame {
 			this.file = file;
 		}
 
-		public String getLocation() {
-			return location.toString();
+		public URL getLocation() {
+			return location;
 		}
 
-		public String getName() {
-			return file.getName();
+		public File getFile() {
+			return file;
 		}
 
 		public File doInBackground() throws IOException {
@@ -116,6 +120,7 @@ public class DownloadManager extends Frame {
 						setProgress(Long.valueOf(100 * l / length).intValue());
 					}
 				}
+				setProgress(100);
 			}
 			return file;
 		}
@@ -124,9 +129,20 @@ public class DownloadManager extends Frame {
 		protected void done() {
 			try {
 				get();
+				jList1.repaint();
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						prepare();
+					}
+				});
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
+		}
+
+		@Override
+		public String toString() {
+			return location.toString();
 		}
 	}
 
@@ -170,15 +186,19 @@ public class DownloadManager extends Frame {
 		}
 	}
 
+	private ActionEvent createActionEvent() {
+		return new ActionEvent(jList1, ActionEvent.ACTION_PERFORMED, null);
+	}
+
 	private class CopyLinkAddressAction extends AbstractAction {
 		public CopyLinkAddressAction() {
-			super("Copy link address");
+			super("Copy link address", copyIcon);
 			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
 		}
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			final String str = loader.getLocation();
+			TransferHandler.getCopyAction().actionPerformed(createActionEvent());
 		}
 	}
 
@@ -211,12 +231,16 @@ public class DownloadManager extends Frame {
 		final URI uri = getURI();
 		if (uri != null) try {
 			final URL location = uri.toURL();
-			final File file = getFile(new File(location.getPath()).getName());
-			if (file != null && (!file.exists() || proceed())) {
-				final FileLoader loader = new FileLoader(location, file);
-				model.addElement(loader);
-				loader.execute();
-			}
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					final File file = getFile(new File(location.getPath()).getName());
+					if (file != null && (!file.exists() || proceed())) {
+						final FileLoader loader = new FileLoader(location, file);
+						model.addElement(loader);
+						loader.execute();
+					}
+				}
+			});
 		} catch (final MalformedURLException ex) {
 			ex.printStackTrace();
 		}
@@ -259,6 +283,22 @@ public class DownloadManager extends Frame {
 			deleteAction.setEnabled(loader.isDone());
 			copyLinkAddressAction.setEnabled(true);
 		}
+	}
+
+	@Override
+	public boolean reuseFor(final URI that) {
+		final URI uri = getURI();
+		if (uri != null) try {
+			final URL location = uri.toURL();
+			for (final FileLoader loader : Collections.list(model.elements())) {
+				if (!loader.isDone() && location.equals(loader.getLocation())) {
+					return true;
+				}
+			}
+		} catch (final MalformedURLException ex) {
+			ex.printStackTrace();
+		}
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")
