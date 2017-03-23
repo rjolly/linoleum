@@ -14,11 +14,9 @@ import java.util.Collections;
 import java.util.jar.Manifest;
 import java.util.jar.Attributes;
 import java.net.URL;
-import linoleum.application.ApplicationManager;
-import linoleum.application.event.ClassPathChangeEvent;
 
 public class Packages {
-	private final ApplicationManager apps;
+	public static final Packages instance = new Packages();
 	private final Map<String, File> map = new HashMap<>();
 	private final SortedMap<String, File> installed = new TreeMap<>();
 	private final FileFilter filter = new FileFilter() {
@@ -26,9 +24,8 @@ public class Packages {
 			return file.isFile() && file.getName().endsWith(".jar");
 		}
 	};
-	private boolean changed;
 
-	Packages(final ApplicationManager apps) {
+	private Packages() {
 		final String extdirs[] = System.getProperty("java.ext.dirs").split(File.pathSeparator);
 		for (final String str : extdirs) try {
 			final File dir = new File(str).getCanonicalFile();
@@ -96,30 +93,23 @@ public class Packages {
 				add(file);
 			}
 		}
-		this.apps = apps;
 	}
 
 	public Collection<File> installed() {
 		return Collections.unmodifiableCollection(installed.values());
 	}
 
-	public void commit(final Object source) {
-		if (changed) {
-			apps.fireClassPathChange(new ClassPathChangeEvent(source));
-			changed = false;
-		}
-	}
-
-	public void add(final File file) {
+	public boolean add(final File file) {
 		final Package pkg = new Package(file);
 		final String name = pkg.getName();
 		if (!pkg.isSourcesOrJavadoc() && !map.containsKey(name)) try {
 			((ClassLoader) ClassLoader.getSystemClassLoader()).addURL(file.toURI().toURL());
 			put(name, file);
-			changed = true;
+			return true;
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
+		return false;
 	}
 
 	private void put(final String name, final File file) {

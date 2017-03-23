@@ -19,13 +19,12 @@ import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
 public class Tools {
-	private final Packages pkgs = Desktop.instance.getPackages();
 	public static final Tools instance = new Tools();
 
 	private Tools() {}
 
 	public File[] classpath() {
-		return pkgs.installed().toArray(new File[0]);
+		return Packages.instance.installed().toArray(new File[0]);
 	}
 
 	static File[] concat(final File a[], final File b[]) {
@@ -97,8 +96,7 @@ public class Tools {
 	}
 
 	public void run(final String name, final File dir, final String args[]) throws Exception {
-		pkgs.add(dir);
-		pkgs.commit(this);
+		Packages.instance.add(dir);
 		Class.forName(name, true, ClassLoader.getSystemClassLoader()).getMethod("main", args.getClass()).invoke(null, (Object) args);
 	}
 }

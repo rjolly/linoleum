@@ -17,13 +17,12 @@ import javax.swing.JOptionPane;
 import linoleum.application.ApplicationManager;
 
 public class Desktop extends JFrame {
-	public static final Desktop instance = new Desktop();
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private static final String ABOUTMSG = "%s %s.%s \n \nJava desktop environment "
 		+ "and software distribution. \n \nWritten by \n  "
 		+ "%s";
 	private final ApplicationManager apps = new ApplicationManager();
-	private final Packages pkgs = new Packages(apps);
+	private final Packages instance = Packages.instance;
 	private final Console console = new Console();
 	private final GraphicsDevice devices[];
 	private Rectangle bounds;
@@ -38,10 +37,6 @@ public class Desktop extends JFrame {
 		console.setApplicationManager(apps);
 		devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 		loadBounds();
-	}
-
-	public Packages getPackages() {
-		return pkgs;
 	}
 
 	private void open() {
@@ -296,7 +291,7 @@ public class Desktop extends JFrame {
 		/* Create and display the form */
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				instance.fullScreen();
+				new Desktop().fullScreen();
 			}
 		});
 	}

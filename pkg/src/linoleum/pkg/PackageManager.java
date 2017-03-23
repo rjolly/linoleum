@@ -11,7 +11,6 @@ import javax.swing.table.DefaultTableModel;
 import linoleum.application.Frame;
 import linoleum.application.event.ClassPathListener;
 import linoleum.application.event.ClassPathChangeEvent;
-import linoleum.Desktop;
 import linoleum.Package;
 import linoleum.Packages;
 import org.apache.ivy.Ivy;
@@ -26,7 +25,6 @@ import org.apache.ivy.plugins.parser.m2.PomModuleDescriptorWriter;
 import org.apache.ivy.plugins.parser.m2.PomWriterOptions;
 
 public class PackageManager extends Frame {
-	private final Packages pkgs = Desktop.instance.getPackages();
 	private final Ivy ivy = Ivy.newInstance();
 	private final File lib = new File("lib");
 	private final DefaultTableModel model;
@@ -56,7 +54,7 @@ public class PackageManager extends Frame {
 	@Override
 	public void open() {
 		model.setRowCount(0);
-		for (final File file : pkgs.installed()) {
+		for (final File file : Packages.instance.installed()) {
 			final Package pkg = new Package(file);
 			model.addRow(new Object[] {pkg.getName(), pkg.getVersion(), pkg.isSnapshot()});
 		}
@@ -125,13 +123,16 @@ public class PackageManager extends Frame {
 			final RetrieveOptions retrieveOptions = new RetrieveOptions();
 			retrieveOptions.setDestArtifactPattern(dir.getPath() + "/[artifact]-[revision](-[classifier]).[ext]");
 			final RetrieveReport retrieveReport = ivy.retrieve(md.getModuleRevisionId(), retrieveOptions);
+			boolean changed = false;
 			for (final Object obj : retrieveReport.getCopiedFiles()) {
 				final File file = (File)obj;
 				if (file.getName().endsWith(".jar")) {
-					pkgs.add(file);
+					changed |= Packages.instance.add(file);
 				}
 			}
-			pkgs.commit(this);
+			if(changed) {
+				getApplicationManager().fireClassPathChange(new ClassPathChangeEvent(this));
+			}
 		} catch (final ParseException | IOException ex) {
 			ex.printStackTrace();
 		}
