@@ -1,7 +1,6 @@
 package linoleum;
 
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.GridBagLayout;
 import java.awt.KeyboardFocusManager;
 import java.awt.KeyEventDispatcher;
@@ -38,7 +37,7 @@ public class DesktopPane extends JDesktopPane {
 	private final LayoutManager layout = new GridBagLayout();
 	private final JList<Frame> list = new JList<>();
 	private final InputMap inputMap = list.getInputMap();
-	private final int keyCode = Desktop.isDesktopSupported()?KeyEvent.VK_A:KeyEvent.VK_TAB;
+	private final InputMap map = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 	private final Action selectAction = new SelectAction();
 	private boolean recording;
 	private boolean searching;
@@ -78,7 +77,7 @@ public class DesktopPane extends JDesktopPane {
 	private class SelectAction extends AbstractAction {
 		public SelectAction() {
 			super("select");
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(keyCode, InputEvent.ALT_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.ALT_MASK));
 		}
 
 		@Override
@@ -124,14 +123,17 @@ public class DesktopPane extends JDesktopPane {
 	}
 
 	public DesktopPane() {
-		getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put((KeyStroke) selectAction.getValue(Action.ACCELERATOR_KEY), selectAction.getValue(Action.NAME));
+		map.put((KeyStroke) selectAction.getValue(Action.ACCELERATOR_KEY), selectAction.getValue(Action.NAME));
+		map.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.ALT_DOWN_MASK), selectAction.getValue(Action.NAME));
 		getActionMap().put(selectAction.getValue(Action.NAME), selectAction);
 		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)));
 		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)));
 		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)));
 		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0)));
-		inputMap.put(KeyStroke.getKeyStroke(keyCode, InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)));
-		inputMap.put(KeyStroke.getKeyStroke(keyCode, InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)));
+		inputMap.put((KeyStroke) selectAction.getValue(Action.ACCELERATOR_KEY), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)));
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)));
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)));
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)));
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
 			public boolean dispatchKeyEvent(final KeyEvent e) {
 				final boolean state;
