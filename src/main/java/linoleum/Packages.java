@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.jar.Manifest;
 import java.util.jar.Attributes;
 import java.net.URL;
@@ -95,8 +94,8 @@ public class Packages {
 		}
 	}
 
-	public Collection<File> installed() {
-		return Collections.unmodifiableCollection(installed.values());
+	public File[] installed() {
+		return installed.values().toArray(new File[0]);
 	}
 
 	public boolean add(final File file) {

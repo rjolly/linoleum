@@ -23,10 +23,6 @@ public class Tools {
 
 	private Tools() {}
 
-	public File[] classpath() {
-		return Packages.instance.installed().toArray(new File[0]);
-	}
-
 	static File[] concat(final File a[], final File b[]) {
 		final File c[] = new File[a.length + b.length];
 		System.arraycopy(a, 0, c, 0, a.length);
@@ -37,7 +33,7 @@ public class Tools {
 	public void compile(final File files[], final File destDir, final String options[]) throws IOException {
 		final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 		try (final StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null)) {
-			fileManager.setLocation(StandardLocation.CLASS_PATH, Arrays.asList(concat(classpath(), new File[] {destDir})));
+			fileManager.setLocation(StandardLocation.CLASS_PATH, Arrays.asList(concat(Packages.instance.installed(), new File[] {destDir})));
 			fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList(new File[] {destDir}));
 			final JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, Arrays.asList(options), null, fileManager.getJavaFileObjectsFromFiles(Arrays.asList(files)));
 			task.call();

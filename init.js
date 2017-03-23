@@ -1,4 +1,5 @@
 Tools = Packages.linoleum.Tools;
+instance = Packages.linoleum.Packages.instance;
 PackageManager = Packages.linoleum.pkg.PackageManager;
 
 function install(pkg, conf, dir) {
@@ -40,7 +41,7 @@ function javac(srcDir, destDir) {
 
 function classpath() {
     var str = "";
-    var files = Tools.instance.classpath();
+    var files = instance.installed();
     for(i in files) str += relativize(new File("."), files[i]).getPath() + (i < files.length - 1 ? java.io.File.pathSeparator : "");
     return str;
 }
@@ -265,7 +266,19 @@ function open(name, app) {
 }
 
 function exit(code) {
-    frame.doDefaultCloseAction();
+    if (typeof(frame) == 'undefined') {
+	if (code) {
+	    java.lang.System.exit(code + 0);		
+	} else {
+	    java.lang.System.exit(0);		
+	}
+    } else {
+	frame.doDefaultCloseAction();
+    }
+}
+
+function quit(code) {
+    exit(code);
 }
 
 function log(str) {
