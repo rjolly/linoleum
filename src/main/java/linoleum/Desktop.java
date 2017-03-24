@@ -267,7 +267,7 @@ public class Desktop extends JFrame {
         }//GEN-LAST:event_screenshotMenuItemActionPerformed
 
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-		if (isShowing() && !full) {
+		if (isShowing() && !full && desktopPane.isRecording()) {
 			final Component c = evt.getComponent();
 			prefs.putInt(getKey("width"), c.getWidth());
 			prefs.putInt(getKey("height"), c.getHeight());
@@ -280,7 +280,7 @@ public class Desktop extends JFrame {
         }//GEN-LAST:event_contentMenuItemActionPerformed
 
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
-		if (isShowing() && !full) {
+		if (isShowing() && !full && desktopPane.isRecording()) {
 			final Component c = evt.getComponent();
 			prefs.putInt(getKey("x"), c.getX());
 			prefs.putInt(getKey("y"), c.getY());

@@ -52,7 +52,6 @@ public class Frame extends JInternalFrame {
 	private Icon icon;
 	private URI uri;
 	private boolean opened;
-	private Frame lastOpened;
 	@Deprecated
 	protected final int index;
 	private final Frame owner;
@@ -354,16 +353,11 @@ public class Frame extends JInternalFrame {
         }// </editor-fold>//GEN-END:initComponents
 
         private void formInternalFrameOpened(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameOpened
-		if (getOwner().lastOpened == null) {
-			final int x = prefs.getInt(getKey("x"), getX());
-			final int y = prefs.getInt(getKey("y"), getY());
-			final int width = prefs.getInt(getKey("width"), getWidth());
-			final int height = prefs.getInt(getKey("height"), getHeight());
-			setBounds(x, y, width, height);
-		} else {
-			setBounds(getOwner().lastOpened.getBounds());
-		}
-		getOwner().lastOpened = this;
+		final int x = prefs.getInt(getKey("x"), getX());
+		final int y = prefs.getInt(getKey("y"), getY());
+		final int width = prefs.getInt(getKey("width"), getWidth());
+		final int height = prefs.getInt(getKey("height"), getHeight());
+		setBounds(x, y, width, height);
 		openFrame();
 		opened = true;
         }//GEN-LAST:event_formInternalFrameOpened

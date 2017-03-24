@@ -170,6 +170,10 @@ public class DesktopPane extends JDesktopPane {
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	}
 
+	public boolean isRecording() {
+		return recording;
+	}
+
 	private void update() {
 		list.setVisibleRowCount(Math.min(model.getSize(), 8));
 	}
