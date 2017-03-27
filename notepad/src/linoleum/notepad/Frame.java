@@ -1,5 +1,6 @@
 package linoleum.notepad;
 
+import java.awt.Component;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.net.URI;
@@ -29,6 +30,11 @@ public class Frame extends linoleum.application.Frame {
 		setJMenuBar(notepad.createMenubar());
 		setSize(500, 400);
 		chooser.setFileFilter(new FileNameExtensionFilter("Text", "txt"));
+	}
+
+	@Override
+	public Component getFocusOwner() {
+		return notepad;
 	}
 
 	@Override

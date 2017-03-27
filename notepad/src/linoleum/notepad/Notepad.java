@@ -121,6 +121,11 @@ public class Notepad extends JPanel {
 		update();
 	}
 
+	@Override
+	public void requestFocus() {
+		editor.requestFocus();
+	}
+
 	public Editor getEditor() {
 		return editor;
 	}

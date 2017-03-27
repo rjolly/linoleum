@@ -1,6 +1,7 @@
 package linoleum.html;
 
 import java.awt.CardLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.datatransfer.StringSelection;
@@ -117,6 +118,11 @@ public class Browser extends Frame {
 		update();
 	}
 
+	@Override
+	public Component getFocusOwner() {
+		return current == null?jTextField1:jEditorPane1;
+	}
+
 	public JEditorPane getEditorPane() {
 		return jEditorPane1;
 	}
@@ -190,7 +196,8 @@ public class Browser extends Frame {
 	}
 
 	private void linkActivated(final HyperlinkEvent evt) {
-		try {
+		final URL url = evt.getURL();
+		if (url != null) try {
 			final URI uri = url.toURI();
 			if (canOpen(stripped(uri))) {
 				open(FrameURL.create(current, evt), 1, false);
@@ -223,7 +230,6 @@ public class Browser extends Frame {
 					}
 				}
 			});
-
 			loader.execute();
 		}
 	}
@@ -253,7 +259,7 @@ public class Browser extends Frame {
 			try {
 				if (get()) {
 					jTextField1.setText(dest.getURL().toString());
-					setTitle((String)jEditorPane1.getDocument().getProperty(Document.TitleProperty));
+					setTitle((String) jEditorPane1.getDocument().getProperty(Document.TitleProperty));
 					if (current != null) {
 						record(dest, delta);
 					}
@@ -297,7 +303,7 @@ public class Browser extends Frame {
 	private void prepare() {
 		jPopupMenu1.removeAll();
 		boolean sep0 = false;
-		try {
+		if (url != null) try {
 			final URI uri = url.toURI();
 			final ApplicationManager mgr = getApplicationManager();
 			final String s = mgr.getApplication(stripped(uri));

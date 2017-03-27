@@ -1,5 +1,6 @@
 package linoleum;
 
+import java.awt.Component;
 import java.io.File;
 import java.io.FileReader;
 import java.io.InputStreamReader;
@@ -29,6 +30,7 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	private final CountDownLatch engineReady = new CountDownLatch(1);
 	private volatile ScriptEngine engine;
 	private volatile String prompt;
+	private ScriptShellPanel panel;
 	private	ScriptEngineFactory factory;
 	private ScriptEngineManager manager;
 	private String extension;
@@ -41,6 +43,11 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 		super(owner);
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
+	}
+
+	@Override
+	public Component getFocusOwner() {
+		return panel;
 	}
 
 	@Override
@@ -102,7 +109,7 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	public void open() {
 		createScriptEngine();
 		setTitle(engine.getFactory().getLanguageName());
-		setContentPane(new ScriptShellPanel(this));
+		setContentPane(panel = new ScriptShellPanel(this));
 		(new Thread() {
 			@Override
 			public void run() {

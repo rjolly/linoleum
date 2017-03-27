@@ -1,5 +1,6 @@
 package linoleum;
 
+import java.awt.Component;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,6 +40,11 @@ public class Console extends Frame {
 				handler.setLevel(Level.CONFIG);
 			}
 		}
+	}
+
+	@Override
+	public Component getFocusOwner() {
+		return panel;
 	}
 
 	@Override

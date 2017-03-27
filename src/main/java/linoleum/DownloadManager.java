@@ -38,11 +38,13 @@ import linoleum.application.FileChooser;
 import linoleum.application.Frame;
 
 public class DownloadManager extends Frame {
+	private final Icon openIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"));
 	private final Icon copyIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Copy16.gif"));
 	private final Icon deleteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Delete16.gif"));
 	private final DefaultListModel<FileLoader> model = new DefaultListModel<>();
 	private final ListCellRenderer renderer = new Renderer();
 	private final FileChooser chooser = new FileChooser();
+	private final Action openAction = new OpenAction();
 	private final Action closeAction = new CloseAction();
 	private final Action cancelAction = new CancelAction();
 	private final Action clearCompletedAction = new ClearCompletedAction();
@@ -146,6 +148,18 @@ public class DownloadManager extends Frame {
 		}
 	}
 
+	private class OpenAction extends AbstractAction {
+		public OpenAction() {
+			super("Open", openIcon);
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			getApplicationManager().open(loader.getFile().toURI());
+		}
+	}
+
 	private class CloseAction extends AbstractAction {
 		public CloseAction() {
 			super("Close");
@@ -219,11 +233,13 @@ public class DownloadManager extends Frame {
 		initComponents();
 		setScheme("ftp:http:https");
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Import24.gif")));
+		jMenu1.add(openAction);
 		jMenu1.add(closeAction);
 		jMenu2.add(cancelAction);
 		jMenu2.add(clearCompletedAction);
 		jMenu2.add(copyLinkAddressAction);
 		jMenu2.add(deleteAction);
+		prepare();
 	}
 
 	@Override
@@ -274,11 +290,13 @@ public class DownloadManager extends Frame {
 	private void prepare() {
 		if (jList1.isSelectionEmpty()) {
 			loader = null;
+			openAction.setEnabled(false);
 			cancelAction.setEnabled(false);
 			deleteAction.setEnabled(false);
 			copyLinkAddressAction.setEnabled(false);
 		} else {
 			loader = (FileLoader) jList1.getSelectedValue();
+			openAction.setEnabled(loader.isDone());
 			cancelAction.setEnabled(!loader.isDone());
 			deleteAction.setEnabled(loader.isDone());
 			copyLinkAddressAction.setEnabled(true);

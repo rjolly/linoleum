@@ -33,6 +33,7 @@ import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -105,7 +106,7 @@ public class FileManager extends Frame {
 	private final FileChooser chooser = new FileChooser();
 	private final ListCellRenderer renderer = new Renderer();
 	private final DefaultListModel<Path> model = new DefaultListModel<>();
-	private final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+	private final DateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 	private final TableCellRenderer tableRenderer = new DefaultTableCellRenderer() {
 		public Component getTableCellRendererComponent(final JTable table, final Object value, boolean isSelected, final boolean hasFocus, final int row, final int column) {
 			if (table.convertColumnIndexToModel(column) != 0) {
