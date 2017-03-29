@@ -8,6 +8,4 @@ mkdir("dist");
 var name = "linoleum";
 jar("dist/" + name + ".jar", "build/classes", ".*", "manifest.mf");
 
-mkdir("dist/bin")
-copy("bin", "dist/bin")
-cp("init.js", "dist/init.js")
+publish("dist")
