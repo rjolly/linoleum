@@ -36,11 +36,6 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	private String extension;
 
 	public ScriptShell() {
-		this(null);
-	}
-
-	public ScriptShell(final Frame owner) {
-		super(owner);
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
 	}
@@ -140,8 +135,8 @@ public class ScriptShell extends Frame implements ScriptShellPanel.CommandProces
 	}
 
 	@Override
-	public Frame getFrame(final Frame owner) {
-		return new ScriptShell(owner);
+	public Frame getFrame() {
+		return new ScriptShell();
 	}
 
 	@Override

@@ -17,11 +17,7 @@ public class Frame extends linoleum.application.Frame {
 	private boolean found;
 
 	public Frame() {
-		this(null);
-	}
-
-	public Frame(final linoleum.application.Frame owner) {
-		super(owner, Notepad.resources.getString("Title"));
+		super(Notepad.resources.getString("Title"));
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Edit24.gif")));
 		setMimeType("text/plain:text/*:application/octet-stream");
@@ -63,8 +59,8 @@ public class Frame extends linoleum.application.Frame {
 	}
 
 	@Override
-	public Frame getFrame(final linoleum.application.Frame owner) {
-		return new Frame(owner);
+	public Frame getFrame() {
+		return new Frame();
 	}
 
 	private void openDialog(final String title) {

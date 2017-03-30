@@ -663,13 +663,8 @@ public class FileManager extends Frame {
 		});
 	}
 
-	public FileManager() {
-		this(null);
-	}
-
 	@SuppressWarnings("deprecation")
-	public FileManager(final Frame owner) {
-		super(owner);
+	public FileManager() {
 		initComponents();
 		jList1.setTransferHandler(handler);
 		jTable1.setTransferHandler(handler);
@@ -750,8 +745,8 @@ public class FileManager extends Frame {
 	}
 
 	@Override
-	public Frame getFrame(final Frame owner) {
-		return new FileManager(owner);
+	public Frame getFrame() {
+		return new FileManager();
 	}
 
 	@Override

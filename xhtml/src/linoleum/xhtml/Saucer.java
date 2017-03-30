@@ -5,11 +5,6 @@ import linoleum.html.Browser;
 
 public class Saucer extends Browser {
 	public Saucer() {
-		this(null);
-	}
-
-	public Saucer(final Frame owner) {
-		super(owner);
 		setMimeType("text/html:application/xhtml+xml");
 		final javax.swing.text.EditorKit kit = new EditorKit();
 		getEditorPane().setEditorKitForContentType("text/xml", kit);
@@ -17,7 +12,7 @@ public class Saucer extends Browser {
 	}
 
 	@Override
-	public Frame getFrame(final Frame owner) {
-		return new Saucer(owner);
+	public Frame getFrame() {
+		return new Saucer();
 	}
 }

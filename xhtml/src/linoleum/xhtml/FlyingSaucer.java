@@ -15,11 +15,6 @@ public class FlyingSaucer extends Frame {
 	}
 
 	public FlyingSaucer() {
-		this(null);
-	}
-
-	public FlyingSaucer(final Frame parent) {
-		super(parent);
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif")));
 		setMimeType("text/html:application/xhtml+xml");
@@ -30,8 +25,8 @@ public class FlyingSaucer extends Frame {
 	}
 
 	@Override
-	public Frame getFrame(final Frame parent) {
-		return new FlyingSaucer(parent);
+	public Frame getFrame() {
+		return new FlyingSaucer();
 	}
 
 	@Override

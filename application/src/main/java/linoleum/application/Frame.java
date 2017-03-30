@@ -67,6 +67,7 @@ public class Frame extends JInternalFrame {
 		this(null, title);
 	}
 
+	@Deprecated
 	public Frame(final Frame owner, final String title) {
 		super(title, true, true, true, true);
 		initComponents();
@@ -75,6 +76,7 @@ public class Frame extends JInternalFrame {
 		index = getOwner().nextIndex();
 	}
 
+	@Deprecated
 	public Frame(final Frame owner) {
 		initComponents();
 		this.owner = owner;
@@ -170,6 +172,7 @@ public class Frame extends JInternalFrame {
 		return getFrame(this);
 	}
 
+	@Deprecated
 	protected JInternalFrame getFrame(final Frame owner) {
 		return this;
 	}

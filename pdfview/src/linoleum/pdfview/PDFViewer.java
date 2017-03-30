@@ -75,11 +75,6 @@ public class PDFViewer extends Frame {
 	}
 
 	public PDFViewer() {
-		this(null);
-	}
-
-	public PDFViewer(final Frame owner) {
-		super(owner);
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("reader.png")));
 		chooser.setFileFilter(new FileNameExtensionFilter("PDF Files", "pdf"));
@@ -94,8 +89,8 @@ public class PDFViewer extends Frame {
 	}
 
 	@Override
-	public Frame getFrame(final Frame owner) {
-		return new PDFViewer(owner);
+	public Frame getFrame() {
+		return new PDFViewer();
 	}
 
 	@Override

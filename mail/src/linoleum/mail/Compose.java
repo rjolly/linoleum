@@ -87,11 +87,6 @@ public class Compose extends Frame {
 	}
 
 	public Compose() {
-		this(null);
-	}
-
-	public Compose(final Frame owner) {
-		super(owner);
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail24.gif")));
 		setFrameIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail16.gif")));
 		setScheme("mailto");
@@ -121,8 +116,8 @@ public class Compose extends Frame {
 	}
 
 	@Override
-	public Frame getFrame(final Frame owner) {
-		return new Compose(owner);
+	public Frame getFrame() {
+		return new Compose();
 	}
 
 	@Override
