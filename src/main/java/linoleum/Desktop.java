@@ -33,8 +33,8 @@ public class Desktop extends JFrame {
 		desktopPane.add(console);
 		desktopPane.add(apps);
 		frame.setLayer(0);
-		frame.setApplicationManager(apps);
-		console.setApplicationManager(apps);
+		apps.manage(frame);
+		apps.manage(console);
 		devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 		loadBounds();
 	}

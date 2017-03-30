@@ -110,11 +110,6 @@ public class Frame extends JInternalFrame {
 
 	public void setApplicationManager(final ApplicationManager manager) {
 		this.manager = manager;
-		if (optionPanel != null) {
-			optionPanel.setFrame(this);
-			manager.addOptionPanel(optionPanel);
-		}
-		init();
 	}
 
 	public ApplicationManager getApplicationManager() {

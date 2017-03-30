@@ -133,7 +133,7 @@ public class ApplicationManager extends Frame {
 				}
 			}
 		});
-		setApplicationManager(this);
+		manage(this);
 		pref.putAll(getPreferred());
 		spref.putAll(getPreferredByScheme());
 	}
@@ -184,8 +184,14 @@ public class ApplicationManager extends Frame {
 		});
 	}
 
-	void addOptionPanel(final OptionPanel panel) {
-		options.add(panel);
+	public void manage(final Frame frame) {
+		final OptionPanel panel = frame.getOptionPanel();
+		if (panel != null) {
+			panel.setFrame(frame);
+			options.add(panel);
+		}
+		frame.setApplicationManager(this);
+		frame.init();
 	}
 
 	public List<OptionPanel> getOptionPanels() {
@@ -504,7 +510,7 @@ public class ApplicationManager extends Frame {
 				}
 			}
 			model.addElement(app);
-			app.setApplicationManager(this);
+			manage(app);
 		}
 	}
 
