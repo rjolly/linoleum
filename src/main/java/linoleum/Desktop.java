@@ -21,9 +21,9 @@ public class Desktop extends JFrame {
 	private static final String ABOUTMSG = "%s %s.%s \n \nJava desktop environment "
 		+ "and software distribution. \n \nWritten by \n  "
 		+ "%s";
-	private final ApplicationManager apps = new ApplicationManager();
-	private final Packages instance = Packages.instance;
 	private final Console console = new Console();
+	private final Packages instance = Packages.instance;
+	private final ApplicationManager apps = new ApplicationManager();
 	private final GraphicsDevice devices[];
 	private Rectangle bounds;
 	private boolean full;
