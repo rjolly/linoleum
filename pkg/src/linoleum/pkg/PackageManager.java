@@ -26,7 +26,6 @@ import org.apache.ivy.plugins.parser.m2.PomWriterOptions;
 
 public class PackageManager extends Frame {
 	private final Ivy ivy = Ivy.newInstance();
-	private final File lib = new File("lib");
 	private final DefaultTableModel model;
 	public static PackageManager instance;
 
@@ -110,7 +109,7 @@ public class PackageManager extends Frame {
 	}
 
 	public void install(final String name, final String conf) {
-		install(name, conf, lib);
+		install(name, conf, new File("lib"));
 	}
 
 	public void install(final String name, final String conf, final File dir) {
