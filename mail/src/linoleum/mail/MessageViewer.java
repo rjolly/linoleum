@@ -21,6 +21,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 	private final Action forwardAction = new ForwardAction();
 	private final Action deleteAction = new DeleteAction();
 	private final Action structureAction = new StructureAction();
+	private final SimpleClient client = SimpleClient.instance;
 	private Message displayed;
 	private Component mainbody;
 
@@ -78,7 +79,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 			@Override
 			public void done() {
 				try {
-					SimpleClient.instance.compose(get());
+					client.compose(get());
 				} catch (final Exception e) {
 					e.printStackTrace();
 				}
@@ -146,7 +147,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			try {
-				SimpleClient.instance.getFolderViewer().getModel().delete(displayed);
+				client.getFolderViewer().getModel().delete(displayed);
 			} catch (final MessagingException me) {
 				me.printStackTrace();
 			}

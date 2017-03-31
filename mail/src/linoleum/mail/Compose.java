@@ -46,8 +46,9 @@ public class Compose extends Frame {
 	private String inReplyTo[];
 	private String references[];
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
-	private final FileChooser chooser = SimpleClient.instance.getFileChooser();
-	private final Session session = SimpleClient.instance.getSession();
+	private final SimpleClient client = SimpleClient.instance;
+	private final FileChooser chooser = client.getFileChooser();
+	private final Session session = client.getSession();
 	private File file;
 
 	private class AttachAction extends AbstractAction {
@@ -95,7 +96,7 @@ public class Compose extends Frame {
                 setMaximizable(true);
                 setResizable(true);
 		setTitle("Untitled Message " + (getIndex() + 1));
-		setJMenuBar(SimpleClient.instance.getJMenuBar());
+		setJMenuBar(client.getJMenuBar());
 
 		JPanel top = new JPanel();
 		top.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -168,16 +169,16 @@ public class Compose extends Frame {
 	}
 
 	private void send() throws MessagingException {
-		final String mailhost = SimpleClient.instance.getMailhost();
-		final String from = SimpleClient.instance.getFrom();
+		final String mailhost = client.getMailhost();
+		final String from = client.getFrom();
 		final String to = toField.getText();
 		final String cc = ccField.getText();
 		final String bcc = bccField.getText();
 		final String replyTo = replyToField.getText();
 		final String subject = subField.getText();
 		final String text = content.getText();
-		final String url = SimpleClient.instance.getURL();
-		final String record = SimpleClient.instance.getRecord();
+		final String url = client.getURL();
+		final String record = client.getRecord();
 
 		if (!mailhost.isEmpty()) {
 			session.getProperties().put("mail.smtp.host", mailhost);
@@ -225,7 +226,7 @@ public class Compose extends Frame {
 				msg.addHeader("References", str);
 			}
 		}
-		msg.setHeader("X-Mailer", SimpleClient.instance.getName());
+		msg.setHeader("X-Mailer", client.getName());
 		msg.setSentDate(new Date());
 		Transport.send(msg);
 		System.out.println("Mail was sent successfully.");

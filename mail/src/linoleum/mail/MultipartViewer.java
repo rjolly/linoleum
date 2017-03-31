@@ -20,8 +20,9 @@ import linoleum.application.FileChooser;
 
 public class MultipartViewer extends JPanel implements Viewer {
 	final JPanel p = new JPanel(new GridBagLayout());
-	final ApplicationManager apps = SimpleClient.instance.getApplicationManager();
-	final FileChooser chooser = SimpleClient.instance.getFileChooser();
+	final SimpleClient client = SimpleClient.instance;
+	final ApplicationManager apps = client.getApplicationManager();
+	final FileChooser chooser = client.getFileChooser();
 	final JScrollPane scp = new JScrollPane(p);
 	final JSplitPane sp = new JSplitPane();
 	Component comp;

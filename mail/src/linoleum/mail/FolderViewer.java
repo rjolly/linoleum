@@ -7,7 +7,8 @@ import javax.swing.event.ListSelectionListener;
 
 public class FolderViewer extends javax.swing.JPanel {
 	private final FolderModel model = new FolderModel();
-	private MessageViewer mv = SimpleClient.instance.getMessageViewer();
+	private final SimpleClient client = SimpleClient.instance;
+	private MessageViewer mv = client.getMessageViewer();
 
 	public FolderModel getModel() {
 		return model;
