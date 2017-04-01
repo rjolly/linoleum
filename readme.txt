@@ -63,5 +63,6 @@ Useful libraries
   commons-io#commons-io;2.4				The Apache Commons IO library
   mstor#mstor;0.9.9					A JavaMail provider for persistent email storage
   org.bouncycastle#bcpg-jdk15;1.45			The Bouncy Castle Java API for handling the OpenPGP protocol
+  org.eclipse.jgit#org.eclipse.jgit;3.4.0.201406110918-r	Java library implementing the Git version control system
   org.scala-lang#scala-compiler;2.12.0			Script engine for the Scala Programming Language (requires Java 8)
 

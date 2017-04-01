@@ -336,6 +336,5 @@ function diff(file1, file2) {
 
 function git() {
     Git = Packages.org.eclipse.jgit.api.Git
-    FileRepository = Packages.org.eclipse.jgit.internal.storage.file.FileRepository
-    return new Git(new FileRepository(pathToFile(".git")))
+    return Git.open(pathToFile(".git"))
 }
