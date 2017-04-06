@@ -26,6 +26,7 @@ public class ClockPanel extends JPanel {
 	private int width = 188;
 	private int height = 17;
 	private boolean analog;
+	private String today;
 
 	public ClockPanel() {
 		try {
@@ -59,6 +60,9 @@ public class ClockPanel extends JPanel {
 		super.paintComponent(g);
 		g.setFont(clockFaceFont);
 		currentDate = new Date();
+
+		// Get the date to print at the bottom
+		today = formatter.format(currentDate);
 
 		if (analog) {
 			int xh, yh, xm, ym, xs, ys;
@@ -107,9 +111,6 @@ public class ClockPanel extends JPanel {
 			g.drawLine(xcenter, ycenter - 1, xh, yh);
 			g.drawLine(xcenter - 1, ycenter, xh, yh);
 		} else {
-			// Get the date to print at the bottom
-			final String today = formatter.format(currentDate);
-
 			final FontMetrics fm = g.getFontMetrics();
 			final int ascent = fm.getAscent();
 			width = fm.stringWidth(today);
@@ -127,6 +128,7 @@ public class ClockPanel extends JPanel {
 			@Override
 			public void run() {
 				repaint();
+				setToolTipText(analog?today:null);
 			}
 		}, 0, 1000);
 	}
