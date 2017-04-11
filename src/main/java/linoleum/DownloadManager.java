@@ -233,12 +233,6 @@ public class DownloadManager extends Frame {
 		initComponents();
 		setScheme("ftp:http:https");
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Import24.gif")));
-		jMenu1.add(openAction);
-		jMenu1.add(closeAction);
-		jMenu2.add(cancelAction);
-		jMenu2.add(clearCompletedAction);
-		jMenu2.add(copyLinkAddressAction);
-		jMenu2.add(deleteAction);
 		prepare();
 	}
 
@@ -327,7 +321,13 @@ public class DownloadManager extends Frame {
                 jList1 = new javax.swing.JList();
                 jMenuBar1 = new javax.swing.JMenuBar();
                 jMenu1 = new javax.swing.JMenu();
+                jMenuItem1 = new javax.swing.JMenuItem();
+                jMenuItem2 = new javax.swing.JMenuItem();
                 jMenu2 = new javax.swing.JMenu();
+                jMenuItem3 = new javax.swing.JMenuItem();
+                jMenuItem4 = new javax.swing.JMenuItem();
+                jMenuItem5 = new javax.swing.JMenuItem();
+                jMenuItem6 = new javax.swing.JMenuItem();
 
                 setClosable(true);
                 setIconifiable(true);
@@ -348,9 +348,29 @@ public class DownloadManager extends Frame {
                 jScrollPane1.setViewportView(jList1);
 
                 jMenu1.setText("File");
+
+                jMenuItem1.setAction(openAction);
+                jMenu1.add(jMenuItem1);
+
+                jMenuItem2.setAction(closeAction);
+                jMenu1.add(jMenuItem2);
+
                 jMenuBar1.add(jMenu1);
 
                 jMenu2.setText("Edit");
+
+                jMenuItem3.setAction(cancelAction);
+                jMenu2.add(jMenuItem3);
+
+                jMenuItem4.setAction(clearCompletedAction);
+                jMenu2.add(jMenuItem4);
+
+                jMenuItem5.setAction(copyLinkAddressAction);
+                jMenu2.add(jMenuItem5);
+
+                jMenuItem6.setAction(deleteAction);
+                jMenu2.add(jMenuItem6);
+
                 jMenuBar1.add(jMenu2);
 
                 setJMenuBar(jMenuBar1);
@@ -385,6 +405,12 @@ public class DownloadManager extends Frame {
         private javax.swing.JMenu jMenu1;
         private javax.swing.JMenu jMenu2;
         private javax.swing.JMenuBar jMenuBar1;
+        private javax.swing.JMenuItem jMenuItem1;
+        private javax.swing.JMenuItem jMenuItem2;
+        private javax.swing.JMenuItem jMenuItem3;
+        private javax.swing.JMenuItem jMenuItem4;
+        private javax.swing.JMenuItem jMenuItem5;
+        private javax.swing.JMenuItem jMenuItem6;
         private javax.swing.JScrollPane jScrollPane1;
         // End of variables declaration//GEN-END:variables
 }

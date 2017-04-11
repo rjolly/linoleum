@@ -7,26 +7,138 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import linoleum.application.ApplicationManager;
 
 public class Desktop extends JFrame {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
+	private final Icon openIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"));
+	private final Icon contentsIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Help16.gif"));
+	private final Icon aboutIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/About16.gif"));
 	private static final String ABOUTMSG = "%s %s.%s \n \nJava desktop environment "
 		+ "and software distribution. \n \nWritten by \n  "
 		+ "%s";
 	private final Console console = new Console();
 	private final Packages instance = Packages.instance;
 	private final ApplicationManager apps = new ApplicationManager();
+	private final Action openAction = new OpenAction();
+	private final Action exitAction = new ExitAction();
+	private final Action fullScreenAction = new FullScreenAction();
+	private final Action screenshotAction = new ScreenshotAction();
+	private final Action contentsAction = new ContentsAction();
+	private final Action aboutAction = new AboutAction();
 	private final GraphicsDevice devices[];
 	private Rectangle bounds;
-	private boolean full;
+
+	private class OpenAction extends AbstractAction {
+		public OpenAction() {
+			super("Open", openIcon);
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
+			putValue(MNEMONIC_KEY, (int) 'o');
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			apps.select();
+			contentsAction.setEnabled(true);
+		}
+	}
+
+	private class ExitAction extends AbstractAction {
+		public ExitAction() {
+			super("Exit");
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.ALT_MASK | InputEvent.CTRL_MASK));
+			putValue(MNEMONIC_KEY, (int) 'x');
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			System.exit(0);
+		}
+	}
+
+	private class FullScreenAction extends AbstractAction {
+		public FullScreenAction() {
+			super("Full screen");
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.ALT_MASK | InputEvent.CTRL_MASK));
+			putValue(MNEMONIC_KEY, (int) 'f');
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			fullScreen();
+		}
+	}
+
+	private class ScreenshotAction extends AbstractAction {
+		public ScreenshotAction() {
+			super("Screenshot");
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK));
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			final BufferedImage bi = new BufferedImage(getRootPane().getWidth(), getRootPane().getHeight(), BufferedImage.TYPE_INT_ARGB);
+			getRootPane().print(bi.createGraphics());
+			try {
+				ImageIO.write(bi, "png", new File("screenshot.png"));
+			} catch (final IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+	private class ContentsAction extends AbstractAction {
+		public ContentsAction() {
+			super("Contents", contentsIcon);
+			putValue(MNEMONIC_KEY, (int) 'c');
+			setEnabled(false);
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			try {
+				final File home = new File(System.getProperty("java.home")).getParentFile().getCanonicalFile();
+				final File file = new File(home, "docs/api/index.html");
+				if (file.exists()) {
+					apps.open(file.toURI());
+				}
+			} catch (final IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+	private class AboutAction extends AbstractAction {
+		public AboutAction() {
+			super("About", aboutIcon);
+			putValue(MNEMONIC_KEY, (int) 'a');
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			final java.lang.Package pkg = getClass().getPackage();
+			JOptionPane.showInternalMessageDialog(desktopPane, String.format(ABOUTMSG,
+					pkg.getImplementationTitle(),
+					pkg.getSpecificationVersion(),
+					pkg.getImplementationVersion(),
+					pkg.getImplementationVendor()));
+		}
+	}
 
 	private Desktop() {
 		initComponents();
@@ -39,37 +151,10 @@ public class Desktop extends JFrame {
 		loadBounds();
 	}
 
-	private void open() {
-		apps.select();
-		if (!contentMenuItem.isEnabled()) {
-			contentMenuItem.setEnabled(true);
-		}
-	}
-
-	private void about() {
-		final java.lang.Package pkg = getClass().getPackage();
-		JOptionPane.showInternalMessageDialog(desktopPane, String.format(ABOUTMSG,
-				pkg.getImplementationTitle(),
-				pkg.getSpecificationVersion(),
-				pkg.getImplementationVersion(),
-				pkg.getImplementationVendor()));
-	}
-
-	private void content() {
-		try {
-			final File home = new File(System.getProperty("java.home")).getParentFile().getCanonicalFile();
-			final File file = new File(home, "docs/api/index.html");
-			if (file.exists()) {
-				apps.open(file.toURI());
-			}
-		} catch (final IOException ex) {
-			ex.printStackTrace();
-		}
-	}
-
 	private void fullScreen() {
 		dispose();
-		setUndecorated(full = fullScreenMenuItem.isSelected());
+		final boolean full = fullScreenMenuItem.isSelected();
+		setUndecorated(full);
 		if (devices.length > 1) {
 			if (full) {
 				bounds = getBounds();
@@ -107,16 +192,6 @@ public class Desktop extends JFrame {
 		frame.setBounds(-insets.left, insets.bottom - height, size.width + width, size.height + height);
 	}
 
-	private void screenshot() {
-		final BufferedImage bi = new BufferedImage(getRootPane().getWidth(), getRootPane().getHeight(), BufferedImage.TYPE_INT_ARGB);
-		getRootPane().print(bi.createGraphics());
-		try {
-			ImageIO.write(bi, "png", new File("screenshot.png"));
-		} catch (final IOException ex) {
-			ex.printStackTrace();
-		}
-	}
-
 	private String getKey(final String str) {
 		return getName() + "." + str;
 	}
@@ -151,30 +226,15 @@ public class Desktop extends JFrame {
 
                 frame.setVisible(true);
                 desktopPane.add(frame);
-                frame.setBounds(0, 0, 891, 531);
+                frame.setBounds(0, 0, 22, 33);
 
                 fileMenu.setMnemonic('f');
                 fileMenu.setText("File");
 
-                openMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
-                openMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"))); // NOI18N
-                openMenuItem.setMnemonic('o');
-                openMenuItem.setText("Open");
-                openMenuItem.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                openMenuItemActionPerformed(evt);
-                        }
-                });
+                openMenuItem.setAction(openAction);
                 fileMenu.add(openMenuItem);
 
-                exitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_W, java.awt.event.InputEvent.ALT_MASK | java.awt.event.InputEvent.CTRL_MASK));
-                exitMenuItem.setMnemonic('x');
-                exitMenuItem.setText("Exit");
-                exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                exitMenuItemActionPerformed(evt);
-                        }
-                });
+                exitMenuItem.setAction(exitAction);
                 fileMenu.add(exitMenuItem);
 
                 menuBar.add(fileMenu);
@@ -182,24 +242,11 @@ public class Desktop extends JFrame {
                 viewMenu.setMnemonic('v');
                 viewMenu.setText("View");
 
-                fullScreenMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.ALT_MASK | java.awt.event.InputEvent.CTRL_MASK));
-                fullScreenMenuItem.setMnemonic('f');
+                fullScreenMenuItem.setAction(fullScreenAction);
                 fullScreenMenuItem.setSelected(isFullScreen());
-                fullScreenMenuItem.setText("Full screen");
-                fullScreenMenuItem.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                fullScreenMenuItemActionPerformed(evt);
-                        }
-                });
                 viewMenu.add(fullScreenMenuItem);
 
-                screenshotMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_MASK));
-                screenshotMenuItem.setText("Screenshot");
-                screenshotMenuItem.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                screenshotMenuItemActionPerformed(evt);
-                        }
-                });
+                screenshotMenuItem.setAction(screenshotAction);
                 viewMenu.add(screenshotMenuItem);
 
                 menuBar.add(viewMenu);
@@ -207,25 +254,10 @@ public class Desktop extends JFrame {
                 helpMenu.setMnemonic('h');
                 helpMenu.setText("Help");
 
-                contentMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Help16.gif"))); // NOI18N
-                contentMenuItem.setMnemonic('c');
-                contentMenuItem.setText("Contents");
-                contentMenuItem.setEnabled(false);
-                contentMenuItem.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                contentMenuItemActionPerformed(evt);
-                        }
-                });
+                contentMenuItem.setAction(contentsAction);
                 helpMenu.add(contentMenuItem);
 
-                aboutMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/About16.gif"))); // NOI18N
-                aboutMenuItem.setMnemonic('a');
-                aboutMenuItem.setText("About");
-                aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                                aboutMenuItemActionPerformed(evt);
-                        }
-                });
+                aboutMenuItem.setAction(aboutAction);
                 helpMenu.add(aboutMenuItem);
 
                 menuBar.add(helpMenu);
@@ -246,28 +278,8 @@ public class Desktop extends JFrame {
                 pack();
         }// </editor-fold>//GEN-END:initComponents
 
-	private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
-		System.exit(0);
-	}//GEN-LAST:event_exitMenuItemActionPerformed
-
-	private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
-		open();
-	}//GEN-LAST:event_openMenuItemActionPerformed
-
-	private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
-		about();
-	}//GEN-LAST:event_aboutMenuItemActionPerformed
-
-        private void fullScreenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fullScreenMenuItemActionPerformed
-		fullScreen();
-        }//GEN-LAST:event_fullScreenMenuItemActionPerformed
-
-        private void screenshotMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_screenshotMenuItemActionPerformed
-		screenshot();
-        }//GEN-LAST:event_screenshotMenuItemActionPerformed
-
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-		if (isShowing() && !full && desktopPane.isRecording()) {
+		if (isShowing() && !fullScreenMenuItem.isSelected() && desktopPane.isRecording()) {
 			final Component c = evt.getComponent();
 			prefs.putInt(getKey("width"), c.getWidth());
 			prefs.putInt(getKey("height"), c.getHeight());
@@ -275,12 +287,8 @@ public class Desktop extends JFrame {
 		resize();
         }//GEN-LAST:event_formComponentResized
 
-        private void contentMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contentMenuItemActionPerformed
-		content();
-        }//GEN-LAST:event_contentMenuItemActionPerformed
-
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
-		if (isShowing() && !full && desktopPane.isRecording()) {
+		if (isShowing() && !fullScreenMenuItem.isSelected() && desktopPane.isRecording()) {
 			final Component c = evt.getComponent();
 			prefs.putInt(getKey("x"), c.getX());
 			prefs.putInt(getKey("y"), c.getY());
