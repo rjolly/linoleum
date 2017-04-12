@@ -91,11 +91,10 @@ public class Compose extends Frame {
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail24.gif")));
 		setFrameIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail16.gif")));
 		setScheme("mailto");
-                setClosable(true);
-                setIconifiable(true);
-                setMaximizable(true);
-                setResizable(true);
-		setTitle("Untitled Message " + (getIndex() + 1));
+		setClosable(true);
+		setIconifiable(true);
+		setMaximizable(true);
+		setResizable(true);
 		setJMenuBar(client.getJMenuBar());
 
 		JPanel top = new JPanel();
@@ -156,6 +155,7 @@ public class Compose extends Frame {
 				}
 			}
 		}
+		setTitle("Untitled Message " + (getIndex() + 1));
 	}
 
 	private JPanel buildButtonPanel() {

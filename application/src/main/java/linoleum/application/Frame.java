@@ -53,10 +53,9 @@ public class Frame extends JInternalFrame {
 	private URI uri;
 	private boolean opened;
 	@Deprecated
-	protected final int index;
-	private final Frame owner;
+	protected int index;
 	@Deprecated
-	protected final Frame parent;
+	protected Frame parent;
 	private final Collection<Integer> openFrames = new HashSet<Integer>();
 
 	public Frame() {
@@ -71,21 +70,27 @@ public class Frame extends JInternalFrame {
 	public Frame(final Frame owner, final String title) {
 		super(title, true, true, true, true);
 		initComponents();
-		this.owner = owner;
-		parent = getOwner();
-		index = getOwner().nextIndex();
+		parent = owner == null?this:owner;
+		index = parent.nextIndex();
 	}
 
 	@Deprecated
 	public Frame(final Frame owner) {
 		initComponents();
-		this.owner = owner;
-		parent = getOwner();
-		index = getOwner().nextIndex();
+		parent = owner == null?this:owner;
+		index = parent.nextIndex();
+	}
+
+	public void setOwner(final Frame owner) {
+		parent = owner;
 	}
 
 	public Frame getOwner() {
-		return owner == null?this:owner;
+		return parent;
+	}
+
+	public void setIndex(final int index) {
+		this.index = index;
 	}
 
 	public int getIndex() {
@@ -215,15 +220,19 @@ public class Frame extends JInternalFrame {
 		for (final JInternalFrame c : desktop.getAllFrames()) {
 			final String name = c.getName();
 			if (name != null && name.equals(getName()) && c instanceof Frame) {
-				final Frame f = (Frame)c;
-				if (f.reuseFor(uri)) {
-					frame = f;
+				if (((Frame) c).reuseFor(uri)) {
+					frame = c;
 					break;
 				}
 			}
 		}
 		if (frame == null) {
-			frame = getFrame();
+			final JInternalFrame c = getFrame();
+			if (c instanceof Frame) {
+				((Frame) c).setOwner(this);
+				((Frame) c).setIndex(nextIndex());
+			}
+			frame = c;
 		}
 		return frame;
 	}
