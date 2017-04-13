@@ -51,7 +51,7 @@ public class Frame extends JInternalFrame {
 	private String scheme;
 	private Icon icon;
 	private URI uri;
-	private boolean opened;
+	private boolean open;
 	@Deprecated
 	protected int index;
 	@Deprecated
@@ -184,15 +184,15 @@ public class Frame extends JInternalFrame {
 
 	public void open(final URI uri) {
 		final JDesktopPane desktop = manager.getDesktopPane();
-		final JInternalFrame internal = getFrame(desktop, uri);
-		if (internal instanceof Frame) {
-			final Frame frame = (Frame) internal;
+		final JInternalFrame c = getFrame(desktop, uri);
+		if (c instanceof Frame) {
+			final Frame frame = (Frame) c;
 			final boolean changed = uri != null && !frame.reuseFor(uri);
 			if (changed) {
 				frame.setURI(uri);
 			}
 			if (frame.getDesktopPane() == null) {
-				if (!frame.opened) {
+				if (!frame.open) {
 					frame.manager = manager;
 					desktop.add(frame);
 				} else {
@@ -204,10 +204,10 @@ public class Frame extends JInternalFrame {
 			}
 			frame.select();
 		} else {
-			if (internal.getDesktopPane() == null) {
-				desktop.add(internal);
+			if (c.getDesktopPane() == null) {
+				desktop.add(c);
 			}
-			manager.select(internal);
+			manager.select(c);
 		}
 	}
 
@@ -216,25 +216,20 @@ public class Frame extends JInternalFrame {
 	}
 
 	private JInternalFrame getFrame(final JDesktopPane desktop, final URI uri) {
-		JInternalFrame frame = null;
 		for (final JInternalFrame c : desktop.getAllFrames()) {
 			final String name = c.getName();
 			if (name != null && name.equals(getName()) && c instanceof Frame) {
 				if (((Frame) c).reuseFor(uri)) {
-					frame = c;
-					break;
+					return c;
 				}
 			}
 		}
-		if (frame == null) {
-			final JInternalFrame c = getFrame();
-			if (c instanceof Frame) {
-				((Frame) c).setOwner(this);
-				((Frame) c).setIndex(nextIndex());
-			}
-			frame = c;
+		final JInternalFrame c = getFrame();
+		if (c instanceof Frame) {
+			((Frame) c).setOwner(this);
+			((Frame) c).setIndex(nextIndex());
 		}
-		return frame;
+		return c;
 	}
 
 	protected boolean reuseFor(final URI that) {
@@ -366,7 +361,7 @@ public class Frame extends JInternalFrame {
 		final int height = prefs.getInt(getKey("height"), getHeight());
 		setBounds(x, y, width, height);
 		openFrame();
-		opened = true;
+		open = true;
         }//GEN-LAST:event_formInternalFrameOpened
 
         private void formInternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosing
