@@ -2,16 +2,16 @@ package linoleum.mail;
 
 import java.awt.*;
 import java.io.*;
-import java.beans.*;
 import javax.activation.*;
-import javax.swing.JPanel;
 import javax.swing.JEditorPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.text.Document;
 import javax.swing.text.EditorKit;
 
-public class TextViewer extends JPanel implements Viewer {
+public class TextViewer extends AbstractViewer {
 	private final JEditorPane text_area;
+	private final JPopupMenu menu = new JPopupMenu();
 
 	public TextViewer() {
 		super(new GridLayout(1,1));
@@ -25,6 +25,7 @@ public class TextViewer extends JPanel implements Viewer {
 		sp.getViewport().add(text_area);
 
 		add(sp);
+		text_area.setComponentPopupMenu(menu);
 	}
 
 	public void setCommandContext(final String verb, final DataHandler dh) throws IOException {
@@ -39,6 +40,7 @@ public class TextViewer extends JPanel implements Viewer {
 		final EditorKit kit = text_area.getEditorKit();
 		final Document doc = kit.createDefaultDocument();
 		text_area.read(ins, doc);
+		menu.add(new SaveAsAction(dh, null));
 	}
 
 	public void scrollToOrigin() {
