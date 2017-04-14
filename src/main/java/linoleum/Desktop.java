@@ -22,7 +22,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
-import linoleum.application.ApplicationManager;
 
 public class Desktop extends JFrame {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
@@ -32,16 +31,14 @@ public class Desktop extends JFrame {
 	private static final String ABOUTMSG = "%s %s.%s \n \nJava desktop environment "
 		+ "and software distribution. \n \nWritten by \n  "
 		+ "%s";
-	private final Console console = new Console();
 	private final Packages instance = Packages.instance;
-	private final ApplicationManager apps = new ApplicationManager();
 	private final Action openAction = new OpenAction();
 	private final Action exitAction = new ExitAction();
 	private final Action fullScreenAction = new FullScreenAction();
 	private final Action screenshotAction = new ScreenshotAction();
 	private final Action contentsAction = new ContentsAction();
 	private final Action aboutAction = new AboutAction();
-	private final GraphicsDevice devices[];
+	private final GraphicsDevice devices[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 	private Rectangle bounds;
 
 	private class OpenAction extends AbstractAction {
@@ -140,14 +137,11 @@ public class Desktop extends JFrame {
 		}
 	}
 
-	private Desktop() {
+	public Desktop() {
 		initComponents();
-		desktopPane.add(console);
-		desktopPane.add(apps);
 		frame.setLayer(0);
 		apps.manage(frame);
 		apps.manage(console);
-		devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 		loadBounds();
 	}
 
@@ -202,6 +196,8 @@ public class Desktop extends JFrame {
 
                 desktopPane = new linoleum.DesktopPane();
                 frame = new linoleum.Background();
+                console = new linoleum.Console();
+                apps = new linoleum.application.ApplicationManager();
                 menuBar = new javax.swing.JMenuBar();
                 fileMenu = new javax.swing.JMenu();
                 openMenuItem = new javax.swing.JMenuItem();
@@ -227,6 +223,12 @@ public class Desktop extends JFrame {
                 frame.setVisible(true);
                 desktopPane.add(frame);
                 frame.setBounds(0, 0, 22, 33);
+
+                desktopPane.add(console);
+                console.setBounds(0, 0, 410, 310);
+
+                desktopPane.add(apps);
+                apps.setBounds(0, 0, 410, 310);
 
                 fileMenu.setMnemonic('f');
                 fileMenu.setText("File");
@@ -306,6 +308,8 @@ public class Desktop extends JFrame {
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JMenuItem aboutMenuItem;
+        private linoleum.application.ApplicationManager apps;
+        private linoleum.Console console;
         private javax.swing.JMenuItem contentMenuItem;
         private linoleum.DesktopPane desktopPane;
         private javax.swing.JMenuItem exitMenuItem;
