@@ -1,4 +1,4 @@
-package linoleum;
+package linoleum.application;
 
 import java.io.File;
 import java.util.regex.Pattern;

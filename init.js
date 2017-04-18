@@ -1,5 +1,5 @@
 Tools = Packages.linoleum.Tools;
-instance = Packages.linoleum.Packages.instance;
+instance = Packages.linoleum.application.Packages.instance;
 PackageManager = Packages.linoleum.pkg.PackageManager;
 
 function install(pkg, conf, dir) {

@@ -31,7 +31,6 @@ public class Desktop extends JFrame {
 	private static final String ABOUTMSG = "%s %s.%s \n \nJava desktop environment "
 		+ "and software distribution. \n \nWritten by \n  "
 		+ "%s";
-	private final Packages instance = Packages.instance;
 	private final Action openAction = new OpenAction();
 	private final Action exitAction = new ExitAction();
 	private final Action fullScreenAction = new FullScreenAction();

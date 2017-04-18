@@ -89,6 +89,7 @@ public class ApplicationManager extends Frame {
 	private final DefaultComboBoxModel<String> comboModel = new DefaultComboBoxModel<>();
 	private final DefaultTableModel tableModel;
 	private final DefaultTableModel schemeTableModel;
+	private final Packages instance = Packages.instance;
 
 	private class Renderer extends JLabel implements ListCellRenderer {
 		public Renderer() {

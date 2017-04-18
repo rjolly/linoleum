@@ -17,6 +17,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
+import linoleum.application.Packages;
 
 public class Tools {
 	public static final Tools instance = new Tools();
