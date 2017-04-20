@@ -80,7 +80,7 @@ import linoleum.application.ApplicationManager;
 import linoleum.application.FileChooser;
 import linoleum.application.Frame;
 
-public class FileManager extends Frame {
+public class FileManager extends Frame implements Runnable {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final Icon openIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"));
 	private final Icon cutIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Cut16.gif"));
@@ -88,6 +88,7 @@ public class FileManager extends Frame {
 	private final Icon pasteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Paste16.gif"));
 	private final Icon deleteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Delete16.gif"));
 	private final Icon newFolderIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/newFolder.gif"));
+	private final Icon upFolderIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/upFolder.gif"));
 	private final Icon fileLinkIcon = new ImageIcon(getClass().getResource("file.png"));
 	private final Icon directoryLinkIcon = new ImageIcon(getClass().getResource("directory.png"));
 	private final Icon fileIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/file.gif"));
@@ -154,52 +155,6 @@ public class FileManager extends Frame {
 		}
 	};
 	private final Map<String, ?> env = new HashMap<>();
-	private final Thread thread = new Thread() {
-		@Override
-		public void run() {
-			try (final WatchService service = fs.newWatchService()) {
-				WatchKey key = register(service);
-				for (;;) {
-					try {
-						key = service.take();
-						for (final WatchEvent<?> event : key.pollEvents()) {
-							SwingUtilities.invokeLater(new Runnable() {
-								public void run() {
-									process(event);
-								}
-							});
-						}
-						key.reset();
-					} catch (final InterruptedException e) {
-						if (closing) {
-							service.close();
-							break;
-						} else {
-							key.cancel();
-							key = register(service);
-						}
-					}
-				}
-			} catch (final IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		private void process(final WatchEvent<?> event) {
-			final Path entry = getPath().resolve((Path) event.context());
-			final WatchEvent.Kind kind = event.kind();
-			if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-				addEntry(entry);
-			} else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-				removeEntry(entry);
-			}
-		}
-
-		private WatchKey register(final WatchService service) throws IOException {
-			setTitle(getFileName(path));
-			return path.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
-		}
-	};
 	private final FileSystem defaultfs = FileSystems.getDefault();
 	private final Map<FileSystem, Collection<Integer>> openFrames = new HashMap<>();
 	private final TransferHandler handler = new TransferHandler() {
@@ -324,6 +279,7 @@ public class FileManager extends Frame {
 	private final DefaultTableModel tableModel;
 	private FileManager source;
 	private boolean closing;
+	private Thread thread;
 	private FileSystem fs;
 	private boolean show;
 	private boolean showDetails;
@@ -784,8 +740,7 @@ public class FileManager extends Frame {
 		return path.toUri();
 	}
 
-	@Override
-	public void open() {
+	private void doOpen() {
 		if(Files.isRegularFile(path) && isJar()) {
 			final URI uri = path.toUri();
 			try {
@@ -795,18 +750,55 @@ public class FileManager extends Frame {
 			}
 		}
 		rescan();
-		if (fs != defaultfs) {
-			Collection<Integer> coll = getOwner().openFrames.get(fs);
-			if (coll == null) {
-				getOwner().openFrames.put(fs, coll = new HashSet<Integer>());
-			}
-			coll.add(getIndex());
-		}
 		if (fs == defaultfs && Files.isDirectory(path)) {
-			thread.start();
+			(thread = new Thread(this)).start();
 		} else {
 			setTitle(getFileName(path));
 		}
+	}
+
+	public void run() {
+		try (final WatchService service = fs.newWatchService()) {
+			WatchKey key = register(service);
+			for (;;) {
+				try {
+					key = service.take();
+					for (final WatchEvent<?> event : key.pollEvents()) {
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								process(event);
+							}
+						});
+					}
+					key.reset();
+				} catch (final InterruptedException e) {
+					if (closing) {
+						service.close();
+						break;
+					} else {
+						key.cancel();
+						key = register(service);
+					}
+				}
+			}
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void process(final WatchEvent<?> event) {
+		final Path entry = getPath().resolve((Path) event.context());
+		final WatchEvent.Kind kind = event.kind();
+		if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+			addEntry(entry);
+		} else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
+			removeEntry(entry);
+		}
+	}
+
+	private WatchKey register(final WatchService service) throws IOException {
+		setTitle(getFileName(path));
+		return path.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
 	}
 
 	static String getFileName(final Path path) {
@@ -815,17 +807,25 @@ public class FileManager extends Frame {
 	}
 
 	private Icon getFileIcon(final Path path) {
-		return Files.isDirectory(path)?
+		return getFileName(path).equals("..")?upFolderIcon:Files.isDirectory(path)?
 				Files.isSymbolicLink(path)?directoryLinkIcon:directoryIcon:
 				Files.isSymbolicLink(path)?fileLinkIcon:fileIcon;
 	}
 
 	@Override
-	public void close() {
-		closing = true;
-		if (fs == defaultfs && Files.isDirectory(path)) {
-			thread.interrupt();
+	public void open() {
+		doOpen();
+		if (fs != defaultfs) {
+			Collection<Integer> coll = getOwner().openFrames.get(fs);
+			if (coll == null) {
+				getOwner().openFrames.put(fs, coll = new HashSet<Integer>());
+			}
+			coll.add(getIndex());
 		}
+	}
+
+	@Override
+	public void close() {
 		if (fs != defaultfs) {
 			Collection<Integer> coll = getOwner().openFrames.get(fs);
 			coll.remove(getIndex());
@@ -837,6 +837,14 @@ public class FileManager extends Frame {
 					ex.printStackTrace();
 				}
 			}
+		}
+		doClose();
+	}
+
+	private void doClose() {
+		closing = true;
+		if (fs == defaultfs && Files.isDirectory(path)) {
+			thread.interrupt();
 		}
 	}
 
@@ -864,6 +872,9 @@ public class FileManager extends Frame {
 				return ac == bc?a.compareTo(b):ac?-1:1;
 			}
 		});
+		if (Files.isDirectory(path) && !path.equals(path.getRoot())) {
+			addEntry(path.resolve(".."));
+		}
 		for (final Path entry : files) {
 			addEntry(entry);
 		}
@@ -952,7 +963,13 @@ public class FileManager extends Frame {
 
 	private void open(final Path entry) {
 		try {
-			getApplicationManager().open(entry.toRealPath().toUri());
+			if (Files.isDirectory(entry) && !Files.isSymbolicLink(entry)) {
+				doClose();
+				setURI(entry.toRealPath().toUri());
+				doOpen();
+			} else {
+				getApplicationManager().open(entry.toRealPath().toUri());
+			}
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
