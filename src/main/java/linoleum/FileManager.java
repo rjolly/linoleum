@@ -19,6 +19,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.FileVisitOption;
@@ -194,17 +195,17 @@ public class FileManager extends Frame implements Runnable {
 				final FileTable table = (FileTable) comp;
 				if (support.isDrop()) {
 					final JTable.DropLocation dl = (JTable.DropLocation) support.getDropLocation();
-					recipient = dl.isInsertRow() || dl.getColumn() > 0?getPath():getDirectory((Path) table.getValueAt(dl.getRow(), 0));
+					recipient = dl.isInsertRow() || dl.getColumn() > 0?path:getDirectory((Path) table.getValueAt(dl.getRow(), 0));
 				} else {
-					recipient = table.isSelectionEmpty()?getPath():getDirectory(table.getSelectedValue());
+					recipient = table.isSelectionEmpty()?path:getDirectory(table.getSelectedValue());
 				}
 			} else {
 				final FileList list = (FileList) comp;
 				if (support.isDrop()) {
 					final JList.DropLocation dl = (JList.DropLocation) support.getDropLocation();
-					recipient = dl.isInsert()?getPath():getDirectory(list.getModel().getElementAt(dl.getIndex()));
+					recipient = dl.isInsert()?path:getDirectory(list.getModel().getElementAt(dl.getIndex()));
 				} else {
-					recipient = list.isSelectionEmpty()?getPath():getDirectory(list.getSelectedValue());
+					recipient = list.isSelectionEmpty()?path:getDirectory(list.getSelectedValue());
 				}
 			}
 			for (final Path entry : files) {
@@ -392,7 +393,7 @@ public class FileManager extends Frame implements Runnable {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			newFolder(getPath().resolve("New folder"));
+			newFolder(path.resolve("New folder"));
 		}
 	}
 
@@ -722,7 +723,7 @@ public class FileManager extends Frame implements Runnable {
 	@Override
 	public void setURI(final URI uri) {
 		try {
-			path = relativize(Paths.get(uri).toRealPath());
+			path = unjar(relativize(Paths.get(uri).toRealPath()));
 			fs = path.getFileSystem();
 		} catch (final IOException ex) {
 			ex.printStackTrace();
@@ -735,22 +736,34 @@ public class FileManager extends Frame implements Runnable {
 		return fs == defaultfs && path.startsWith(user)?user.relativize(path):path;
 	}
 
+	private Path unjar(final Path path) throws IOException {
+		try {
+			final MimeType t = new MimeType(Files.probeContentType(path));
+			if (t.match("application/java-archive") || t.match("application/zip")) {
+				return getFileSystem(new URI("jar", path.toUri().toString(), null)).getPath("/");
+			}
+		} catch (final MimeTypeParseException | URISyntaxException ex) {
+			ex.printStackTrace();
+		}
+		return path;
+	}
+
+	private FileSystem getFileSystem(final URI uri) throws IOException {
+		try {
+			return FileSystems.getFileSystem(uri);
+		} catch (final FileSystemNotFoundException ex) {
+		}
+		return FileSystems.newFileSystem(uri, env);
+	}
+
 	@Override
 	public URI getURI() {
 		return path.toUri();
 	}
 
 	private void doOpen() {
-		if(Files.isRegularFile(path) && isJar()) {
-			final URI uri = path.toUri();
-			try {
-				fs = FileSystems.newFileSystem(new URI("jar", uri.toString(), null), env);
-			} catch (final URISyntaxException | IOException ex) {
-				ex.printStackTrace();
-			}
-		}
 		rescan();
-		if (fs == defaultfs && Files.isDirectory(path)) {
+		if (fs == defaultfs) {
 			(thread = new Thread(this)).start();
 		} else {
 			setTitle(getFileName(path));
@@ -787,7 +800,7 @@ public class FileManager extends Frame implements Runnable {
 	}
 
 	private void process(final WatchEvent<?> event) {
-		final Path entry = getPath().resolve((Path) event.context());
+		final Path entry = path.resolve((Path) event.context());
 		final WatchEvent.Kind kind = event.kind();
 		if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
 			addEntry(entry);
@@ -843,7 +856,7 @@ public class FileManager extends Frame implements Runnable {
 
 	private void doClose() {
 		closing = true;
-		if (fs == defaultfs && Files.isDirectory(path)) {
+		if (fs == defaultfs) {
 			thread.interrupt();
 		}
 	}
@@ -861,10 +874,7 @@ public class FileManager extends Frame implements Runnable {
 		showDetails = jCheckBoxMenuItem2.isSelected();
 		((CardLayout) jPanel1.getLayout()).show(jPanel1, showDetails?"table":"list");
 		clear();
-		Path files[] = new Path[0];
-		if (Files.isDirectory(path) || isJar()) {
-			files = listFiles(getPath()).toArray(files);
-		}
+		final Path files[] = listFiles(path).toArray(new Path[0]);
 		Arrays.sort(files, new Comparator<Path>() {
 			public int compare(final Path a, final Path b) {
 				boolean ac = Files.isDirectory(a);
@@ -872,7 +882,7 @@ public class FileManager extends Frame implements Runnable {
 				return ac == bc?a.compareTo(b):ac?-1:1;
 			}
 		});
-		if (Files.isDirectory(path) && !path.equals(path.getRoot())) {
+		if (!path.equals(path.getRoot())) {
 			addEntry(path.resolve(".."));
 		}
 		for (final Path entry : files) {
@@ -914,27 +924,6 @@ public class FileManager extends Frame implements Runnable {
 		}
 	}
 
-	private boolean isJar() {
-		if (path.getFileSystem() == defaultfs) try {
-			final MimeType t = new MimeType(Files.probeContentType(path));
-			return t.match("application/java-archive") || t.match("application/zip");
-		} catch (final IOException | MimeTypeParseException ex) {
-			ex.printStackTrace();
-		}
-		return false;
-	}
-
-	private Path getPath() {
-		return Files.isDirectory(path)?path:getRootDirectory();
-	}
-
-	private Path getRootDirectory() {
-		for (final Path entry : fs.getRootDirectories()) {
-			return entry;
-		}
-		return null;
-	}
-
 	@Override
 	public boolean canOpen(final Path entry) {
 		try {
@@ -950,7 +939,7 @@ public class FileManager extends Frame implements Runnable {
 	@Override
 	public boolean reuseFor(final URI that) {
 		try {
-			return Files.isSameFile(path, Paths.get(that == null?getHome():that));
+			return Files.isSameFile(path, unjar(Paths.get(that == null?getHome():that)));
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
