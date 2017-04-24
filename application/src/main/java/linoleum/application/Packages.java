@@ -49,7 +49,7 @@ public class Packages {
 			final File jar = new File(classpath[0]).getCanonicalFile();
 			final URL url = new URL("jar:" + jar.toURI().toURL() + "!/META-INF/MANIFEST.MF");
 			final Manifest manifest = new Manifest(url.openStream());
-			final String cp = (String)manifest.getMainAttributes().get(Attributes.Name.CLASS_PATH);
+			final String cp = (String) manifest.getMainAttributes().get(Attributes.Name.CLASS_PATH);
 			if (cp != null) for (final String str : cp.split(" ")) {
 				final File file = new File(jar.getParentFile(), str).getCanonicalFile();
 				if (file.isFile() && file.getName().endsWith(".jar")) {
@@ -68,10 +68,11 @@ public class Packages {
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
-		try {
+		final File jar = map.get("linoleum");
+		if (jar != null) try {
 			String str = System.getProperty("linoleum.home");
 			if (str == null) {
-				System.setProperty("linoleum.home", str = map.get("linoleum").getParentFile().getCanonicalPath());
+				System.setProperty("linoleum.home", str = jar.getParentFile().getCanonicalPath());
 			}
 			final File home = new File(str).getCanonicalFile();
 			if (!Files.isSameFile(home.toPath(), Paths.get("."))) {
