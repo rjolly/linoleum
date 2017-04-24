@@ -225,7 +225,7 @@ public class Frame extends JInternalFrame {
 			}
 		}
 		final JInternalFrame c = getFrame();
-		if (c instanceof Frame) {
+		if (c instanceof Frame && c != this) {
 			((Frame) c).setOwner(this);
 			((Frame) c).setIndex(nextIndex());
 		}
