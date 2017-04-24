@@ -80,10 +80,11 @@ public class DownloadManager extends Frame {
 			label.setFont(list.getFont());
 			final FileLoader loader = (FileLoader) value;
 			label.setText(loader.getFile().getName());
+			progress.setValue(loader.getProgress());
 			loader.addPropertyChangeListener(new PropertyChangeListener() {
 				public  void propertyChange(final PropertyChangeEvent evt) {
 					if ("progress".equals(evt.getPropertyName())) {
-						progress.setValue((Integer) evt.getNewValue());
+						list.repaint();
 					}
 				}
 			});

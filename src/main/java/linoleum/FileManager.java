@@ -1009,8 +1009,9 @@ public class FileManager extends Frame implements Runnable {
 			jMenu3.setEnabled(true);
 			renameAction.setEnabled(true);
 			deleteAction.setEnabled(true);
-			try {
-				final URI uri = getSelectedValue().toRealPath().toUri();
+			final Path path = getSelectedValue();
+			if (Files.exists(path)) try {
+				final URI uri = path.toRealPath().toUri();
 				final ApplicationManager mgr = getApplicationManager();
 				final String s = mgr.getApplication(uri);
 				boolean sep = false;
@@ -1379,7 +1380,6 @@ public class FileManager extends Frame implements Runnable {
 		if (idx > -1 && !isSelectedIndex(idx)) {
 			setSelectedIndex(idx);
 		}
-		prepare();
         }//GEN-LAST:event_jPopupMenu1PopupMenuWillBecomeVisible
 
         private void jList1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseMoved
