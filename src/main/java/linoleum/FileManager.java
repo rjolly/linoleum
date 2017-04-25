@@ -938,8 +938,10 @@ public class FileManager extends Frame implements Runnable {
 
 	@Override
 	public boolean reuseFor(final URI that) {
-		try {
-			return Files.isSameFile(path, unjar(Paths.get(that == null?getHome():that)));
+		if (that == null) {
+			return reuseFor(getHome());
+		} else try {
+			return Files.isSameFile(path, unjar(Paths.get(that)));
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}

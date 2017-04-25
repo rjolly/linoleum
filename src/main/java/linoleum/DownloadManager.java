@@ -300,9 +300,8 @@ public class DownloadManager extends Frame {
 
 	@Override
 	public boolean reuseFor(final URI that) {
-		final URI uri = getURI();
 		if (that == null) {
-			return that == uri;
+			return super.reuseFor(that);
 		} else try {
 			final URL location = that.toURL();
 			for (final FileLoader loader : Collections.list(model.elements())) {

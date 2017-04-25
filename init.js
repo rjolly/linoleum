@@ -256,7 +256,7 @@ function wget(from, to) {
 function open(name, app) {
     var uri = new java.net.URI(name);
     if (!uri.isAbsolute()) {
-    	uri = pathToFile(name).toURI();
+	uri = pathToFile(name).toURI();
     }
     if (app == undefined) {
 	frame.getApplicationManager().open(uri);
@@ -335,6 +335,6 @@ function diff(file1, file2) {
 // requires org.eclipse.jgit#org.eclipse.jgit;3.4.0.201406110918-r
 
 function git() {
-    Git = Packages.org.eclipse.jgit.api.Git
-    return Git.open(pathToFile(".git"))
+    Git = Packages.org.eclipse.jgit.api.Git;
+    return Git.open(pathToFile(".git"));
 }

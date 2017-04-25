@@ -30,7 +30,7 @@ copy("bin", "dist/bin")
 cp("init.js", "dist/init.js")
 
 mkdir("dist/lib")
-copy(new File("lib").getAbsolutePath(), "dist/lib")
+copy(new File("lib"), "dist/lib")
 
 rm("dist/lib/linoleum-" + version + ".jar")
 jar("../linoleum.zip", "dist");

@@ -44,7 +44,7 @@ public class FrameURL {
 		url = panel.getPage();
 		final javax.swing.text.Document doc = panel.getDocument();
 		if (doc instanceof Document) {
-			((Document)doc).setFrames(map, panel);
+			((Document) doc).setFrames(map, panel);
 		}
 	}
 
@@ -54,7 +54,7 @@ public class FrameURL {
 
 	public boolean equals(final Object obj) {
 		if (obj instanceof FrameURL) {
-			final FrameURL that = (FrameURL)obj;
+			final FrameURL that = (FrameURL) obj;
 			return url.equals(that.url) && map.equals(that.map);
 		} else {
 			return false;
@@ -66,10 +66,10 @@ public class FrameURL {
 	}
 
 	public static FrameURL create(final FrameURL url, final HyperlinkEvent evt) {
-		return evt instanceof HTMLFrameHyperlinkEvent?new FrameURL(url, (HTMLFrameHyperlinkEvent)evt):new FrameURL(evt.getURL());
+		return evt instanceof HTMLFrameHyperlinkEvent?new FrameURL(url, (HTMLFrameHyperlinkEvent) evt):new FrameURL(evt.getURL());
 	}
 
 	private static String getName(final Element element) {
-	    return (String)element.getAttributes().getAttribute(HTML.Attribute.NAME);
+	    return (String) element.getAttributes().getAttribute(HTML.Attribute.NAME);
 	}
 }

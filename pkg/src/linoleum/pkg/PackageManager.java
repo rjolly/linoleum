@@ -124,7 +124,7 @@ public class PackageManager extends Frame {
 			final RetrieveReport retrieveReport = ivy.retrieve(md.getModuleRevisionId(), retrieveOptions);
 			boolean changed = false;
 			for (final Object obj : retrieveReport.getCopiedFiles()) {
-				final File file = (File)obj;
+				final File file = (File) obj;
 				if (file.getName().endsWith(".jar")) {
 					changed |= Packages.instance.add(file);
 				}
