@@ -65,6 +65,9 @@ public class DesktopPane extends JDesktopPane {
 			final Icon icon = value.getIcon();
 			setIcon(icon == null?defaultIcon:icon);
 			String str = value.getTitle();
+			if (str == null || str.isEmpty()) {
+				str = value.getName();
+			}
 			if (str != null && str.length() > 16) {
 				str = str.substring(0, 13) + "...";
 			}

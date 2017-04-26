@@ -4,3 +4,4 @@ linoleum.DownloadManager
 linoleum.PreferenceManager
 linoleum.ImageViewer
 linoleum.Clock
+linoleum.Tools

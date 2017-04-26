@@ -17,14 +17,21 @@ import javax.tools.JavaCompiler;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
+import linoleum.application.Frame;
 import linoleum.application.Packages;
 
-public class Tools {
-	public static final Tools instance = new Tools();
+public class Tools extends Frame {
+	public static Tools instance;
 
-	private Tools() {}
+	public Tools() {
+		if (instance == null) {
+			instance = this;
+		}
+		setSize(150, 150);
+                setClosable(true);
+	}
 
-	static File[] concat(final File a[], final File b[]) {
+	private File[] concat(final File a[], final File b[]) {
 		final File c[] = new File[a.length + b.length];
 		System.arraycopy(a, 0, c, 0, a.length);
 		System.arraycopy(b, 0, c, a.length, b.length);
