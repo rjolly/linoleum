@@ -18,7 +18,6 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 import linoleum.application.Frame;
-import linoleum.application.Packages;
 
 public class Tools extends Frame {
 	public static Tools instance;
@@ -41,7 +40,7 @@ public class Tools extends Frame {
 	public void compile(final File files[], final File destDir, final String options[]) throws IOException {
 		final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 		try (final StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null)) {
-			fileManager.setLocation(StandardLocation.CLASS_PATH, Arrays.asList(concat(Packages.instance.installed(), new File[] {destDir})));
+			fileManager.setLocation(StandardLocation.CLASS_PATH, Arrays.asList(concat(getApplicationManager().getPackages().installed(), new File[] {destDir})));
 			fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList(new File[] {destDir}));
 			final JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, Arrays.asList(options), null, fileManager.getJavaFileObjectsFromFiles(Arrays.asList(files)));
 			task.call();
@@ -100,7 +99,7 @@ public class Tools extends Frame {
 	}
 
 	public void run(final String name, final File dir, final String args[]) throws Exception {
-		Packages.instance.add(dir);
+		getApplicationManager().getPackages().add(dir);
 		Class.forName(name, true, ClassLoader.getSystemClassLoader()).getMethod("main", args.getClass()).invoke(null, (Object) args);
 	}
 }

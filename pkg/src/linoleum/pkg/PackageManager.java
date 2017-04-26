@@ -8,6 +8,7 @@ import java.util.Arrays;
 import javax.swing.ImageIcon;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
+import linoleum.application.ApplicationManager;
 import linoleum.application.Frame;
 import linoleum.application.Package;
 import linoleum.application.Packages;
@@ -53,7 +54,7 @@ public class PackageManager extends Frame {
 	@Override
 	public void open() {
 		model.setRowCount(0);
-		for (final File file : Packages.instance.installed()) {
+		for (final File file : getApplicationManager().getPackages().installed()) {
 			final Package pkg = new Package(file);
 			model.addRow(new Object[] {pkg.getName(), pkg.getVersion(), pkg.isSnapshot()});
 		}
@@ -113,6 +114,8 @@ public class PackageManager extends Frame {
 	}
 
 	public void install(final String name, final String conf, final File dir) {
+		final ApplicationManager apps = getApplicationManager();
+		final Packages pkgs = apps.getPackages();
 		final ModuleRevisionId mRID = ModuleRevisionId.parse(name);
 		final ResolveOptions resolveOptions = new ResolveOptions();
 		resolveOptions.setConfs(new String[] { conf });
@@ -126,11 +129,11 @@ public class PackageManager extends Frame {
 			for (final Object obj : retrieveReport.getCopiedFiles()) {
 				final File file = (File) obj;
 				if (file.getName().endsWith(".jar")) {
-					changed |= Packages.instance.add(file);
+					changed |= pkgs.add(file);
 				}
 			}
 			if(changed) {
-				getApplicationManager().fireClassPathChange(new ClassPathChangeEvent(this));
+				apps.fireClassPathChange(new ClassPathChangeEvent(this));
 			}
 		} catch (final ParseException | IOException ex) {
 			ex.printStackTrace();

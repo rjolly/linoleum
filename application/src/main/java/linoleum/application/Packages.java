@@ -15,7 +15,6 @@ import java.util.jar.Attributes;
 import java.net.URL;
 
 public class Packages {
-	public static final Packages instance = new Packages();
 	private final Map<String, File> map = new HashMap<>();
 	private final SortedMap<String, File> installed = new TreeMap<>();
 	private final FileFilter filter = new FileFilter() {
@@ -24,7 +23,7 @@ public class Packages {
 		}
 	};
 
-	private Packages() {
+	Packages() {
 		final String extdirs[] = System.getProperty("java.ext.dirs").split(File.pathSeparator);
 		for (final String str : extdirs) try {
 			final File dir = new File(str).getCanonicalFile();

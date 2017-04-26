@@ -88,7 +88,7 @@ public class ApplicationManager extends Frame {
 	private final DefaultComboBoxModel<String> comboModel = new DefaultComboBoxModel<>();
 	private final DefaultTableModel tableModel;
 	private final DefaultTableModel schemeTableModel;
-	private final Packages instance = Packages.instance;
+	private final Packages instance = new Packages();
 
 	private class Renderer extends JLabel implements ListCellRenderer {
 		public Renderer() {
@@ -136,6 +136,10 @@ public class ApplicationManager extends Frame {
 		manage(this);
 		pref.putAll(getPreferred());
 		spref.putAll(getPreferredByScheme());
+	}
+
+	public Packages getPackages() {
+		return instance;
 	}
 
 	private Map<MimeType, String> getPreferred() {

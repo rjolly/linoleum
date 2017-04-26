@@ -1,5 +1,4 @@
 Tools = Packages.linoleum.Tools;
-instance = Packages.linoleum.application.Packages.instance;
 PackageManager = Packages.linoleum.pkg.PackageManager;
 
 function install(pkg, conf, dir) {
@@ -41,7 +40,7 @@ function javac(srcDir, destDir) {
 
 function classpath() {
     var str = "";
-    var files = instance.installed();
+    var files = frame.getApplicationManager().getPackages().installed();
     for(i in files) str += relativize(new File("."), files[i]).getPath() + (i < files.length - 1 ? java.io.File.pathSeparator : "");
     return str;
 }
