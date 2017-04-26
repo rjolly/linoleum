@@ -16,12 +16,16 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
+import java.nio.file.Paths;
+import java.nio.file.FileSystemNotFoundException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 import javax.swing.Action;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
@@ -206,6 +210,22 @@ public class Browser extends Frame {
 
 	private URI stripped(final URI uri) throws URISyntaxException {
 		return uri.isOpaque()?new URI(uri.getScheme(), uri.getSchemeSpecificPart(), null):new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null);
+	}
+
+	private boolean canOpen(final URI uri) {
+		try {
+			return canOpen(Paths.get(uri));
+		} catch (final FileSystemNotFoundException ex) {
+		}
+		if (canOpen(uri.getScheme())) try {
+			final URLConnection conn = uri.toURL().openConnection();
+			final String str = conn.getContentType();
+			conn.getInputStream().close();
+			return canOpen(new MimeType(str));
+		} catch (final IOException | MimeTypeParseException ex) {
+			ex.printStackTrace();
+		}
+		return false;
 	}
 
 	private void open(final int delta) {

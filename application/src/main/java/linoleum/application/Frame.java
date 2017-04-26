@@ -23,10 +23,9 @@ import java.awt.Component;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.DirectoryStream;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
@@ -237,14 +236,6 @@ public class Frame extends JInternalFrame {
 		return that == null?that == uri:that.equals(uri);
 	}
 
-	protected boolean canOpen(final URI uri) {
-		try {
-			return canOpen(Paths.get(uri));
-		} catch (final FileSystemNotFoundException ex) {
-		}
-		return canOpen(uri.getScheme());
-	}
-
 	public final List<Path> listFiles(final Path path) {
 		final List<Path> list = new ArrayList<>();
 		try (final DirectoryStream<Path> stream = Files.newDirectoryStream(path, new DirectoryStream.Filter<Path>() {
@@ -270,7 +261,7 @@ public class Frame extends JInternalFrame {
 		return false;
 	}
 
-	private boolean canOpen(final MimeType t) throws MimeTypeParseException {
+	public final boolean canOpen(final MimeType t) throws MimeTypeParseException {
 		for (final String s : type.split(":")) {
 			if (t.match(s)) {
 				return true;
@@ -279,13 +270,8 @@ public class Frame extends JInternalFrame {
 		return false;
 	}
 
-	private boolean canOpen(final String p) {
-		for (final String s : scheme.split(":")) {
-			if (p.equals(s)) {
-				return true;
-			}
-		}
-		return false;
+	public final boolean canOpen(final String p) {
+		return Arrays.asList(scheme.split(":")).contains(p);
 	}
 
 	protected void init() {

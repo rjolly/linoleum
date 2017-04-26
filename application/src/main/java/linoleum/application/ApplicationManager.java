@@ -81,8 +81,7 @@ public class ApplicationManager extends Frame {
 	private final SortedMap<String, String> spref = new TreeMap<>();
 	private final SortedMap<String, List<String>> sapps = new TreeMap<>();
 	private final DefaultListModel<Frame> model = new DefaultListModel<>();
-	private final List<String> names = new ArrayList<>(); 
-	private final List<OptionPanel> options = new ArrayList<>(); 
+	private final List<OptionPanel> options = new ArrayList<>();
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final ListCellRenderer renderer = new Renderer();
@@ -299,7 +298,7 @@ public class ApplicationManager extends Frame {
 		return null;
 	}
 
-	public String getApplication(final String scheme) {
+	private String getApplication(final String scheme) {
 		if (spref.containsKey(scheme)) {
 			return spref.get(scheme);
 		}
@@ -339,15 +338,11 @@ public class ApplicationManager extends Frame {
 		return Collections.unmodifiableList(names);
 	}
 
-	public List<String> getApplications(final String scheme) {
+	private List<String> getApplications(final String scheme) {
 		final List<String> names = new ArrayList<>();
 		if (sapps.containsKey(scheme)) {
 			names.addAll(sapps.get(scheme));
 		}
-		return Collections.unmodifiableList(names);
-	}
-
-	public List<String> getApplications() {
 		return Collections.unmodifiableList(names);
 	}
 
@@ -488,7 +483,6 @@ public class ApplicationManager extends Frame {
 			map.put(name, app);
 			final String str = app.getMimeType();
 			if (str != null) {
-				names.add(name);
 				for (final String s : str.split(":")) try {
 					final MimeType type = new MimeType(s);
 					List<String> list = apps.get(type);
