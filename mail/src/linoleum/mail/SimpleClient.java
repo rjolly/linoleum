@@ -51,7 +51,7 @@ public class SimpleClient extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			getApplicationManager().open("Compose");
+			getApplicationManager().get("Compose").open(null);
 		}
 	}
 

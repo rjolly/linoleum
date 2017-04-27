@@ -264,11 +264,11 @@ public class ApplicationManager extends Frame {
 	public void open(final URI uri) {
 		String name = getApplication(uri);
 		if (name != null) {
-			open(name, uri);
+			get(name).open(uri);
 		} else {
 			final List<String> names = getApplications(uri);
 			if (names.size() > 0) {
-				open(names.get(0), uri);
+				get(names.get(0)).open(uri);
 			}
 		}
 	}
@@ -350,20 +350,14 @@ public class ApplicationManager extends Frame {
 		return Collections.unmodifiableList(names);
 	}
 
-	public void open(final String name, final URI uri) {
-		if (map.containsKey(name)) {
-			map.get(name).open(uri);
-		}
-	}
-
-	public void open(final String name) {
-		open(name, null);
+	public Frame get(final String name) {
+		return map.get(name);
 	}
 
 	private void open(final int index) {
 		if (index < 0) {
 		} else {
-			model.getElementAt(index).open((URI) null);
+			model.getElementAt(index).open(null);
 		}
 	}
 

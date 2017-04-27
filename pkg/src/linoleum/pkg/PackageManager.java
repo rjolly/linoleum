@@ -28,13 +28,9 @@ import org.apache.ivy.plugins.parser.m2.PomWriterOptions;
 public class PackageManager extends Frame {
 	private final Ivy ivy = Ivy.newInstance();
 	private final DefaultTableModel model;
-	public static PackageManager instance;
 
 	public PackageManager() {
 		super("Packages");
-		if (instance == null) {
-			instance = this;
-		}
 		initComponents();
 		setScheme("mvn");
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Jar24.gif")));

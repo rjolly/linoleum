@@ -1021,7 +1021,7 @@ public class FileManager extends Frame implements Runnable {
 					final Action action = new AbstractAction(s) {
 						@Override
 						public void actionPerformed(final ActionEvent evt) {
-							mgr.open(s, uri);
+							mgr.get(s).open(uri);
 						}
 					};
 					jMenu3.add(action);
@@ -1038,7 +1038,7 @@ public class FileManager extends Frame implements Runnable {
 						final Action action = new AbstractAction(str) {
 							@Override
 							public void actionPerformed(final ActionEvent evt) {
-								mgr.open(str, uri);
+								mgr.get(str).open(uri);
 							}
 						};
 						jMenu3.add(action);

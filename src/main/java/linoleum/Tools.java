@@ -20,12 +20,7 @@ import javax.tools.ToolProvider;
 import linoleum.application.Frame;
 
 public class Tools extends Frame {
-	public static Tools instance;
-
 	public Tools() {
-		if (instance == null) {
-			instance = this;
-		}
 		setSize(150, 150);
                 setClosable(true);
 	}

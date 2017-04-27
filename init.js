@@ -1,14 +1,18 @@
-Tools = Packages.linoleum.Tools;
-PackageManager = Packages.linoleum.pkg.PackageManager;
+if (typeof(frame) == 'undefined') {
+    apps = new Packages.linoleum.application.ApplicationManager();
+    apps.open();
+} else {
+    apps = frame.getApplicationManager();
+}
 
 function install(pkg, conf, dir) {
     if (conf == undefined) {
 	conf = "default";
     }
     if (dir == undefined) {
-	PackageManager.instance.install(pkg, conf);
+	apps.get("Packages").install(pkg, conf);
     } else {
-	PackageManager.instance.install(pkg, conf, pathToFile(dir));
+	apps.get("Packages").install(pkg, conf, pathToFile(dir));
     }
 }
 
@@ -35,12 +39,12 @@ function javac(srcDir, destDir) {
     if (destDir == undefined) {
 	destDir = srcDir;
     }
-    Tools.instance.compile(fileset(srcDir, ".*\.java"), pathToFile(destDir), ["-source", "1.7", "-target", "1.7"]);
+    apps.get("Tools").compile(fileset(srcDir, ".*\.java"), pathToFile(destDir), ["-source", "1.7", "-target", "1.7"]);
 }
 
 function classpath() {
     var str = "";
-    var files = frame.getApplicationManager().getPackages().installed();
+    var files = apps.getPackages().installed();
     for(i in files) str += relativize(new File("."), files[i]).getPath() + (i < files.length - 1 ? java.io.File.pathSeparator : "");
     return str;
 }
@@ -58,7 +62,7 @@ function javadoc(srcDir, destDir) {
 }
 
 function copy(src, dest, pattern) {
-    Tools.instance.copy(pathToFile(src), fileset(src, pattern), pathToFile(dest));
+    apps.get("Tools").copy(pathToFile(src), fileset(src, pattern), pathToFile(dest));
 }
 
 function jar(dest, dir, pattern, manifest) {
@@ -66,9 +70,9 @@ function jar(dest, dir, pattern, manifest) {
 	dir = ".";
     }
     if (manifest == undefined) {
-	Tools.instance.jar(pathToFile(dir), fileset(dir, pattern), pathToFile(dest));
+	apps.get("Tools").jar(pathToFile(dir), fileset(dir, pattern), pathToFile(dest));
     } else {
-	Tools.instance.jar(pathToFile(dir), fileset(dir, pattern), pathToFile(dest), pathToFile(manifest));
+	apps.get("Tools").jar(pathToFile(dir), fileset(dir, pattern), pathToFile(dest), pathToFile(manifest));
     }
 }
 
@@ -76,7 +80,7 @@ function makepom(dest, source) {
     if (source == undefined) {
 	source = "ivy.xml";
     }
-    PackageManager.instance.makepom(pathToFile(source), pathToFile(dest));
+    apps.get("Packages").makepom(pathToFile(source), pathToFile(dest));
 }
 
 function publish(dir, resolver, source) {
@@ -86,7 +90,7 @@ function publish(dir, resolver, source) {
     if (source == undefined) {
 	source = "ivy.xml";
     }
-    PackageManager.instance.publish(pathToFile(source), pathToFile(dir), resolver);
+    apps.get("Packages").publish(pathToFile(source), pathToFile(dir), resolver);
 }
 
 function clean(dir) {
@@ -200,7 +204,7 @@ function run(name) {
     for (var i = 0; i < array.length; i++) {
 	array[i] = arguments[i+1];
     }
-    Tools.instance.run(name, curDir, array);
+    apps.get("Tools").run(name, curDir, array);
 }
 
 function javap(name) {
@@ -240,7 +244,7 @@ function ln(from, to) {
     if (to == undefined) {
 	to = target.getName();
     }
-    Tools.instance.mklink(pathToFile(to), target);
+    apps.get("Tools").mklink(pathToFile(to), target);
 }
 
 function wget(from, to) {
@@ -258,9 +262,9 @@ function open(name, app) {
 	uri = pathToFile(name).toURI();
     }
     if (app == undefined) {
-	frame.getApplicationManager().open(uri);
+	apps.open(uri);
     } else {
-	frame.getApplicationManager().open(app, uri);
+	apps.get(app).open(uri);
     }
 }
 
