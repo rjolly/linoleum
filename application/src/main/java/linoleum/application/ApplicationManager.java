@@ -76,16 +76,16 @@ public class ApplicationManager extends Frame {
 			return a.equals("*") && !b.equals("*")?1:!a.equals("*") && b.equals("*")?-1:a.compareTo(b);
 		}
 	};
-	private final SortedMap<MimeType, String> pref = new TreeMap<>(comparator);
-	private final SortedMap<MimeType, List<String>> apps = new TreeMap<>(comparator);
-	private final SortedMap<String, String> spref = new TreeMap<>();
-	private final SortedMap<String, List<String>> sapps = new TreeMap<>();
+	private final SortedMap<MimeType, Frame> pref = new TreeMap<>(comparator);
+	private final SortedMap<MimeType, List<Frame>> apps = new TreeMap<>(comparator);
+	private final SortedMap<String, Frame> spref = new TreeMap<>();
+	private final SortedMap<String, List<Frame>> sapps = new TreeMap<>();
 	private final DefaultListModel<Frame> model = new DefaultListModel<>();
 	private final List<OptionPanel> options = new ArrayList<>();
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final ListCellRenderer renderer = new Renderer();
-	private final DefaultComboBoxModel<String> comboModel = new DefaultComboBoxModel<>();
+	private final DefaultComboBoxModel<Frame> comboModel = new DefaultComboBoxModel<>();
 	private final DefaultTableModel tableModel;
 	private final DefaultTableModel schemeTableModel;
 	private final Packages instance = new Packages();
@@ -142,13 +142,13 @@ public class ApplicationManager extends Frame {
 		return instance;
 	}
 
-	private Map<MimeType, String> getPreferred() {
-		final Map<MimeType, String> pref = new TreeMap<>(comparator);
+	private Map<MimeType, Frame> getPreferred() {
+		final Map<MimeType, Frame> pref = new TreeMap<>(comparator);
 		final String str = prefs.get(getKey("preferred"), "");
 		for (final String entry : str.split(", ")) {
 			final String s[] = entry.split("=");
 			if (s.length > 1) try {
-				pref.put(new MimeType(s[0]), s[1]);
+				pref.put(new MimeType(s[0]), get(s[1]));
 			} catch (final MimeTypeParseException ex) {
 				ex.printStackTrace();
 			}
@@ -156,24 +156,24 @@ public class ApplicationManager extends Frame {
 		return pref;
 	}
 
-	private void setPreferred(final Map<MimeType, String> pref) {
+	private void setPreferred(final Map<MimeType, Frame> pref) {
 		final String str = pref.toString();
 		prefs.put(getKey("preferred"), str.substring(1, str.length() - 1));
 	}
 
-	private Map<String, String> getPreferredByScheme() {
-		final Map<String, String> pref = new TreeMap<>();
+	private Map<String, Frame> getPreferredByScheme() {
+		final Map<String, Frame> pref = new TreeMap<>();
 		final String str = prefs.get(getKey("scheme-preferred"), "");
 		for (final String entry : str.split(", ")) {
 			final String s[] = entry.split("=");
 			if (s.length > 1) {
-				pref.put(s[0], s[1]);
+				pref.put(s[0], get(s[1]));
 			}
 		}
 		return pref;
 	}
 
-	private void setPreferredByScheme(final Map<String, String> pref) {
+	private void setPreferredByScheme(final Map<String, Frame> pref) {
 		final String str = pref.toString();
 		prefs.put(getKey("scheme-preferred"), str.substring(1, str.length() - 1));
 	}
@@ -208,16 +208,16 @@ public class ApplicationManager extends Frame {
 			public Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int row, final int column) {
 				comboModel.removeAllElements();
 				comboModel.addElement(null);
-				final List<String> names = new ArrayList<>();
+				final List<Frame> as = new ArrayList<>();
 				if (table == jTable1) {
 					final MimeType type = (MimeType) tableModel.getValueAt(row, 0);
-					names.addAll(apps.get(type));
+					as.addAll(apps.get(type));
 				} else if (table == jTable2) {
 					final String scheme = (String) schemeTableModel.getValueAt(row, 0);
-					names.addAll(sapps.get(scheme));
+					as.addAll(sapps.get(scheme));
 				}
-				for (final String name : names) {
-					comboModel.addElement(name);
+				for (final Frame app : as) {
+					comboModel.addElement(app);
 				}
 				return super.getTableCellEditorComponent(table, value, isSelected, row, column);
 			}
@@ -227,12 +227,12 @@ public class ApplicationManager extends Frame {
 	@Override
 	public void load() {
 		tableModel.setRowCount(0);
-		final Map<MimeType, String> pref = getPreferred();
+		final Map<MimeType, Frame> pref = getPreferred();
 		for (final MimeType type : apps.keySet()) {
 			tableModel.addRow(new Object[] {type, pref.get(type)});
 		}
 		schemeTableModel.setRowCount(0);
-		final Map<String, String> spref = getPreferredByScheme();
+		final Map<String, Frame> spref = getPreferredByScheme();
 		for (final String scheme : sapps.keySet()) {
 			schemeTableModel.addRow(new Object[] {scheme, spref.get(scheme)});
 		}
@@ -240,21 +240,21 @@ public class ApplicationManager extends Frame {
 
 	@Override
 	public void save() {
-		final Map<MimeType, String> pref = new TreeMap<>(comparator);
+		final Map<MimeType, Frame> pref = new TreeMap<>(comparator);
 		for (int row = 0 ; row < tableModel.getRowCount() ; row++) {
 			final MimeType type = (MimeType) tableModel.getValueAt(row, 0);
-			final String name = (String) tableModel.getValueAt(row, 1);
-			if (name != null && !name.isEmpty()) {
-				pref.put(type, name);
+			final Frame app = (Frame) tableModel.getValueAt(row, 1);
+			if (app != null) {
+				pref.put(type, app);
 			}
 		}
 		setPreferred(pref);
-		final Map<String, String> spref = new TreeMap<>();
+		final Map<String, Frame> spref = new TreeMap<>();
 		for (int row = 0 ; row < schemeTableModel.getRowCount() ; row++) {
 			final String scheme = (String) schemeTableModel.getValueAt(row, 0);
-			final String name = (String) schemeTableModel.getValueAt(row, 1);
-			if (name != null && !name.isEmpty()) {
-				spref.put(scheme, name);
+			final Frame app = (Frame) schemeTableModel.getValueAt(row, 1);
+			if (app != null) {
+				spref.put(scheme, app);
 			}
 		}
 		setPreferredByScheme(spref);
@@ -262,18 +262,18 @@ public class ApplicationManager extends Frame {
 
 	@Override
 	public void open(final URI uri) {
-		String name = getApplication(uri);
-		if (name != null) {
-			get(name).open(uri);
+		final Frame app = getApplication(uri);
+		if (app != null) {
+			app.open(uri);
 		} else {
-			final List<String> names = getApplications(uri);
-			if (names.size() > 0) {
-				get(names.get(0)).open(uri);
+			final List<Frame> apps = getApplications(uri);
+			if (apps.size() > 0) {
+				apps.get(0).open(uri);
 			}
 		}
 	}
 
-	public String getApplication(final URI uri) {
+	public Frame getApplication(final URI uri) {
 		try {
 			return getApplication(Paths.get(uri));
 		} catch (final FileSystemNotFoundException ex) {
@@ -281,7 +281,7 @@ public class ApplicationManager extends Frame {
 		return getApplication(uri.getScheme());
 	}
 
-	private String getApplication(final Path path) {
+	private Frame getApplication(final Path path) {
 		try {
 			return getApplication(new MimeType(Files.probeContentType(path)));
 		} catch (final IOException | MimeTypeParseException ex) {
@@ -290,11 +290,11 @@ public class ApplicationManager extends Frame {
 		return null;
 	}
 
-	private String getApplication(final MimeType type) {
+	private Frame getApplication(final MimeType type) {
 		if (pref.containsKey(type)) {
 			return pref.get(type);
 		}
-		for (final Map.Entry<MimeType, String> entry : pref.entrySet()) {
+		for (final Map.Entry<MimeType, Frame> entry : pref.entrySet()) {
 			if (type.match(entry.getKey())) {
 				return entry.getValue();
 			}
@@ -302,14 +302,14 @@ public class ApplicationManager extends Frame {
 		return null;
 	}
 
-	private String getApplication(final String scheme) {
+	private Frame getApplication(final String scheme) {
 		if (spref.containsKey(scheme)) {
 			return spref.get(scheme);
 		}
 		return null;
 	}
 
-	public List<String> getApplications(final URI uri) {
+	public List<Frame> getApplications(final URI uri) {
 		try {
 			return getApplications(Paths.get(uri));
 		} catch (final FileSystemNotFoundException ex) {
@@ -317,37 +317,37 @@ public class ApplicationManager extends Frame {
 		return getApplications(uri.getScheme());
 	}
 
-	private List<String> getApplications(final Path path) {
-		final List<String> names = new ArrayList<>();
+	private List<Frame> getApplications(final Path path) {
+		final List<Frame> apps = new ArrayList<>();
 		try {
-			names.addAll(getApplications(new MimeType(Files.probeContentType(path))));
+			apps.addAll(getApplications(new MimeType(Files.probeContentType(path))));
 		} catch (final IOException | MimeTypeParseException ex) {
 			ex.printStackTrace();
 		}
-		return Collections.unmodifiableList(names);
+		return Collections.unmodifiableList(apps);
 	}
 
-	private List<String> getApplications(final MimeType type) {
-		final List<String> names = new ArrayList<>();
+	private List<Frame> getApplications(final MimeType type) {
+		final List<Frame> as = new ArrayList<>();
 		if (apps.containsKey(type)) {
-			names.addAll(apps.get(type));
+			as.addAll(apps.get(type));
 		}
-		for (final Map.Entry<MimeType, List<String>> entry : apps.entrySet()) {
+		for (final Map.Entry<MimeType, List<Frame>> entry : apps.entrySet()) {
 			if (type.match(entry.getKey())) {
-				final List<String> s = new ArrayList<>(entry.getValue());
-				s.removeAll(names);
-				names.addAll(s);
+				final List<Frame> s = new ArrayList<>(entry.getValue());
+				s.removeAll(as);
+				as.addAll(s);
 			}
 		}
-		return Collections.unmodifiableList(names);
+		return Collections.unmodifiableList(as);
 	}
 
-	private List<String> getApplications(final String scheme) {
-		final List<String> names = new ArrayList<>();
+	private List<Frame> getApplications(final String scheme) {
+		final List<Frame> as = new ArrayList<>();
 		if (sapps.containsKey(scheme)) {
-			names.addAll(sapps.get(scheme));
+			as.addAll(sapps.get(scheme));
 		}
-		return Collections.unmodifiableList(names);
+		return Collections.unmodifiableList(as);
 	}
 
 	public Frame get(final String name) {
@@ -483,11 +483,11 @@ public class ApplicationManager extends Frame {
 			if (str != null) {
 				for (final String s : str.split(":")) try {
 					final MimeType type = new MimeType(s);
-					List<String> list = apps.get(type);
+					List<Frame> list = apps.get(type);
 					if (list == null) {
 						apps.put(type, list = new ArrayList<>());
 					}
-					list.add(name);
+					list.add(app);
 				} catch (final MimeTypeParseException ex) {
 					ex.printStackTrace();
 				}
@@ -495,11 +495,11 @@ public class ApplicationManager extends Frame {
 			final String ss = app.getScheme();
 			if (ss != null) {
 				for (final String scheme : ss.split(":")) {
-					List<String> list = sapps.get(scheme);
+					List<Frame> list = sapps.get(scheme);
 					if (list == null) {
 						sapps.put(scheme, list = new ArrayList<>());
 					}
-					list.add(name);
+					list.add(app);
 				}
 			}
 			model.addElement(app);
@@ -526,11 +526,11 @@ public class ApplicationManager extends Frame {
 
                         },
                         new String [] {
-                                "Type", "Name"
+                                "Type", "Application"
                         }
                 ) {
                         Class[] types = new Class [] {
-                                javax.activation.MimeType.class, java.lang.String.class
+                                javax.activation.MimeType.class, linoleum.application.Frame.class
                         };
                         boolean[] canEdit = new boolean [] {
                                 false, true
@@ -556,11 +556,11 @@ public class ApplicationManager extends Frame {
 
                         },
                         new String [] {
-                                "Scheme", "Name"
+                                "Scheme", "Application"
                         }
                 ) {
                         Class[] types = new Class [] {
-                                java.lang.String.class, java.lang.String.class
+                                java.lang.String.class, linoleum.application.Frame.class
                         };
                         boolean[] canEdit = new boolean [] {
                                 false, true

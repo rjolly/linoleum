@@ -321,29 +321,29 @@ public class Browser extends Frame {
 		if (url != null) try {
 			final URI uri = url.toURI();
 			final ApplicationManager mgr = getApplicationManager();
-			final String s = mgr.getApplication(stripped(uri));
+			final Frame a = mgr.getApplication(stripped(uri));
 			boolean sep = false;
-			if (s != null) {
-				final Action action = new AbstractAction(s) {
+			if (a != null) {
+				final Action action = new AbstractAction(a.getName(), a.getFrameIcon()) {
 					@Override
 					public void actionPerformed(final ActionEvent evt) {
-						mgr.get(s).open(uri);
+						a.open(uri);
 					}
 				};
 				jPopupMenu1.add(action);
 				sep = true;
 			}
 			sep0 = sep;
-			for (final String str : mgr.getApplications(stripped(uri))) {
-				if (!str.equals(s)) {
+			for (final Frame app : mgr.getApplications(stripped(uri))) {
+				if (!app.equals(a)) {
 					if (sep) {
 						jPopupMenu1.addSeparator();
 						sep = false;
 					}
-					final Action action = new AbstractAction(str) {
+					final Action action = new AbstractAction(app.getName(), app.getFrameIcon()) {
 						@Override
 						public void actionPerformed(final ActionEvent evt) {
-							mgr.get(str).open(uri);
+							app.open(uri);
 						}
 					};
 					jPopupMenu1.add(action);

@@ -294,7 +294,7 @@ public class Frame extends JInternalFrame {
 	}
 
 	@Override
-	public String toString() {
+	public final String toString() {
 		return getName();
 	}
 
