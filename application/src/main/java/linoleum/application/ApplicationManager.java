@@ -400,51 +400,10 @@ public class ApplicationManager extends Frame {
 	@SuppressWarnings("deprecation")
 	private void doOpen() {
 		for (final JInternalFrame frame : ServiceLoader.load(JInternalFrame.class)) {
-			if (frame instanceof Frame) {
-				process((Frame) frame);
-			} else {
-				process(new Frame() {
-					@Override
-					public JInternalFrame getFrame() {
-						return frame;
-					}
-
-					@Override
-					public String getName() {
-						final String name = frame.getName();
-						return name == null?frame.getClass().getSimpleName():name;
-					}
-				});
-			}
+			process(frame instanceof Frame?(Frame) frame:new InternalFrameWrapper(frame));
 		}
 		for (final Application app : ServiceLoader.load(Application.class)) {
-			process(new Frame() {
-				@Override
-				public JInternalFrame getFrame() {
-					return app.open(getURI());
-				}
-
-				@Override
-				public String getName() {
-					return app.getName();
-				}
-
-				@Override
-				public Icon getIcon() {
-					return app.getIcon();
-				}
-
-				@Override
-				public String getMimeType() {
-					return app.getMimeType();
-				}
-
-				@Override
-				public void open(final URI uri) {
-					setURI(uri);
-					super.open(uri);
-				}
-			});
+			process(new ApplicationWrapper(app));
 		}
 	}
 
