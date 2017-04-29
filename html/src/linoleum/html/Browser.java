@@ -36,7 +36,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.Document;
-import linoleum.application.ApplicationManager;
 import linoleum.application.Frame;
 
 public class Browser extends Frame {
@@ -320,21 +319,20 @@ public class Browser extends Frame {
 		boolean sep0 = false;
 		if (url != null) try {
 			final URI uri = url.toURI();
-			final ApplicationManager mgr = getApplicationManager();
-			final Frame a = mgr.getApplication(stripped(uri));
+			final Frame a = getApplicationManager().getApplication(stripped(uri));
 			boolean sep = false;
 			if (a != null) {
 				final Action action = new AbstractAction(a.getName(), a.getFrameIcon()) {
 					@Override
 					public void actionPerformed(final ActionEvent evt) {
-						a.open(uri);
+						a.open(uri, getDesktopPane());
 					}
 				};
 				jPopupMenu1.add(action);
 				sep = true;
 			}
 			sep0 = sep;
-			for (final Frame app : mgr.getApplications(stripped(uri))) {
+			for (final Frame app : getApplicationManager().getApplications(stripped(uri))) {
 				if (!app.equals(a)) {
 					if (sep) {
 						jPopupMenu1.addSeparator();
@@ -343,7 +341,7 @@ public class Browser extends Frame {
 					final Action action = new AbstractAction(app.getName(), app.getFrameIcon()) {
 						@Override
 						public void actionPerformed(final ActionEvent evt) {
-							app.open(uri);
+							app.open(uri, getDesktopPane());
 						}
 					};
 					jPopupMenu1.add(action);

@@ -264,7 +264,7 @@ function open(name, app) {
     if (app == undefined) {
 	apps.open(uri);
     } else {
-	apps.get(app).open(uri);
+	apps.get(app).open(uri, frame.getDesktopPane());
     }
 }
 

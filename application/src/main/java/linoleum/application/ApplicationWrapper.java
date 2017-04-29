@@ -2,6 +2,7 @@ package linoleum.application;
 
 import java.net.URI;
 import javax.swing.Icon;
+import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 
 @SuppressWarnings("deprecation")
@@ -33,8 +34,8 @@ public class ApplicationWrapper extends Frame {
 	}
 
 	@Override
-	public void open(final URI uri) {
+	public void open(final URI uri, final JDesktopPane desktop) {
 		setURI(uri);
-		super.open(uri);
+		super.open(uri, desktop);
 	}
 }

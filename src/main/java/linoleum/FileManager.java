@@ -1014,21 +1014,20 @@ public class FileManager extends Frame implements Runnable {
 			final Path path = getSelectedValue();
 			if (Files.exists(path)) try {
 				final URI uri = path.toRealPath().toUri();
-				final ApplicationManager mgr = getApplicationManager();
-				final Frame a = mgr.getApplication(uri);
+				final Frame a = getApplicationManager().getApplication(uri);
 				boolean sep = false;
 				if (a != null) {
 					final Action action = new AbstractAction(a.getName(), a.getFrameIcon()) {
 						@Override
 						public void actionPerformed(final ActionEvent evt) {
-							a.open(uri);
+							a.open(uri, getDesktopPane());
 						}
 					};
 					jMenu3.add(action);
 					jPopupMenu1.add(action);
 					sep = true;
 				}
-				for (final Frame app : mgr.getApplications(uri)) {
+				for (final Frame app : getApplicationManager().getApplications(uri)) {
 					if (!app.equals(a)) {
 						if (sep) {
 							jMenu3.addSeparator();
@@ -1038,7 +1037,7 @@ public class FileManager extends Frame implements Runnable {
 						final Action action = new AbstractAction(app.getName(), app.getFrameIcon()) {
 							@Override
 							public void actionPerformed(final ActionEvent evt) {
-								app.open(uri);
+								app.open(uri, getDesktopPane());
 							}
 						};
 						jMenu3.add(action);

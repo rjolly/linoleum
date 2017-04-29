@@ -40,7 +40,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JRootPane;
 
-public class Frame extends JInternalFrame {
+public class Frame extends JInternalFrame implements App {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private ApplicationManager manager;
 	private OptionPanel optionPanel;
@@ -181,8 +181,7 @@ public class Frame extends JInternalFrame {
 		return this;
 	}
 
-	public void open(final URI uri) {
-		final JDesktopPane desktop = manager.getDesktopPane();
+	public void open(final URI uri, final JDesktopPane desktop) {
 		final JInternalFrame c = getFrame(desktop, uri);
 		if (c instanceof Frame) {
 			final Frame frame = (Frame) c;

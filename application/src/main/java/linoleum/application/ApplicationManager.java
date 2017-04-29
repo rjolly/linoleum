@@ -50,6 +50,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -260,15 +261,19 @@ public class ApplicationManager extends Frame {
 		setPreferredByScheme(spref);
 	}
 
-	@Override
 	public void open(final URI uri) {
+		open(uri, getDesktopPane());
+	}
+
+	@Override
+	public void open(final URI uri, final JDesktopPane desktop) {
 		final Frame app = getApplication(uri);
 		if (app != null) {
-			app.open(uri);
+			app.open(uri, desktop);
 		} else {
 			final List<Frame> apps = getApplications(uri);
 			if (apps.size() > 0) {
-				apps.get(0).open(uri);
+				apps.get(0).open(uri, desktop);
 			}
 		}
 	}
@@ -357,7 +362,7 @@ public class ApplicationManager extends Frame {
 	private void open(final int index) {
 		if (index < 0) {
 		} else {
-			model.getElementAt(index).open(null);
+			model.getElementAt(index).open(null, getDesktopPane());
 		}
 	}
 
