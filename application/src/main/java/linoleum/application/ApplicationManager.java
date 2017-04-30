@@ -22,6 +22,7 @@ package linoleum.application;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.beans.ConstructorProperties;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.net.URI;
@@ -90,6 +91,7 @@ public class ApplicationManager extends Frame {
 	private final DefaultTableModel tableModel;
 	private final DefaultTableModel schemeTableModel;
 	private final Packages instance = new Packages();
+	private final List<App> list;
 
 	private class Renderer extends JLabel implements ListCellRenderer {
 		public Renderer() {
@@ -119,6 +121,11 @@ public class ApplicationManager extends Frame {
 	}
 
 	public ApplicationManager() {
+		this(new ArrayList<App>());
+	}
+
+	@ConstructorProperties({"applications"})
+	public ApplicationManager(final List<App> list) {
 		initComponents();
 		tableModel = (DefaultTableModel) jTable1.getModel();
 		schemeTableModel = (DefaultTableModel) jTable2.getModel();
@@ -137,6 +144,16 @@ public class ApplicationManager extends Frame {
 		manage(this);
 		pref.putAll(getPreferred());
 		spref.putAll(getPreferredByScheme());
+		final List<App> as = new ArrayList<>(list);
+		list.clear();
+		this.list = list;
+		for (final App app : as) {
+			process(app);
+		}
+	}
+
+	public List<App> getApplications() {
+		return list;
 	}
 
 	public Packages getPackages() {
@@ -442,6 +459,7 @@ public class ApplicationManager extends Frame {
 		final String name = app.getName();
 		if (!map.containsKey(name)) {
 			logger.config("Processing " + name);
+			list.add(app);
 			map.put(name, app);
 			final String str = app.getMimeType();
 			if (str != null) {

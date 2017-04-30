@@ -1,10 +1,12 @@
 package linoleum.application;
 
+import java.beans.ConstructorProperties;
 import javax.swing.JInternalFrame;
 
 public class InternalFrameWrapper extends Frame {
 	private final JInternalFrame frame;
 
+	@ConstructorProperties({"frame"})
 	public InternalFrameWrapper(final JInternalFrame frame) {
 		this.frame = frame;
 	}

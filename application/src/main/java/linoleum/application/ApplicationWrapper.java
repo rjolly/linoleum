@@ -1,5 +1,6 @@
 package linoleum.application;
 
+import java.beans.ConstructorProperties;
 import java.net.URI;
 import javax.swing.Icon;
 import javax.swing.JDesktopPane;
@@ -9,8 +10,13 @@ import javax.swing.JInternalFrame;
 public class ApplicationWrapper extends Frame {
 	private final Application app;
 
+	@ConstructorProperties({"application"})
 	public ApplicationWrapper(final Application app) {
 		this.app = app;
+	}
+
+	public Application getApplication() {
+		return app;
 	}
 
 	@Override
