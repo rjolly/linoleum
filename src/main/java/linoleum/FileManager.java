@@ -77,6 +77,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import linoleum.application.App;
 import linoleum.application.ApplicationManager;
 import linoleum.application.FileChooser;
 import linoleum.application.Frame;
@@ -1014,7 +1015,7 @@ public class FileManager extends Frame implements Runnable {
 			final Path path = getSelectedValue();
 			if (Files.exists(path)) try {
 				final URI uri = path.toRealPath().toUri();
-				final Frame a = getApplicationManager().getApplication(uri);
+				final App a = getApplicationManager().getApplication(uri);
 				boolean sep = false;
 				if (a != null) {
 					final Action action = new AbstractAction(a.getName(), a.getFrameIcon()) {
@@ -1027,7 +1028,7 @@ public class FileManager extends Frame implements Runnable {
 					jPopupMenu1.add(action);
 					sep = true;
 				}
-				for (final Frame app : getApplicationManager().getApplications(uri)) {
+				for (final App app : getApplicationManager().getApplications(uri)) {
 					if (!app.equals(a)) {
 						if (sep) {
 							jMenu3.addSeparator();

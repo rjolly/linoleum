@@ -65,7 +65,7 @@ import linoleum.application.event.ClassPathChangeEvent;
 public class ApplicationManager extends Frame {
 	private final Icon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
 	private final List<ClassPathListener> listeners = new ArrayList<>();
-	private final Map<String, Frame> map = new HashMap<>();
+	private final Map<String, App> map = new HashMap<>();
 	private final Comparator<MimeType> comparator = new Comparator<MimeType>() {
 		@Override
 		public int compare(final MimeType a, final MimeType b) {
@@ -77,16 +77,16 @@ public class ApplicationManager extends Frame {
 			return a.equals("*") && !b.equals("*")?1:!a.equals("*") && b.equals("*")?-1:a.compareTo(b);
 		}
 	};
-	private final SortedMap<MimeType, Frame> pref = new TreeMap<>(comparator);
-	private final SortedMap<MimeType, List<Frame>> apps = new TreeMap<>(comparator);
-	private final SortedMap<String, Frame> spref = new TreeMap<>();
-	private final SortedMap<String, List<Frame>> sapps = new TreeMap<>();
-	private final DefaultListModel<Frame> model = new DefaultListModel<>();
+	private final SortedMap<MimeType, App> pref = new TreeMap<>(comparator);
+	private final SortedMap<MimeType, List<App>> apps = new TreeMap<>(comparator);
+	private final SortedMap<String, App> spref = new TreeMap<>();
+	private final SortedMap<String, List<App>> sapps = new TreeMap<>();
+	private final DefaultListModel<App> model = new DefaultListModel<>();
 	private final List<OptionPanel> options = new ArrayList<>();
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final ListCellRenderer renderer = new Renderer();
-	private final DefaultComboBoxModel<Frame> comboModel = new DefaultComboBoxModel<>();
+	private final DefaultComboBoxModel<App> comboModel = new DefaultComboBoxModel<>();
 	private final DefaultTableModel tableModel;
 	private final DefaultTableModel schemeTableModel;
 	private final Packages instance = new Packages();
@@ -109,7 +109,7 @@ public class ApplicationManager extends Frame {
 				setBackground(list.getBackground());
 				setForeground(list.getForeground());
 			}
-			final Frame app = (Frame) value;
+			final App app = (App) value;
 			final Icon icon = app.getIcon();
 			setIcon(icon == null?defaultIcon:icon);
 			setText(app.getName());
@@ -143,8 +143,8 @@ public class ApplicationManager extends Frame {
 		return instance;
 	}
 
-	private Map<MimeType, Frame> getPreferred() {
-		final Map<MimeType, Frame> pref = new TreeMap<>(comparator);
+	private Map<MimeType, App> getPreferred() {
+		final Map<MimeType, App> pref = new TreeMap<>(comparator);
 		final String str = prefs.get(getKey("preferred"), "");
 		for (final String entry : str.split(", ")) {
 			final String s[] = entry.split("=");
@@ -157,13 +157,13 @@ public class ApplicationManager extends Frame {
 		return pref;
 	}
 
-	private void setPreferred(final Map<MimeType, Frame> pref) {
+	private void setPreferred(final Map<MimeType, App> pref) {
 		final String str = pref.toString();
 		prefs.put(getKey("preferred"), str.substring(1, str.length() - 1));
 	}
 
-	private Map<String, Frame> getPreferredByScheme() {
-		final Map<String, Frame> pref = new TreeMap<>();
+	private Map<String, App> getPreferredByScheme() {
+		final Map<String, App> pref = new TreeMap<>();
 		final String str = prefs.get(getKey("scheme-preferred"), "");
 		for (final String entry : str.split(", ")) {
 			final String s[] = entry.split("=");
@@ -174,7 +174,7 @@ public class ApplicationManager extends Frame {
 		return pref;
 	}
 
-	private void setPreferredByScheme(final Map<String, Frame> pref) {
+	private void setPreferredByScheme(final Map<String, App> pref) {
 		final String str = pref.toString();
 		prefs.put(getKey("scheme-preferred"), str.substring(1, str.length() - 1));
 	}
@@ -209,7 +209,7 @@ public class ApplicationManager extends Frame {
 			public Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int row, final int column) {
 				comboModel.removeAllElements();
 				comboModel.addElement(null);
-				final List<Frame> as = new ArrayList<>();
+				final List<App> as = new ArrayList<>();
 				if (table == jTable1) {
 					final MimeType type = (MimeType) tableModel.getValueAt(row, 0);
 					as.addAll(apps.get(type));
@@ -217,7 +217,7 @@ public class ApplicationManager extends Frame {
 					final String scheme = (String) schemeTableModel.getValueAt(row, 0);
 					as.addAll(sapps.get(scheme));
 				}
-				for (final Frame app : as) {
+				for (final App app : as) {
 					comboModel.addElement(app);
 				}
 				return super.getTableCellEditorComponent(table, value, isSelected, row, column);
@@ -228,12 +228,12 @@ public class ApplicationManager extends Frame {
 	@Override
 	public void load() {
 		tableModel.setRowCount(0);
-		final Map<MimeType, Frame> pref = getPreferred();
+		final Map<MimeType, App> pref = getPreferred();
 		for (final MimeType type : apps.keySet()) {
 			tableModel.addRow(new Object[] {type, pref.get(type)});
 		}
 		schemeTableModel.setRowCount(0);
-		final Map<String, Frame> spref = getPreferredByScheme();
+		final Map<String, App> spref = getPreferredByScheme();
 		for (final String scheme : sapps.keySet()) {
 			schemeTableModel.addRow(new Object[] {scheme, spref.get(scheme)});
 		}
@@ -241,19 +241,19 @@ public class ApplicationManager extends Frame {
 
 	@Override
 	public void save() {
-		final Map<MimeType, Frame> pref = new TreeMap<>(comparator);
+		final Map<MimeType, App> pref = new TreeMap<>(comparator);
 		for (int row = 0 ; row < tableModel.getRowCount() ; row++) {
 			final MimeType type = (MimeType) tableModel.getValueAt(row, 0);
-			final Frame app = (Frame) tableModel.getValueAt(row, 1);
+			final App app = (App) tableModel.getValueAt(row, 1);
 			if (app != null) {
 				pref.put(type, app);
 			}
 		}
 		setPreferred(pref);
-		final Map<String, Frame> spref = new TreeMap<>();
+		final Map<String, App> spref = new TreeMap<>();
 		for (int row = 0 ; row < schemeTableModel.getRowCount() ; row++) {
 			final String scheme = (String) schemeTableModel.getValueAt(row, 0);
-			final Frame app = (Frame) schemeTableModel.getValueAt(row, 1);
+			final App app = (App) schemeTableModel.getValueAt(row, 1);
 			if (app != null) {
 				spref.put(scheme, app);
 			}
@@ -267,18 +267,18 @@ public class ApplicationManager extends Frame {
 
 	@Override
 	public void open(final URI uri, final JDesktopPane desktop) {
-		final Frame app = getApplication(uri);
+		final App app = getApplication(uri);
 		if (app != null) {
 			app.open(uri, desktop);
 		} else {
-			final List<Frame> apps = getApplications(uri);
+			final List<App> apps = getApplications(uri);
 			if (apps.size() > 0) {
 				apps.get(0).open(uri, desktop);
 			}
 		}
 	}
 
-	public Frame getApplication(final URI uri) {
+	public App getApplication(final URI uri) {
 		try {
 			return getApplication(Paths.get(uri));
 		} catch (final FileSystemNotFoundException ex) {
@@ -286,7 +286,7 @@ public class ApplicationManager extends Frame {
 		return getApplication(uri.getScheme());
 	}
 
-	private Frame getApplication(final Path path) {
+	private App getApplication(final Path path) {
 		try {
 			return getApplication(new MimeType(Files.probeContentType(path)));
 		} catch (final IOException | MimeTypeParseException ex) {
@@ -295,11 +295,11 @@ public class ApplicationManager extends Frame {
 		return null;
 	}
 
-	private Frame getApplication(final MimeType type) {
+	private App getApplication(final MimeType type) {
 		if (pref.containsKey(type)) {
 			return pref.get(type);
 		}
-		for (final Map.Entry<MimeType, Frame> entry : pref.entrySet()) {
+		for (final Map.Entry<MimeType, App> entry : pref.entrySet()) {
 			if (type.match(entry.getKey())) {
 				return entry.getValue();
 			}
@@ -307,14 +307,14 @@ public class ApplicationManager extends Frame {
 		return null;
 	}
 
-	private Frame getApplication(final String scheme) {
+	private App getApplication(final String scheme) {
 		if (spref.containsKey(scheme)) {
 			return spref.get(scheme);
 		}
 		return null;
 	}
 
-	public List<Frame> getApplications(final URI uri) {
+	public List<App> getApplications(final URI uri) {
 		try {
 			return getApplications(Paths.get(uri));
 		} catch (final FileSystemNotFoundException ex) {
@@ -322,8 +322,8 @@ public class ApplicationManager extends Frame {
 		return getApplications(uri.getScheme());
 	}
 
-	private List<Frame> getApplications(final Path path) {
-		final List<Frame> apps = new ArrayList<>();
+	private List<App> getApplications(final Path path) {
+		final List<App> apps = new ArrayList<>();
 		try {
 			apps.addAll(getApplications(new MimeType(Files.probeContentType(path))));
 		} catch (final IOException | MimeTypeParseException ex) {
@@ -332,14 +332,14 @@ public class ApplicationManager extends Frame {
 		return Collections.unmodifiableList(apps);
 	}
 
-	private List<Frame> getApplications(final MimeType type) {
-		final List<Frame> as = new ArrayList<>();
+	private List<App> getApplications(final MimeType type) {
+		final List<App> as = new ArrayList<>();
 		if (apps.containsKey(type)) {
 			as.addAll(apps.get(type));
 		}
-		for (final Map.Entry<MimeType, List<Frame>> entry : apps.entrySet()) {
+		for (final Map.Entry<MimeType, List<App>> entry : apps.entrySet()) {
 			if (type.match(entry.getKey())) {
-				final List<Frame> s = new ArrayList<>(entry.getValue());
+				final List<App> s = new ArrayList<>(entry.getValue());
 				s.removeAll(as);
 				as.addAll(s);
 			}
@@ -347,15 +347,15 @@ public class ApplicationManager extends Frame {
 		return Collections.unmodifiableList(as);
 	}
 
-	private List<Frame> getApplications(final String scheme) {
-		final List<Frame> as = new ArrayList<>();
+	private List<App> getApplications(final String scheme) {
+		final List<App> as = new ArrayList<>();
 		if (sapps.containsKey(scheme)) {
 			as.addAll(sapps.get(scheme));
 		}
 		return Collections.unmodifiableList(as);
 	}
 
-	public Frame get(final String name) {
+	public App get(final String name) {
 		return map.get(name);
 	}
 
@@ -438,7 +438,7 @@ public class ApplicationManager extends Frame {
 		}
 	}
 
-	private void process(final Frame app) {
+	private void process(final App app) {
 		final String name = app.getName();
 		if (!map.containsKey(name)) {
 			logger.config("Processing " + name);
@@ -447,7 +447,7 @@ public class ApplicationManager extends Frame {
 			if (str != null) {
 				for (final String s : str.split(":")) try {
 					final MimeType type = new MimeType(s);
-					List<Frame> list = apps.get(type);
+					List<App> list = apps.get(type);
 					if (list == null) {
 						apps.put(type, list = new ArrayList<>());
 					}
@@ -459,7 +459,7 @@ public class ApplicationManager extends Frame {
 			final String ss = app.getScheme();
 			if (ss != null) {
 				for (final String scheme : ss.split(":")) {
-					List<Frame> list = sapps.get(scheme);
+					List<App> list = sapps.get(scheme);
 					if (list == null) {
 						sapps.put(scheme, list = new ArrayList<>());
 					}
@@ -467,7 +467,9 @@ public class ApplicationManager extends Frame {
 				}
 			}
 			model.addElement(app);
-			manage(app);
+			if (app instanceof Frame) {
+				manage((Frame) app);
+			}
 		}
 	}
 
@@ -494,7 +496,7 @@ public class ApplicationManager extends Frame {
                         }
                 ) {
                         Class[] types = new Class [] {
-                                javax.activation.MimeType.class, linoleum.application.Frame.class
+                                javax.activation.MimeType.class, linoleum.application.App.class
                         };
                         boolean[] canEdit = new boolean [] {
                                 false, true
@@ -524,7 +526,7 @@ public class ApplicationManager extends Frame {
                         }
                 ) {
                         Class[] types = new Class [] {
-                                java.lang.String.class, linoleum.application.Frame.class
+                                java.lang.String.class, linoleum.application.App.class
                         };
                         boolean[] canEdit = new boolean [] {
                                 false, true

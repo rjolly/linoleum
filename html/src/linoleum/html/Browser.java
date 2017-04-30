@@ -36,6 +36,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.Document;
+import linoleum.application.App;
 import linoleum.application.Frame;
 
 public class Browser extends Frame {
@@ -319,7 +320,7 @@ public class Browser extends Frame {
 		boolean sep0 = false;
 		if (url != null) try {
 			final URI uri = url.toURI();
-			final Frame a = getApplicationManager().getApplication(stripped(uri));
+			final App a = getApplicationManager().getApplication(stripped(uri));
 			boolean sep = false;
 			if (a != null) {
 				final Action action = new AbstractAction(a.getName(), a.getFrameIcon()) {
@@ -332,7 +333,7 @@ public class Browser extends Frame {
 				sep = true;
 			}
 			sep0 = sep;
-			for (final Frame app : getApplicationManager().getApplications(stripped(uri))) {
+			for (final App app : getApplicationManager().getApplications(stripped(uri))) {
 				if (!app.equals(a)) {
 					if (sep) {
 						jPopupMenu1.addSeparator();
