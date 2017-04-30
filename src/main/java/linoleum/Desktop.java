@@ -1,5 +1,8 @@
 package linoleum;
 
+import java.beans.ExceptionListener;
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -11,33 +14,43 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.GroupLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 public class Desktop extends JFrame {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final Icon openIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"));
+	private final Icon saveIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Save16.gif"));
 	private final Icon contentsIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Help16.gif"));
 	private final Icon aboutIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/About16.gif"));
 	private static final String ABOUTMSG = "%s %s.%s \n \nJava desktop environment "
 		+ "and software distribution. \n \nWritten by \n  "
 		+ "%s";
 	private final Action openAction = new OpenAction();
+	private final Action saveAction = new SaveAction();
 	private final Action exitAction = new ExitAction();
 	private final Action fullScreenAction = new FullScreenAction();
 	private final Action screenshotAction = new ScreenshotAction();
 	private final Action contentsAction = new ContentsAction();
 	private final Action aboutAction = new AboutAction();
 	private final GraphicsDevice devices[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+	private final File file = new File("desktop.xml");
 	private Rectangle bounds;
 
 	private class OpenAction extends AbstractAction {
@@ -51,6 +64,23 @@ public class Desktop extends JFrame {
 		public void actionPerformed(final ActionEvent e) {
 			apps.select();
 			contentsAction.setEnabled(true);
+		}
+	}
+
+	private class SaveAction extends AbstractAction {
+		public SaveAction() {
+			super("Save", saveIcon);
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
+			putValue(MNEMONIC_KEY, (int) 's');
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					save();
+				}
+			});
 		}
 	}
 
@@ -84,6 +114,7 @@ public class Desktop extends JFrame {
 		public ScreenshotAction() {
 			super("Screenshot");
 			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK));
+			putValue(MNEMONIC_KEY, (int) 's');
 		}
 
 		@Override
@@ -136,11 +167,40 @@ public class Desktop extends JFrame {
 		}
 	}
 
+	private void save() {
+		try (final XMLEncoder e = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(file)))) {
+			e.setExceptionListener(new ExceptionListener() {
+				public void exceptionThrown(final Exception ex) {
+					ex.printStackTrace();
+				}
+			});
+			e.writeObject(desktopPane);
+		} catch (final FileNotFoundException ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	private void load() {
+		try (final XMLDecoder d = new XMLDecoder(new BufferedInputStream(new FileInputStream(file)))) {
+			d.setExceptionListener(new ExceptionListener() {
+				public void exceptionThrown(final Exception ex) {
+					ex.printStackTrace();
+				}
+			});
+			((GroupLayout) getContentPane().getLayout()).replace(desktopPane, (DesktopPane) d.readObject());
+		} catch (final FileNotFoundException ex) {
+			ex.printStackTrace();
+		}
+	}
+
 	public Desktop() {
 		initComponents();
 		frame.setLayer(0);
 		apps.manage(frame);
 		apps.manage(console);
+		if (file.exists()) {
+			load();
+		}
 		loadBounds();
 	}
 
@@ -200,6 +260,8 @@ public class Desktop extends JFrame {
                 menuBar = new javax.swing.JMenuBar();
                 fileMenu = new javax.swing.JMenu();
                 openMenuItem = new javax.swing.JMenuItem();
+                saveMenuItem = new javax.swing.JMenuItem();
+                separator = new javax.swing.JPopupMenu.Separator();
                 exitMenuItem = new javax.swing.JMenuItem();
                 viewMenu = new javax.swing.JMenu();
                 fullScreenMenuItem = new javax.swing.JCheckBoxMenuItem();
@@ -234,6 +296,10 @@ public class Desktop extends JFrame {
 
                 openMenuItem.setAction(openAction);
                 fileMenu.add(openMenuItem);
+
+                saveMenuItem.setAction(saveAction);
+                fileMenu.add(saveMenuItem);
+                fileMenu.add(separator);
 
                 exitMenuItem.setAction(exitAction);
                 fileMenu.add(exitMenuItem);
@@ -318,7 +384,9 @@ public class Desktop extends JFrame {
         private javax.swing.JMenu helpMenu;
         private javax.swing.JMenuBar menuBar;
         private javax.swing.JMenuItem openMenuItem;
+        private javax.swing.JMenuItem saveMenuItem;
         private javax.swing.JMenuItem screenshotMenuItem;
+        private javax.swing.JPopupMenu.Separator separator;
         private javax.swing.JMenu viewMenu;
         // End of variables declaration//GEN-END:variables
 }
