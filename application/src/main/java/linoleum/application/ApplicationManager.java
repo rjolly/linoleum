@@ -284,13 +284,17 @@ public class ApplicationManager extends Frame {
 
 	@Override
 	public void open(final URI uri, final JDesktopPane desktop) {
-		final App app = getApplication(uri);
-		if (app != null) {
-			app.open(uri, desktop);
+		if (uri == null) {
+			super.open(uri, desktop);
 		} else {
-			final List<App> apps = getApplications(uri);
-			if (apps.size() > 0) {
-				apps.get(0).open(uri, desktop);
+			final App app = getApplication(uri);
+			if (app != null) {
+				app.open(uri, desktop);
+			} else {
+				final List<App> apps = getApplications(uri);
+				if (apps.size() > 0) {
+					apps.get(0).open(uri, desktop);
+				}
 			}
 		}
 	}
