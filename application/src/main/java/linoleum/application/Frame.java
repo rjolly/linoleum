@@ -69,27 +69,22 @@ public class Frame extends JInternalFrame implements App {
 	public Frame(final Frame owner, final String title) {
 		super(title, true, true, true, true);
 		initComponents();
-		parent = owner == null?this:owner;
-		index = parent.nextIndex();
+		setOwner(owner == null?this:owner);
 	}
 
 	@Deprecated
 	public Frame(final Frame owner) {
 		initComponents();
-		parent = owner == null?this:owner;
-		index = parent.nextIndex();
+		setOwner(owner == null?this:owner);
 	}
 
 	public void setOwner(final Frame owner) {
 		parent = owner;
+		index = parent.nextIndex();
 	}
 
 	public Frame getOwner() {
 		return parent;
-	}
-
-	public void setIndex(final int index) {
-		this.index = index;
 	}
 
 	public int getIndex() {
@@ -225,7 +220,6 @@ public class Frame extends JInternalFrame implements App {
 		final JInternalFrame c = getFrame();
 		if (c instanceof Frame && c != this) {
 			((Frame) c).setOwner(this);
-			((Frame) c).setIndex(nextIndex());
 		}
 		return c;
 	}
