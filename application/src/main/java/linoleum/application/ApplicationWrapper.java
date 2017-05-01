@@ -2,7 +2,6 @@ package linoleum.application;
 
 import java.beans.ConstructorProperties;
 import java.net.URI;
-import javax.swing.Icon;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 
@@ -12,6 +11,9 @@ public class ApplicationWrapper extends Frame {
 
 	@ConstructorProperties({"application"})
 	public ApplicationWrapper(final Application app) {
+		setName(app.getName());
+		setIcon(app.getIcon());
+		setMimeType(app.getMimeType());
 		this.app = app;
 	}
 
@@ -22,21 +24,6 @@ public class ApplicationWrapper extends Frame {
 	@Override
 	public JInternalFrame getFrame() {
 		return app.open(getURI());
-	}
-
-	@Override
-	public String getName() {
-		return app.getName();
-	}
-
-	@Override
-	public Icon getIcon() {
-		return app.getIcon();
-	}
-
-	@Override
-	public String getMimeType() {
-		return app.getMimeType();
 	}
 
 	@Override
