@@ -109,19 +109,19 @@ public class Frame extends JInternalFrame implements App {
 		parent.openFrames.remove(index);
 	}
 
-	public void setApplicationManager(final ApplicationManager manager) {
+	void setApplicationManager(final ApplicationManager manager) {
 		this.manager = manager;
 	}
 
 	public ApplicationManager getApplicationManager() {
-		return manager;
+		return parent.manager;
 	}
 
 	public void setOptionPanel(final OptionPanel optionPanel) {
 		this.optionPanel = optionPanel;
 	}
 
-	public OptionPanel getOptionPanel() {
+	OptionPanel getOptionPanel() {
 		return optionPanel;
 	}
 
@@ -185,11 +185,8 @@ public class Frame extends JInternalFrame implements App {
 				frame.setURI(uri);
 			}
 			if (frame.getDesktopPane() == null) {
-				if (!frame.open) {
-					frame.manager = manager;
-					desktop.add(frame);
-				} else {
-					desktop.add(frame);
+				desktop.add(frame);
+				if (frame.open) {
 					frame.openFrame();
 				}
 			} else if (changed) {
@@ -205,7 +202,7 @@ public class Frame extends JInternalFrame implements App {
 	}
 
 	public void select() {
-		manager.select(this);
+		getApplicationManager().select(this);
 	}
 
 	private JInternalFrame getFrame(final JDesktopPane desktop, final URI uri) {
