@@ -84,7 +84,7 @@ public class Frame extends JInternalFrame implements App {
 	}
 
 	public Frame getOwner() {
-		return parent;
+		return parent == this?null:parent;
 	}
 
 	public int getIndex() {
@@ -100,13 +100,13 @@ public class Frame extends JInternalFrame implements App {
 	}
 
 	private void openFrame() {
-		getOwner().openFrames.add(index);
+		parent.openFrames.add(index);
 		open();
 	}
 
 	private void closeFrame() {
 		close();
-		getOwner().openFrames.remove(index);
+		parent.openFrames.remove(index);
 	}
 
 	public void setApplicationManager(final ApplicationManager manager) {
