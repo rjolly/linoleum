@@ -29,9 +29,11 @@ import javax.swing.GroupLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import linoleum.application.ApplicationManager;
 
 public class Desktop extends JFrame {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
@@ -51,6 +53,9 @@ public class Desktop extends JFrame {
 	private final Action aboutAction = new AboutAction();
 	private final GraphicsDevice devices[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 	private final File file = new File("desktop.xml");
+	private final ApplicationManager apps;
+	private final Background frame;
+	private final Console console;
 	private Rectangle bounds;
 
 	private class OpenAction extends AbstractAction {
@@ -174,7 +179,7 @@ public class Desktop extends JFrame {
 					ex.printStackTrace();
 				}
 			});
-			e.writeObject(desktopPane);
+			e.writeObject(desktopPane.getAllFrames());
 		} catch (final FileNotFoundException ex) {
 			ex.printStackTrace();
 		}
@@ -187,7 +192,10 @@ public class Desktop extends JFrame {
 					ex.printStackTrace();
 				}
 			});
-			((GroupLayout) getContentPane().getLayout()).replace(desktopPane, (DesktopPane) d.readObject());
+			new ApplicationManager();
+			for (final JInternalFrame frame : (JInternalFrame[]) d.readObject()) {
+				desktopPane.add(frame);
+			}
 		} catch (final FileNotFoundException ex) {
 			ex.printStackTrace();
 		}
@@ -195,12 +203,37 @@ public class Desktop extends JFrame {
 
 	public Desktop() {
 		initComponents();
+		if (file.exists()) {
+			load();
+			ApplicationManager apps = null;
+			Background frame = null;
+			Console console = null;
+			for (final JInternalFrame c : desktopPane.getAllFrames()) {
+				if (c instanceof Background) {
+					frame = (Background) c;
+				} else if (c instanceof Console) {
+					console = (Console) c;
+				} else if (c instanceof ApplicationManager) {
+					apps = (ApplicationManager) c;
+				} else {
+					c.setVisible(true);
+				}
+			}
+			this.apps = apps;
+			this.frame = frame;
+			this.console = console;
+		} else {
+			apps = new ApplicationManager();
+			frame = new Background();
+			console = new Console();
+			desktopPane.add(frame);
+			desktopPane.add(console);
+			desktopPane.add(apps);
+		}
+		frame.setVisible(true);
 		frame.setLayer(0);
 		apps.manage(frame);
 		apps.manage(console);
-		if (file.exists()) {
-			load();
-		}
 		loadBounds();
 	}
 
@@ -254,9 +287,6 @@ public class Desktop extends JFrame {
         private void initComponents() {
 
                 desktopPane = new linoleum.DesktopPane();
-                frame = new linoleum.Background();
-                console = new linoleum.Console();
-                apps = new linoleum.application.ApplicationManager();
                 menuBar = new javax.swing.JMenuBar();
                 fileMenu = new javax.swing.JMenu();
                 openMenuItem = new javax.swing.JMenuItem();
@@ -280,16 +310,6 @@ public class Desktop extends JFrame {
                                 formComponentMoved(evt);
                         }
                 });
-
-                frame.setVisible(true);
-                desktopPane.add(frame);
-                frame.setBounds(0, 0, 22, 33);
-
-                desktopPane.add(console);
-                console.setBounds(0, 0, 410, 310);
-
-                desktopPane.add(apps);
-                apps.setBounds(0, 0, 410, 310);
 
                 fileMenu.setMnemonic('f');
                 fileMenu.setText("File");
@@ -373,13 +393,10 @@ public class Desktop extends JFrame {
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JMenuItem aboutMenuItem;
-        private linoleum.application.ApplicationManager apps;
-        private linoleum.Console console;
         private javax.swing.JMenuItem contentMenuItem;
         private linoleum.DesktopPane desktopPane;
         private javax.swing.JMenuItem exitMenuItem;
         private javax.swing.JMenu fileMenu;
-        private linoleum.Background frame;
         private javax.swing.JCheckBoxMenuItem fullScreenMenuItem;
         private javax.swing.JMenu helpMenu;
         private javax.swing.JMenuBar menuBar;
