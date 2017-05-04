@@ -42,6 +42,7 @@ public class DesktopPane extends JDesktopPane {
 	private boolean recording;
 	private boolean searching;
 	private boolean selecting;
+	private boolean reopen;
 	private Background bkg;
 
 	private class Renderer extends JLabel implements ListCellRenderer<Frame> {
@@ -151,7 +152,7 @@ public class DesktopPane extends JDesktopPane {
 				switch (e.getKeyCode()) {
 				case KeyEvent.VK_CONTROL:
 					if (recording != state) {
-						putClientProperty("DesktopPane.recording", recording = state);
+						setRecording(state);
 					}
 					break;
 				case KeyEvent.VK_ALT:
@@ -171,6 +172,18 @@ public class DesktopPane extends JDesktopPane {
 		list.setCellRenderer(renderer);
 		list.setLayoutOrientation(JList.VERTICAL_WRAP);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	}
+
+	void setReopen(final boolean reopen) {
+		putClientProperty("DesktopPane.reopen", this.reopen = reopen);
+	}
+
+	public boolean isReopen() {
+		return reopen;
+	}
+
+	private void setRecording(final boolean recording) {
+		putClientProperty("DesktopPane.recording", this.recording = recording);
 	}
 
 	public boolean isRecording() {

@@ -205,6 +205,7 @@ public class Desktop extends JFrame {
 		initComponents();
 		if (file.exists()) {
 			load();
+			desktopPane.setReopen(true);
 			ApplicationManager apps = null;
 			Background frame = null;
 			Console console = null;
@@ -222,6 +223,7 @@ public class Desktop extends JFrame {
 			this.apps = apps;
 			this.frame = frame;
 			this.console = console;
+			desktopPane.setReopen(false);
 		} else {
 			apps = new ApplicationManager();
 			frame = new Background();

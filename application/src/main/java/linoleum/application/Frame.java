@@ -293,6 +293,11 @@ public class Frame extends JInternalFrame implements App {
 		return obj instanceof Boolean?(Boolean) obj:false;
 	}
 
+	private boolean isReopen() {
+		final Object obj = getDesktopPane().getClientProperty("DesktopPane.reopen");
+		return obj instanceof Boolean?(Boolean) obj:false;
+	}
+
 	@SuppressWarnings("unchecked")
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
@@ -331,11 +336,13 @@ public class Frame extends JInternalFrame implements App {
         }// </editor-fold>//GEN-END:initComponents
 
         private void formInternalFrameOpened(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameOpened
-		final int x = prefs.getInt(getKey("x"), getX());
-		final int y = prefs.getInt(getKey("y"), getY());
-		final int width = prefs.getInt(getKey("width"), getWidth());
-		final int height = prefs.getInt(getKey("height"), getHeight());
-		setBounds(x, y, width, height);
+		if (!isReopen()) {
+			final int x = prefs.getInt(getKey("x"), getX());
+			final int y = prefs.getInt(getKey("y"), getY());
+			final int width = prefs.getInt(getKey("width"), getWidth());
+			final int height = prefs.getInt(getKey("height"), getHeight());
+			setBounds(x, y, width, height);
+		}
 		openFrame();
 		open = true;
         }//GEN-LAST:event_formInternalFrameOpened
