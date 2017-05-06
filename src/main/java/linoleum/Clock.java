@@ -36,6 +36,16 @@ public class Clock extends Frame {
 		prefs.putBoolean(getKey("analog"), jRadioButton1.isSelected());
 	}
 
+	@Override
+	public void open() {
+		clockPanel1.start();
+	}
+
+	@Override
+	public void close() {
+		clockPanel1.stop();
+	}
+
 	@SuppressWarnings("unchecked")
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
@@ -84,29 +94,12 @@ public class Clock extends Frame {
                 );
 
                 setClosable(true);
-                setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
                 setTitle("Clock");
                 setOptionPanel(optionPanel1);
-                addComponentListener(new java.awt.event.ComponentAdapter() {
-                        public void componentShown(java.awt.event.ComponentEvent evt) {
-                                formComponentShown(evt);
-                        }
-                        public void componentHidden(java.awt.event.ComponentEvent evt) {
-                                formComponentHidden(evt);
-                        }
-                });
                 getContentPane().add(clockPanel1, java.awt.BorderLayout.CENTER);
 
                 pack();
         }// </editor-fold>//GEN-END:initComponents
-
-        private void formComponentHidden(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentHidden
-		clockPanel1.stop();
-        }//GEN-LAST:event_formComponentHidden
-
-        private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
-		clockPanel1.start();
-        }//GEN-LAST:event_formComponentShown
 
         private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
 		optionPanel1.setDirty(true);
