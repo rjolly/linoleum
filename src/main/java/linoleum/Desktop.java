@@ -216,6 +216,10 @@ public class Desktop extends JFrame {
 					console = (Console) c;
 				} else if (c instanceof ApplicationManager) {
 					apps = (ApplicationManager) c;
+					if (apps.getApplications().size() > 0) {
+						apps.setVisible(true);
+						contentsAction.setEnabled(true);
+					}
 				} else {
 					c.setVisible(true);
 				}
