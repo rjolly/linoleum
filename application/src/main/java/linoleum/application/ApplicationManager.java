@@ -66,7 +66,7 @@ import linoleum.application.event.ClassPathChangeEvent;
 public class ApplicationManager extends Frame {
 	private final Icon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
 	private final List<ClassPathListener> listeners = new ArrayList<>();
-	private final Map<String, App> map = new HashMap<>();
+	private final Map<String, App> appsByName = new HashMap<>();
 	private final Comparator<MimeType> comparator = new Comparator<MimeType>() {
 		@Override
 		public int compare(final MimeType a, final MimeType b) {
@@ -79,9 +79,9 @@ public class ApplicationManager extends Frame {
 		}
 	};
 	private final SortedMap<MimeType, App> pref = new TreeMap<>(comparator);
-	private final SortedMap<MimeType, List<App>> apps = new TreeMap<>(comparator);
-	private final SortedMap<String, App> spref = new TreeMap<>();
-	private final SortedMap<String, List<App>> sapps = new TreeMap<>();
+	private final SortedMap<MimeType, List<App>> appsByType = new TreeMap<>(comparator);
+	private final SortedMap<String, App> prefByScheme = new TreeMap<>();
+	private final SortedMap<String, List<App>> appsByScheme = new TreeMap<>();
 	private final DefaultListModel<App> model = new DefaultListModel<>();
 	private final List<OptionPanel> options = new ArrayList<>();
 	private final Logger logger = Logger.getLogger(getClass().getName());
@@ -91,7 +91,7 @@ public class ApplicationManager extends Frame {
 	private final DefaultTableModel tableModel;
 	private final DefaultTableModel schemeTableModel;
 	private final Packages instance = new Packages();
-	private final List<App> list;
+	private final List<App> apps;
 
 	private class Renderer extends JLabel implements ListCellRenderer {
 		public Renderer() {
@@ -125,7 +125,7 @@ public class ApplicationManager extends Frame {
 	}
 
 	@ConstructorProperties({"applications"})
-	public ApplicationManager(final List<App> list) {
+	public ApplicationManager(final List<App> apps) {
 		initComponents();
 		tableModel = (DefaultTableModel) jTable1.getModel();
 		schemeTableModel = (DefaultTableModel) jTable2.getModel();
@@ -136,24 +136,24 @@ public class ApplicationManager extends Frame {
 					pref.clear();
 					pref.putAll(getPreferred());
 				} else if (evt.getKey().equals(getKey("scheme-preferred"))) {
-					spref.clear();
-					spref.putAll(getPreferredByScheme());
+					prefByScheme.clear();
+					prefByScheme.putAll(getPreferredByScheme());
 				}
 			}
 		});
 		manage(this);
 		pref.putAll(getPreferred());
-		spref.putAll(getPreferredByScheme());
-		final List<App> as = new ArrayList<>(list);
-		list.clear();
-		this.list = list;
-		for (final App app : as) {
+		prefByScheme.putAll(getPreferredByScheme());
+		final List<App> s = new ArrayList<>(apps);
+		apps.clear();
+		this.apps = apps;
+		for (final App app : s) {
 			process(app);
 		}
 	}
 
 	public List<App> getApplications() {
-		return list;
+		return apps;
 	}
 
 	public Packages getPackages() {
@@ -180,19 +180,19 @@ public class ApplicationManager extends Frame {
 	}
 
 	private Map<String, App> getPreferredByScheme() {
-		final Map<String, App> pref = new TreeMap<>();
+		final Map<String, App> prefByScheme = new TreeMap<>();
 		final String str = prefs.get(getKey("scheme-preferred"), "");
 		for (final String entry : str.split(", ")) {
 			final String s[] = entry.split("=");
 			if (s.length > 1) {
-				pref.put(s[0], get(s[1]));
+				prefByScheme.put(s[0], get(s[1]));
 			}
 		}
-		return pref;
+		return prefByScheme;
 	}
 
-	private void setPreferredByScheme(final Map<String, App> pref) {
-		final String str = pref.toString();
+	private void setPreferredByScheme(final Map<String, App> prefByScheme) {
+		final String str = prefByScheme.toString();
 		prefs.put(getKey("scheme-preferred"), str.substring(1, str.length() - 1));
 	}
 
@@ -226,15 +226,15 @@ public class ApplicationManager extends Frame {
 			public Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int row, final int column) {
 				comboModel.removeAllElements();
 				comboModel.addElement(null);
-				final List<App> as = new ArrayList<>();
+				final List<App> apps = new ArrayList<>();
 				if (table == jTable1) {
 					final MimeType type = (MimeType) tableModel.getValueAt(row, 0);
-					as.addAll(apps.get(type));
+					apps.addAll(appsByType.get(type));
 				} else if (table == jTable2) {
 					final String scheme = (String) schemeTableModel.getValueAt(row, 0);
-					as.addAll(sapps.get(scheme));
+					apps.addAll(appsByScheme.get(scheme));
 				}
-				for (final App app : as) {
+				for (final App app : apps) {
 					comboModel.addElement(app);
 				}
 				return super.getTableCellEditorComponent(table, value, isSelected, row, column);
@@ -246,13 +246,13 @@ public class ApplicationManager extends Frame {
 	public void load() {
 		tableModel.setRowCount(0);
 		final Map<MimeType, App> pref = getPreferred();
-		for (final MimeType type : apps.keySet()) {
+		for (final MimeType type : appsByType.keySet()) {
 			tableModel.addRow(new Object[] {type, pref.get(type)});
 		}
 		schemeTableModel.setRowCount(0);
-		final Map<String, App> spref = getPreferredByScheme();
-		for (final String scheme : sapps.keySet()) {
-			schemeTableModel.addRow(new Object[] {scheme, spref.get(scheme)});
+		final Map<String, App> prefByScheme = getPreferredByScheme();
+		for (final String scheme : appsByScheme.keySet()) {
+			schemeTableModel.addRow(new Object[] {scheme, prefByScheme.get(scheme)});
 		}
 	}
 
@@ -267,15 +267,15 @@ public class ApplicationManager extends Frame {
 			}
 		}
 		setPreferred(pref);
-		final Map<String, App> spref = new TreeMap<>();
+		final Map<String, App> prefByScheme = new TreeMap<>();
 		for (int row = 0 ; row < schemeTableModel.getRowCount() ; row++) {
 			final String scheme = (String) schemeTableModel.getValueAt(row, 0);
 			final App app = (App) schemeTableModel.getValueAt(row, 1);
 			if (app != null) {
-				spref.put(scheme, app);
+				prefByScheme.put(scheme, app);
 			}
 		}
-		setPreferredByScheme(spref);
+		setPreferredByScheme(prefByScheme);
 	}
 
 	public void open(final URI uri) {
@@ -329,8 +329,8 @@ public class ApplicationManager extends Frame {
 	}
 
 	private App getApplication(final String scheme) {
-		if (spref.containsKey(scheme)) {
-			return spref.get(scheme);
+		if (prefByScheme.containsKey(scheme)) {
+			return prefByScheme.get(scheme);
 		}
 		return null;
 	}
@@ -354,30 +354,30 @@ public class ApplicationManager extends Frame {
 	}
 
 	private List<App> getApplications(final MimeType type) {
-		final List<App> as = new ArrayList<>();
-		if (apps.containsKey(type)) {
-			as.addAll(apps.get(type));
+		final List<App> apps = new ArrayList<>();
+		if (appsByType.containsKey(type)) {
+			apps.addAll(appsByType.get(type));
 		}
-		for (final Map.Entry<MimeType, List<App>> entry : apps.entrySet()) {
+		for (final Map.Entry<MimeType, List<App>> entry : appsByType.entrySet()) {
 			if (type.match(entry.getKey())) {
 				final List<App> s = new ArrayList<>(entry.getValue());
-				s.removeAll(as);
-				as.addAll(s);
+				s.removeAll(apps);
+				apps.addAll(s);
 			}
 		}
-		return Collections.unmodifiableList(as);
+		return Collections.unmodifiableList(apps);
 	}
 
 	private List<App> getApplications(final String scheme) {
-		final List<App> as = new ArrayList<>();
-		if (sapps.containsKey(scheme)) {
-			as.addAll(sapps.get(scheme));
+		final List<App> apps = new ArrayList<>();
+		if (appsByScheme.containsKey(scheme)) {
+			apps.addAll(appsByScheme.get(scheme));
 		}
-		return Collections.unmodifiableList(as);
+		return Collections.unmodifiableList(apps);
 	}
 
 	public App get(final String name) {
-		return map.get(name);
+		return appsByName.get(name);
 	}
 
 	private void open(final int index) {
@@ -461,19 +461,19 @@ public class ApplicationManager extends Frame {
 
 	private void process(final App app) {
 		final String name = app.getName();
-		if (!map.containsKey(name)) {
+		if (!appsByName.containsKey(name)) {
 			logger.config("Processing " + name);
-			list.add(app);
-			map.put(name, app);
+			apps.add(app);
+			appsByName.put(name, app);
 			final String str = app.getMimeType();
 			if (str != null) {
 				for (final String s : str.split(":")) try {
 					final MimeType type = new MimeType(s);
-					List<App> list = apps.get(type);
-					if (list == null) {
-						apps.put(type, list = new ArrayList<>());
+					List<App> apps = appsByType.get(type);
+					if (apps == null) {
+						appsByType.put(type, apps = new ArrayList<>());
 					}
-					list.add(app);
+					apps.add(app);
 				} catch (final MimeTypeParseException ex) {
 					ex.printStackTrace();
 				}
@@ -481,11 +481,11 @@ public class ApplicationManager extends Frame {
 			final String ss = app.getScheme();
 			if (ss != null) {
 				for (final String scheme : ss.split(":")) {
-					List<App> list = sapps.get(scheme);
-					if (list == null) {
-						sapps.put(scheme, list = new ArrayList<>());
+					List<App> apps = appsByScheme.get(scheme);
+					if (apps == null) {
+						appsByScheme.put(scheme, apps = new ArrayList<>());
 					}
-					list.add(app);
+					apps.add(app);
 				}
 			}
 			model.addElement(app);
