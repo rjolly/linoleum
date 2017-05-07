@@ -45,7 +45,7 @@ function javac(srcDir, destDir) {
 function classpath() {
     var str = "";
     var files = apps.getPackages().installed();
-    for(i in files) str += relativize(new File("."), files[i]).getPath() + (i < files.length - 1 ? java.io.File.pathSeparator : "");
+    for(i in files) str += files[i].getPath() + (i < files.length - 1 ? java.io.File.pathSeparator : "");
     return str;
 }
 
@@ -220,15 +220,15 @@ function pathToFile(pathname) {
     if (!(file instanceof File)) {
 	file = new File(pathname);
 	if (!file.isAbsolute()) {
-	    file = new File(curDir, pathname);
+	    file = new File(curDir, pathname).getCanonicalFile();
 	}
     }
-    return relativize(new File("."), file);
+    return relativize(new File(".").getCanonicalFile(), file);
 }
 
 function relativize(baseDir, file) {
-    var path = file.getCanonicalPath();
-    var base = baseDir.getCanonicalPath();
+    var path = file.getPath();
+    var base = baseDir.getPath();
     if (path.startsWith(base)) {
 	if (path.equals(base)) {
 	    path = ".";
