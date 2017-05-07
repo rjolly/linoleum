@@ -10,5 +10,6 @@ public interface App {
 	public Icon getFrameIcon();
 	public String getMimeType();
 	public String getScheme();
+	public void open(JDesktopPane desktop);
 	public void open(URI uri, JDesktopPane desktop);
 }

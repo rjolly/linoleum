@@ -383,7 +383,7 @@ public class ApplicationManager extends Frame {
 	private void open(final int index) {
 		if (index < 0) {
 		} else {
-			model.getElementAt(index).open(null, getDesktopPane());
+			model.getElementAt(index).open(getDesktopPane());
 		}
 	}
 

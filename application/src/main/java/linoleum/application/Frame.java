@@ -183,6 +183,10 @@ public class Frame extends JInternalFrame implements App {
 		return this;
 	}
 
+	public void open(final JDesktopPane desktop) {
+		open(null, desktop);
+	}
+
 	public void open(final URI uri, final JDesktopPane desktop) {
 		final JInternalFrame c = getFrame(desktop, uri);
 		if (c instanceof Frame) {
