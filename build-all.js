@@ -22,7 +22,7 @@ cd("..")
 clean("build/classes")
 load("build.js")
 
-var version = "1.3.1";
+var version = "1.4";
 install("net.java.linoleum#linoleum;" + version)
 
 mkdir("dist/bin")

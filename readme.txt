@@ -36,7 +36,7 @@ To build linoleum from itself, first clone the repository by external means (for
 
 To publish an application:
 
-- add net.java.linoleum#application;1.3.1 to your project's dependencies
+- add net.java.linoleum#application;1.4 to your project's dependencies
 - extend linoleum.application.Frame
 - make it available to the service loader in META-INF/services/javax.swing.JInternalFrame
 - publish your artifact in maven central
