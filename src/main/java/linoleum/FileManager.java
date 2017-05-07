@@ -213,7 +213,7 @@ public class FileManager extends Frame implements Runnable {
 			for (final Path entry : files) {
 				final Path target = recipient.resolve(getFileName(entry));
 				try {
-					switch (action) {
+					if (!Files.isSameFile(recipient, entry) && !Files.isSameFile(recipient, getParent(entry))) switch (action) {
 					case COPY:
 						if (Files.isDirectory(entry)) {
 							copy(entry, target);
@@ -583,7 +583,12 @@ public class FileManager extends Frame implements Runnable {
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
-		return path.getParent();
+		return getParent(path);
+	}
+
+	private Path getParent(final Path path) {
+		final Path parent = path.getParent();
+		return parent == null?Paths.get(""):parent;
 	}
 
 	private void copy(final Path source, final Path target) throws IOException {

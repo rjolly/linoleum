@@ -100,9 +100,14 @@ public class PackageManager extends Frame {
 		final PublishOptions options = new PublishOptions();
 		options.setOverwrite(true);
 		if (resolver.startsWith("local")) {
-			options.setSrcIvyPattern(source.getParent() + "/[artifact].[ext]");
+			options.setSrcIvyPattern(getParent(source) + "/[artifact].[ext]");
 		}
 		ivy.publish(mRID, Arrays.asList(pattern), resolver, options);
+	}
+
+	private String getParent(final File file) {
+		final String parent = file.getParent();
+		return parent == null?".":parent;
 	}
 
 	public void install(final String name, final String conf) {
