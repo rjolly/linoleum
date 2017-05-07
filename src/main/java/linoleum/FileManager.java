@@ -84,6 +84,7 @@ import linoleum.application.Frame;
 
 public class FileManager extends Frame implements Runnable {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
+	private final Preferences apps = Preferences.userNodeForPackage(ApplicationManager.class);
 	private final Icon openIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"));
 	private final Icon cutIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Cut16.gif"));
 	private final Icon copyIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Copy16.gif"));
@@ -276,6 +277,14 @@ public class FileManager extends Frame implements Runnable {
 		@Override
 		public void exportDone(final JComponent c, final Transferable data, final int action) {
 			refresh();
+		}
+	};
+	private final PreferenceChangeListener listener = new PreferenceChangeListener() {
+		@Override
+		public void preferenceChange(final PreferenceChangeEvent evt) {
+			if (evt.getKey().equals(getApplicationManager().getKey("preferred"))) {
+				prepare();
+			}
 		}
 	};
 	private final DefaultTableModel tableModel;
@@ -649,14 +658,6 @@ public class FileManager extends Frame implements Runnable {
 		});
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
 		setMimeType("application/x-directory:application/java-archive:application/zip");
-		Preferences.userNodeForPackage(ApplicationManager.class).addPreferenceChangeListener(new PreferenceChangeListener() {
-			@Override
-			public void preferenceChange(final PreferenceChangeEvent evt) {
-				if (evt.getKey().equals(getApplicationManager().getKey("preferred"))) {
-					prepare();
-				}
-			}
-		});
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		editCell.setName("FileList.cellEditor");
 		editCell.addActionListener(new ActionListener() {
@@ -828,6 +829,7 @@ public class FileManager extends Frame implements Runnable {
 
 	@Override
 	public void open() {
+		apps.addPreferenceChangeListener(listener);
 		doOpen();
 		if (fs != defaultfs) {
 			Collection<Integer> coll = getOwner().openFrames.get(fs);
@@ -853,6 +855,7 @@ public class FileManager extends Frame implements Runnable {
 			}
 		}
 		doClose();
+		apps.removePreferenceChangeListener(listener);
 	}
 
 	private void doClose() {

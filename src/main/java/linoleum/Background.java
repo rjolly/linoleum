@@ -17,6 +17,11 @@ public class Background extends Frame {
 
 	public Background() {
 		initComponents();
+		chooser.setFileFilter(new FileNameExtensionFilter("Images", "jpg", "gif", "png"));
+	}
+
+	@Override
+	public void init() {
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
 			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
@@ -25,7 +30,6 @@ public class Background extends Frame {
 				}
 			}
 		});
-		chooser.setFileFilter(new FileNameExtensionFilter("Images", "jpg", "gif", "png"));
 	}
 
 	@Override

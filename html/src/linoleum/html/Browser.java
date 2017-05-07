@@ -44,6 +44,14 @@ public class Browser extends Frame {
 	private final Icon stopIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
 	private final Icon reloadIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Refresh16.gif"));
 	private final DefaultComboBoxModel<Integer> model = new DefaultComboBoxModel<>(new Integer[] { 8, 10, 12, 14, 18, 24, 36 });
+	private final PreferenceChangeListener listener = new PreferenceChangeListener() {
+		@Override
+		public void preferenceChange(final PreferenceChangeEvent evt) {
+			if (evt.getKey().equals(getKey("fontSize"))) {
+				resize();
+			}
+		}
+	};
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final Action copyLinkLocationAction = new CopyLinkLocationAction();
 	private List<FrameURL> history = new ArrayList<>();
@@ -83,14 +91,6 @@ public class Browser extends Frame {
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif")));
 		setMimeType("text/html");
 		setScheme("http:https");
-		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
-			@Override
-			public void preferenceChange(final PreferenceChangeEvent evt) {
-				if (evt.getKey().equals(getKey("fontSize"))) {
-					resize();
-				}
-			}
-		});
 		resize();
 		jEditorPane1.setEditorKitForContentType("text/html", new EditorKit());
 		jEditorPane1.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
@@ -181,6 +181,7 @@ public class Browser extends Frame {
 
 	@Override
 	public void open() {
+		prefs.addPreferenceChangeListener(listener);
 		if (current == null) {
 			final String str = prefs.get(getName() + ".home", "");
 			if (!str.isEmpty()) try {
@@ -192,6 +193,11 @@ public class Browser extends Frame {
 		if (current != null) {
 			open(current, 1, reload);
 		}
+	}
+
+	@Override
+	public void close() {
+		prefs.removePreferenceChangeListener(listener);
 	}
 
 	private void linkActivated(final HyperlinkEvent evt) {

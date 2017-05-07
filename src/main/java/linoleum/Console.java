@@ -21,14 +21,6 @@ public class Console extends Frame {
 		initComponents();
 		setContentPane(panel);
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
-		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
-			@Override
-			public void preferenceChange(final PreferenceChangeEvent evt) {
-				if (evt.getKey().equals(getKey("level")) || evt.getKey().equals(getKey("visible"))) {
-					refresh();
-				}
-			}
-		});
 		model.addElement(Level.CONFIG);
 		model.addElement(Level.INFO);
 		model.addElement(Level.WARNING);
@@ -49,6 +41,14 @@ public class Console extends Frame {
 
 	@Override
 	public void init() {
+		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
+			@Override
+			public void preferenceChange(final PreferenceChangeEvent evt) {
+				if (evt.getKey().equals(getKey("level")) || evt.getKey().equals(getKey("visible"))) {
+					refresh();
+				}
+			}
+		});
 		refresh();
 	}
 

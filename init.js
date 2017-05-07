@@ -1,5 +1,6 @@
 if (typeof(frame) == 'undefined') {
     apps = new Packages.linoleum.application.ApplicationManager();
+    apps.manage(apps);
     apps.open();
 } else {
     apps = frame.getApplicationManager();

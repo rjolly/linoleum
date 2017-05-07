@@ -107,16 +107,6 @@ public class SimpleClient extends Frame {
 		setIcon(new ImageIcon(getClass().getResource("Mail24.png")));
 		session.getProperties().put("mail.mime.decodefilename", "true");
 		session.getProperties().put("mstor.mbox.metadataStrategy", "none");
-		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
-			@Override
-			public void preferenceChange(final PreferenceChangeEvent evt) {
-				if (evt.getKey().equals(getKey("url"))) {
-					open();
-				} else if (evt.getKey().equals(getKey("debug")) && getDebug()) {
-					session.setDebug(true);
-				}
-			}
-		});
 	}
 
 	public Session getSession() {
@@ -175,6 +165,20 @@ public class SimpleClient extends Frame {
 		prefs.put(getKey("from"), jTextField3.getText());
 		prefs.put(getKey("record"), jTextField4.getText());
 		prefs.putBoolean(getKey("debug"), jCheckBox1.isSelected());
+	}
+
+	@Override
+	public void init() {
+		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
+			@Override
+			public void preferenceChange(final PreferenceChangeEvent evt) {
+				if (evt.getKey().equals(getKey("url"))) {
+					open();
+				} else if (evt.getKey().equals(getKey("debug")) && getDebug()) {
+					session.setDebug(true);
+				}
+			}
+		});
 	}
 
 	@Override

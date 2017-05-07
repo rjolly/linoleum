@@ -240,6 +240,7 @@ public class Desktop extends JFrame {
 		frame.setLayer(0);
 		apps.manage(frame);
 		apps.manage(console);
+		apps.manage(apps);
 		loadBounds();
 	}
 

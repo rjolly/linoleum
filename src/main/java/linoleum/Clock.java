@@ -10,6 +10,16 @@ public class Clock extends Frame {
 
 	public Clock() {
 		initComponents();
+		refresh();
+	}
+
+	private void refresh() {
+		clockPanel1.setAnalog(prefs.getBoolean(getKey("analog"), false));
+		pack();
+	}
+
+	@Override
+	public void init() {
 		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
 			@Override
 			public void preferenceChange(final PreferenceChangeEvent evt) {
@@ -18,12 +28,6 @@ public class Clock extends Frame {
 				}
 			}
 		});
-		refresh();
-	}
-
-	private void refresh() {
-		clockPanel1.setAnalog(prefs.getBoolean(getKey("analog"), false));
-		pack();
 	}
 
 	@Override

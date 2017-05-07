@@ -27,6 +27,23 @@ public class MediaPlayer extends Frame {
 	private Player player;
 	private final Icon playIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"));
 	private final Icon pauseIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Pause16.gif"));
+	private final ControllerListener listener = new ControllerListener() {
+		@Override
+		public void controllerUpdate(final ControllerEvent ce) {
+			if (ce instanceof EndOfMediaEvent) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						if (index + 1 < files.length) {
+							index += 1;
+							open();
+						} else {
+							stop();
+						}
+					}
+				});
+			}
+		}
+	};
 	private Path files[] = new Path[0];
 	private boolean slide;
 	private Timer timer;
@@ -106,24 +123,6 @@ public class MediaPlayer extends Frame {
 		files = new Path[0];
 		index = 0;
 	}
-
-	private ControllerListener listener = new ControllerListener() {
-		@Override
-		public void controllerUpdate(ControllerEvent ce) {
-			if (ce instanceof EndOfMediaEvent) {
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						if (index + 1 < files.length) {
-							index += 1;
-							open();
-						} else {
-							stop();
-						}
-					}
-				});
-			}
-		}
-	};
 
 	private void play() {
 		if (player != null) {

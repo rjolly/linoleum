@@ -129,19 +129,6 @@ public class ApplicationManager extends Frame {
 		initComponents();
 		tableModel = (DefaultTableModel) jTable1.getModel();
 		schemeTableModel = (DefaultTableModel) jTable2.getModel();
-		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
-			@Override
-			public void preferenceChange(final PreferenceChangeEvent evt) {
-				if (evt.getKey().equals(getKey("preferred"))) {
-					pref.clear();
-					pref.putAll(getPreferred());
-				} else if (evt.getKey().equals(getKey("scheme-preferred"))) {
-					prefByScheme.clear();
-					prefByScheme.putAll(getPreferredByScheme());
-				}
-			}
-		});
-		manage(this);
 		pref.putAll(getPreferred());
 		prefByScheme.putAll(getPreferredByScheme());
 		final List<App> s = new ArrayList<>(apps);
@@ -202,6 +189,18 @@ public class ApplicationManager extends Frame {
 			@Override
 			public void classPathChanged(final ClassPathChangeEvent e) {
 				open();
+			}
+		});
+		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
+			@Override
+			public void preferenceChange(final PreferenceChangeEvent evt) {
+				if (evt.getKey().equals(getKey("preferred"))) {
+					pref.clear();
+					pref.putAll(getPreferred());
+				} else if (evt.getKey().equals(getKey("scheme-preferred"))) {
+					prefByScheme.clear();
+					prefByScheme.putAll(getPreferredByScheme());
+				}
 			}
 		});
 	}
