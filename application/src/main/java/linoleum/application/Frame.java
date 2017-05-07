@@ -20,6 +20,7 @@
 package linoleum.application;
 
 import java.awt.Component;
+import java.beans.Transient;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
@@ -97,6 +98,12 @@ public class Frame extends JInternalFrame implements App {
 			index++;
 		}
 		return index;
+	}
+
+	@Override
+	@Transient
+	public int getLayer() {
+		return super.getLayer();
 	}
 
 	private void openFrame() {
