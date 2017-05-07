@@ -30,7 +30,7 @@ public class Frame extends linoleum.application.Frame {
 
 	@Override
 	public Component getFocusOwner() {
-		return notepad;
+		return notepad.getEditor();
 	}
 
 	@Override

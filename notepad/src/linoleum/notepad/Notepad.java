@@ -126,7 +126,7 @@ public class Notepad extends JPanel {
 		editor.requestFocus();
 	}
 
-	public Editor getEditor() {
+	Editor getEditor() {
 		return editor;
 	}
 
@@ -408,9 +408,7 @@ public class Notepad extends JPanel {
 			frame.closeDialog();
 			if (clean() || proceed("Warning")) {
 				setFile(null);
-				editor.getDocument().addUndoableEditListener(undoHandler);
-				resetUndoManager();
-				revalidate();
+				open();
 			}
 		}
 	}
