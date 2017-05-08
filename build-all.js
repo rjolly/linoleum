@@ -24,13 +24,4 @@ load("build.js")
 
 var version = "1.4";
 install("net.java.linoleum#linoleum;" + version)
-
-mkdir("dist/bin")
-copy("bin", "dist/bin")
-cp("init.js", "dist/init.js")
-
-mkdir("dist/lib")
-copy(new File("lib"), "dist/lib")
-
-rm("dist/lib/linoleum-" + version + ".jar")
-jar("../linoleum.zip", "dist");
+rm(new File(new File("lib"), "linoleum-" + version + ".jar"))

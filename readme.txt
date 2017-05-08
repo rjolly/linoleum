@@ -10,7 +10,7 @@ Optional software:
 - jai 1.1.2_01 ( same as above )
 
 
-To run linoleum, add dist/bin to your path, give dist/bin/linoleum execution privilege (unix), then:
+To run linoleum, add bin to your path, give bin/linoleum execution privilege (unix), then:
   linoleum
 
 
@@ -29,9 +29,12 @@ Alternatively:
   click "Install"
 
 
-To build linoleum from itself, first clone the repository by external means (for now), then in the script shell:
-  cd("/path/to/linoleum");
-  load("build.js")
+To build linoleum from itself, first clone the repository, then run "build-all". In the script shell:
+  install("org.eclipse.jgit#org.eclipse.jgit;3.4.0.201406110918-r");
+  mkdir("linoleum");
+  cd("linoleum");
+  clone("https://github.com/rjolly/linoleum.git");
+  load("build-all.js");
 
 
 To publish an application:
@@ -44,8 +47,8 @@ To publish an application:
 
 
 To use linoleum as your desktop environment in Linux:
-  wget https://java.net/downloads/linoleum/linoleum.deb
-  sudo dpkg -i linoleum.deb
+  wget http://raphael.jolly.free.fr/linoleum/linoleum-1.4.deb
+  sudo dpkg -i linoleum-1.4.deb
 
 
 List of applications
@@ -58,11 +61,10 @@ List of applications
 
 Useful libraries
 
-  com.github.rjolly#flying-saucer;9.0.9			XML/XHTML+MathML+SVG and CSS 2.1 browser in pure Java
+  com.github.rjolly#flying-saucer;9.1.1			XML/XHTML+MathML+SVG and CSS 2.1 browser in pure Java
   com.googlecode.java-diff-utils#diffutils;1.3.0	The DiffUtils library for computing diffs in Java
   commons-io#commons-io;2.4				The Apache Commons IO library
   mstor#mstor;0.9.9					A JavaMail provider for persistent email storage
   org.bouncycastle#bcpg-jdk15;1.45			The Bouncy Castle Java API for handling the OpenPGP protocol
-  org.eclipse.jgit#org.eclipse.jgit;3.4.0.201406110918-r	Java library implementing the Git version control system
   org.scala-lang#scala-compiler;2.12.0			Script engine for the Scala Programming Language (requires Java 8)
 

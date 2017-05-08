@@ -339,6 +339,9 @@ function diff(file1, file2) {
 // requires org.eclipse.jgit#org.eclipse.jgit;3.4.0.201406110918-r
 
 function git() {
-    Git = Packages.org.eclipse.jgit.api.Git;
-    return Git.open(pathToFile(".git"));
+    return Packages.org.eclipse.jgit.api.Git.open(pathToFile(".git"));
+}
+
+function clone(uri) {
+    return Packages.org.eclipse.jgit.api.Git.cloneRepository().setDirectory(curDir).setURI(uri).call();
 }
