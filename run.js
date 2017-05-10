@@ -1,0 +1,1 @@
+Packages.linoleum.Desktop.main([]);

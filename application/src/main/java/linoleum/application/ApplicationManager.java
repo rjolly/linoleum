@@ -429,7 +429,7 @@ public class ApplicationManager extends Frame {
 	}
 
 	@SuppressWarnings("deprecation")
-	private void doOpen() {
+	public void doOpen() {
 		for (final JInternalFrame frame : ServiceLoader.load(JInternalFrame.class)) {
 			process(frame instanceof Frame?(Frame) frame:new InternalFrameWrapper(frame));
 		}
