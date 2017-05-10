@@ -67,6 +67,7 @@ public class ApplicationManager extends Frame {
 	private final Icon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
 	private final List<ClassPathListener> listeners = new ArrayList<>();
 	private final Map<String, App> appsByName = new HashMap<>();
+	private final Map<Class<? extends App>, App> appsByClass = new HashMap<>();
 	private final Comparator<MimeType> comparator = new Comparator<MimeType>() {
 		@Override
 		public int compare(final MimeType a, final MimeType b) {
@@ -379,6 +380,11 @@ public class ApplicationManager extends Frame {
 		return appsByName.get(name);
 	}
 
+	@SuppressWarnings("unchecked")
+	public <A extends App> A get(final Class<A> cls) {
+		return (A) appsByClass.get(cls);
+	}
+
 	private void open(final int index) {
 		if (index < 0) {
 		} else {
@@ -464,6 +470,7 @@ public class ApplicationManager extends Frame {
 			logger.config("Processing " + name);
 			apps.add(app);
 			appsByName.put(name, app);
+			appsByClass.put(app.getClass(), app);
 			final String str = app.getMimeType();
 			if (str != null) {
 				for (final String s : str.split(":")) try {
