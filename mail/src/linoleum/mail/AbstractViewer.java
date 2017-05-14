@@ -13,18 +13,14 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import linoleum.application.ApplicationManager;
 import linoleum.application.FileChooser;
 
-public abstract class AbstractViewer extends JPanel implements Viewer {
+public abstract class AbstractViewer extends Panel implements Viewer {
 	final Icon saveAsIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/SaveAs16.gif"));
-	final SimpleClient client = SimpleClient.instance;
-	final ApplicationManager apps = client.getApplicationManager();
-	final FileChooser chooser = client.getFileChooser();
 
-	class SaveAsAction extends AbstractAction {
+	protected class SaveAsAction extends AbstractAction {
 		final DataHandler dh;
 		final String filename;
 
@@ -36,6 +32,9 @@ public abstract class AbstractViewer extends JPanel implements Viewer {
 
 		@Override
 		public void actionPerformed(final ActionEvent evt) {
+			final SimpleClient client = getClient();
+			final ApplicationManager apps = client.getApplicationManager();
+			final FileChooser chooser = client.getFileChooser();
 			final File file;
 			chooser.setSelectedFile(new File(filename == null?"":filename));
 			final int returnVal = chooser.showInternalSaveDialog(AbstractViewer.this);

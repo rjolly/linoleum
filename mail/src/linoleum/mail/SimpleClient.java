@@ -42,7 +42,6 @@ public class SimpleClient extends Frame {
 	private final Session session = Session.getInstance(System.getProperties(), new SimpleAuthenticator(this));
 	private final FileChooser chooser = new FileChooser();
 	private Folder folder;
-	static SimpleClient instance;
 
 	private class ComposeAction extends AbstractAction {
 		public ComposeAction() {
@@ -99,9 +98,6 @@ public class SimpleClient extends Frame {
 	}
 
 	public SimpleClient() {
-		if (instance == null) {
-			instance = this;
-		}
 		initComponents();
 		setScheme("imap:imaps");
 		setIcon(new ImageIcon(getClass().getResource("Mail24.png")));

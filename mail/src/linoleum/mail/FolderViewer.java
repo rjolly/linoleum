@@ -5,10 +5,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public class FolderViewer extends javax.swing.JPanel {
+public class FolderViewer extends Panel {
 	private final FolderModel model = new FolderModel();
-	private final SimpleClient client = SimpleClient.instance;
-	private MessageViewer mv = client.getMessageViewer();
 
 	public FolderModel getModel() {
 		return model;
@@ -26,7 +24,7 @@ public class FolderViewer extends javax.swing.JPanel {
 					if (which != -1) {
 						// get the message and display it
 						final Message msg = model.getMessage(which);
-						mv.setMessage(msg);
+						getClient().getMessageViewer().setMessage(msg);
 					}
 				}
 			}
@@ -38,6 +36,7 @@ public class FolderViewer extends javax.swing.JPanel {
 
 	public void setFolder(final Folder what) throws MessagingException {
 		table.getSelectionModel().clearSelection();
+		final MessageViewer mv = getClient().getMessageViewer();
 		if (mv != null) {
 			mv.setMessage(null);
 		}

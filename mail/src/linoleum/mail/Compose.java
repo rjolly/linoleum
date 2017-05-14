@@ -46,9 +46,6 @@ public class Compose extends Frame {
 	private String inReplyTo[];
 	private String references[];
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
-	private final SimpleClient client = SimpleClient.instance;
-	private final FileChooser chooser = client.getFileChooser();
-	private final Session session = client.getSession();
 	private File file;
 
 	private class AttachAction extends AbstractAction {
@@ -58,6 +55,7 @@ public class Compose extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent evt) {
+			final FileChooser chooser = getClient().getFileChooser();
 			chooser.setSelectedFile(new File(""));
 			final int returnVal = chooser.showInternalOpenDialog(Compose.this);
 			switch (returnVal) {
@@ -95,7 +93,6 @@ public class Compose extends Frame {
 		setIconifiable(true);
 		setMaximizable(true);
 		setResizable(true);
-		setJMenuBar(client.getJMenuBar());
 
 		JPanel top = new JPanel();
 		top.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -156,6 +153,11 @@ public class Compose extends Frame {
 			}
 		}
 		setTitle("Untitled Message " + (getIndex() + 1));
+		setJMenuBar(getClient().getJMenuBar());
+	}
+
+	private SimpleClient getClient() {
+		return getApplicationManager().get(SimpleClient.class);
 	}
 
 	private JPanel buildButtonPanel() {
@@ -169,6 +171,8 @@ public class Compose extends Frame {
 	}
 
 	private void send() throws MessagingException {
+		final SimpleClient client = getClient();
+		final Session session = client.getSession();
 		final String mailhost = client.getMailhost();
 		final String from = client.getFrom();
 		final String to = toField.getText();

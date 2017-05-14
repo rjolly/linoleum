@@ -14,14 +14,13 @@ import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 
-public class MessageViewer extends javax.swing.JPanel implements Viewer {
+public class MessageViewer extends Panel implements Viewer {
 	private final Icon deleteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Delete16.gif"));
 	private final Action replyAction = new ReplyAction();
 	private final Action replyToAllAction = new ReplyToAllAction();
 	private final Action forwardAction = new ForwardAction();
 	private final Action deleteAction = new DeleteAction();
 	private final Action structureAction = new StructureAction();
-	private final SimpleClient client = SimpleClient.instance;
 	private Message displayed;
 	private Component mainbody;
 
@@ -79,7 +78,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 			@Override
 			public void done() {
 				try {
-					client.compose(get());
+					getClient().compose(get());
 				} catch (final Exception e) {
 					e.printStackTrace();
 				}
@@ -147,7 +146,7 @@ public class MessageViewer extends javax.swing.JPanel implements Viewer {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			try {
-				client.getFolderViewer().getModel().delete(displayed);
+				getClient().getFolderViewer().getModel().delete(displayed);
 			} catch (final MessagingException me) {
 				me.printStackTrace();
 			}
