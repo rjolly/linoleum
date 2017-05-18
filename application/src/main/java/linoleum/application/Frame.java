@@ -299,13 +299,18 @@ public class Frame extends JInternalFrame implements App {
 		return getName();
 	}
 
+	private Object getDesktopProperty(final Object key) {
+		final JDesktopPane desktop = getDesktopPane();
+		return desktop == null?null:desktop.getClientProperty(key);
+	}
+
 	private boolean isRecording() {
-		final Object obj = getDesktopPane().getClientProperty("DesktopPane.recording");
+		final Object obj = getDesktopProperty("DesktopPane.recording");
 		return obj instanceof Boolean?(Boolean) obj:false;
 	}
 
 	private boolean isReopen() {
-		final Object obj = getDesktopPane().getClientProperty("DesktopPane.reopen");
+		final Object obj = getDesktopProperty("DesktopPane.reopen");
 		return obj instanceof Boolean?(Boolean) obj:false;
 	}
 
