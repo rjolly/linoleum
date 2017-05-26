@@ -29,11 +29,6 @@ public class OptionPanel extends JPanel {
 		initComponents();
 	}
 
-	@Override
-	public String getName() {
-		return frame == null?super.getName():frame.getName();
-	}
-
 	public void setFrame(final Frame frame) {
 		this.frame = frame;
 	}

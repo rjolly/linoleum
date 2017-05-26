@@ -217,6 +217,7 @@ public class ApplicationManager extends Frame {
 		final OptionPanel panel = frame.getOptionPanel();
 		if (panel != null) {
 			panel.setFrame(frame);
+			panel.setName(frame.getName());
 			options.add(panel);
 		}
 		frame.setApplicationManager(this);
