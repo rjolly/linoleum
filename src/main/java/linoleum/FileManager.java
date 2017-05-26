@@ -27,6 +27,7 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -218,7 +219,7 @@ public class FileManager extends Frame implements Runnable {
 						if (Files.isDirectory(entry)) {
 							copy(entry, target);
 						} else {
-							Files.copy(entry, target);
+							Files.copy(entry, target, StandardCopyOption.COPY_ATTRIBUTES);
 						}
 						break;
 					case MOVE:
@@ -226,7 +227,7 @@ public class FileManager extends Frame implements Runnable {
 							copy(entry, target);
 							delete(entry);
 						} else {
-							Files.move(entry, target);
+							Files.move(entry, target, StandardCopyOption.ATOMIC_MOVE);
 						}
 						break;
 					case LINK:
@@ -608,7 +609,7 @@ public class FileManager extends Frame implements Runnable {
 
 			@Override
 			public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-				Files.copy(file, target.resolve(source.relativize(file).toString()));
+				Files.copy(file, target.resolve(source.relativize(file).toString()), StandardCopyOption.COPY_ATTRIBUTES);
 				return FileVisitResult.CONTINUE;
 			}
 		});
