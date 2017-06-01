@@ -342,7 +342,7 @@ public class FileManager extends Frame implements Runnable {
 	}
 
 	private ActionEvent createActionEvent() {
-		return new ActionEvent(jList1, ActionEvent.ACTION_PERFORMED, null);
+		return new ActionEvent(showDetails?jTable1:jList1, ActionEvent.ACTION_PERFORMED, null);
 	}
 
 	private class CutAction extends AbstractAction {
