@@ -63,12 +63,21 @@ public class SimpleClient extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			try {
-				folder.expunge();
-				folderViewer.setFolder(folder);
-			} catch (final MessagingException me) {
-				me.printStackTrace();
-			}
+			(new SwingWorker<Object, Object>() {
+				public Object doInBackground() throws MessagingException  {
+					folder.expunge();
+					return null;
+				}
+
+				public void done() {
+					try {
+						get();
+						folderViewer.setFolder(folder);
+					} catch (final Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}).execute();
 		}
 	}
 

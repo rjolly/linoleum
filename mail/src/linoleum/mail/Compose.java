@@ -29,6 +29,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 import linoleum.application.FileChooser;
 import linoleum.application.Frame;
@@ -76,12 +77,21 @@ public class Compose extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent evt) {
-			try {
-				send();
-				doDefaultCloseAction();
-			} catch (final MessagingException me) {
-				me.printStackTrace();
-			}
+			(new SwingWorker<Object, Object>() {
+				public Object doInBackground() throws MessagingException  {
+					send();
+					return null;
+				}
+
+				public void done() {
+					try {
+						get();
+						doDefaultCloseAction();
+					} catch (final Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}).execute();
 		}
 	}
 
