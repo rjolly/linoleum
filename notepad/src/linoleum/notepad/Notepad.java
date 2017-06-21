@@ -91,9 +91,6 @@ public class Notepad extends JPanel {
 		editor = new Editor();
 		editor.addCaretListener(caretListener);
 
-		// Add this as a listener for undoable edits.
-		editor.getDocument().addUndoableEditListener(undoHandler);
-
 		// install the command table
 		final ActionMap commands = editor.getActionMap();
 		for (final Action a : defaultActions) {
@@ -118,7 +115,6 @@ public class Notepad extends JPanel {
 		panel.add("Center", scroller);
 		add("Center", panel);
 		add("South", createStatusbar());
-		update();
 	}
 
 	@Override
