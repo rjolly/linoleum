@@ -304,7 +304,7 @@ public class Frame extends JInternalFrame implements App {
 		return desktop == null?null:desktop.getClientProperty(key);
 	}
 
-	private boolean isRecording() {
+	protected boolean isRecording() {
 		final Object obj = getDesktopProperty("DesktopPane.recording");
 		return obj instanceof Boolean?(Boolean) obj:false;
 	}
