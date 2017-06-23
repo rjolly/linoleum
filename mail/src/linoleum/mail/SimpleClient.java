@@ -7,7 +7,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
@@ -22,6 +21,7 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -325,11 +325,38 @@ public class SimpleClient extends Frame {
                 setResizable(true);
                 setTitle("Simple JavaMail Client");
                 setName("Mail");
+                addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
+                        public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+                                formInternalFrameOpened(evt);
+                        }
+                });
 
                 jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
                 jSplitPane1.setResizeWeight(0.3);
+                jSplitPane1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+                        public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                                jSplitPane1PropertyChange(evt);
+                        }
+                });
 
                 jSplitPane2.setResizeWeight(0.5);
+                jSplitPane2.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+                        public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                                jSplitPane2PropertyChange(evt);
+                        }
+                });
 
                 jTree1.setModel(model);
                 jTree1.addTreeWillExpandListener(new javax.swing.event.TreeWillExpandListener() {
@@ -459,6 +486,23 @@ public class SimpleClient extends Frame {
         private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
 		optionPanel1.setDirty(true);
         }//GEN-LAST:event_jCheckBox1ActionPerformed
+
+        private void jSplitPane1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jSplitPane1PropertyChange
+		if (isShowing() && !isMaximum() && isRecording() && JSplitPane.DIVIDER_LOCATION_PROPERTY.equals(evt.getPropertyName())) {
+			prefs.putInt(getKey("horizontalDividerLocation"), jSplitPane1.getDividerLocation());
+		}
+        }//GEN-LAST:event_jSplitPane1PropertyChange
+
+        private void jSplitPane2PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jSplitPane2PropertyChange
+		if (isShowing() && !isMaximum() && isRecording() && JSplitPane.DIVIDER_LOCATION_PROPERTY.equals(evt.getPropertyName())) {
+			prefs.putInt(getKey("verticalDividerLocation"), jSplitPane2.getDividerLocation());
+		}
+        }//GEN-LAST:event_jSplitPane2PropertyChange
+
+        private void formInternalFrameOpened(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameOpened
+		jSplitPane1.setDividerLocation(prefs.getInt(getKey("horizontalDividerLocation"), jSplitPane1.getDividerLocation()));
+		jSplitPane2.setDividerLocation(prefs.getInt(getKey("verticalDividerLocation"), jSplitPane2.getDividerLocation()));
+        }//GEN-LAST:event_formInternalFrameOpened
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JCheckBox jCheckBox1;
