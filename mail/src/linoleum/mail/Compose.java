@@ -242,7 +242,9 @@ public class Compose extends Frame {
 		}
 		msg.setHeader("X-Mailer", client.getName());
 		msg.setSentDate(new Date());
-		Transport.send(msg);
+		final Transport t = session.getTransport();
+		t.connect();
+		t.sendMessage(msg, msg.getAllRecipients());
 		System.out.println("Mail was sent successfully.");
 
 		if (!url.isEmpty() && !record.isEmpty()) {
