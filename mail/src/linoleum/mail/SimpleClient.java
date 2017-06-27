@@ -143,6 +143,10 @@ public class SimpleClient extends Frame {
 		return prefs.get(getKey("record"), "");
 	}
 
+	public String getTransport() {
+		return prefs.get(getKey("transport"), "");
+	}
+
 	void compose(final String str) throws URISyntaxException {
 		getApplicationManager().open(new URI("mailto", str, null));
 	}
@@ -162,7 +166,7 @@ public class SimpleClient extends Frame {
 	@Override
 	public void load() {
 		jTextField1.setText(prefs.get(getKey("url"), ""));
-		jTextField2.setText(prefs.get(getKey("mailhost"), ""));
+		jTextField2.setText(prefs.get(getKey("transport"), ""));
 		jTextField3.setText(prefs.get(getKey("from"), ""));
 		jTextField4.setText(prefs.get(getKey("record"), "Sent"));
 		jCheckBox1.setSelected(prefs.getBoolean(getKey("debug"), false));
@@ -171,7 +175,7 @@ public class SimpleClient extends Frame {
 	@Override
 	public void save() {
 		prefs.put(getKey("url"), jTextField1.getText());
-		prefs.put(getKey("mailhost"), jTextField2.getText());
+		prefs.put(getKey("transport"), jTextField2.getText());
 		prefs.put(getKey("from"), jTextField3.getText());
 		prefs.put(getKey("record"), jTextField4.getText());
 		prefs.putBoolean(getKey("debug"), jCheckBox1.isSelected());
@@ -265,7 +269,7 @@ public class SimpleClient extends Frame {
 
                 jLabel1.setText("URL :");
 
-                jLabel2.setText("Mailhost :");
+                jLabel2.setText("Transport :");
 
                 jLabel3.setText("From :");
 

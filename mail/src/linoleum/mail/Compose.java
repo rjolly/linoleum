@@ -193,6 +193,7 @@ public class Compose extends Frame {
 		final String text = content.getText();
 		final String url = client.getURL();
 		final String record = client.getRecord();
+		final String transport = client.getTransport();
 
 		if (!mailhost.isEmpty()) {
 			session.getProperties().put("mail.smtp.host", mailhost);
@@ -242,7 +243,7 @@ public class Compose extends Frame {
 		}
 		msg.setHeader("X-Mailer", client.getName());
 		msg.setSentDate(new Date());
-		final Transport t = session.getTransport();
+		final Transport t = transport.isEmpty()?session.getTransport():session.getTransport(new URLName(transport));
 		t.connect();
 		t.sendMessage(msg, msg.getAllRecipients());
 		System.out.println("Mail was sent successfully.");
