@@ -183,7 +183,6 @@ public class Compose extends Frame {
 	private void send() throws MessagingException {
 		final SimpleClient client = getClient();
 		final Session session = client.getSession();
-		final String mailhost = client.getMailhost();
 		final String from = client.getFrom();
 		final String to = toField.getText();
 		final String cc = ccField.getText();
@@ -194,10 +193,6 @@ public class Compose extends Frame {
 		final String url = client.getURL();
 		final String record = client.getRecord();
 		final String transport = client.getTransport();
-
-		if (!mailhost.isEmpty()) {
-			session.getProperties().put("mail.smtp.host", mailhost);
-		}
 		final Message msg = new MimeMessage(session);
 		if (!from.isEmpty()) {
 			msg.setFrom(new InternetAddress(from));

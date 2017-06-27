@@ -127,10 +127,6 @@ public class SimpleClient extends Frame {
 		return prefs.getBoolean(getKey("debug"), false);
 	}
 
-	public String getMailhost() {
-		return prefs.get(getKey("mailhost"), "");
-	}
-
 	public String getFrom() {
 		return prefs.get(getKey("from"), "");
 	}
