@@ -227,7 +227,7 @@ public class Browser extends Frame {
 			final URLConnection conn = uri.toURL().openConnection();
 			final String str = conn.getContentType();
 			conn.getInputStream().close();
-			return canOpen(new MimeType(str));
+			return str == null || canOpen(new MimeType(str));
 		} catch (final IOException | MimeTypeParseException ex) {
 			ex.printStackTrace();
 		}

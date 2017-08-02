@@ -10,7 +10,6 @@ import javax.security.auth.callback.CallbackHandler;
 import org.apache.commons.codec.binary.Base64;
 
 public class Basic {
-
 	public String auth(final Component comp) throws IOException {
 		final CallbackHandler handler = new DialogCallbackHandler(comp);
 		final NameCallback name = new NameCallback("Name:");
