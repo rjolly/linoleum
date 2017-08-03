@@ -13,7 +13,7 @@ import linoleum.application.Frame;
 
 public class Console extends Frame {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
-	private final ConsolePanel panel = new ConsolePanel(prefs.getBoolean(getKey("visible"), false));
+	private final ConsolePanel panel = new ConsolePanel(visible());
 	private final DefaultComboBoxModel<Level> model = new DefaultComboBoxModel<>();
 	private final Logger logger = Logger.getLogger("");
 
@@ -21,16 +21,16 @@ public class Console extends Frame {
 		initComponents();
 		setContentPane(panel);
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
+		model.addElement(Level.FINEST);
+		model.addElement(Level.FINER);
+		model.addElement(Level.FINE);
 		model.addElement(Level.CONFIG);
 		model.addElement(Level.INFO);
 		model.addElement(Level.WARNING);
 		model.addElement(Level.SEVERE);
 		final Handler[] handlers = logger.getHandlers();
 		if (handlers.length > 0) {
-			final Handler handler = handlers[0];
-			if (handler.getLevel().intValue() > Level.CONFIG.intValue()) {
-				handler.setLevel(Level.CONFIG);
-			}
+			handlers[0].setLevel(visible()?Level.CONFIG:Level.ALL);
 		}
 	}
 
@@ -54,13 +54,13 @@ public class Console extends Frame {
 
 	private void refresh() {
 		logger.setLevel(getLevel());
-		setVisible(prefs.getBoolean(getKey("visible"), false));
+		setVisible(visible());
 	}
 
 	@Override
 	public void load() {
 		model.setSelectedItem(getLevel());
-		jCheckBox1.setSelected(prefs.getBoolean(getKey("visible"), false));
+		jCheckBox1.setSelected(visible());
 	}
 
 	@Override
@@ -71,6 +71,10 @@ public class Console extends Frame {
 
 	private Level getLevel() {
 		return Level.parse(prefs.get(getKey("level"), Level.INFO.toString()));
+	}
+
+	private boolean visible() {
+		return prefs.getBoolean(getKey("visible"), false);
 	}
 
 	@SuppressWarnings("unchecked")

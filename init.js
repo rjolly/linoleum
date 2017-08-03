@@ -289,14 +289,16 @@ function log(str) {
     Level = java.util.logging.Level;
     Logger = java.util.logging.Logger;
     var root = Logger.getLogger("");
-    var handlers = root.getHandlers();
-    if (handlers.length > 0) {
-	var handler = handlers[0];
-	if (handler.getLevel() > Level.CONFIG) {
-	    handler.setLevel(Level.CONFIG);
-	}
-    }
     switch (str) {
+    case "finest":
+	root.setLevel(Level.FINEST);
+	break;
+    case "finer":
+	root.setLevel(Level.FINER);
+	break;
+    case "fine":
+	root.setLevel(Level.FINE);
+	break;
     case "config":
 	root.setLevel(Level.CONFIG);
 	break;
