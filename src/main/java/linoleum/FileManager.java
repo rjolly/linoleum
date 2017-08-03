@@ -223,12 +223,7 @@ public class FileManager extends Frame implements Runnable {
 						}
 						break;
 					case MOVE:
-						if (Files.isDirectory(entry)) {
-							copy(entry, target);
-							delete(entry);
-						} else {
-							Files.move(entry, target, StandardCopyOption.ATOMIC_MOVE);
-						}
+						Files.move(entry, target, StandardCopyOption.ATOMIC_MOVE);
 						break;
 					case LINK:
 						Files.createSymbolicLink(target, entry.isAbsolute()?entry:recipient.isAbsolute()?entry.toAbsolutePath():recipient.relativize(entry));
