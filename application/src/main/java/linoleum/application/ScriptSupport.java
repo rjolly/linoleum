@@ -1,5 +1,7 @@
 package linoleum.application;
 
+import java.util.Map;
+import java.util.HashMap;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
@@ -12,6 +14,8 @@ import linoleum.application.event.ClassPathChangeEvent;
 
 public class ScriptSupport extends Frame {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
+	private final Map<String, ScriptEngineFactory> factories = new HashMap<>();
+	private final Map<String, ScriptEngineFactory> factoriesByName = new HashMap<>();
 	private final DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
 	private	ScriptEngineFactory factory;
 	private ScriptEngineManager manager;
@@ -44,9 +48,16 @@ public class ScriptSupport extends Frame {
 	}
 
 	private void refresh() {
+		factories.clear();
+		factoriesByName.clear();
 		model.removeAllElements();
 		manager = new ScriptEngineManager();
 		for (final ScriptEngineFactory sef : manager.getEngineFactories()) {
+			if (!factories.containsKey("")) {
+				factories.put("", sef);
+			}
+			factories.put(sef.getNames().get(0), sef);
+			factoriesByName.put(sef.getEngineName(), sef);
 			model.addElement(sef.getEngineName());
 		}
 		reload();
@@ -54,23 +65,22 @@ public class ScriptSupport extends Frame {
 
 	private void reload() {
 		final String language = prefs.get(getKey("language"), "");
-		for (final ScriptEngineFactory sef : manager.getEngineFactories()) {
-			if (factory == null || language.equals(sef.getEngineName())) {
-				factory = sef;
-			}
-		}
-		if (factory == null) {
+		if ((factory = getFactory(language)) == null) {
 			throw new RuntimeException("cannot load " + language + " factory");
 		}
 	}
 
+	private ScriptEngineFactory getFactory(final String language) {
+		return factories.get(factories.containsKey(language) ? language : "");
+	}
+
 	@Override
 	public void load() {
-		model.setSelectedItem(prefs.get(getKey("language"), ""));
+		model.setSelectedItem(getFactory(prefs.get(getKey("language"), "")).getEngineName());
 	}
 
 	@Override
 	public void save() {
-		prefs.put(getKey("language"), (String) model.getSelectedItem());
+		prefs.put(getKey("language"), factoriesByName.get(model.getSelectedItem()).getNames().get(0));
 	}
 }
