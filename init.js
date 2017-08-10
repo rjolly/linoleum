@@ -344,6 +344,12 @@ function git() {
     return Packages.org.eclipse.jgit.api.Git.open(pathToFile(".git"));
 }
 
-function clone(uri) {
-    return Packages.org.eclipse.jgit.api.Git.cloneRepository().setDirectory(curDir).setURI(uri).call();
+function clone(str, dir) {
+    var uri = new java.net.URI(str);
+    if (dir == undefined) {
+	var name = new File(uri.getPath()).getName();
+	var n = name.lastIndexOf(".git");
+	dir = n < 0 ? name : name.substring(0, n);
+    }
+    return Packages.org.eclipse.jgit.api.Git.cloneRepository().setDirectory(pathToFile(dir)).setURI(uri.toString()).call();
 }
