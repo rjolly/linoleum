@@ -1,6 +1,5 @@
 package linoleum.html;
 
-import java.net.URL;
 import javax.swing.SwingWorker;
 
 public abstract class PageLoader extends SwingWorker<Boolean, Object> {

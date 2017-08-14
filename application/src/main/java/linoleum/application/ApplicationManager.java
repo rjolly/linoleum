@@ -137,8 +137,6 @@ public class ApplicationManager extends Frame {
 		initComponents();
 		tableModel = (DefaultTableModel) jTable1.getModel();
 		schemeTableModel = (DefaultTableModel) jTable2.getModel();
-		pref.putAll(getPreferred());
-		prefByScheme.putAll(getPreferredByScheme());
 		final List<App> s = new ArrayList<>(apps);
 		apps.clear();
 		this.apps = apps;
@@ -416,11 +414,11 @@ public class ApplicationManager extends Frame {
 
 	@Override
 	public void open() {
-		(new SwingWorker<Object, Object>() {
+		(new SwingWorker<Boolean, Object>() {
 			@Override
-			public Object doInBackground() {
+			public Boolean doInBackground() {
 				doOpen();
-				return null;
+				return true;
 			}
 
 			@Override
@@ -432,6 +430,8 @@ public class ApplicationManager extends Frame {
 				} catch (final ExecutionException ex) {
 					ex.printStackTrace();
 				}
+				pref.putAll(getPreferred());
+				prefByScheme.putAll(getPreferredByScheme());
 			}
 		}).execute();
 	}

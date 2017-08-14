@@ -137,9 +137,13 @@ public class Notepad extends JPanel {
 			if (name != null) {
 				a.putValue(Action.NAME, name);
 			}
-			final URL url = getResource(cmd + imageSuffix);
+			final URL url = getSmallResource(cmd + imageSuffix);
 			if (url != null) {
 				a.putValue(Action.SMALL_ICON, new ImageIcon(url));
+			}
+			final URL lurl = getResource(cmd + imageSuffix);
+			if (lurl != null) {
+				a.putValue(Action.LARGE_ICON_KEY, new ImageIcon(lurl));
 			}
 			final String tip = getResourceString(cmd + tipSuffix);
 			if (tip != null) {
@@ -171,6 +175,14 @@ public class Notepad extends JPanel {
 		String name = getResourceString(key);
 		if (name != null) {
 			return getClass().getResource(name);
+		}
+		return null;
+	}
+
+	private URL getSmallResource(String key) {
+		String name = getResourceString(key);
+		if (name != null) {
+			return getClass().getResource(name.replace("24", "16"));
 		}
 		return null;
 	}
@@ -282,11 +294,10 @@ public class Notepad extends JPanel {
 				final int pos = editor.getCaretPosition();
 				final int line = editor.getLineOfOffset(pos);
 				final int column = pos - editor.getLineStartOffset(line);
-				label.setText((line + 1) + "," + column);
+				label.setText((line + 1) + "," + (column + 1));
 			} catch (final BadLocationException ex) {
 				ex.printStackTrace();
 			}
-
 		}
 	};
 
