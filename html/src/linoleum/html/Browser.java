@@ -21,6 +21,7 @@ import java.nio.file.FileSystemNotFoundException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
@@ -127,25 +128,27 @@ public class Browser extends Frame {
 	}
 
 	private void open(final String str) {
-		if (!reload) try {
-			setURI(new URI(str));
-		} catch (final URISyntaxException ex) {
-			ex.printStackTrace();
+		if (!reload) {
+			setURI(str);
 		}
-		open();
+		doOpen();
 	}
 
 	@Override
 	public void load() {
-		jTextField2.setText(prefs.get(getKey("home"), ""));
+		jTextField2.setText(getHome());
 		jComboBox1.setSelectedItem(getFontSize());
 	}
 
-	final int getFontSize() {
+	private String getHome() {
+		return prefs.get(getKey("home"), "");
+	}
+
+	private int getFontSize() {
 		return prefs.getInt(getKey("fontSize"), jEditorPane1.getFont().getSize());
 	}
 
-	final void resize() {
+	private void resize() {
 		jEditorPane1.setFont(jEditorPane1.getFont().deriveFont((float) getFontSize()));
 	}
 
@@ -179,19 +182,33 @@ public class Browser extends Frame {
 		return null;
 	}
 
+	private void setURI(final String str) {
+		if (!str.isEmpty()) try {
+			setURI(new URI(str));
+		} catch (final URISyntaxException ex) {
+			ex.printStackTrace();
+		}
+	}
+
 	@Override
 	public void open() {
 		prefs.addPreferenceChangeListener(listener);
 		if (current == null) {
-			final String str = prefs.get(getName() + ".home", "");
-			if (!str.isEmpty()) try {
-				setURI(new URI(str));
-			} catch (final URISyntaxException ex) {
-				ex.printStackTrace();
-			}
+			setURI(getHome());
 		}
-		if (current != null) {
-			open(current, 1, reload);
+		doOpen();
+	}
+
+	private void doOpen() {
+		if (current != null) try {
+			final URI uri = current.getURL().toURI();
+			if (canOpen(stripped(uri))) {
+				open(current, 1, reload);
+			} else {
+				getApplicationManager().open(uri);
+			}
+		} catch (final URISyntaxException ex) {
+			ex.printStackTrace();
 		}
 	}
 
@@ -219,6 +236,9 @@ public class Browser extends Frame {
 	}
 
 	private boolean canOpen(final URI uri) {
+		if (uri.isOpaque() && "file".equals(uri.getScheme())) {
+			return canOpen(Paths.get(uri.getSchemeSpecificPart()));
+		}
 		try {
 			return canOpen(Paths.get(uri));
 		} catch (final FileSystemNotFoundException ex) {
@@ -244,19 +264,13 @@ public class Browser extends Frame {
 		}
 		if (loader == null) {
 			loader = new PageLoader(url, delta, force);
-			loader.addPropertyChangeListener(new PropertyChangeListener() {
-				public  void propertyChange(final PropertyChangeEvent evt) {
-					if ("progress".equals(evt.getPropertyName())) {
-						jProgressBar1.setValue((Integer) evt.getNewValue());
-					}
-				}
-			});
 			loader.execute();
 		}
 	}
 
 	private class PageLoader extends linoleum.html.PageLoader {
-		private final CardLayout layout = (CardLayout)jPanel2.getLayout();
+		private final CardLayout layout = (CardLayout) jPanel2.getLayout();
+		private final Cursor waitCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 		private final Cursor cursor = jEditorPane1.getCursor();
 		private final FrameURL dest;
 		private final boolean force;
@@ -266,9 +280,16 @@ public class Browser extends Frame {
 			this.dest = dest;
 			this.delta = delta;
 			this.force = force;
+			addPropertyChangeListener(new PropertyChangeListener() {
+				public  void propertyChange(final PropertyChangeEvent evt) {
+					if ("progress".equals(evt.getPropertyName())) {
+						jProgressBar1.setValue((Integer) evt.getNewValue());
+					}
+				}
+			});
 			jButton1.setIcon(stopIcon);
 			layout.show(jPanel2, "progressBar");
-			jEditorPane1.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			jEditorPane1.setCursor(waitCursor);
 		}
 
 		public Boolean doInBackground() throws IOException {
@@ -287,7 +308,9 @@ public class Browser extends Frame {
 					current = dest;
 					reload = true;
 				}
-			} catch (final Exception e) {
+			} catch (final InterruptedException e) {
+				e.printStackTrace();
+			} catch (final ExecutionException e) {
 				e.printStackTrace();
 			}
 			// restore the original cursor
@@ -549,6 +572,7 @@ public class Browser extends Frame {
 				jLabel1.setText(url.toString());
 			}
 		} else if (evt.getEventType() == HyperlinkEvent.EventType.EXITED) {
+			((JEditorPane) evt.getSource()).setComponentPopupMenu(null);
 			url = null;
 			jLabel1.setText("");
 		}

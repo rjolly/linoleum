@@ -574,6 +574,7 @@ public class Notepad extends JPanel {
 	abstract class FileWorker extends SwingWorker<Document, Object> {
 		final CardLayout layout = (CardLayout) status.getLayout();
 		final Document doc = editor.getReplaceDocument();
+		final Cursor waitCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 		final Cursor cursor = editor.getCursor();
 		final int length;
 
@@ -587,7 +588,7 @@ public class Notepad extends JPanel {
 				}
 			});
 			layout.show(status, "progress");
-			editor.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			editor.setCursor(waitCursor);
 		}
 
 		void setNumber(final int n) {
