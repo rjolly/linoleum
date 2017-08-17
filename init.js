@@ -287,8 +287,7 @@ function quit(code) {
 
 function log(str) {
     Level = java.util.logging.Level;
-    Logger = java.util.logging.Logger;
-    var root = Logger.getLogger("");
+    var root = java.util.logging.Logger.getLogger("");
     switch (str) {
     case "finest":
 	root.setLevel(Level.FINEST);
@@ -312,6 +311,14 @@ function log(str) {
 	root.setLevel(Level.SEVERE);
 	break;
     }
+}
+
+function gc() {
+    java.lang.System.gc();
+}
+
+function version() {
+    return java.lang.System.getProperty("java.version");	
 }
 
 // requires commons-io#commons-io;2.4
