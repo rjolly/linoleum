@@ -13,10 +13,11 @@ import java.util.concurrent.CountDownLatch;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
 import linoleum.application.Frame;
 import linoleum.application.ScriptSupport;
 
-public class ScriptShell extends ScriptSupport implements ScriptShellPanel.CommandProcessor {
+public class ScriptShell extends ScriptSupport implements ScriptShellPanel.CommandProcessor, Runnable {
 	private final CountDownLatch engineReady = new CountDownLatch(1);
 	private volatile ScriptEngine engine;
 	private volatile String prompt;
@@ -34,22 +35,20 @@ public class ScriptShell extends ScriptSupport implements ScriptShellPanel.Comma
 	}
 
 	@Override
-	public ScriptShell getOwner() {
-		return (ScriptShell) super.getOwner();
+	public void open() {
+		new Thread(this).start();
 	}
 
-	@Override
-	public void open() {
+	public void run() {
 		createScriptEngine();
-		setTitle(engine.getFactory().getLanguageName());
-		setContentPane(panel = new ScriptShellPanel(this));
-		(new Thread() {
-			@Override
+		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				initScriptEngine();
-				engineReady.countDown();
+				setTitle(engine.getFactory().getLanguageName());
+				setContentPane(panel = new ScriptShellPanel(ScriptShell.this));
 			}
-		}).start();
+		});
+		initScriptEngine();
+		engineReady.countDown();
 	}
 
 	@Override
@@ -153,7 +152,7 @@ public class ScriptShell extends ScriptSupport implements ScriptShellPanel.Comma
 
 	// create script engine
 	private void createScriptEngine() {
-		engine = getOwner().getFactory().getScriptEngine();
+		engine = getEngine();
 		extension = engine.getFactory().getExtensions().get(0);
 		prompt = extension + ">";
 	}

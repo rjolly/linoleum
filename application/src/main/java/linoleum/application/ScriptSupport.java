@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
+import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.swing.ComboBoxModel;
@@ -17,11 +18,17 @@ public class ScriptSupport extends Frame {
 	private final Map<String, ScriptEngineFactory> factories = new HashMap<>();
 	private final Map<String, ScriptEngineFactory> factoriesByName = new HashMap<>();
 	private final DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+	private ScriptEngine engine;
 	private	ScriptEngineFactory factory;
 	private ScriptEngineManager manager;
 
-	public ScriptEngineFactory getFactory() {
-		return factory;
+	@Override
+	public ScriptSupport getOwner() {
+		return (ScriptSupport) super.getOwner();
+	}
+
+	public ScriptEngine getEngine() {
+		return engine == null?engine = getOwner().factory.getScriptEngine():engine;
 	}
 
 	public ComboBoxModel<String> getModel() {
