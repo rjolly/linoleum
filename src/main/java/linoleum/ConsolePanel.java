@@ -22,7 +22,7 @@ public class ConsolePanel extends JPanel {
 		}
 
 		setLayout(new BorderLayout());
-		this.editor = new JTextArea();
+		editor = new JTextArea();
 		editor.setFont(new Font("monospaced", Font.PLAIN, 12));
 		editor.setDocument(new EditableAtEndDocument());
 		editor.setLineWrap(true);
@@ -41,27 +41,18 @@ public class ConsolePanel extends JPanel {
 				beginUpdate();
 				editor.setCaretPosition(editor.getDocument().getLength());
 				if (insertContains(e, '\n')) {
-					String cmd = getMarkedText();
+					final String cmd = getMarkedText();
 					// Handle multi-line input
 					if ((cmd.length() == 0) ||
 						(cmd.charAt(cmd.length() - 1) != '\\')) {
 						// Trim "\\n" combinations
 						final String cmd1 = trimContinuations(cmd);
-						SwingUtilities.invokeLater(new Runnable() {
-							@Override
-							public void run() {
-								out.print(cmd1 + "\n");
-								out.flush();
-								setMark();
-								endUpdate();
-							}
-						});
-					} else {
-						endUpdate();
+						out.print(cmd1 + "\n");
+						out.flush();
+						setMark();
 					}
-				} else {
-					endUpdate();
 				}
+				endUpdate();
 			}
 
 			@Override
@@ -105,19 +96,19 @@ public class ConsolePanel extends JPanel {
 	}
 
 	public void clear() {
-		EditableAtEndDocument d = (EditableAtEndDocument)editor.getDocument();
+		EditableAtEndDocument d = (EditableAtEndDocument) editor.getDocument();
 		d.clear();
 		setMark();
 		editor.requestFocus();
 	}
 
 	public void setMark() {
-		((EditableAtEndDocument)editor.getDocument()).setMark();
+		((EditableAtEndDocument) editor.getDocument()).setMark();
 	}
 
 	public String getMarkedText() {
 		try {
-			String s = ((EditableAtEndDocument)editor.getDocument()).getMarkedText();
+			String s = ((EditableAtEndDocument) editor.getDocument()).getMarkedText();
 			int i = s.length();
 			while ((i > 0) && (s.charAt(i - 1) == '\n')) {
 				i--;
