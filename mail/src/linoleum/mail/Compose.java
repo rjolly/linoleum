@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -36,6 +37,7 @@ import linoleum.application.Frame;
 
 public class Compose extends Frame {
 	private final Icon sendIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/SendMail16.gif"));
+	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final Action attachAction = new AttachAction();
 	private final Action sendAction = new SendAction();
 	private JTextField toField;
@@ -46,7 +48,7 @@ public class Compose extends Frame {
 	private JTextArea content;
 	private String inReplyTo[];
 	private String references[];
-	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
+	private SimpleClient client;
 	private File file;
 
 	private class AttachAction extends AbstractAction {
@@ -56,7 +58,7 @@ public class Compose extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent evt) {
-			final FileChooser chooser = getClient().getFileChooser();
+			final FileChooser chooser = getOwner().client.getFileChooser();
 			chooser.setSelectedFile(new File(""));
 			final int returnVal = chooser.showInternalOpenDialog(Compose.this);
 			switch (returnVal) {
@@ -77,17 +79,19 @@ public class Compose extends Frame {
 
 		@Override
 		public void actionPerformed(final ActionEvent evt) {
-			(new SwingWorker<Object, Object>() {
-				public Object doInBackground() throws MessagingException  {
+			(new SwingWorker<Boolean, Object>() {
+				public Boolean doInBackground() throws MessagingException  {
 					send();
-					return null;
+					return true;
 				}
 
 				public void done() {
 					try {
 						get();
 						doDefaultCloseAction();
-					} catch (final Exception e) {
+					} catch (final InterruptedException e) {
+						e.printStackTrace();
+					} catch (final ExecutionException e) {
 						e.printStackTrace();
 					}
 				}
@@ -128,6 +132,16 @@ public class Compose extends Frame {
 	}
 
 	@Override
+	public Compose getOwner() {
+		return (Compose) super.getOwner();
+	}
+
+	@Override
+	public void init() {
+		client = getApplicationManager().get(SimpleClient.class);
+	}
+
+	@Override
 	public void open() {
 		final URI uri = getURI();
 		if (uri != null) {
@@ -163,11 +177,7 @@ public class Compose extends Frame {
 			}
 		}
 		setTitle("Untitled Message " + (getIndex() + 1));
-		setJMenuBar(getClient().getJMenuBar());
-	}
-
-	private SimpleClient getClient() {
-		return getApplicationManager().get(SimpleClient.class);
+		setJMenuBar(getOwner().client.getJMenuBar());
 	}
 
 	private JPanel buildButtonPanel() {
@@ -181,7 +191,7 @@ public class Compose extends Frame {
 	}
 
 	private void send() throws MessagingException {
-		final SimpleClient client = getClient();
+		final SimpleClient client = getOwner().client;
 		final Session session = client.getSession();
 		final String from = client.getFrom();
 		final String to = toField.getText();

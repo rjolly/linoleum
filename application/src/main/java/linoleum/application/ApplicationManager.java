@@ -121,13 +121,6 @@ public class ApplicationManager extends Frame {
 		}
 	}
 
-	public static ApplicationManager getInstance(final JDesktopPane desktop) {
-		for (final JInternalFrame c : desktop.getAllFrames()) if (c instanceof ApplicationManager) {
-			return (ApplicationManager) c;
-		}
-		return null;
-	}
-
 	public ApplicationManager() {
 		this(new ArrayList<App>());
 	}
