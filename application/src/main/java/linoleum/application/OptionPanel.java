@@ -1,6 +1,7 @@
 package linoleum.application;
 
 import java.awt.Component;
+import java.awt.Container;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -33,18 +34,30 @@ public class OptionPanel extends JPanel {
 		this.dirty = dirty;
 	}
 
-	public final void load() {
-		for (final Component comp : getComponents()) {
-			if (comp instanceof JTextComponent) {
-				((JTextComponent) comp).getDocument().removeDocumentListener(listener);
-			}
-		}
-		frame.load();
-		for (final Component comp : getComponents()) {
+	private void addDocumentListener(final Container cont) {
+		for (final Component comp : cont.getComponents()) {
 			if (comp instanceof JTextComponent) {
 				((JTextComponent) comp).getDocument().addDocumentListener(listener);
+			} else if (comp instanceof Container) {
+				addDocumentListener((Container) comp);
 			}
 		}
+	}
+
+	private void removeDocumentListener(final Container cont) {
+		for (final Component comp : cont.getComponents()) {
+			if (comp instanceof JTextComponent) {
+				((JTextComponent) comp).getDocument().removeDocumentListener(listener);
+			} else if (comp instanceof Container) {
+				removeDocumentListener((Container) comp);
+			}
+		}
+	}
+
+	public final void load() {
+		removeDocumentListener(this);
+		frame.load();
+		addDocumentListener(this);
 		dirty = false;
 	}
 
