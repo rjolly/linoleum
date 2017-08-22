@@ -31,12 +31,12 @@ public class ScriptSupport extends Frame {
 		return engine == null?engine = getOwner().factory.getScriptEngine():engine;
 	}
 
-	public ComboBoxModel<String> getModel() {
+	protected ComboBoxModel<String> getModel() {
 		return model;
 	}
 
 	@Override
-	public void init() {
+	protected void init() {
 		getApplicationManager().addClassPathListener(new ClassPathListener() {
 			@Override
 			public void classPathChanged(final ClassPathChangeEvent e) {
@@ -82,16 +82,16 @@ public class ScriptSupport extends Frame {
 	}
 
 	@Override
-	public void load() {
+	protected void load() {
 		model.setSelectedItem(getFactory(prefs.get(getKey("language"), "")).getEngineName());
 	}
 
 	@Override
-	public void save() {
+	protected void save() {
 		prefs.put(getKey("language"), getLanguageName());
 	}
 
-	public String getLanguageName() {
+	protected String getLanguageName() {
 		return factoriesByName.get(model.getSelectedItem()).getNames().get(0);
 	}
 }
