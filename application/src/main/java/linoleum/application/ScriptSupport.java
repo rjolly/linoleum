@@ -88,10 +88,11 @@ public class ScriptSupport extends Frame {
 
 	@Override
 	protected void save() {
-		prefs.put(getKey("language"), getLanguageName());
+		prefs.put(getKey("language"), getSelectedLanguage());
 	}
 
-	protected String getLanguageName() {
-		return factoriesByName.get(model.getSelectedItem()).getNames().get(0);
+	protected String getSelectedLanguage() {
+		final ScriptEngineFactory factory = factoriesByName.get(model.getSelectedItem());
+		return factory == null?null:factory.getNames().get(0);
 	}
 }
