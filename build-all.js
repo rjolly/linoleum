@@ -16,6 +16,6 @@ load("build.js")
 cd("..")
 load("build.js")
 
-var version = "1.4";
+var version = "1.5";
 install("net.java.linoleum#linoleum;" + version)
 rm(new File(new File("lib"), "linoleum-" + version + ".jar"))

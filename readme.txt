@@ -38,7 +38,7 @@ To build linoleum from itself, first install jgit, then clone the repository, ch
 
 To publish an application:
 
-- add net.java.linoleum#application;1.4 to your project's dependencies
+- add net.java.linoleum#application;1.5 to your project's dependencies
 - extend linoleum.application.Frame
 - make it available to the service loader in META-INF/services/javax.swing.JInternalFrame
 - publish your artifact in maven central
@@ -46,8 +46,8 @@ To publish an application:
 
 
 To use linoleum as your desktop environment in Linux:
-  wget http://raphael.jolly.free.fr/linoleum/linoleum-1.4.deb
-  sudo dpkg -i linoleum-1.4.deb
+  wget http://raphael.jolly.free.fr/linoleum/linoleum-1.5.deb
+  sudo dpkg -i linoleum-1.5.deb
 
 
 List of applications

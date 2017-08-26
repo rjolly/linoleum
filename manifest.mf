@@ -4,6 +4,6 @@ Implementation-Title: Linoleum
 Implementation-Version: 0
 Specification-Vendor: com.github.rjolly
 Specification-Title: linoleum
-Specification-Version: 1.4
+Specification-Version: 1.5
 Main-Class: linoleum.Desktop
-Class-Path: lib/application-1.4.jar lib/jlfgr-1_0.jar
+Class-Path: lib/application-1.5.jar lib/jlfgr-1_0.jar
