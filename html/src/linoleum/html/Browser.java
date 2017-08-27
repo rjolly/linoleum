@@ -207,7 +207,7 @@ public class Browser extends Frame {
 			} else {
 				getApplicationManager().open(uri);
 			}
-		} catch (final URISyntaxException ex) {
+		} catch (final URISyntaxException | IOException ex) {
 			ex.printStackTrace();
 		}
 	}
@@ -226,7 +226,7 @@ public class Browser extends Frame {
 			} else {
 				getApplicationManager().open(uri);
 			}
-		} catch (final URISyntaxException ex) {
+		} catch (final URISyntaxException | IOException ex) {
 			ex.printStackTrace();
 		}
 	}
@@ -235,7 +235,7 @@ public class Browser extends Frame {
 		return uri.isOpaque()?new URI(uri.getScheme(), uri.getSchemeSpecificPart(), null):new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null);
 	}
 
-	private boolean canOpen(final URI uri) {
+	private boolean canOpen(final URI uri) throws IOException {
 		if (uri.isOpaque() && "file".equals(uri.getScheme())) {
 			return canOpen(Paths.get(uri.getSchemeSpecificPart()));
 		}
@@ -248,7 +248,7 @@ public class Browser extends Frame {
 			final String str = conn.getContentType();
 			conn.getInputStream().close();
 			return str == null || canOpen(new MimeType(str));
-		} catch (final IOException | MimeTypeParseException ex) {
+		} catch (final MimeTypeParseException ex) {
 			ex.printStackTrace();
 		}
 		return false;
