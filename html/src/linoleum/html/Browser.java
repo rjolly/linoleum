@@ -62,9 +62,10 @@ public class Browser extends Frame {
 	private int index;
 	private URL url;
 	private static final String protocols[] = new String[] {"mvn", "imap", "imaps"};
+	private static URLStreamHandlerFactory factory;
 
 	static {
-		URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
+		if (factory == null) URL.setURLStreamHandlerFactory(factory = new URLStreamHandlerFactory() {
 			public URLStreamHandler createURLStreamHandler(final String protocol) {
 				return Arrays.asList(protocols).contains(protocol)?new URLStreamHandler() {
 					public URLConnection openConnection(final URL u) {
