@@ -201,15 +201,8 @@ public class Browser extends Frame {
 	}
 
 	private void doOpen() {
-		if (current != null) try {
-			final URI uri = current.getURL().toURI();
-			if (canOpen(stripped(uri))) {
-				open(current, 1, reload);
-			} else {
-				getApplicationManager().open(uri);
-			}
-		} catch (final URISyntaxException | IOException ex) {
-			ex.printStackTrace();
+		if (current != null) {
+			open(current, current.getURL(), reload);
 		}
 	}
 
@@ -220,10 +213,18 @@ public class Browser extends Frame {
 
 	private void linkActivated(final HyperlinkEvent evt) {
 		final URL url = evt.getURL();
-		if (url != null) try {
-			final URI uri = url.toURI();
-			if (canOpen(stripped(uri))) {
-				open(FrameURL.create(current, evt), 1, false);
+		if (url != null) {
+			open(FrameURL.create(current, evt), url, false);
+		}
+	}
+
+	private void open(final FrameURL dest, final URL url, final boolean force) {
+		try {
+			final URI uri = stripped(url.toURI());
+			if (canOpen(uri)) {
+				open(dest, 1, force);
+			} else if (canOpen(uri.getScheme())) {
+				getApplicationManager().get("Downloads").open(uri, getDesktopPane());
 			} else {
 				getApplicationManager().open(uri);
 			}
@@ -259,12 +260,12 @@ public class Browser extends Frame {
 		open(history.get(index + delta), delta, false);
 	}
 
-	private void open(final FrameURL url, final int delta, final boolean force) {
+	private void open(final FrameURL dest, final int delta, final boolean force) {
 		if (loader != null) {
 			loader.cancel(true);
 		}
 		if (loader == null) {
-			loader = new PageLoader(url, delta, force);
+			loader = new PageLoader(dest, delta, force);
 			loader.execute();
 		}
 	}
