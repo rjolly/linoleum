@@ -85,7 +85,7 @@ public class Frame extends JInternalFrame implements App {
 	}
 
 	public Frame getOwner() {
-		return parent == this?null:parent;
+		return parent;
 	}
 
 	public int getIndex() {

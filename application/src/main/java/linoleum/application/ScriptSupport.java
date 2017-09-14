@@ -18,7 +18,6 @@ public class ScriptSupport extends Frame {
 	private final Map<String, ScriptEngineFactory> factories = new HashMap<>();
 	private final Map<String, ScriptEngineFactory> factoriesByName = new HashMap<>();
 	private final DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
-	private ScriptEngine engine;
 	private	ScriptEngineFactory factory;
 	private ScriptEngineManager manager;
 
@@ -28,7 +27,7 @@ public class ScriptSupport extends Frame {
 	}
 
 	public ScriptEngine getEngine() {
-		return engine == null?engine = getOwner().factory.getScriptEngine():engine;
+		return getOwner().factory.getScriptEngine();
 	}
 
 	protected ComboBoxModel<String> getModel() {
