@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Files;
 import java.util.Arrays;
@@ -94,7 +96,6 @@ public class Tools extends Frame {
 	}
 
 	public void run(final String name, final File dir, final String args[]) throws Exception {
-		getApplicationManager().getPackages().add(dir);
-		Class.forName(name, true, ClassLoader.getSystemClassLoader()).getMethod("main", args.getClass()).invoke(null, (Object) args);
+		Class.forName(name, true, new URLClassLoader(new URL[] {dir.toURI().toURL()})).getMethod("main", args.getClass()).invoke(null, (Object) args);
 	}
 }
