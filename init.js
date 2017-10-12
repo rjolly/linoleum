@@ -338,8 +338,12 @@ function diff(file1, file2) {
     FileUtils = Packages.org.apache.commons.io.FileUtils;
     file1 = pathToFile(file1);
     file2 = pathToFile(file2);
-    var a = IOUtils.readLines(FileUtils.openInputStream(file1));
-    var b = IOUtils.readLines(FileUtils.openInputStream(file2));
+    is1 = FileUtils.openInputStream(file1);
+    is2 = FileUtils.openInputStream(file2);
+    var a = IOUtils.readLines(is1);
+    var b = IOUtils.readLines(is2);
+    is1.close();
+    is2.close();
     var p = DiffUtils.diff(a, b);
     var d = DiffUtils.generateUnifiedDiff(file1.getName(), file2.getName(), a, p, 3);
     for (var i = 0; i < d.size(); i++) println(d.get(i));
