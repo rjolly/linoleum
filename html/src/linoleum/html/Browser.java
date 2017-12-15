@@ -14,13 +14,10 @@ import java.net.URISyntaxException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLStreamHandler;
-import java.net.URLStreamHandlerFactory;
 import java.nio.file.Paths;
 import java.nio.file.FileSystemNotFoundException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
@@ -53,6 +50,7 @@ public class Browser extends Frame {
 			}
 		}
 	};
+	private final URLStreamHandlerFactory instance = URLStreamHandlerFactory.instance;
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final Action copyLinkLocationAction = new CopyLinkLocationAction();
 	private List<FrameURL> history = new ArrayList<>();
@@ -61,20 +59,6 @@ public class Browser extends Frame {
 	private boolean reload;
 	private int index;
 	private URL url;
-	private static final String protocols[] = new String[] {"mvn", "imap", "imaps"};
-	private static URLStreamHandlerFactory factory;
-
-	static {
-		if (factory == null) URL.setURLStreamHandlerFactory(factory = new URLStreamHandlerFactory() {
-			public URLStreamHandler createURLStreamHandler(final String protocol) {
-				return Arrays.asList(protocols).contains(protocol)?new URLStreamHandler() {
-					public URLConnection openConnection(final URL u) {
-						return null;
-					}
-				}:null;
-			}
-		});
-	}
 
 	private class CopyLinkLocationAction extends AbstractAction {
 		public CopyLinkLocationAction() {
