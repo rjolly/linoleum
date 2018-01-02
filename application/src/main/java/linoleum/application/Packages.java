@@ -25,8 +25,8 @@ public class Packages {
 	};
 
 	Packages() {
-		final String extdirs[] = System.getProperty("java.ext.dirs").split(File.pathSeparator);
-		for (final String str : extdirs) {
+		final String extdirs = System.getProperty("java.ext.dirs");
+		if (extdirs != null) for (final String str : extdirs.split(File.pathSeparator)) {
 			final File dir = new File(str);
 			if (dir.isDirectory()) {
 				for (final File file : dir.listFiles(filter)) {

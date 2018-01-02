@@ -91,12 +91,12 @@ public class FileManager extends Frame implements Runnable {
 	private final Icon copyIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Copy16.gif"));
 	private final Icon pasteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Paste16.gif"));
 	private final Icon deleteIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Delete16.gif"));
-	private final Icon newFolderIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/newFolder.gif"));
-	private final Icon upFolderIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/upFolder.gif"));
+	private final Icon newFolderIcon = new ImageIcon(Icon.class.getResource("plaf/metal/icons/ocean/newFolder.gif"));
+	private final Icon upFolderIcon = new ImageIcon(Icon.class.getResource("plaf/metal/icons/ocean/upFolder.gif"));
 	private final Icon fileLinkIcon = new ImageIcon(getClass().getResource("file.png"));
 	private final Icon directoryLinkIcon = new ImageIcon(getClass().getResource("directory.png"));
-	private final Icon fileIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/file.gif"));
-	private final Icon directoryIcon = new ImageIcon(getClass().getResource("/javax/swing/plaf/metal/icons/ocean/directory.gif"));
+	private final Icon fileIcon = new ImageIcon(Icon.class.getResource("plaf/metal/icons/ocean/file.gif"));
+	private final Icon directoryIcon = new ImageIcon(Icon.class.getResource("plaf/metal/icons/ocean/directory.gif"));
 	private final Action openAction = new OpenAction();
 	private final Action openLocationAction = new OpenLocationAction();
 	private final Action closeAction = new CloseAction();

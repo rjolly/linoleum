@@ -162,7 +162,11 @@ public class ScriptShell extends ScriptSupport implements ScriptShellPanel.Comma
 		// set pre-defined global variables
 		setGlobals();
 		// load pre-defined initialization file
-		loadInitFile(ClassLoader.getSystemResource("com/sun/tools/script/shell/init." + extension));
+		try {
+			loadInitFile(ClassLoader.getSystemClassLoader().loadClass("com.sun.tools.script.shell.Main").getResource("init." + extension));
+		} catch (final ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		try {
 			final File home = new File(System.getProperty("linoleum.home")).getCanonicalFile();
 			loadUserInitFile(new File(home, "init." + extension));
