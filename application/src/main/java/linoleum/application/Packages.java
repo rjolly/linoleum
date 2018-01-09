@@ -23,9 +23,12 @@ public class Packages {
 			return file.isFile() && file.getName().endsWith(".jar");
 		}
 	};
+	private final String extdirs = System.getProperty("java.ext.dirs");
+	private final String classpath[] = System.getProperty("java.class.path").split(File.pathSeparator);
+	private final File home = new File(System.getProperty("java.home")).getParentFile();
+	private final File lib = new File("lib");
 
 	Packages() {
-		final String extdirs = System.getProperty("java.ext.dirs");
 		if (extdirs != null) for (final String str : extdirs.split(File.pathSeparator)) {
 			final File dir = new File(str);
 			if (dir.isDirectory()) {
@@ -34,7 +37,6 @@ public class Packages {
 				}
 			}
 		}
-		final String classpath[] = System.getProperty("java.class.path").split(File.pathSeparator);
 		for (final String str : classpath) {
 			final File file = normalize(new File(str));
 			if (file.isFile() && file.getName().endsWith(".jar")) {
@@ -55,13 +57,8 @@ public class Packages {
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
-		{
-			final File home = new File(System.getProperty("java.home")).getParentFile();
-			final File file = new File(home, "lib/tools.jar");
-			if (file.exists()) {
-				add(file);
-			}
-		}
+		add1(new File(home, "lib/tools.jar"));
+		add1(new File(home, "lib/jconsole.jar"));
 		if (jar != null) try {
 			String str = System.getProperty("linoleum.home");
 			if (str == null) {
@@ -79,7 +76,6 @@ public class Packages {
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
-		final File lib = new File("lib");
 		lib.mkdir();
 		if (lib.isDirectory()) {
 			for (final File file : lib.listFiles(filter)) {
@@ -96,6 +92,12 @@ public class Packages {
 
 	public File[] installed() {
 		return installed.values().toArray(new File[0]);
+	}
+
+	private void add1(final File file) {
+		if (file.exists()) {
+			add(file);
+		}
 	}
 
 	public boolean add(final File file) {
