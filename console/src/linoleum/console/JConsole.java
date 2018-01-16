@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import linoleum.application.Frame;
@@ -28,6 +29,7 @@ public class JConsole extends Frame {
 		setTitle("JConsole");
 		setFrameIcon(new ImageIcon(getClass().getResource("JavaCup16.png")));
 		setIcon(new ImageIcon(getClass().getResource("JavaCup24.png")));
+		setShouldUseSSL(false);
 	}
 
 	private VMPanel getPanel() {
@@ -52,5 +54,25 @@ public class JConsole extends Frame {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private void setShouldUseSSL(final boolean shouldUseSSL) {
+		try {
+			final Field f = VMPanel.class.getDeclaredField("shouldUseSSL");
+			f.setAccessible(true);
+			f.setBoolean(panel, shouldUseSSL);
+		} catch (final ReflectiveOperationException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void open() {
+		panel.connect();
+	}
+
+	@Override
+	public void close() {
+		panel.disconnect();
 	}
 }
