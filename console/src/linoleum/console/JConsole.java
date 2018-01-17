@@ -13,7 +13,8 @@ import sun.tools.jconsole.ProxyClient;
 import sun.tools.jconsole.VMPanel;
 
 public class JConsole extends Frame {
-	final VMPanel panel = getPanel();
+	private final ProxyClient client = getProxyClient();
+	private VMPanel panel;
 
 	static {
 		System.setProperty("swing.defaultlaf", "javax.swing.plaf.metal.MetalLookAndFeel");
@@ -24,21 +25,18 @@ public class JConsole extends Frame {
 		setIconifiable(true);
 		setMaximizable(true);
 		setResizable(true);
-		getContentPane().add(panel, BorderLayout.CENTER);
-		pack();
+		setSize(640, 480);
 		setTitle("JConsole");
 		setFrameIcon(new ImageIcon(getClass().getResource("JavaCup16.png")));
 		setIcon(new ImageIcon(getClass().getResource("JavaCup24.png")));
-		setShouldUseSSL(false);
 	}
 
-	private VMPanel getPanel() {
+	private ProxyClient getProxyClient() {
 		String name = ManagementFactory.getRuntimeMXBean().getName();
 		name = name.substring(0, name.indexOf("@"));
 		final LocalVirtualMachine lvm = LocalVirtualMachine.getAllVirtualMachines().get(Integer.valueOf(name));
 		try {
-			final ProxyClient c = ProxyClient.getProxyClient(lvm);
-			return getPanel(c, 4000);
+			return ProxyClient.getProxyClient(lvm);
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
@@ -68,11 +66,17 @@ public class JConsole extends Frame {
 
 	@Override
 	public void open() {
+		panel = getPanel(client, 4000);
+		getContentPane().add(panel, BorderLayout.CENTER);
+		setShouldUseSSL(false);
 		panel.connect();
 	}
 
 	@Override
 	public void close() {
 		panel.disconnect();
+		panel.cleanUp();
+		getContentPane().remove(panel);
+		panel = null;
 	}
 }
