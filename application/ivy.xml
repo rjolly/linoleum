@@ -20,4 +20,7 @@
         <artifact name="application" type="javadoc" ext="jar" conf="javadoc" e:classifier="javadoc"/>
         <artifact name="application" type="pom" ext="pom" conf="pom"/>
     </publications>
+    <dependencies>
+        <dependency org="javax.activation" name="activation" rev="1.1" conf="compile->master;runtime->default"/>
+    </dependencies>
 </ivy-module>
