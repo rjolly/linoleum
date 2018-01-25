@@ -575,7 +575,7 @@ public class FileManager extends Frame implements Runnable {
 
 	private Path getDirectory(final Path path) {
 		if (Files.isDirectory(path)) try {
-			return relativize(path.toRealPath());
+			return relativize(path);
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
@@ -726,7 +726,7 @@ public class FileManager extends Frame implements Runnable {
 	@Override
 	public void setURI(final URI uri) {
 		try {
-			path = unjar(relativize(Paths.get(uri).toRealPath()));
+			path = unfile(unjar(relativize(Paths.get(uri))));
 			fs = path.getFileSystem();
 		} catch (final IOException ex) {
 			ex.printStackTrace();
@@ -734,9 +734,10 @@ public class FileManager extends Frame implements Runnable {
 	}
 
 	private Path relativize(final Path path) throws IOException {
-		final FileSystem fs = path.getFileSystem();
+		final Path real = path.toRealPath();
+		final FileSystem fs = real.getFileSystem();
 		final Path user = Paths.get("").toRealPath();
-		return fs == defaultfs && path.startsWith(user)?user.relativize(path):path;
+		return fs == defaultfs && real.startsWith(user)?user.relativize(real):real;
 	}
 
 	private Path unjar(final Path path) throws IOException {
@@ -749,6 +750,13 @@ public class FileManager extends Frame implements Runnable {
 			ex.printStackTrace();
 		}
 		return path;
+	}
+
+	private Path unfile(final Path path) {
+		if (Files.isDirectory(path)) {
+			return path;
+		}
+		return getParent(path);
 	}
 
 	private FileSystem getFileSystem(final URI uri) throws IOException {
@@ -835,7 +843,7 @@ public class FileManager extends Frame implements Runnable {
 		if (fs != defaultfs) {
 			Collection<Integer> coll = getOwner().openFrames.get(fs);
 			if (coll == null) {
-				getOwner().openFrames.put(fs, coll = new HashSet<Integer>());
+				getOwner().openFrames.put(fs, coll = new HashSet<>());
 			}
 			coll.add(getIndex());
 		}
@@ -946,7 +954,7 @@ public class FileManager extends Frame implements Runnable {
 		if (that == null) {
 			return reuseFor(getHome());
 		} else try {
-			return Files.isSameFile(path, unjar(Paths.get(that)));
+			return Files.isSameFile(path, unfile(unjar(Paths.get(that))));
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
@@ -958,16 +966,12 @@ public class FileManager extends Frame implements Runnable {
 	}
 
 	private void open(final Path entry) {
-		try {
-			if (Files.isDirectory(entry) && !Files.isSymbolicLink(entry)) {
-				doClose();
-				setURI(entry.toRealPath().toUri());
-				doOpen();
-			} else {
-				getApplicationManager().open(entry.toRealPath().toUri());
-			}
-		} catch (final IOException ex) {
-			ex.printStackTrace();
+		if (Files.isDirectory(entry) && !Files.isSymbolicLink(entry)) {
+			doClose();
+			setURI(entry.toUri());
+			doOpen();
+		} else {
+			getApplicationManager().open(entry.toUri());
 		}
 	}
 
@@ -1017,8 +1021,8 @@ public class FileManager extends Frame implements Runnable {
 			renameAction.setEnabled(true);
 			deleteAction.setEnabled(true);
 			final Path path = getSelectedValue();
-			if (Files.exists(path)) try {
-				final URI uri = path.toRealPath().toUri();
+			if (Files.exists(path)) {
+				final URI uri = path.toUri();
 				final App a = getApplicationManager().getApplication(uri);
 				boolean sep = false;
 				if (a != null) {
@@ -1049,8 +1053,6 @@ public class FileManager extends Frame implements Runnable {
 						jPopupMenu1.add(action);
 					}
 				}
-			} catch (final IOException ex) {
-				ex.printStackTrace();
 			}
 		}
 	}
