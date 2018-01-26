@@ -479,11 +479,6 @@ public class Notepad extends JPanel {
 	}
 
 	void setFile(final Path file) {
-		final Document doc = editor.getReplaceDocument();
-		if (doc != null) {
-			doc.removeUndoableEditListener(undoHandler);
-		}
-		editor.setDocument(new Document());
 		this.file = file;
 	}
 
@@ -492,6 +487,11 @@ public class Notepad extends JPanel {
 	}
 
 	void open() {
+		final Document doc = editor.getReplaceDocument();
+		if (doc != null) {
+			doc.removeUndoableEditListener(undoHandler);
+		}
+		editor.setDocument(new Document());
 		if (file != null && Files.exists(file)) {
 			new FileLoader().execute();
 		} else {
