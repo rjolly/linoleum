@@ -14,6 +14,10 @@ public class StoreTreeNode extends DefaultMutableTreeNode {
 		store = what;
 	}
 
+	public Store getStore() {
+		return store;
+	}
+
 	public boolean isLeaf() {
 		return false;
 	}

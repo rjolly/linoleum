@@ -35,6 +35,7 @@ public class SimpleClient extends Frame {
 	private final Action composeAction = new ComposeAction();
 	private final Action expungeAction = new ExpungeAction();
 	private final Action settingsAction = new SettingsAction();
+	private final Action removeAction = new RemoveAction();
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 	private final DefaultTreeModel model = new DefaultTreeModel(root);
@@ -42,6 +43,7 @@ public class SimpleClient extends Frame {
 	private final Session session = Session.getInstance(System.getProperties(), new SimpleAuthenticator(this));
 	private final FileChooser chooser = new FileChooser();
 	private Folder folder;
+	private Store store;
 
 	private class ComposeAction extends AbstractAction {
 		public ComposeAction() {
@@ -96,6 +98,22 @@ public class SimpleClient extends Frame {
 				break;
 			default:
 			}
+		}
+	}
+
+	private class RemoveAction extends AbstractAction {
+		public RemoveAction() {
+			super("Remove");
+			setEnabled(false);
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			final URLName name = store.getURLName();
+			final StoreTreeNode storenode = map.get(name);
+			model.removeNodeFromParent(storenode);
+			map.remove(name);
+			setEnabled(false);
 		}
 	}
 
@@ -205,6 +223,11 @@ public class SimpleClient extends Frame {
 		}
 	}
 
+	@Override
+	public void close() {
+		setURI(null);
+	}
+
 	private void open(final String str) {
 		final URLName name = new URLName(str);
 		(new SwingWorker<StoreTreeNode, Object>() {
@@ -212,7 +235,7 @@ public class SimpleClient extends Frame {
 				StoreTreeNode storenode = map.get(name);
 				if (storenode == null) {
 					final Store store = session.getStore(name);
-					map.put(name, storenode = new StoreTreeNode(store));
+					map.put(store.getURLName(), storenode = new StoreTreeNode(store));
 					model.insertNodeInto(storenode, root, root.getChildCount());
 				}
 				return storenode;
@@ -247,8 +270,8 @@ public class SimpleClient extends Frame {
                 jSplitPane2 = new javax.swing.JSplitPane();
                 jScrollPane1 = new javax.swing.JScrollPane();
                 jTree1 = new javax.swing.JTree();
-                messageViewer = new linoleum.mail.MessageViewer();
                 folderViewer = new linoleum.mail.FolderViewer();
+                messageViewer = new linoleum.mail.MessageViewer();
                 jMenuBar1 = new javax.swing.JMenuBar();
                 jMenu1 = new javax.swing.JMenu();
                 jMenuItem1 = new javax.swing.JMenuItem();
@@ -261,6 +284,8 @@ public class SimpleClient extends Frame {
                 jMenuItem6 = new javax.swing.JMenuItem();
                 jMenu3 = new javax.swing.JMenu();
                 jMenuItem7 = new javax.swing.JMenuItem();
+                jSeparator2 = new javax.swing.JPopupMenu.Separator();
+                jMenuItem8 = new javax.swing.JMenuItem();
 
                 optionPanel1.setFrame(this);
 
@@ -330,7 +355,7 @@ public class SimpleClient extends Frame {
                 setMaximizable(true);
                 setResizable(true);
                 setTitle("Simple JavaMail Client");
-                setName("Mail");
+                setName("Mail"); // NOI18N
                 addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
                         public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
                         }
@@ -366,11 +391,11 @@ public class SimpleClient extends Frame {
 
                 jTree1.setModel(model);
                 jTree1.addTreeWillExpandListener(new javax.swing.event.TreeWillExpandListener() {
-                        public void treeWillExpand(javax.swing.event.TreeExpansionEvent evt)throws javax.swing.tree.ExpandVetoException {
-                                jTree1TreeWillExpand(evt);
-                        }
                         public void treeWillCollapse(javax.swing.event.TreeExpansionEvent evt)throws javax.swing.tree.ExpandVetoException {
                                 jTree1TreeWillCollapse(evt);
+                        }
+                        public void treeWillExpand(javax.swing.event.TreeExpansionEvent evt)throws javax.swing.tree.ExpandVetoException {
+                                jTree1TreeWillExpand(evt);
                         }
                 });
                 jTree1.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
@@ -381,11 +406,9 @@ public class SimpleClient extends Frame {
                 jScrollPane1.setViewportView(jTree1);
 
                 jSplitPane2.setLeftComponent(jScrollPane1);
-
                 jSplitPane2.setRightComponent(folderViewer);
 
                 jSplitPane1.setTopComponent(jSplitPane2);
-
                 jSplitPane1.setBottomComponent(messageViewer);
 
                 jMenu1.setText("Message");
@@ -419,6 +442,10 @@ public class SimpleClient extends Frame {
 
                 jMenuItem7.setAction(settingsAction);
                 jMenu3.add(jMenuItem7);
+                jMenu3.add(jSeparator2);
+
+                jMenuItem8.setAction(removeAction);
+                jMenu3.add(jMenuItem8);
 
                 jMenuBar1.add(jMenu3);
 
@@ -443,7 +470,7 @@ public class SimpleClient extends Frame {
 		if (path != null) {
 			final Object o = path.getLastPathComponent();
 			if (o instanceof FolderTreeNode) {
-				folder = ((FolderTreeNode)o).getFolder();
+				folder = ((FolderTreeNode) o).getFolder();
 				expungeAction.setEnabled(true);
 				try {
 					if ((folder.getType() & Folder.HOLDS_MESSAGES) != 0) {
@@ -454,6 +481,12 @@ public class SimpleClient extends Frame {
 				}
 			} else {
 				expungeAction.setEnabled(false);
+			}
+			if (o instanceof StoreTreeNode) {
+				store = ((StoreTreeNode) o).getStore();
+				removeAction.setEnabled(!store.isConnected());
+			} else {
+				removeAction.setEnabled(false);
 			}
 		}
         }//GEN-LAST:event_jTree1ValueChanged
@@ -467,6 +500,15 @@ public class SimpleClient extends Frame {
 					public Object doInBackground() throws MessagingException  {
 						((StoreTreeNode) o).open(model);
 						return null;
+					}
+
+					public void done() {
+						try {
+							get();
+							removeAction.setEnabled(false);
+						} catch (final Exception e) {
+							e.printStackTrace();
+						}
 					}
 				}).execute();
 			}
@@ -483,6 +525,15 @@ public class SimpleClient extends Frame {
 						folderViewer.setFolder(null);
 						((StoreTreeNode) o).close();
 						return null;
+					}
+
+					public void done() {
+						try {
+							get();
+							removeAction.setEnabled(true);
+						} catch (final Exception e) {
+							e.printStackTrace();
+						}
 					}
 				}).execute();
 			}
@@ -511,6 +562,7 @@ public class SimpleClient extends Frame {
         }//GEN-LAST:event_formInternalFrameOpened
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
+        private linoleum.mail.FolderViewer folderViewer;
         private javax.swing.JCheckBox jCheckBox1;
         private javax.swing.JLabel jLabel1;
         private javax.swing.JLabel jLabel2;
@@ -527,8 +579,10 @@ public class SimpleClient extends Frame {
         private javax.swing.JMenuItem jMenuItem5;
         private javax.swing.JMenuItem jMenuItem6;
         private javax.swing.JMenuItem jMenuItem7;
+        private javax.swing.JMenuItem jMenuItem8;
         private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JPopupMenu.Separator jSeparator1;
+        private javax.swing.JPopupMenu.Separator jSeparator2;
         private javax.swing.JSplitPane jSplitPane1;
         private javax.swing.JSplitPane jSplitPane2;
         private javax.swing.JTextField jTextField1;
@@ -537,7 +591,6 @@ public class SimpleClient extends Frame {
         private javax.swing.JTextField jTextField4;
         private javax.swing.JTree jTree1;
         private linoleum.mail.MessageViewer messageViewer;
-        private linoleum.mail.FolderViewer folderViewer;
         private linoleum.application.OptionPanel optionPanel1;
         // End of variables declaration//GEN-END:variables
 }
