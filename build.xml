@@ -1,25 +1,63 @@
 <project name="linoleum" default="default" basedir=".">
     <description>Builds, tests, and runs the project linoleum.</description>
 
-    <target depends="jar" description="Build and test whole project." name="default"/>
+    <target depends="zip,deb" description="Build and test whole project." name="default"/>
+
+    <property environment="env"/>
+    <property name="env.LINOLEUM_HOME" value="/usr/share/linoleum"/>
+    <property name="linoleum.home" value="${env.LINOLEUM_HOME}"/>
+
+    <path id="linoleum.classpath">
+	<pathelement location="${java.home}/../lib/tools.jar"/>
+	<pathelement location="${linoleum.home}/linoleum.jar"/>
+    </path>
+
+    <target name="clean">
+	<delete dir="dist"/>
+	<linoleum file="clean.js"/>
+    </target>
+
+    <macrodef name="linoleum">
+	<attribute name="file"/>
+	<sequential>
+	    <java classname="com.sun.tools.script.shell.Main" fork="true">
+		<sysproperty key="java.system.class.loader" value="linoleum.application.ClassLoader"/>
+		<classpath refid="linoleum.classpath"/>
+		<arg value="-f"/>
+		<arg value="${linoleum.home}/init.js"/>
+		<arg value="-f"/>
+		<arg value="@{file}"/>
+	    </java>
+	</sequential>
+    </macrodef>
 
     <target name="init">
         <property file="build.properties"/>
     </target>
 
-    <target depends="init,post-jar" description="Build JAR." name="jar"/>
+    <target name="src" depends="init">
+	<tar destfile="../${application.title}.tar.gz" compression="gzip">
+	    <tarfileset dir=".." includes="ant-deb-task/dist/ant-deb.jar"/>
+	    <tarfileset prefix="linoleum" dir="." includes="application/**,bin/**,html/**,local/**,mail/**,notepad/**,pkg/**,src/**,*.js,build.properties,*.xml,manifest.mf,*.txt" excludes="**/build/**,**/dist/**,**/private/**"/>
+	</tar>
+    </target>
+
+    <target depends="init" description="Build JAR." name="jar">
+	<linoleum file="build-all.js"/>
+	<antcall target="post-jar"/>
+    </target>
 
     <target name="post-jar">
-	<copy todir="${dist.dir}/lib">
+	<copy todir="${dist.dir}/lib" overwrite="true">
 	    <fileset dir="lib"/>
 	</copy>
-	<copy todir="${dist.dir}/bin">
+	<copy todir="${dist.dir}/bin" overwrite="true">
 	    <fileset dir="bin"/>
 	</copy>
 	<chmod file="${dist.dir}/bin/linoleum" perm="+x"/>
 	<chmod file="${dist.dir}/bin/linoleum-headless" perm="+x"/>
-	<copy todir="${dist.dir}" file="init.js"/>
-	<copy todir="${dist.dir}" file="readme.txt"/>
+	<copy todir="${dist.dir}" file="init.js" overwrite="true"/>
+	<copy todir="${dist.dir}" file="readme.txt" overwrite="true"/>
     </target>
 
     <target name="zip" depends="jar">
@@ -31,7 +69,7 @@
     </path>
 
     <taskdef resource="ant_deb_task.properties" classpathref="classpath"/>
-    
+
     <target name="deb" depends="jar" description="build the deb file">
         <deb
             todir=".."
