@@ -200,12 +200,15 @@ function printfile(file) {
     println(fileToPath(file));
 }
 
-function run(name) {
+function run(name, dir) {
+    if (dir == undefined) {
+	dir = ".";
+    }
     var array = new Array(arguments.length - 1);
     for (var i = 0; i < array.length; i++) {
 	array[i] = arguments[i+1];
     }
-    apps.get("Tools").run(name, curDir, array);
+    apps.get("Tools").run(name, pathToFile(dir), array);
 }
 
 function javap(name) {
