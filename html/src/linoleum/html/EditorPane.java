@@ -102,7 +102,7 @@ public class EditorPane extends JEditorPane {
 			final String charset = (String) getClientProperty("charset");
 			final Reader r = (charset != null)?new InputStreamReader(in, charset):new InputStreamReader(in);
 			getEditorKit().read(r, doc, 0);
-			final URL url = (URL)doc.getProperty(Document.StreamDescriptionProperty);
+			final URL url = (URL) doc.getProperty(Document.StreamDescriptionProperty);
 			if (url != null) {
 				map.remove(url.getHost());
 			}
@@ -120,7 +120,7 @@ public class EditorPane extends JEditorPane {
 			} catch (final IOException exception) {
 				//mark was invalidated
 				in.close();
-				final URL url = (URL)doc.getProperty(Document.StreamDescriptionProperty);
+				final URL url = (URL) doc.getProperty(Document.StreamDescriptionProperty);
 				if (url != null) {
 					in = getStream(url, null);
 				} else {
@@ -169,12 +169,23 @@ public class EditorPane extends JEditorPane {
 				return getStream(page, loader, conn.getHeaderField("WWW-authenticate"));
 			}
 		}
-		handleConnectionProperties(conn);
+		if (SwingUtilities.isEventDispatchThread()) {
+			handleConnectionProperties(conn);
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						handleConnectionProperties(conn);
+					}
+				});
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+		}
 		try {
 			return new PageStream(conn.getInputStream(), loader, conn.getContentLength());
-		} catch (final IOException ex) {
+		} finally {
 			map.remove(host);
-			throw ex;
 		}
 	}
 
@@ -198,7 +209,7 @@ public class EditorPane extends JEditorPane {
 		}
 	}
 
-	private void handleConnectionProperties(final URLConnection conn) throws IOException {
+	private void handleConnectionProperties(final URLConnection conn) {
 		if (pageProperties == null) {
 			pageProperties = new Hashtable<String, Object>();
 		}
@@ -259,7 +270,7 @@ public class EditorPane extends JEditorPane {
 	}
 
 	private void handlePostData(final HttpURLConnection conn, final Object postData) throws IOException {
-		final String str = (String)postData;
+		final String str = (String) postData;
 		logger.config(URLDecoder.decode(str, "UTF-8"));
 		conn.setDoOutput(true);
 		conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
