@@ -249,6 +249,7 @@ public class Browser extends Frame {
 		}
 		if (loader == null) {
 			loader = new PageLoader(dest, delta, force);
+			jEditorPane1.setLoader(loader);
 			loader.execute();
 		}
 	}
@@ -278,7 +279,7 @@ public class Browser extends Frame {
 		}
 
 		public Boolean doInBackground() throws IOException {
-			jEditorPane1.setPage(dest, this, force);
+			jEditorPane1.setPage(dest, force);
 			return true;
 		}
 

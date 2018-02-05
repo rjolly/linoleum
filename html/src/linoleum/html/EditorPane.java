@@ -37,12 +37,17 @@ public class EditorPane extends JEditorPane {
 	private final Map<String, String> map = new HashMap<>();
 	private final CookieManager manager = new CookieManager();
 	private final Logger logger = Logger.getLogger(getClass().getName());
+	private PageLoader loader;
 
-	public void setPage(final URL page) throws IOException {
-		setPage(new FrameURL(page), null, false);
+	public void setLoader(final PageLoader loader) {
+		this.loader = loader;
 	}
 
-	public void setPage(final FrameURL dest, final PageLoader loader, final boolean force) throws IOException {
+	public void setPage(final URL page) throws IOException {
+		setPage(new FrameURL(page), false);
+	}
+
+	public void setPage(final FrameURL dest, final boolean force) throws IOException {
 		final URL page = dest.getURL();
 		final String reference = page.getRef();
 		final URL loaded = getPage();
@@ -51,7 +56,7 @@ public class EditorPane extends JEditorPane {
 		}
 		final Object postData = getPostData();
 		if ((loaded == null) || !loaded.sameFile(page) || force || (postData != null)) {
-			final InputStream in = getStream(page, loader);
+			final InputStream in = getStream(page);
 			final EditorKit kit = getEditorKit();
 			if (kit != null) {
 				final Document doc = initializeModel(kit, page);
@@ -121,7 +126,7 @@ public class EditorPane extends JEditorPane {
 				in.close();
 				final URL url = (URL) doc.getProperty(Document.StreamDescriptionProperty);
 				if (url != null) {
-					in = getStream(url, null);
+					in = getStream(url);
 				} else {
 					//there is nothing we can do to recover stream
 					throw ccse;
@@ -135,11 +140,12 @@ public class EditorPane extends JEditorPane {
 		}
 	}
 
-	private InputStream getStream(final URL page, final PageLoader loader) throws IOException {
-		return getStream(page, loader, "");
+	@Override
+	protected InputStream getStream(final URL page) throws IOException {
+		return getStream(page, "");
 	}
 
-	protected InputStream getStream(final URL page, final PageLoader loader, final String auth) throws IOException {
+	private InputStream getStream(final URL page, final String auth) throws IOException {
 		final URLConnection conn = page.openConnection();
 		final String host = conn.getURL().getHost();
 		if (auth.startsWith("Basic")) {
@@ -162,10 +168,10 @@ public class EditorPane extends JEditorPane {
 			if (redirect) {
 				clearPostData();
 				final String loc = conn.getHeaderField("Location");
-				return getStream(loc.startsWith("http", 0)?new URL(loc):new URL(page, loc), loader);
+				return getStream(loc.startsWith("http", 0)?new URL(loc):new URL(page, loc));
 			}
 			if (auth.isEmpty() && response == HttpURLConnection.HTTP_UNAUTHORIZED) {
-				return getStream(page, loader, conn.getHeaderField("WWW-authenticate"));
+				return getStream(page, conn.getHeaderField("WWW-authenticate"));
 			}
 		}
 		if (SwingUtilities.isEventDispatchThread()) {
