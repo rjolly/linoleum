@@ -11,9 +11,7 @@ import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.HttpURLConnection;
-import java.net.URISyntaxException;
 import java.net.URLDecoder;
-import java.net.CookieManager;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
@@ -35,7 +33,8 @@ import javax.swing.text.html.HTMLDocument;
 public class EditorPane extends JEditorPane {
 	private final Basic basic = new Basic();
 	private final Map<String, String> map = new HashMap<>();
-	private final CookieManager manager = new CookieManager();
+	private static final java.net.CookieManager manager = new CookieManager();
+	private static final java.net.URLStreamHandlerFactory instance = new URLStreamHandlerFactory();
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private PageLoader loader;
 
@@ -157,14 +156,12 @@ public class EditorPane extends JEditorPane {
 		if (conn instanceof HttpURLConnection) {
 			final HttpURLConnection hconn = (HttpURLConnection) conn;
 			hconn.setInstanceFollowRedirects(false);
-			useCookies(conn);
 			final Object postData = getPostData();
 			if (postData != null) {
 				handlePostData(hconn, postData);
 			}
 			final int response = hconn.getResponseCode();
 			final boolean redirect = (response >= 300 && response <= 399);
-			handleCookies(conn);
 			if (redirect) {
 				clearPostData();
 				final String loc = conn.getHeaderField("Location");
@@ -228,42 +225,6 @@ public class EditorPane extends JEditorPane {
 		if (enc != null) {
 			pageProperties.put("content-encoding", enc);
 		}
-	}
-
-	private void handleCookies(final URLConnection conn) throws IOException {
-		final Map<String, List<String>> map = new HashMap<>();
-		final Map<String, List<String>> fields = conn.getHeaderFields();
-		logger.config(fields.toString());
-		for (final Map.Entry<String, List<String>> entry : fields.entrySet()) {
-			final String key = entry.getKey();
-			if ("Set-Cookie".equals(key)) {
-				final List<String> list = new ArrayList<>();
-				for (final String value : entry.getValue()) {
-					list.add(value.replace(" -0000", " GMT"));
-				}
-				map.put(key, list);
-			} else {
-				map.put(key, entry.getValue());
-			}
-		}
-		try {
-			manager.put(conn.getURL().toURI(), map);
-		} catch (final URISyntaxException ex) {
-			ex.printStackTrace();
-		}
-	}
-
-	private void useCookies(final URLConnection conn) throws IOException {
-		try {
-			for (final Map.Entry<String, List<String>> entry : manager.get(conn.getURL().toURI(), conn.getRequestProperties()).entrySet()) {
-				for (final String value : entry.getValue()) {
-					conn.addRequestProperty(entry.getKey(), value);
-				}
-			}
-		} catch (final URISyntaxException ex) {
-			ex.printStackTrace();
-		}
-		logger.config(conn.getRequestProperties().toString());
 	}
 
 	private void clearPostData() {

@@ -50,7 +50,6 @@ public class Browser extends Frame {
 			}
 		}
 	};
-	private final URLStreamHandlerFactory instance = URLStreamHandlerFactory.instance;
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final Action copyLinkLocationAction = new CopyLinkLocationAction();
 	private List<FrameURL> history = new ArrayList<>();
