@@ -161,8 +161,7 @@ public class EditorPane extends JEditorPane {
 				handlePostData(hconn, postData);
 			}
 			final int response = hconn.getResponseCode();
-			final boolean redirect = (response >= 300 && response <= 399);
-			if (redirect) {
+			if (response >= 300 && response <= 399) {
 				clearPostData();
 				final String loc = conn.getHeaderField("Location");
 				return getStream(loc.startsWith("http", 0)?new URL(loc):new URL(page, loc));

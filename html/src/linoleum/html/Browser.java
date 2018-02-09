@@ -14,6 +14,7 @@ import java.net.URISyntaxException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.HttpURLConnection;
 import java.nio.file.Paths;
 import java.nio.file.FileSystemNotFoundException;
 import java.util.List;
@@ -230,6 +231,15 @@ public class Browser extends Frame {
 		}
 		if (canOpen(uri.getScheme())) try {
 			final URLConnection conn = uri.toURL().openConnection();
+			if (conn instanceof HttpURLConnection) {
+				final HttpURLConnection hconn = (HttpURLConnection) conn;
+				hconn.setInstanceFollowRedirects(false);
+				final int response = hconn.getResponseCode();
+				if (response >= 300 && response <= 399) {
+					final String loc = conn.getHeaderField("Location");
+					return canOpen(uri.resolve(loc));
+				}
+			}
 			final String str = conn.getContentType();
 			return str == null || canOpen(new MimeType(str));
 		} catch (final MimeTypeParseException ex) {
