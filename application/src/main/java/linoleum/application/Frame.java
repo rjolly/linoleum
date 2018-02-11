@@ -191,8 +191,8 @@ public class Frame extends JInternalFrame implements App {
 		final JInternalFrame c = getFrame(desktop, uri);
 		if (c instanceof Frame) {
 			final Frame frame = (Frame) c;
-			final boolean changed = uri != null && !frame.reuseFor(uri);
-			if (uri != null) {
+			final boolean changed = uri != null && !uri.equals(frame.getURI());
+			if (changed) {
 				frame.setURI(uri);
 			}
 			if (frame.getDesktopPane() == null) {
