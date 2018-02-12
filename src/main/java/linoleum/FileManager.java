@@ -283,6 +283,13 @@ public class FileManager extends Frame implements Runnable {
 			}
 		}
 	};
+	private final Comparator<Path> comparator = new Comparator<Path>() {
+		public int compare(final Path a, final Path b) {
+			boolean ac = Files.isDirectory(a);
+			boolean bc = Files.isDirectory(b);
+			return ac == bc?a.compareTo(b):ac?-1:1;
+		}
+	};
 	private final DefaultTableModel tableModel;
 	private FileManager source;
 	private boolean closing;
@@ -888,13 +895,7 @@ public class FileManager extends Frame implements Runnable {
 		((CardLayout) jPanel1.getLayout()).show(jPanel1, showDetails?"table":"list");
 		clear();
 		final Path files[] = listFiles(path).toArray(new Path[0]);
-		Arrays.sort(files, new Comparator<Path>() {
-			public int compare(final Path a, final Path b) {
-				boolean ac = Files.isDirectory(a);
-				boolean bc = Files.isDirectory(b);
-				return ac == bc?a.compareTo(b):ac?-1:1;
-			}
-		});
+		Arrays.sort(files, comparator);
 		if (!path.equals(path.getRoot())) {
 			addEntry(path.resolve(".."));
 		}
