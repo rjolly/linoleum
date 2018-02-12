@@ -242,6 +242,11 @@ public class DownloadManager extends Frame {
 		final URI uri = getURI();
 		if (uri != null) try {
 			final URL location = uri.toURL();
+			for (final FileLoader loader : Collections.list(model.elements())) {
+				if (!loader.isDone() && location.equals(loader.getLocation())) {
+					return;
+				}
+			}
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					final File file = getFile(new File(location.getPath()).getName());
@@ -296,23 +301,6 @@ public class DownloadManager extends Frame {
 			deleteAction.setEnabled(loader.isDone());
 			copyLinkAddressAction.setEnabled(true);
 		}
-	}
-
-	@Override
-	public boolean reuseFor(final URI that) {
-		if (that == null) {
-			return super.reuseFor(that);
-		} else try {
-			final URL location = that.toURL();
-			for (final FileLoader loader : Collections.list(model.elements())) {
-				if (!loader.isDone() && location.equals(loader.getLocation())) {
-					return true;
-				}
-			}
-		} catch (final MalformedURLException ex) {
-			ex.printStackTrace();
-		}
-		return false;
 	}
 
 	@SuppressWarnings("unchecked")
