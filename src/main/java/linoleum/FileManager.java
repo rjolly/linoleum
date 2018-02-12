@@ -297,6 +297,8 @@ public class FileManager extends Frame implements Runnable {
 	private FileSystem fs;
 	private boolean show;
 	private boolean showDetails;
+	private Path selected;
+	private boolean open;
 	private int action;
 	private Path path;
 	private int idx;
@@ -733,7 +735,9 @@ public class FileManager extends Frame implements Runnable {
 	@Override
 	public void setURI(final URI uri) {
 		try {
-			path = unfile(unjar(relativize(Paths.get(uri))));
+			final Path path = unjar(relativize(Paths.get(uri)));
+			selected = Files.isDirectory(path)?null:path;
+			this.path = unfile(path);
 			fs = path.getFileSystem();
 		} catch (final IOException ex) {
 			ex.printStackTrace();
@@ -760,10 +764,7 @@ public class FileManager extends Frame implements Runnable {
 	}
 
 	private Path unfile(final Path path) {
-		if (Files.isDirectory(path)) {
-			return path;
-		}
-		return getParent(path);
+		return Files.isDirectory(path)?path:getParent(path);
 	}
 
 	private FileSystem getFileSystem(final URI uri) throws IOException {
@@ -781,6 +782,7 @@ public class FileManager extends Frame implements Runnable {
 
 	private void doOpen() {
 		rescan();
+		closing = false;
 		if (fs == defaultfs) {
 			(thread = new Thread(this)).start();
 		} else {
@@ -845,14 +847,20 @@ public class FileManager extends Frame implements Runnable {
 
 	@Override
 	public void open() {
-		apps.addPreferenceChangeListener(listener);
-		doOpen();
-		if (fs != defaultfs) {
-			Collection<Integer> coll = getOwner().openFrames.get(fs);
-			if (coll == null) {
-				getOwner().openFrames.put(fs, coll = new HashSet<>());
+		if (!open) {
+			apps.addPreferenceChangeListener(listener);
+			doOpen();
+			if (fs != defaultfs) {
+				Collection<Integer> coll = getOwner().openFrames.get(fs);
+				if (coll == null) {
+					getOwner().openFrames.put(fs, coll = new HashSet<>());
+				}
+				coll.add(getIndex());
 			}
-			coll.add(getIndex());
+			open = true;
+		}
+		if (selected != null) {
+			setSelectedValue(selected);
 		}
 	}
 
@@ -988,7 +996,7 @@ public class FileManager extends Frame implements Runnable {
 		if (showDetails) {
 			jTable1.setSelectedValue(path);
 		} else {
-			jList1.setSelectedValue(path, false);
+			jList1.setSelectedValue(path, true);
 		}
 	}
 
