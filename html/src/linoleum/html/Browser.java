@@ -57,6 +57,7 @@ public class Browser extends Frame {
 	private PageLoader loader;
 	private FrameURL current;
 	private boolean reload;
+	private boolean open;
 	private int index;
 	private URL url;
 
@@ -101,6 +102,7 @@ public class Browser extends Frame {
 			}
 		});
 		update();
+		setURI(getHome());
 	}
 
 	@Override
@@ -116,7 +118,7 @@ public class Browser extends Frame {
 		if (!reload) {
 			setURI(str);
 		}
-		doOpen();
+		open();
 	}
 
 	@Override
@@ -177,14 +179,10 @@ public class Browser extends Frame {
 
 	@Override
 	public void open() {
-		prefs.addPreferenceChangeListener(listener);
-		if (current == null) {
-			setURI(getHome());
+		if (!open) {
+			prefs.addPreferenceChangeListener(listener);
+			open = true;
 		}
-		doOpen();
-	}
-
-	private void doOpen() {
 		if (current != null) {
 			open(current, current.getURL(), reload);
 		}
