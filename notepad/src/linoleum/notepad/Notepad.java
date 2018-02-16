@@ -263,7 +263,8 @@ public class Notepad extends JPanel {
 	private JInternalFrame elementTreeFrame;
 	private ElementTreePanel elementTreePanel;
 	private Frame frame;
-	private int modified;
+	int modified;
+	private Path prev;
 	private Path file;
 	private UndoManager undo = new UndoManager();
 
@@ -407,10 +408,8 @@ public class Notepad extends JPanel {
 
 		public void actionPerformed(final ActionEvent e) {
 			frame.closeDialog();
-			if (proceed()) {
-				setFile(null);
-				open();
-			}
+			setFile(null);
+			open();
 		}
 	}
 
@@ -422,7 +421,7 @@ public class Notepad extends JPanel {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			frame.closeDialog();
-			frame.getApplicationManager().get("Files").open(file == null?null:file.toUri(), frame.getDesktopPane());
+			frame.getApplicationManager().get("Files").open(file == null?prev == null?null:prev.toUri():file.toUri(), frame.getDesktopPane());
 		}
 	}
 
@@ -464,6 +463,7 @@ public class Notepad extends JPanel {
 	}
 
 	void setFile(final Path file) {
+		prev = this.file;
 		this.file = file;
 	}
 
@@ -472,15 +472,19 @@ public class Notepad extends JPanel {
 	}
 
 	void open() {
-		editor.getDocument().removeUndoableEditListener(undoHandler);
-		editor.setDocument(new Document());
-		if (file != null && Files.exists(file)) {
-			try {
-				frame.getFileChooser().setSelectedFile(file.toFile());
-			} catch (final UnsupportedOperationException e) {}
-			new FileLoader().execute();
+		if (proceed()) {
+			editor.getDocument().removeUndoableEditListener(undoHandler);
+			editor.setDocument(new Document());
+			if (file != null && Files.exists(file)) {
+				try {
+					frame.getFileChooser().setSelectedFile(file.toFile());
+				} catch (final UnsupportedOperationException e) {}
+				new FileLoader().execute();
+			} else {
+				reset();
+			}
 		} else {
-			reset();
+			file = prev;
 		}
 	}
 
@@ -516,7 +520,7 @@ public class Notepad extends JPanel {
 		getAction("save").setEnabled(file != null && modified != 0);
 	}
 
-	boolean proceed() {
+	private boolean proceed() {
 		return modified == 0 || proceed("Warning");
 	}
 

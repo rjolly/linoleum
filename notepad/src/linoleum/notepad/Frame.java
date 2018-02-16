@@ -58,6 +58,12 @@ public class Frame extends linoleum.application.Frame {
 		return new Frame();
 	}
 
+	@Override
+	public boolean reuseFor(final URI uri) {
+		final Path file = notepad.getFile();
+		return file == null?true:super.reuseFor(uri);
+	}
+
 	private void openDialog(final String title) {
 		if (dialog1.getDesktopPane() == null) {
 			dialog1.setParent(this);
@@ -251,7 +257,9 @@ public class Frame extends linoleum.application.Frame {
         private void formVetoableChange(java.beans.PropertyChangeEvent evt)throws java.beans.PropertyVetoException {//GEN-FIRST:event_formVetoableChange
 		if (IS_CLOSED_PROPERTY.equals(evt.getPropertyName()) && (Boolean) evt.getNewValue()) {
 			closeDialog();
-			if (notepad.proceed()) {
+			notepad.setFile(null);
+			notepad.open();
+			if (notepad.modified == 0) {
 				dialog1.setClosed(true);
 			} else {
 				throw new PropertyVetoException("aborted", evt);
