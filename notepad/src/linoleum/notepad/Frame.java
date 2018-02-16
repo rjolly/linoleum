@@ -13,6 +13,7 @@ import linoleum.application.FileChooser;
 public class Frame extends linoleum.application.Frame {
 	private final FileChooser chooser = new FileChooser();
 	private final Notepad notepad = new Notepad(this);
+	private final Editor editor = notepad.editor;
 	private boolean found;
 
 	public Frame() {
@@ -29,7 +30,7 @@ public class Frame extends linoleum.application.Frame {
 
 	@Override
 	public Component getFocusOwner() {
-		return notepad.getEditor();
+		return editor;
 	}
 
 	@Override
@@ -216,7 +217,7 @@ public class Frame extends linoleum.application.Frame {
 
         private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 		try {
-			found = notepad.getEditor().findNext(jTextField1.getText(), true);
+			found = editor.findNext(jTextField1.getText(), true);
 			setSelected(true);
 		} catch (final BadLocationException | PropertyVetoException ex) {
 			ex.printStackTrace();
@@ -225,7 +226,7 @@ public class Frame extends linoleum.application.Frame {
 
         private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
 		if (found) try {
-			found = notepad.getEditor().replace(jTextField1.getText(), jTextField2.getText());
+			found = editor.replace(jTextField1.getText(), jTextField2.getText());
 			setSelected(true);
 		} catch (final BadLocationException | PropertyVetoException ex) {
 			ex.printStackTrace();
@@ -234,7 +235,7 @@ public class Frame extends linoleum.application.Frame {
 
         private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
 		try {
-			notepad.getEditor().replaceAll(jTextField1.getText(), jTextField2.getText());
+			editor.replaceAll(jTextField1.getText(), jTextField2.getText());
 			setSelected(true);
 		} catch (final BadLocationException | PropertyVetoException ex) {
 			ex.printStackTrace();

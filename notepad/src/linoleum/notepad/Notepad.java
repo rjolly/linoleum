@@ -60,9 +60,8 @@ import linoleum.application.FileChooser;
 
 @SuppressWarnings("serial")
 public class Notepad extends JPanel {
-
-	private static Properties properties;
-	public static ResourceBundle resources;
+	private final Properties properties = new Properties();
+	static final ResourceBundle resources = ResourceBundle.getBundle(Notepad.class.getName());
 
 	private static final String[] MENUBAR_KEYS = {"file", "edit", "debug"};
 	private static final String[] TOOLBAR_KEYS = {"new", "open", "save", "-", "cut", "copy", "paste"};
@@ -70,26 +69,45 @@ public class Notepad extends JPanel {
 	private static final String[] EDIT_KEYS = {"cut", "copy", "paste", "-", "undo", "redo", "-", "find", "replace"};
 	private static final String[] DEBUG_KEYS = {"dump", "showElementTree"};
 
-	static {
-		try {
-			properties = new Properties();
-			properties.load(Notepad.class.getResourceAsStream("NotepadSystem.properties"));
-			resources = ResourceBundle.getBundle("linoleum.notepad.Notepad", Locale.getDefault());
-		} catch (MissingResourceException | IOException  e) {
-			System.err.println("Notepad.properties or NotepadSystem.properties not found");
-			System.exit(1);
-		}
-	}
+	final Editor editor = new Editor();
+	private final JToolBar toolbar = new JToolBar();
+	private final JPanel status = new JPanel();
+	private final JLabel label = new JLabel();
+	private final JProgressBar progress = new JProgressBar();
+	private final JInternalFrame elementTreeFrame = new JInternalFrame(resources.getString("ElementTreeFrameTitle"));
+	private final ElementTreePanel elementTreePanel = new ElementTreePanel(editor);
+	private final UndoManager undo = new UndoManager();
+	private final Frame frame;
+	private Path file;
+	private Path prev;
+	int modified;
 
 	@SuppressWarnings("OverridableMethodCallInConstructor")
 	public Notepad(final Frame frame) {
 		super(true);
-		this.frame = frame;
+		try {
+			properties.load(getClass().getResourceAsStream("NotepadSystem.properties"));
+		} catch (final IOException  e) {
+			e.printStackTrace();
+		}
+
+		// Create a frame containing an instance of ElementTreePanel.
+		frame.addInternalFrameListener(new InternalFrameAdapter() {
+			@Override
+			public void internalFrameClosing(final InternalFrameEvent weeee) {
+				elementTreeFrame.doDefaultCloseAction();
+			}
+		});
+		final Container fContentPane = elementTreeFrame.getContentPane();
+		fContentPane.setLayout(new BorderLayout());
+		fContentPane.add(elementTreePanel);
+		elementTreeFrame.setClosable(true);
+		elementTreeFrame.pack();
+
 		setBorder(BorderFactory.createEtchedBorder());
 		setLayout(new BorderLayout());
 
 		// create the embedded JTextComponent
-		editor = new Editor();
 		editor.addCaretListener(caretListener);
 
 		// install the command table
@@ -98,11 +116,11 @@ public class Notepad extends JPanel {
 			commands.put(a.getValue(Action.NAME), a);
 		}
 
-		JScrollPane scroller = new JScrollPane();
-		JViewport port = scroller.getViewport();
+		final JScrollPane scroller = new JScrollPane();
+		final JViewport port = scroller.getViewport();
 		port.add(editor);
 
-		String vpFlag = getProperty("ViewportBackingStore");
+		final String vpFlag = getProperty("ViewportBackingStore");
 		if (vpFlag != null) {
 			Boolean bs = Boolean.valueOf(vpFlag);
 			port.setScrollMode(bs
@@ -110,21 +128,18 @@ public class Notepad extends JPanel {
 					: JViewport.BLIT_SCROLL_MODE);
 		}
 
-		JPanel panel = new JPanel();
+		final JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 		panel.add("North", createToolbar());
 		panel.add("Center", scroller);
 		add("Center", panel);
 		add("South", createStatusbar());
+		this.frame = frame;
 	}
 
 	@Override
 	public void requestFocus() {
 		editor.requestFocus();
-	}
-
-	Editor getEditor() {
-		return editor;
 	}
 
 	private Action getAction(final String cmd) {
@@ -158,30 +173,27 @@ public class Notepad extends JPanel {
 		return a;
 	}
 
-	private String getProperty(String key) {
+	private String getProperty(final String key) {
 		return properties.getProperty(key);
 	}
 
-	private String getResourceString(String nm) {
-		String str;
+	private String getResourceString(final String nm) {
 		try {
-			str = resources.getString(nm);
-		} catch (MissingResourceException mre) {
-			str = null;
-		}
-		return str;
+			return resources.getString(nm);
+		} catch (final MissingResourceException e) {}
+		return null;
 	}
 
-	private URL getResource(String key) {
-		String name = getResourceString(key);
+	private URL getResource(final String key) {
+		final String name = getResourceString(key);
 		if (name != null) {
 			return getClass().getResource(name);
 		}
 		return null;
 	}
 
-	private URL getSmallResource(String key) {
-		String name = getResourceString(key);
+	private URL getSmallResource(final String key) {
+		final String name = getResourceString(key);
 		if (name != null) {
 			return getClass().getResource(name.replace("24", "16"));
 		}
@@ -189,18 +201,14 @@ public class Notepad extends JPanel {
 	}
 
 	private JPanel createStatusbar() {
-		status = new JPanel();
-                status.setLayout(new CardLayout());
-		label = new JLabel();
-		progress = new JProgressBar();
-                status.add(label, "label");
-                status.add(progress, "progress");
+		status.setLayout(new CardLayout());
+		status.add(label, "label");
+		status.add(progress, "progress");
 		return status;
 	}
 
 	private JToolBar createToolbar() {
-		toolbar = new JToolBar();
-		for (String toolKey: getToolBarKeys()) {
+		for (final String toolKey: getToolBarKeys()) {
 			if (toolKey.equals("-")) {
 				toolbar.add(Box.createHorizontalStrut(5));
 			} else {
@@ -211,10 +219,10 @@ public class Notepad extends JPanel {
 		return toolbar;
 	}
 
-	public JMenuBar createMenubar() {
-		JMenuBar mb = new JMenuBar();
-		for(String menuKey: getMenuBarKeys()){
-			JMenu m = createMenu(menuKey);
+	JMenuBar createMenubar() {
+		final JMenuBar mb = new JMenuBar();
+		for(final String menuKey : getMenuBarKeys()){
+			final JMenu m = createMenu(menuKey);
 			if (m != null) {
 				mb.add(m);
 			}
@@ -222,9 +230,9 @@ public class Notepad extends JPanel {
 		return mb;
 	}
 
-	private JMenu createMenu(String key) {
-		JMenu menu = new JMenu(getResourceString(key + labelSuffix));
-		for (String itemKey: getItemKeys(key)) {
+	private JMenu createMenu(final String key) {
+		final JMenu menu = new JMenu(getResourceString(key + labelSuffix));
+		for (final String itemKey : getItemKeys(key)) {
 			if (itemKey.equals("-")) {
 				menu.addSeparator();
 			} else {
@@ -234,7 +242,7 @@ public class Notepad extends JPanel {
 		return menu;
 	}
 
-	private String[] getItemKeys(String key) {
+	private String[] getItemKeys(final String key) {
 		switch (key) {
 			case "file":
 				return FILE_KEYS;
@@ -255,19 +263,6 @@ public class Notepad extends JPanel {
 		return TOOLBAR_KEYS;
 	}
 
-	private Editor editor;
-	private JToolBar toolbar;
-	private JPanel status;
-	private JLabel label;
-	private JProgressBar progress;
-	private JInternalFrame elementTreeFrame;
-	private ElementTreePanel elementTreePanel;
-	private Frame frame;
-	int modified;
-	private Path prev;
-	private Path file;
-	private UndoManager undo = new UndoManager();
-
 	public static final String imageSuffix = "Image";
 	public static final String labelSuffix = "Label";
 	public static final String actionSuffix = "Action";
@@ -275,7 +270,7 @@ public class Notepad extends JPanel {
 	public static final String acceleratorSuffix = "Accelerator";
 
 	private UndoableEditListener undoHandler = new UndoableEditListener() {
-		public void undoableEditHappened(UndoableEditEvent e) {
+		public void undoableEditHappened(final UndoableEditEvent e) {
 			undo.addEdit(e.getEdit());
 			if (modified >= 0) modified += 1;
 			undoAction.update();
@@ -297,10 +292,10 @@ public class Notepad extends JPanel {
 	};
 
 	// --- action implementations -----------------------------------
-	private UndoAction undoAction = new UndoAction();
-	private RedoAction redoAction = new RedoAction();
+	private final UndoAction undoAction = new UndoAction();
+	private final RedoAction redoAction = new RedoAction();
 
-	private Action[] defaultActions = {
+	private final Action[] defaultActions = {
 		new NewAction(),
 		new OpenAction(),
 		new SaveAction(),
@@ -322,13 +317,12 @@ public class Notepad extends JPanel {
 			setEnabled(false);
 		}
 
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(final ActionEvent e) {
 			try {
 				undo.undo();
 				modified -= 1;
-			} catch (CannotUndoException ex) {
-				Logger.getLogger(UndoAction.class.getName()).log(Level.SEVERE,
-						"Unable to undo", ex);
+			} catch (final CannotUndoException ex) {
+				Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Unable to undo", ex);
 			}
 			update();
 			redoAction.update();
@@ -352,13 +346,12 @@ public class Notepad extends JPanel {
 			setEnabled(false);
 		}
 
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(final ActionEvent e) {
 			try {
 				undo.redo();
 				modified += 1;
-			} catch (CannotRedoException ex) {
-				Logger.getLogger(RedoAction.class.getName()).log(Level.SEVERE,
-						"Unable to redo", ex);
+			} catch (final CannotRedoException ex) {
+				Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Unable to redo", ex);
 			}
 			update();
 			undoAction.update();
@@ -375,8 +368,8 @@ public class Notepad extends JPanel {
 		}
 	}
 
-	class FindAction extends AbstractAction {
-		FindAction() {
+	private class FindAction extends AbstractAction {
+		private FindAction() {
 			super("find");
 		}
 
@@ -386,8 +379,8 @@ public class Notepad extends JPanel {
 		}
 	}
 
-	class ReplaceAction extends AbstractAction {
-		ReplaceAction() {
+	private class ReplaceAction extends AbstractAction {
+		private ReplaceAction() {
 			super("replace");
 		}
 
@@ -397,13 +390,9 @@ public class Notepad extends JPanel {
 		}
 	}
 
-	class NewAction extends AbstractAction {
-		NewAction() {
+	private class NewAction extends AbstractAction {
+		private NewAction() {
 			super("new");
-		}
-
-		NewAction(String nm) {
-			super(nm);
 		}
 
 		public void actionPerformed(final ActionEvent e) {
@@ -413,8 +402,8 @@ public class Notepad extends JPanel {
 		}
 	}
 
-	class OpenAction extends AbstractAction {
-		OpenAction() {
+	private class OpenAction extends AbstractAction {
+		private OpenAction() {
 			super("open");
 		}
 
@@ -425,8 +414,8 @@ public class Notepad extends JPanel {
 		}
 	}
 
-	class SaveAction extends AbstractAction {
-		SaveAction() {
+	private class SaveAction extends AbstractAction {
+		private SaveAction() {
 			super("save");
 		}
 
@@ -435,8 +424,8 @@ public class Notepad extends JPanel {
 		}
 	}
 
-	class SaveAsAction extends AbstractAction {
-		SaveAsAction() {
+	private class SaveAsAction extends AbstractAction {
+		private SaveAsAction() {
 			super("saveAs");
 		}
 
@@ -452,8 +441,8 @@ public class Notepad extends JPanel {
 		}
 	}
 
-	class ExitAction extends AbstractAction {
-		ExitAction() {
+	private class ExitAction extends AbstractAction {
+		private ExitAction() {
 			super("exit");
 		}
 
@@ -524,7 +513,7 @@ public class Notepad extends JPanel {
 		return modified == 0 || proceed("Warning");
 	}
 
-	boolean proceed(final String key) {
+	private boolean proceed(final String key) {
 		switch (JOptionPane.showInternalConfirmDialog(frame, resources.getString(key), resources.getString("WarningTitle"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE)) {
 		case JOptionPane.OK_OPTION:
 			return true;
@@ -539,32 +528,7 @@ public class Notepad extends JPanel {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			if (elementTreeFrame == null) {
-				// Create a frame containing an instance of
-				// ElementTreePanel.
-				try {
-					String title = resources.getString("ElementTreeFrameTitle");
-					elementTreeFrame = new JInternalFrame(title);
-				} catch (MissingResourceException mre) {
-					elementTreeFrame = new JInternalFrame();
-				}
-
-				frame.addInternalFrameListener(new InternalFrameAdapter() {
-
-					@Override
-					public void internalFrameClosing(InternalFrameEvent weeee) {
-						elementTreeFrame.setVisible(false);
-					}
-				});
-				Container fContentPane = elementTreeFrame.getContentPane();
-
-				fContentPane.setLayout(new BorderLayout());
-				elementTreePanel = new ElementTreePanel(editor);
-				fContentPane.add(elementTreePanel);
-				elementTreeFrame.pack();
-			}
 			frame.getDesktopPane().add(elementTreeFrame);
-			elementTreeFrame.setClosable(true);
 			elementTreeFrame.setVisible(true);
 		}
 	}
