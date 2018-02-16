@@ -63,7 +63,7 @@ public class Editor extends JTextArea {
 	}
 
 	public Document getReplaceDocument() {
-		return (Document)getDocument();
+		return (Document) getDocument();
 	}
 
 	protected Document createDefaultModel() {

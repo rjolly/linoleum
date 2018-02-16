@@ -23,6 +23,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.concurrent.ExecutionException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -195,13 +196,6 @@ public class Notepad extends JPanel {
                 status.add(label, "label");
                 status.add(progress, "progress");
 		return status;
-	}
-
-	private void resetUndoManager() {
-		undo.discardAllEdits();
-		modified = 0;
-		undoAction.update();
-		redoAction.update();
 	}
 
 	private JToolBar createToolbar() {
@@ -413,7 +407,7 @@ public class Notepad extends JPanel {
 
 		public void actionPerformed(final ActionEvent e) {
 			frame.closeDialog();
-			if (clean() || proceed("Warning")) {
+			if (proceed()) {
 				setFile(null);
 				open();
 			}
@@ -428,16 +422,7 @@ public class Notepad extends JPanel {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			frame.closeDialog();
-			if (clean() || proceed("Warning")) {
-				final FileChooser chooser = frame.getFileChooser();
-				switch (chooser.showInternalOpenDialog(Notepad.this)) {
-				case JFileChooser.APPROVE_OPTION:
-					setFile(chooser.getSelectedFile().toPath());
-					open();
-					break;
-				default:
-				}
-			}
+			frame.getApplicationManager().get("Files").open(file == null?null:file.toUri(), frame.getDesktopPane());
 		}
 	}
 
@@ -487,17 +472,28 @@ public class Notepad extends JPanel {
 	}
 
 	void open() {
-		final Document doc = editor.getReplaceDocument();
-		if (doc != null) {
-			doc.removeUndoableEditListener(undoHandler);
-		}
+		editor.getDocument().removeUndoableEditListener(undoHandler);
 		editor.setDocument(new Document());
 		if (file != null && Files.exists(file)) {
+			try {
+				frame.getFileChooser().setSelectedFile(file.toFile());
+			} catch (final UnsupportedOperationException e) {}
 			new FileLoader().execute();
 		} else {
-			editor.getDocument().addUndoableEditListener(undoHandler);
-			resetUndoManager();
+			reset();
 		}
+	}
+
+	private void reset() {
+		editor.getDocument().addUndoableEditListener(undoHandler);
+		resetUndoManager();
+	}
+
+	private void resetUndoManager() {
+		undo.discardAllEdits();
+		modified = 0;
+		undoAction.update();
+		redoAction.update();
 	}
 
 	private void save(final Path file) {
@@ -509,8 +505,6 @@ public class Notepad extends JPanel {
 
 	private void save() {
 		new FileSaver().execute();
-		modified = 0;
-		update();
 	}
 
 	private void update() {
@@ -522,8 +516,8 @@ public class Notepad extends JPanel {
 		getAction("save").setEnabled(file != null && modified != 0);
 	}
 
-	boolean clean() {
-		return modified == 0;
+	boolean proceed() {
+		return modified == 0 || proceed("Warning");
 	}
 
 	boolean proceed(final String key) {
@@ -571,24 +565,24 @@ public class Notepad extends JPanel {
 		}
 	}
 
-	abstract class FileWorker extends SwingWorker<Document, Object> {
+	abstract class FileWorker extends SwingWorker<Object, Object> {
+		final Cursor waitCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 		final CardLayout layout = (CardLayout) status.getLayout();
 		final Document doc = editor.getReplaceDocument();
-		final Cursor waitCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 		final Cursor cursor = editor.getCursor();
 		final int length;
 
 		FileWorker(final int length) {
-			this.length = length;
 			addPropertyChangeListener(new PropertyChangeListener() {
 				public  void propertyChange(final PropertyChangeEvent evt) {
 					if ("progress".equals(evt.getPropertyName())) {
-						progress.setValue((Integer)evt.getNewValue());
+						progress.setValue((Integer) evt.getNewValue());
 					}
 				}
 			});
 			layout.show(status, "progress");
 			editor.setCursor(waitCursor);
+			this.length = length;
 		}
 
 		void setNumber(final int n) {
@@ -599,20 +593,31 @@ public class Notepad extends JPanel {
 
 		@Override
 		public void done() {
+			try {
+				get();
+				doDone();
+			} catch (final InterruptedException e) {
+				e.printStackTrace();
+			} catch (final ExecutionException e) {
+				e.printStackTrace();
+			}
+			editor.requestFocus();
 			editor.setCursor(cursor);
 			layout.show(status, "label");
 			progress.setValue(0);
 		}
+
+		protected void doDone() {
+		}
 	}
 
 	private int getFileLength() {
-		int n = 0;
 		try {
-			n = (int) Files.size(file);
+			return (int) Files.size(file);
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
-		return n;
+		return 0;
 	}
 
 	class FileLoader extends FileWorker {
@@ -624,7 +629,7 @@ public class Notepad extends JPanel {
 		}
 
 		@Override
-		public Document doInBackground() {
+		public Object doInBackground() {
 			try (final Reader in = Files.newBufferedReader(file, Charset.defaultCharset())) {
 				// try to start reading
 				final char[] buff = new char[4096];
@@ -639,17 +644,15 @@ public class Notepad extends JPanel {
 			} catch (final BadLocationException e) {
 				System.err.println(e.getMessage());
 			}
-			return doc;
+			return null;
 		}
 
 		@Override
-		public void done() {
-			super.done();
+		public void doDone() {
 			if (elementTreePanel != null) {
 				elementTreePanel.setEditor(editor);
 			}
-			doc.addUndoableEditListener(undoHandler);
-			resetUndoManager();
+			reset();
 		}
 	}
 
@@ -659,7 +662,7 @@ public class Notepad extends JPanel {
 		}
 
 		@Override
-		public Document doInBackground() {
+		public Object doInBackground() {
 			try (final Writer out = Files.newBufferedWriter(file, Charset.defaultCharset())) {
 				// start writing
 				final Segment text = new Segment();
@@ -679,7 +682,13 @@ public class Notepad extends JPanel {
 			} catch (final BadLocationException e) {
 				System.err.println(e.getMessage());
 			}
-			return doc;
+			return null;
+		}
+
+		@Override
+		public void doDone() {
+			modified = 0;
+			update();
 		}
 	}
 }

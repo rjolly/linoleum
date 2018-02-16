@@ -2,7 +2,6 @@ package linoleum.notepad;
 
 import java.awt.Component;
 import java.beans.PropertyVetoException;
-import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,11 +44,7 @@ public class Frame extends linoleum.application.Frame {
 
 	@Override
 	public void setURI(final URI uri) {
-		try {
-			notepad.setFile(Paths.get(uri).toRealPath());
-		} catch (final IOException ex) {
-			ex.printStackTrace();
-		}
+		notepad.setFile(Paths.get(uri));
 	}
 
 	@Override
@@ -256,7 +251,7 @@ public class Frame extends linoleum.application.Frame {
         private void formVetoableChange(java.beans.PropertyChangeEvent evt)throws java.beans.PropertyVetoException {//GEN-FIRST:event_formVetoableChange
 		if (IS_CLOSED_PROPERTY.equals(evt.getPropertyName()) && (Boolean) evt.getNewValue()) {
 			closeDialog();
-			if (notepad.clean() || notepad.proceed("Warning")) {
+			if (notepad.proceed()) {
 				dialog1.setClosed(true);
 			} else {
 				throw new PropertyVetoException("aborted", evt);
