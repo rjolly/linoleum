@@ -583,12 +583,7 @@ public class FileManager extends Frame implements Runnable {
 	}
 
 	private Path getDirectory(final Path path) {
-		if (Files.isDirectory(path)) try {
-			return relativize(path);
-		} catch (final IOException ex) {
-			ex.printStackTrace();
-		}
-		return getParent(path);
+		return Files.isDirectory(path)?path.normalize():getParent(path);
 	}
 
 	private Path getParent(final Path path) {
@@ -735,7 +730,7 @@ public class FileManager extends Frame implements Runnable {
 	@Override
 	public void setURI(final URI uri) {
 		try {
-			final Path path = unjar(relativize(Paths.get(uri)));
+			final Path path = unjar(relativize(Paths.get(uri).normalize()));
 			selected = Files.isDirectory(path)?null:path;
 			this.path = unfile(path);
 			fs = path.getFileSystem();
@@ -744,11 +739,10 @@ public class FileManager extends Frame implements Runnable {
 		}
 	}
 
-	private Path relativize(final Path path) throws IOException {
-		final Path real = path.toRealPath();
-		final FileSystem fs = real.getFileSystem();
-		final Path user = Paths.get("").toRealPath();
-		return fs == defaultfs && real.startsWith(user)?user.relativize(real):real;
+	private Path relativize(final Path path) {
+		final FileSystem fs = path.getFileSystem();
+		final Path user = Paths.get(System.getProperty("user.dir"));
+		return fs == defaultfs && path.startsWith(user)?user.relativize(path):path;
 	}
 
 	private Path unjar(final Path path) throws IOException {
@@ -963,7 +957,7 @@ public class FileManager extends Frame implements Runnable {
 		if (that == null) {
 			return reuseFor(getHome());
 		} else try {
-			return Files.isSameFile(path, unfile(unjar(Paths.get(that))));
+			return path.equals(unfile(unjar(relativize(Paths.get(that).normalize()))));
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
@@ -975,7 +969,7 @@ public class FileManager extends Frame implements Runnable {
 	}
 
 	private void open(final Path entry) {
-		if (Files.isDirectory(entry) && !Files.isSymbolicLink(entry)) {
+		if (Files.isDirectory(entry)) {
 			doClose();
 			setURI(entry.toUri());
 			doOpen();
