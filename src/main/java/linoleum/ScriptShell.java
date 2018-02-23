@@ -168,7 +168,7 @@ public class ScriptShell extends ScriptSupport implements ScriptShellPanel.Comma
 			e.printStackTrace();
 		}
 		try {
-			final File home = new File(System.getProperty("linoleum.home")).getCanonicalFile();
+			final File home = new File(System.getProperty("linoleum.home"));
 			loadUserInitFile(new File(home, "init." + extension));
 			if (!Files.isSameFile(home.toPath(), Paths.get("."))) {
 				// load current user's initialization file

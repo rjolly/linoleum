@@ -86,7 +86,7 @@ public class Packages {
 
 	private File normalize(final File file) {
 		final Path path = file.toPath().normalize();
-		final Path user = Paths.get(".").normalize().toAbsolutePath();
+		final Path user = Paths.get(System.getProperty("user.dir"));
 		return (path.startsWith(user)?user.relativize(path):path).toFile();
 	}
 
