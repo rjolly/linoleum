@@ -8,8 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.Collection;
 import java.util.jar.Manifest;
 import java.util.jar.Attributes;
@@ -90,15 +88,6 @@ public class Packages {
 		final Path path = file.toPath().normalize();
 		final Path user = Paths.get(".").normalize().toAbsolutePath();
 		return (path.startsWith(user)?user.relativize(path):path).toFile();
-	}
-
-	public File[] installed() {
-		final SortedMap<String, File> map = new TreeMap<>();
-		for (final String str : System.getProperty("java.class.path").split(File.pathSeparator)) {
-			final File file = new File(str);
-			map.put(new Package(file).getName(), file);
-		}
-		return map.values().toArray(new File[0]);
 	}
 
 	private void add1(final File file) {

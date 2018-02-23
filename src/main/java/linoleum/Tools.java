@@ -11,6 +11,8 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
@@ -27,17 +29,15 @@ public class Tools extends Frame {
                 setClosable(true);
 	}
 
-	private File[] concat(final File a[], final File b[]) {
-		final File c[] = new File[a.length + b.length];
-		System.arraycopy(a, 0, c, 0, a.length);
-		System.arraycopy(b, 0, c, a.length, b.length);
-		return c;
-	}
-
 	public void compile(final File files[], final File destDir, final String options[]) throws IOException {
 		final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 		try (final StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null)) {
-			fileManager.setLocation(StandardLocation.CLASS_PATH, Arrays.asList(concat(getApplicationManager().getPackages().installed(), new File[] {destDir})));
+			final List<File> concat = new ArrayList<>();
+			for (final String str : System.getProperty("java.class.path").split(File.pathSeparator)) {
+				concat.add(new File(str));
+			}
+			concat.add(destDir);
+			fileManager.setLocation(StandardLocation.CLASS_PATH, concat);
 			fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList(new File[] {destDir}));
 			final JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, Arrays.asList(options), null, fileManager.getJavaFileObjectsFromFiles(Arrays.asList(files)));
 			task.call();
