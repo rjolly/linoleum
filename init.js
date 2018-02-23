@@ -44,10 +44,7 @@ function javac(srcDir, destDir) {
 }
 
 function classpath() {
-    var str = "";
-    var files = apps.getPackages().installed();
-    for(i in files) str += files[i].getPath() + (i < files.length - 1 ? java.io.File.pathSeparator : "");
-    return str;
+    return java.lang.System.getProperty("java.class.path");
 }
 
 function javadoc(srcDir, destDir) {

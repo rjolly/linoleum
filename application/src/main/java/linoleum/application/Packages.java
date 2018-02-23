@@ -17,7 +17,6 @@ import java.net.URL;
 
 public class Packages {
 	private final Map<String, File> map = new HashMap<>();
-	private final SortedMap<String, File> installed = new TreeMap<>();
 	private final FileFilter filter = new FileFilter() {
 		public boolean accept(final File file) {
 			return file.isFile() && file.getName().endsWith(".jar");
@@ -40,7 +39,7 @@ public class Packages {
 		for (final String str : classpath) {
 			final File file = normalize(new File(str));
 			if (file.isFile() && file.getName().endsWith(".jar")) {
-				put(new Package(file).getName(), file);
+				map.put(new Package(file).getName(), file);
 			}
 		}
 		final File jar = map.get("linoleum");
@@ -51,7 +50,10 @@ public class Packages {
 			if (cp != null) for (final String str : cp.split(" ")) {
 				final File file = new File(jar.getParentFile(), str);
 				if (file.isFile() && file.getName().endsWith(".jar")) {
-					put(new Package(file).getName(), file);
+					final String name = new Package(file).getName();
+					if (!map.containsKey(name)) {
+						put(name, file);
+					}
 				}
 			}
 		} catch (final IOException e) {
@@ -91,7 +93,12 @@ public class Packages {
 	}
 
 	public File[] installed() {
-		return installed.values().toArray(new File[0]);
+		final SortedMap<String, File> map = new TreeMap<>();
+		for (final String str : System.getProperty("java.class.path").split(File.pathSeparator)) {
+			final File file = new File(str);
+			map.put(new Package(file).getName(), file);
+		}
+		return map.values().toArray(new File[0]);
 	}
 
 	private void add1(final File file) {
@@ -115,6 +122,6 @@ public class Packages {
 
 	private void put(final String name, final File file) {
 		map.put(name, file);
-		installed.put(name, file);
+		System.setProperty("java.class.path", System.getProperty("java.class.path") + File.pathSeparator + file);
 	}
 }
