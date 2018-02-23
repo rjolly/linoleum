@@ -107,18 +107,18 @@ public class PackageManager extends Frame {
 		final ResolveReport resolveReport = ivy.resolve(source);
 		final ModuleDescriptor md = resolveReport.getModuleDescriptor();
 		final ModuleRevisionId mRID = md.getModuleRevisionId();
-		final String pattern[] = new String[] { dir.getPath() + "/[artifact]-[type].[ext]", dir.getPath() + "/[artifact].[ext]" };
+		final String pattern[] = new String[] { new File(dir, "[artifact]-[type].[ext]").getPath(), new File(dir, "[artifact].[ext]").getPath() };
 		final PublishOptions options = new PublishOptions();
 		options.setOverwrite(true);
 		if (resolver.startsWith("local")) {
-			options.setSrcIvyPattern(getParent(source) + "/[artifact].[ext]");
+			options.setSrcIvyPattern(new File(getParent(source), "[artifact].[ext]").getPath());
 		}
 		ivy.publish(mRID, Arrays.asList(pattern), resolver, options);
 	}
 
-	private String getParent(final File file) {
-		final String parent = file.getParent();
-		return parent == null?".":parent;
+	private File getParent(final File file) {
+		final File parent = file.getParentFile();
+		return parent == null?new File(""):parent;
 	}
 
 	public void install(final String name, final String conf) {
