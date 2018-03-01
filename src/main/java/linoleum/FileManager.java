@@ -716,8 +716,8 @@ public class FileManager extends Frame implements Runnable {
 	@Override
 	public void load() {
 		jTextField1.setText(prefs.get(getKey("home"), ""));
-		jCheckBox1.setSelected(isShowHidden());
-		jCheckBox2.setSelected(isShowDetails());
+		jCheckBox1.setSelected(showHidden());
+		jCheckBox2.setSelected(showDetails());
 	}
 
 	@Override
@@ -883,11 +883,11 @@ public class FileManager extends Frame implements Runnable {
 		}
 	}
 
-	private boolean isShowHidden() {
+	private boolean showHidden() {
 		return prefs.getBoolean(getKey("showHidden"), false);
 	}
 
-	private boolean isShowDetails() {
+	private boolean showDetails() {
 		return prefs.getBoolean(getKey("showDetails"), false);
 	}
 
@@ -1313,7 +1313,7 @@ public class FileManager extends Frame implements Runnable {
 
                 jMenu4.setText("View");
 
-                jCheckBoxMenuItem1.setSelected(isShowHidden());
+                jCheckBoxMenuItem1.setSelected(showHidden());
                 jCheckBoxMenuItem1.setText("Show hidden");
                 jCheckBoxMenuItem1.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1322,7 +1322,7 @@ public class FileManager extends Frame implements Runnable {
                 });
                 jMenu4.add(jCheckBoxMenuItem1);
 
-                jCheckBoxMenuItem2.setSelected(isShowDetails());
+                jCheckBoxMenuItem2.setSelected(showDetails());
                 jCheckBoxMenuItem2.setText("Show details");
                 jCheckBoxMenuItem2.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {

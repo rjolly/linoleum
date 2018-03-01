@@ -195,7 +195,7 @@
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="jCheckBoxMenuItem1">
               <Properties>
                 <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="isShowHidden()" type="code"/>
+                  <Connection code="showHidden()" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Show hidden"/>
               </Properties>
@@ -206,7 +206,7 @@
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="jCheckBoxMenuItem2">
               <Properties>
                 <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="isShowDetails()" type="code"/>
+                  <Connection code="showDetails()" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Show details"/>
               </Properties>
