@@ -98,4 +98,20 @@ public class Tools extends Frame {
 	public void run(final String name, final File dir, final String args[]) throws Exception {
 		Class.forName(name, true, new URLClassLoader(new URL[] {dir.toURI().toURL()})).getMethod("main", args.getClass()).invoke(null, (Object) args);
 	}
+
+	public Thread getThread(final String name) {
+		Thread[] array;
+		int m;
+		int n = Thread.activeCount();
+		while ((m = Thread.enumerate(array = new Thread[n])) == n) {
+			n <<= 1;
+		}
+		for (int i = 0 ; i < m ; i++) {
+			final Thread thread = array[i];
+			if (name != null && name.equals(thread.getName())) {
+				return thread;
+			}
+		}
+		return null;
+	}
 }

@@ -197,6 +197,10 @@ function printfile(file) {
     println(fileToPath(file));
 }
 
+function kill(name) {
+    apps.get("Tools").getThread(name).stop();
+}
+
 function run(name, dir) {
     if (dir == undefined) {
 	dir = ".";
