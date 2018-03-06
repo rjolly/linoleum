@@ -190,29 +190,32 @@ public class Frame extends JInternalFrame implements App {
 	public void open(final URI uri, final JDesktopPane desktop) {
 		final JInternalFrame c = getFrame(desktop, uri);
 		if (c instanceof Frame) {
-			final Frame frame = (Frame) c;
-			final boolean open = frame.open;
-			final boolean changed = uri != null && !uri.equals(frame.getURI());
-			if (changed) {
-				frame.setURI(uri);
-			}
-			if (frame.getDesktopPane() == null) {
-				desktop.add(frame);
-				frame.select();
-				if (open) {
-					frame.openFrame();
-				}
-			} else {
-				frame.select();
-				if (changed) {
-					frame.open();
-				}
-			}
+			((Frame) c).doOpen(uri, desktop);
 		} else {
 			if (c.getDesktopPane() == null) {
 				desktop.add(c);
 			}
 			manager.select(c);
+		}
+	}
+
+	private void doOpen(final URI uri, final JDesktopPane desktop) {
+		final boolean open = this.open;
+		final boolean changed = uri != null && !uri.equals(getURI());
+		if (changed) {
+			setURI(uri);
+		}
+		if (getDesktopPane() == null) {
+			desktop.add(this);
+			select();
+			if (open) {
+				openFrame();
+			}
+		} else {
+			select();
+			if (changed) {
+				open();
+			}
 		}
 	}
 
