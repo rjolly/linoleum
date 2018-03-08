@@ -1,5 +1,6 @@
 package linoleum;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -19,6 +20,7 @@ public class Background extends Frame {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final MetalThemeModel model = new MetalThemeModel();
 	private final FileChooser chooser = new FileChooser();
+	private final Color zero = new Color(0, 0, 0, 0);
 
 	public Background() {
 		initComponents();
@@ -145,6 +147,7 @@ public class Background extends Frame {
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 );
 
+                setBackground(zero);
                 setOptionPanel(optionPanel1);
 
                 jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);

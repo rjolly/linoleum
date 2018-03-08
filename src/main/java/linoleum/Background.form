@@ -83,6 +83,9 @@
     </Container>
   </NonVisualComponents>
   <Properties>
+    <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+      <Connection code="zero" type="code"/>
+    </Property>
     <Property name="optionPanel" type="linoleum.application.OptionPanel" editor="org.netbeans.modules.form.ComponentChooserEditor">
       <ComponentRef name="optionPanel1"/>
     </Property>
