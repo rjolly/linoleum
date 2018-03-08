@@ -1,8 +1,11 @@
 package linoleum;
 
 import java.beans.ExceptionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -28,11 +31,13 @@ import javax.swing.Action;
 import javax.swing.GroupLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import linoleum.application.ApplicationManager;
 
 public class Desktop extends JFrame {
@@ -52,6 +57,21 @@ public class Desktop extends JFrame {
 	private final Action contentsAction = new ContentsAction();
 	private final Action aboutAction = new AboutAction();
 	private final GraphicsDevice devices[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+	private final Color zero = new Color(0, 0, 0, 0);
+	private final PropertyChangeListener listener = new PropertyChangeListener() {
+		public void propertyChange(final PropertyChangeEvent e) {
+			final String name = e.getPropertyName();
+			if (name.equals("lookAndFeel")) {
+				final JComponent comp = getRootPane();
+				SwingUtilities.updateComponentTreeUI(comp);
+				comp.invalidate();
+				comp.validate();
+				comp.repaint();
+				frame.setBackground(zero);
+				frame.getContentPane().setBackground(zero);
+			}
+		}
+	};
 	private final File file = new File("desktop.xml");
 	private final ApplicationManager apps;
 	private final Background frame;
@@ -242,6 +262,7 @@ public class Desktop extends JFrame {
 		apps.manage(console);
 		apps.manage(apps);
 		loadBounds();
+		UIManager.addPropertyChangeListener(listener);
 	}
 
 	private void fullScreen() {
@@ -303,6 +324,7 @@ public class Desktop extends JFrame {
                 viewMenu = new javax.swing.JMenu();
                 fullScreenMenuItem = new javax.swing.JCheckBoxMenuItem();
                 screenshotMenuItem = new javax.swing.JMenuItem();
+                themeMenu = new linoleum.theme.MetalThemeMenu();
                 helpMenu = new javax.swing.JMenu();
                 contentMenuItem = new javax.swing.JMenuItem();
                 aboutMenuItem = new javax.swing.JMenuItem();
@@ -344,6 +366,10 @@ public class Desktop extends JFrame {
                 viewMenu.add(screenshotMenuItem);
 
                 menuBar.add(viewMenu);
+
+                themeMenu.setMnemonic('t');
+                themeMenu.setText("Theme");
+                menuBar.add(themeMenu);
 
                 helpMenu.setMnemonic('h');
                 helpMenu.setText("Help");
@@ -411,6 +437,7 @@ public class Desktop extends JFrame {
         private javax.swing.JMenuItem saveMenuItem;
         private javax.swing.JMenuItem screenshotMenuItem;
         private javax.swing.JPopupMenu.Separator separator;
+        private linoleum.theme.MetalThemeMenu themeMenu;
         private javax.swing.JMenu viewMenu;
         // End of variables declaration//GEN-END:variables
 }

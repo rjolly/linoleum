@@ -60,6 +60,12 @@
             </MenuItem>
           </SubComponents>
         </Menu>
+        <Menu class="linoleum.theme.MetalThemeMenu" name="themeMenu">
+          <Properties>
+            <Property name="mnemonic" type="int" value="116"/>
+            <Property name="text" type="java.lang.String" value="Theme"/>
+          </Properties>
+        </Menu>
         <Menu class="javax.swing.JMenu" name="helpMenu">
           <Properties>
             <Property name="mnemonic" type="int" value="104"/>
