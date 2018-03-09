@@ -1,19 +1,19 @@
 package linoleum.theme;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.Map;
+import java.util.HashMap;
 import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.UIManager;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalTheme;
 import javax.swing.plaf.metal.OceanTheme;
 
 @SuppressWarnings("serial")
-public class MetalThemeMenu extends JMenu implements ActionListener {
-	final MetalTheme[] themes = {
+public class MetalThemeMenu extends JMenu {
+	private final Map<String, MetalAction> map = new HashMap<>();
+	private final MetalTheme[] themes = {
 		new OceanTheme(),
 		new DefaultMetalTheme(),
 		new GreenMetalTheme(),
@@ -28,26 +28,20 @@ public class MetalThemeMenu extends JMenu implements ActionListener {
 	@SuppressWarnings("LeakingThisInConstructor")
 	public MetalThemeMenu() {
 		final ButtonGroup group = new ButtonGroup();
-		for (int i = 0; i < themes.length; i++) {
-			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(themes[i].getName());
+		for (final MetalTheme theme : themes) {
+			final MetalAction action = new MetalAction(theme);
+			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(action);
+			map.put(action.getName(), action);
 			group.add(item);
 			add(item);
-			item.setActionCommand(i + "");
-			item.addActionListener(this);
-			if (i == 0) {
-				item.setSelected(true);
-			}
 		}
 	}
 
-	public void actionPerformed(final ActionEvent e) {
-		final String numStr = e.getActionCommand();
-		final MetalTheme selectedTheme = themes[Integer.parseInt(numStr)];
-		MetalLookAndFeel.setCurrentTheme(selectedTheme);
-		try {
-			UIManager.setLookAndFeel(MetalLookAndFeel.class.getName());
-		} catch (final Exception ex) {
-			ex.printStackTrace();
-		}
+	public void select(final String str) {
+		map.get(str).select();
+	}
+
+	public String selected() {
+		return MetalLookAndFeel.getCurrentTheme().getName();
 	}
 }

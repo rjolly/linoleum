@@ -31,7 +31,6 @@ import javax.swing.Action;
 import javax.swing.GroupLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
@@ -62,13 +61,7 @@ public class Desktop extends JFrame {
 		public void propertyChange(final PropertyChangeEvent e) {
 			final String name = e.getPropertyName();
 			if (name.equals("lookAndFeel")) {
-				final JComponent comp = getRootPane();
-				SwingUtilities.updateComponentTreeUI(comp);
-				comp.invalidate();
-				comp.validate();
-				comp.repaint();
-				frame.setBackground(zero);
-				frame.getContentPane().setBackground(zero);
+				update();
 			}
 		}
 	};
@@ -263,6 +256,7 @@ public class Desktop extends JFrame {
 		apps.manage(apps);
 		loadBounds();
 		UIManager.addPropertyChangeListener(listener);
+		themeMenu.select(getTheme());
 	}
 
 	private void fullScreen() {
@@ -288,6 +282,10 @@ public class Desktop extends JFrame {
 		return prefs.getBoolean(getKey("fullScreen"), true);
 	}
 
+	private String getTheme() {
+		return prefs.get(getKey("theme"), "Ocean");
+	}
+
 	private void loadBounds() {
 		final int x = prefs.getInt(getKey("x"), getX());
 		final int y = prefs.getInt(getKey("y"), getY());
@@ -295,6 +293,14 @@ public class Desktop extends JFrame {
 		final int height = prefs.getInt(getKey("height"), getHeight());
 		setBounds(x, y, width, height);
 		bounds = getBounds();
+	}
+
+	private void update() {
+		SwingUtilities.updateComponentTreeUI(getRootPane());
+		frame.setBackground(zero);
+		frame.getContentPane().setBackground(zero);
+		resize();
+		prefs.put(getKey("theme"), themeMenu.selected());
 	}
 
 	private void resize() {
