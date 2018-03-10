@@ -241,7 +241,7 @@ public class Frame extends JInternalFrame implements App {
 
 	protected boolean reuseFor(final URI that) {
 		final URI uri = getURI();
-		return that == null?that == uri:that.equals(uri);
+		return uri == null?true:uri.equals(that);
 	}
 
 	public final List<Path> listFiles(final Path path) {

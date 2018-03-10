@@ -95,7 +95,7 @@ public class Frame extends linoleum.application.Frame {
 
 		try {
 			properties.load(getClass().getResourceAsStream("NotepadSystem.properties"));
-		} catch (final IOException  e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 
@@ -479,11 +479,6 @@ public class Frame extends linoleum.application.Frame {
 	@Override
 	public Frame getFrame() {
 		return new Frame();
-	}
-
-	@Override
-	public boolean reuseFor(final URI uri) {
-		return file == null?true:super.reuseFor(uri);
 	}
 
 	private void openDialog(final String title) {
