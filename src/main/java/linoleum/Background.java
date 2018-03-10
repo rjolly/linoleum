@@ -1,5 +1,9 @@
 package linoleum;
 
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Insets;
 import java.beans.PropertyVetoException;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
@@ -14,6 +18,7 @@ import linoleum.application.Frame;
 public class Background extends Frame {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final FileChooser chooser = new FileChooser();
+	private final Color zero = new Color(0, 0, 0, 0);
 
 	public Background() {
 		initComponents();
@@ -54,6 +59,21 @@ public class Background extends Frame {
 	private Icon getImage() {
 		final String str = prefs.get(getKey("image"), "");
 		return !str.isEmpty()?new ImageIcon(str):new ImageIcon(getClass().getResource("Wave.png"));
+	}
+
+	void update() {
+		setBackground(zero);
+		getContentPane().setBackground(zero);
+		resize();
+	}
+
+	void resize() {
+		final Dimension size = getDesktopPane().getSize();
+		final Insets insets = getInsets();
+		final Container panel = getContentPane();
+		final int width = getWidth() - panel.getWidth();
+		final int height = getHeight() - panel.getHeight();
+		setBounds(-insets.left, insets.bottom - height, size.width + width, size.height + height);
 	}
 
 	@SuppressWarnings("unchecked")

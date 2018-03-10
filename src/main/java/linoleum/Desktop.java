@@ -5,13 +5,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -24,6 +20,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -33,10 +31,12 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import linoleum.application.App;
 import linoleum.application.ApplicationManager;
 
 public class Desktop extends JFrame {
@@ -56,7 +56,6 @@ public class Desktop extends JFrame {
 	private final Action contentsAction = new ContentsAction();
 	private final Action aboutAction = new AboutAction();
 	private final GraphicsDevice devices[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
-	private final Color zero = new Color(0, 0, 0, 0);
 	private final PropertyChangeListener listener = new PropertyChangeListener() {
 		public void propertyChange(final PropertyChangeEvent e) {
 			final String name = e.getPropertyName();
@@ -297,19 +296,29 @@ public class Desktop extends JFrame {
 
 	private void update() {
 		SwingUtilities.updateComponentTreeUI(getRootPane());
-		frame.setBackground(zero);
-		frame.getContentPane().setBackground(zero);
-		resize();
+		final List<JInternalFrame> list = Arrays.asList(desktopPane.getAllFrames());
+		for (final App app : apps.getApplications()) {
+			if (app instanceof JInternalFrame) {
+				final JInternalFrame frame = (JInternalFrame) app;
+				if (!list.contains(frame)) {
+					SwingUtilities.updateComponentTreeUI(frame.getRootPane());
+					update(frame);
+				}
+			}
+		}
+		for (final JInternalFrame frame : list) {
+			update(frame);
+		}
+		frame.update();
 		prefs.put(getKey("theme"), themeMenu.selected());
 	}
 
-	private void resize() {
-		final Dimension size = desktopPane.getSize();
-		final Insets insets = frame.getInsets();
-		final Container panel = frame.getContentPane();
-		final int width = frame.getWidth() - panel.getWidth();
-		final int height = frame.getHeight() - panel.getHeight();
-		frame.setBounds(-insets.left, insets.bottom - height, size.width + width, size.height + height);
+	private void update(final JInternalFrame frame) {
+		SwingUtilities.updateComponentTreeUI(frame.getDesktopIcon());
+		final JMenuBar menuBar = frame.getJMenuBar();
+		if (menuBar != null) {
+			SwingUtilities.updateComponentTreeUI(menuBar);
+		}
 	}
 
 	private String getKey(final String str) {
@@ -410,7 +419,7 @@ public class Desktop extends JFrame {
 			prefs.putInt(getKey("width"), c.getWidth());
 			prefs.putInt(getKey("height"), c.getHeight());
 		}
-		resize();
+		frame.resize();
         }//GEN-LAST:event_formComponentResized
 
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
