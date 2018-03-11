@@ -13,7 +13,6 @@
     </path>
 
     <target name="clean">
-	<delete dir="dist"/>
 	<linoleum file="clean.js"/>
     </target>
 

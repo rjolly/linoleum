@@ -18,7 +18,7 @@ public class ScriptSupport extends Frame {
 	private final Map<String, ScriptEngineFactory> factories = new HashMap<>();
 	private final Map<String, ScriptEngineFactory> factoriesByName = new HashMap<>();
 	private final DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
-	private	ScriptEngineFactory factory;
+	private ScriptEngineFactory factory;
 	private ScriptEngineManager manager;
 
 	@Override
