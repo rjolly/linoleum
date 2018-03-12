@@ -1,6 +1,5 @@
 package linoleum;
 
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -20,7 +19,6 @@ public class Background extends Frame {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final MetalThemeModel model = new MetalThemeModel();
 	private final FileChooser chooser = new FileChooser();
-	private final Color zero = new Color(0, 0, 0, 0);
 
 	public Background() {
 		initComponents();
@@ -35,11 +33,10 @@ public class Background extends Frame {
 				if (evt.getKey().equals(getKey("image"))) {
 					jLabel1.setIcon(getImage());
 				} else if (evt.getKey().equals(getKey("theme"))) {
-					updateTheme();
+					update();
 				}
 			}
 		});
-		updateTheme();
 	}
 
 	@Override
@@ -72,14 +69,8 @@ public class Background extends Frame {
 		return prefs.get(getKey("theme"), "Ocean");
 	}
 
-	void updateTheme() {
-		model.select(getTheme());
-	}
-
 	void update() {
-		setBackground(zero);
-		getContentPane().setBackground(zero);
-		resize();
+		model.select(getTheme());
 	}
 
 	void resize() {

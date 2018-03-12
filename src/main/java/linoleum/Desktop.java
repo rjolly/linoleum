@@ -20,8 +20,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -35,7 +33,6 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import linoleum.application.App;
 import linoleum.application.ApplicationManager;
 
 public class Desktop extends JFrame {
@@ -59,7 +56,7 @@ public class Desktop extends JFrame {
 		public void propertyChange(final PropertyChangeEvent e) {
 			final String name = e.getPropertyName();
 			if (name.equals("lookAndFeel")) {
-				update();
+				SwingUtilities.updateComponentTreeUI(getRootPane());
 			}
 		}
 	};
@@ -213,6 +210,8 @@ public class Desktop extends JFrame {
 	}
 
 	public Desktop() {
+		UIManager.addPropertyChangeListener(listener);
+		new Background().update();
 		initComponents();
 		if (file.exists()) {
 			load();
@@ -249,7 +248,6 @@ public class Desktop extends JFrame {
 		}
 		frame.setVisible(true);
 		frame.setLayer(0);
-		UIManager.addPropertyChangeListener(listener);
 		apps.manage(frame);
 		apps.manage(console);
 		apps.manage(apps);
@@ -286,32 +284,6 @@ public class Desktop extends JFrame {
 		final int height = prefs.getInt(getKey("height"), getHeight());
 		setBounds(x, y, width, height);
 		bounds = getBounds();
-	}
-
-	private void update() {
-		SwingUtilities.updateComponentTreeUI(getRootPane());
-		final List<JInternalFrame> list = Arrays.asList(desktopPane.getAllFrames());
-		for (final App app : apps.getApplications()) {
-			if (app instanceof JInternalFrame) {
-				final JInternalFrame frame = (JInternalFrame) app;
-				if (!list.contains(frame)) {
-					SwingUtilities.updateComponentTreeUI(frame.getRootPane());
-					update(frame);
-				}
-			}
-		}
-		for (final JInternalFrame frame : list) {
-			update(frame);
-		}
-		frame.update();
-	}
-
-	private void update(final JInternalFrame frame) {
-		SwingUtilities.updateComponentTreeUI(frame.getDesktopIcon());
-		final JMenuBar menuBar = frame.getJMenuBar();
-		if (menuBar != null) {
-			SwingUtilities.updateComponentTreeUI(menuBar);
-		}
 	}
 
 	private String getKey(final String str) {
