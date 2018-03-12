@@ -57,6 +57,9 @@ public class Desktop extends JFrame {
 			final String name = e.getPropertyName();
 			if (name.equals("lookAndFeel")) {
 				SwingUtilities.updateComponentTreeUI(getRootPane());
+				if (frame != null) {
+					frame.update();
+				}
 			}
 		}
 	};
@@ -211,7 +214,7 @@ public class Desktop extends JFrame {
 
 	public Desktop() {
 		UIManager.addPropertyChangeListener(listener);
-		new Background().update();
+		new Background().updateTheme();
 		initComponents();
 		if (file.exists()) {
 			load();

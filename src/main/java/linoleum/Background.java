@@ -35,7 +35,7 @@ public class Background extends Frame {
 				if (evt.getKey().equals(getKey("image"))) {
 					jLabel1.setIcon(getImage());
 				} else if (evt.getKey().equals(getKey("theme"))) {
-					update();
+					updateTheme();
 				}
 			}
 		});
@@ -71,8 +71,14 @@ public class Background extends Frame {
 		return prefs.get(getKey("theme"), "Ocean");
 	}
 
-	void update() {
+	void updateTheme() {
 		model.select(getTheme());
+	}
+
+	void update() {
+		setBackground(zero);
+		getContentPane().setBackground(zero);
+		resize();
 	}
 
 	void resize() {
