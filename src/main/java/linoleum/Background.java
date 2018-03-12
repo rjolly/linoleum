@@ -8,19 +8,19 @@ import java.beans.PropertyVetoException;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import linoleum.application.FileChooser;
 import linoleum.application.Frame;
+import linoleum.theme.MetalThemeModel;
 
 public class Background extends Frame {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
+	private final MetalThemeModel model = new MetalThemeModel();
 	private final FileChooser chooser = new FileChooser();
 	private final Color zero = new Color(0, 0, 0, 0);
-	private final DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
 
 	public Background() {
 		initComponents();
@@ -34,9 +34,12 @@ public class Background extends Frame {
 			public void preferenceChange(final PreferenceChangeEvent evt) {
 				if (evt.getKey().equals(getKey("image"))) {
 					jLabel1.setIcon(getImage());
+				} else if (evt.getKey().equals(getKey("theme"))) {
+					updateTheme();
 				}
 			}
 		});
+		updateTheme();
 	}
 
 	@Override
@@ -51,16 +54,26 @@ public class Background extends Frame {
 	@Override
 	public void load() {
 		jTextField1.setText(prefs.get(getKey("image"), ""));
+		model.setSelectedItem(getTheme());
 	}
 
 	@Override
 	public void save() {
 		prefs.put(getKey("image"), jTextField1.getText());
+		prefs.put(getKey("theme"), model.getSelectedItem());
 	}
 
 	private Icon getImage() {
 		final String str = prefs.get(getKey("image"), "");
 		return !str.isEmpty()?new ImageIcon(str):new ImageIcon(getClass().getResource("Wave.png"));
+	}
+
+	private String getTheme() {
+		return prefs.get(getKey("theme"), "Ocean");
+	}
+
+	void updateTheme() {
+		model.select(getTheme());
 	}
 
 	void update() {

@@ -2,17 +2,16 @@ package linoleum.theme;
 
 import java.util.Map;
 import java.util.HashMap;
-import javax.swing.ButtonGroup;
-import javax.swing.JMenu;
-import javax.swing.JRadioButtonMenuItem;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.UIManager;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalTheme;
 import javax.swing.plaf.metal.OceanTheme;
 
 @SuppressWarnings("serial")
-public class MetalThemeMenu extends JMenu {
-	private final Map<String, MetalAction> map = new HashMap<>();
+public class MetalThemeModel extends DefaultComboBoxModel<String> {
+	private final Map<String, MetalTheme> map = new HashMap<>();
 	private final MetalTheme[] themes = {
 		new OceanTheme(),
 		new DefaultMetalTheme(),
@@ -26,22 +25,25 @@ public class MetalThemeMenu extends JMenu {
 	};
 
 	@SuppressWarnings("LeakingThisInConstructor")
-	public MetalThemeMenu() {
-		final ButtonGroup group = new ButtonGroup();
+	public MetalThemeModel() {
 		for (final MetalTheme theme : themes) {
-			final MetalAction action = new MetalAction(theme);
-			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(action);
-			map.put(action.getName(), action);
-			group.add(item);
-			add(item);
+			final String name = theme.getName();
+			map.put(name, theme);
+			addElement(name);
 		}
 	}
 
 	public void select(final String str) {
-		map.get(str).select();
+		MetalLookAndFeel.setCurrentTheme(map.get(str));
+		try {
+			UIManager.setLookAndFeel(MetalLookAndFeel.class.getName());
+		} catch (final Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
-	public String selected() {
-		return MetalLookAndFeel.getCurrentTheme().getName();
+	@Override
+	public String getSelectedItem() {
+		return (String) super.getSelectedItem();
 	}
 }

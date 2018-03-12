@@ -26,7 +26,6 @@ import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.GroupLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -250,12 +249,11 @@ public class Desktop extends JFrame {
 		}
 		frame.setVisible(true);
 		frame.setLayer(0);
+		UIManager.addPropertyChangeListener(listener);
 		apps.manage(frame);
 		apps.manage(console);
 		apps.manage(apps);
 		loadBounds();
-		UIManager.addPropertyChangeListener(listener);
-		themeMenu.select(getTheme());
 	}
 
 	private void fullScreen() {
@@ -279,10 +277,6 @@ public class Desktop extends JFrame {
 
 	private boolean isFullScreen() {
 		return prefs.getBoolean(getKey("fullScreen"), true);
-	}
-
-	private String getTheme() {
-		return prefs.get(getKey("theme"), "Ocean");
 	}
 
 	private void loadBounds() {
@@ -310,7 +304,6 @@ public class Desktop extends JFrame {
 			update(frame);
 		}
 		frame.update();
-		prefs.put(getKey("theme"), themeMenu.selected());
 	}
 
 	private void update(final JInternalFrame frame) {
@@ -339,7 +332,6 @@ public class Desktop extends JFrame {
                 viewMenu = new javax.swing.JMenu();
                 fullScreenMenuItem = new javax.swing.JCheckBoxMenuItem();
                 screenshotMenuItem = new javax.swing.JMenuItem();
-                themeMenu = new linoleum.theme.MetalThemeMenu();
                 helpMenu = new javax.swing.JMenu();
                 contentMenuItem = new javax.swing.JMenuItem();
                 aboutMenuItem = new javax.swing.JMenuItem();
@@ -381,10 +373,6 @@ public class Desktop extends JFrame {
                 viewMenu.add(screenshotMenuItem);
 
                 menuBar.add(viewMenu);
-
-                themeMenu.setMnemonic('t');
-                themeMenu.setText("Theme");
-                menuBar.add(themeMenu);
 
                 helpMenu.setMnemonic('h');
                 helpMenu.setText("Help");
@@ -452,7 +440,6 @@ public class Desktop extends JFrame {
         private javax.swing.JMenuItem saveMenuItem;
         private javax.swing.JMenuItem screenshotMenuItem;
         private javax.swing.JPopupMenu.Separator separator;
-        private linoleum.theme.MetalThemeMenu themeMenu;
         private javax.swing.JMenu viewMenu;
         // End of variables declaration//GEN-END:variables
 }
