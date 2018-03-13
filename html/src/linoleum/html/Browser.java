@@ -151,10 +151,21 @@ public class Browser extends Frame {
 	@Override
 	public void setURI(final URI uri) {
 		try {
-			current = new FrameURL(uri.toURL());
+			setURL(uri.toURL());
+			reload = false;
 		} catch (final MalformedURLException ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	private void setURL(final URL url) {
+		if (url != null) {
+			current = new FrameURL(url);
+		}
+	}
+
+	private void setURI(final String str) {
+		setURL(toURL(str));
 	}
 
 	@Override
@@ -165,14 +176,6 @@ public class Browser extends Frame {
 			ex.printStackTrace();
 		}
 		return null;
-	}
-
-	private void setURI(final String str) {
-		if (!str.isEmpty()) try {
-			setURI(new URI(str));
-		} catch (final URISyntaxException ex) {
-			ex.printStackTrace();
-		}
 	}
 
 	@Override
@@ -236,6 +239,32 @@ public class Browser extends Frame {
 			ex.printStackTrace();
 		}
 		return super.canOpen(uri);
+	}
+
+	private boolean reuseFor(final URL that) {
+		if (current != null) {
+			return current.getURL().sameFile(that);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean reuseFor(final URI that) {
+		try {
+			return reuseFor(that == null?toURL(getHome()):that.toURL());
+		} catch (final MalformedURLException ex) {
+			ex.printStackTrace();
+		}
+		return false;
+	}
+
+	private URL toURL(final String str) {
+		if (!str.isEmpty()) try {
+			return new URL(str);
+		} catch (final MalformedURLException ex) {
+			ex.printStackTrace();
+		}
+		return null;
 	}
 
 	private void open(final int delta) {
