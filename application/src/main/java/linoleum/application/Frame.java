@@ -24,7 +24,9 @@ import java.beans.Transient;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.Files;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.DirectoryStream;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -258,6 +260,18 @@ public class Frame extends JInternalFrame implements App {
 			ex.printStackTrace();
 		}
 		return Collections.unmodifiableList(list);
+	}
+
+	Path getPath(final URI uri) {
+		return uri.isOpaque() && "file".equals(uri.getScheme())?Paths.get(uri.getSchemeSpecificPart()):Paths.get(uri);
+	}
+
+	protected boolean canOpen(final URI uri) {
+		try {
+			return canOpen(getPath(uri));
+		} catch (final FileSystemNotFoundException ex) {
+		}
+		return canOpen(uri.getScheme());
 	}
 
 	protected boolean canOpen(final Path entry) {

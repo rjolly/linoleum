@@ -300,7 +300,7 @@ public class ApplicationManager extends Frame {
 
 	public App getApplication(final URI uri) {
 		try {
-			return getApplication(Paths.get(uri));
+			return getApplication(getPath(uri));
 		} catch (final FileSystemNotFoundException ex) {
 		}
 		return getApplication(uri.getScheme());
@@ -336,7 +336,7 @@ public class ApplicationManager extends Frame {
 
 	public List<App> getApplications(final URI uri) {
 		try {
-			return getApplications(Paths.get(uri));
+			return getApplications(getPath(uri));
 		} catch (final FileSystemNotFoundException ex) {
 		}
 		return getApplications(uri.getScheme());

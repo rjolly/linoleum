@@ -15,8 +15,6 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.HttpURLConnection;
-import java.nio.file.Paths;
-import java.nio.file.FileSystemNotFoundException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -210,7 +208,7 @@ public class Browser extends Frame {
 			} else {
 				getApplicationManager().open(uri);
 			}
-		} catch (final URISyntaxException | IOException ex) {
+		} catch (final URISyntaxException ex) {
 			ex.printStackTrace();
 		}
 	}
@@ -219,14 +217,8 @@ public class Browser extends Frame {
 		return uri.isOpaque()?new URI(uri.getScheme(), uri.getSchemeSpecificPart(), null):new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null);
 	}
 
-	private boolean canOpen(final URI uri) throws IOException {
-		if (uri.isOpaque() && "file".equals(uri.getScheme())) {
-			return canOpen(Paths.get(uri.getSchemeSpecificPart()));
-		}
-		try {
-			return canOpen(Paths.get(uri));
-		} catch (final FileSystemNotFoundException ex) {
-		}
+	@Override
+	public boolean canOpen(final URI uri) {
 		if (canOpen(uri.getScheme())) try {
 			final URLConnection conn = uri.toURL().openConnection();
 			if (conn instanceof HttpURLConnection) {
@@ -240,10 +232,10 @@ public class Browser extends Frame {
 			}
 			final String str = conn.getContentType();
 			return str == null || canOpen(new MimeType(str));
-		} catch (final MimeTypeParseException ex) {
+		} catch (final MimeTypeParseException | IOException ex) {
 			ex.printStackTrace();
 		}
-		return false;
+		return super.canOpen(uri);
 	}
 
 	private void open(final int delta) {
