@@ -2,7 +2,7 @@ package linoleum.html;
 
 import javax.swing.SwingWorker;
 
-public abstract class PageLoader extends SwingWorker<Boolean, Object> {
+public abstract class PageLoader extends SwingWorker<Object, Object> {
 	private int length;
 
 	public void setLength(final int length) {

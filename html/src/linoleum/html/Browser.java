@@ -53,9 +53,11 @@ public class Browser extends Frame {
 	private final Action copyLinkLocationAction = new CopyLinkLocationAction();
 	private List<FrameURL> history = new ArrayList<>();
 	private PageLoader loader;
+	private FrameURL previous;
 	private FrameURL current;
 	private boolean reload;
 	private boolean open;
+	private int delta;
 	private int index;
 	private URL url;
 
@@ -159,8 +161,13 @@ public class Browser extends Frame {
 
 	private void setURL(final URL url) {
 		if (url != null) {
-			current = new FrameURL(url);
+			setURL(new FrameURL(url));
 		}
+	}
+
+	private void setURL(final FrameURL dest) {
+		reload = false;
+		current = dest;
 	}
 
 	private void setURI(final String str) {
@@ -184,8 +191,8 @@ public class Browser extends Frame {
 			open = true;
 		}
 		if (current != null) {
-			reload = false;
-			open(current, current.getURL());
+			url = current.getURL();
+			doOpen();
 		}
 	}
 
@@ -195,18 +202,18 @@ public class Browser extends Frame {
 	}
 
 	private void linkActivated(final HyperlinkEvent evt) {
-		final URL url = evt.getURL();
 		if (url != null) {
-			reload = false;
-			open(FrameURL.create(current, evt), url);
+			setURL(FrameURL.create(current, evt));
+			doOpen();
 		}
 	}
 
-	private void open(final FrameURL dest, final URL url) {
+	private void doOpen() {
 		try {
 			final URI uri = stripped(url.toURI());
 			if (canOpen(uri)) {
-				open(dest, 1);
+				delta = 1;
+				doDoOpen();
 			} else if (canOpen(uri.getScheme())) {
 				getApplicationManager().get("Downloads").open(uri, getDesktopPane());
 			} else {
@@ -268,17 +275,17 @@ public class Browser extends Frame {
 		return null;
 	}
 
-	private void open(final int delta) {
-		reload = false;
-		open(history.get(index + delta), delta);
+	private void setURL(final int delta) {
+		this.delta = delta;
+		setURL(history.get(index + delta));
 	}
 
-	private void open(final FrameURL dest, final int delta) {
+	private void doDoOpen() {
 		if (loader != null) {
 			loader.cancel(true);
 		}
 		if (loader == null) {
-			loader = new PageLoader(dest, delta);
+			loader = new PageLoader();
 			jEditorPane1.setLoader(loader);
 			loader.execute();
 		}
@@ -288,12 +295,8 @@ public class Browser extends Frame {
 		private final CardLayout layout = (CardLayout) jPanel2.getLayout();
 		private final Cursor waitCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 		private final Cursor cursor = jEditorPane1.getCursor();
-		private final FrameURL dest;
-		private final int delta;
 
-		PageLoader(final FrameURL dest, final int delta) {
-			this.dest = dest;
-			this.delta = delta;
+		PageLoader() {
 			addPropertyChangeListener(new PropertyChangeListener() {
 				public  void propertyChange(final PropertyChangeEvent evt) {
 					if ("progress".equals(evt.getPropertyName())) {
@@ -307,21 +310,20 @@ public class Browser extends Frame {
 		}
 
 		public Boolean doInBackground() throws IOException {
-			jEditorPane1.setPage(dest, reload);
-			return true;
+			jEditorPane1.setPage(current, reload);
+			return null;
 		}
 
 		public void done() {
 			try {
-				if (get()) {
-					jTextField1.setText(dest.getURL().toString());
-					setTitle((String) jEditorPane1.getDocument().getProperty(Document.TitleProperty));
-					if (current != null) {
-						record(dest, delta);
-					}
-					current = dest;
-					reload = true;
+				get();
+				jTextField1.setText(current.getURL().toString());
+				setTitle((String) jEditorPane1.getDocument().getProperty(Document.TitleProperty));
+				if (previous != null) {
+					record();
 				}
+				previous = current;
+				reload = true;
 			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			} catch (final ExecutionException e) {
@@ -340,14 +342,14 @@ public class Browser extends Frame {
 		}
 	}
 
-	private void record(final FrameURL dest, final int delta) {
+	private void record() {
 		if (index == history.size()) {
-			history.add(current);
+			history.add(previous);
 		}
-		if (!dest.equals(history.get(index))) {
+		if (!current.equals(history.get(index))) {
 			index += delta;
 		}
-		if (index < history.size() && !dest.equals(history.get(index))) {
+		if (index < history.size() && !current.equals(history.get(index))) {
 			history = new ArrayList<>(history.subList(0, index));
 		}
 		update();
@@ -593,11 +595,13 @@ public class Browser extends Frame {
         }//GEN-LAST:event_jEditorPane1HyperlinkUpdate
 
         private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-		open(-1);
+		setURL(-1);
+		doDoOpen();
         }//GEN-LAST:event_jButton2ActionPerformed
 
         private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-		open(1);
+		setURL(1);
+		doDoOpen();
         }//GEN-LAST:event_jButton3ActionPerformed
 
         private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
