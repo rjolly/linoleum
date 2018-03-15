@@ -210,7 +210,7 @@ public class Browser extends Frame {
 
 	private void doOpen() {
 		try {
-			final URI uri = stripped(url.toURI());
+			final URI uri = url.toURI();
 			if (canOpen(uri)) {
 				delta = 1;
 				doDoOpen();
@@ -222,10 +222,6 @@ public class Browser extends Frame {
 		} catch (final URISyntaxException ex) {
 			ex.printStackTrace();
 		}
-	}
-
-	private URI stripped(final URI uri) throws URISyntaxException {
-		return uri.isOpaque()?new URI(uri.getScheme(), uri.getSchemeSpecificPart(), null):new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null);
 	}
 
 	@Override
@@ -365,7 +361,7 @@ public class Browser extends Frame {
 		boolean sep0 = false;
 		if (url != null) try {
 			final URI uri = url.toURI();
-			final App a = getApplicationManager().getApplication(stripped(uri));
+			final App a = getApplicationManager().getApplication(uri);
 			boolean sep = false;
 			if (a != null) {
 				final Action action = new AbstractAction(a.getName(), a.getFrameIcon()) {
@@ -378,7 +374,7 @@ public class Browser extends Frame {
 				sep = true;
 			}
 			sep0 = sep;
-			for (final App app : getApplicationManager().getApplications(stripped(uri))) {
+			for (final App app : getApplicationManager().getApplications(uri)) {
 				if (!app.equals(a)) {
 					if (sep) {
 						jPopupMenu1.addSeparator();

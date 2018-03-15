@@ -23,6 +23,7 @@ import java.awt.Component;
 import java.beans.Transient;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
@@ -263,7 +264,25 @@ public class Frame extends JInternalFrame implements App {
 	}
 
 	Path getPath(final URI uri) {
-		return uri.isOpaque() && "file".equals(uri.getScheme())?Paths.get(uri.getSchemeSpecificPart()):Paths.get(uri);
+		return uri.isOpaque()?"file".equals(uri.getScheme())?Paths.get(uri.getSchemeSpecificPart()):getPath(uri.getScheme(), uri.getSchemeSpecificPart()):getPath(uri.getScheme(), uri.getAuthority(), uri.getPath());
+	}
+
+	private Path getPath(final String scheme, final String authority, final String path) {
+		try {
+			return Paths.get(new URI(scheme, authority, path, null, null));
+		} catch (final URISyntaxException ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+
+	private Path getPath(final String scheme, final String ssp) {
+		try {
+			return Paths.get(new URI(scheme, ssp, null));
+		} catch (final URISyntaxException ex) {
+			ex.printStackTrace();
+		}
+		return null;
 	}
 
 	protected boolean canOpen(final URI uri) {
