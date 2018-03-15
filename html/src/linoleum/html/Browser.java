@@ -152,7 +152,6 @@ public class Browser extends Frame {
 	public void setURI(final URI uri) {
 		try {
 			setURL(uri.toURL());
-			reload = false;
 		} catch (final MalformedURLException ex) {
 			ex.printStackTrace();
 		}
@@ -185,7 +184,8 @@ public class Browser extends Frame {
 			open = true;
 		}
 		if (current != null) {
-			open(current, current.getURL(), reload);
+			reload = false;
+			open(current, current.getURL());
 		}
 	}
 
@@ -197,15 +197,16 @@ public class Browser extends Frame {
 	private void linkActivated(final HyperlinkEvent evt) {
 		final URL url = evt.getURL();
 		if (url != null) {
-			open(FrameURL.create(current, evt), url, false);
+			reload = false;
+			open(FrameURL.create(current, evt), url);
 		}
 	}
 
-	private void open(final FrameURL dest, final URL url, final boolean force) {
+	private void open(final FrameURL dest, final URL url) {
 		try {
 			final URI uri = stripped(url.toURI());
 			if (canOpen(uri)) {
-				open(dest, 1, force);
+				open(dest, 1);
 			} else if (canOpen(uri.getScheme())) {
 				getApplicationManager().get("Downloads").open(uri, getDesktopPane());
 			} else {
@@ -268,15 +269,16 @@ public class Browser extends Frame {
 	}
 
 	private void open(final int delta) {
-		open(history.get(index + delta), delta, false);
+		reload = false;
+		open(history.get(index + delta), delta);
 	}
 
-	private void open(final FrameURL dest, final int delta, final boolean force) {
+	private void open(final FrameURL dest, final int delta) {
 		if (loader != null) {
 			loader.cancel(true);
 		}
 		if (loader == null) {
-			loader = new PageLoader(dest, delta, force);
+			loader = new PageLoader(dest, delta);
 			jEditorPane1.setLoader(loader);
 			loader.execute();
 		}
@@ -287,13 +289,11 @@ public class Browser extends Frame {
 		private final Cursor waitCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 		private final Cursor cursor = jEditorPane1.getCursor();
 		private final FrameURL dest;
-		private final boolean force;
 		private final int delta;
 
-		PageLoader(final FrameURL dest, final int delta, final boolean force) {
+		PageLoader(final FrameURL dest, final int delta) {
 			this.dest = dest;
 			this.delta = delta;
-			this.force = force;
 			addPropertyChangeListener(new PropertyChangeListener() {
 				public  void propertyChange(final PropertyChangeEvent evt) {
 					if ("progress".equals(evt.getPropertyName())) {
@@ -307,7 +307,7 @@ public class Browser extends Frame {
 		}
 
 		public Boolean doInBackground() throws IOException {
-			jEditorPane1.setPage(dest, force);
+			jEditorPane1.setPage(dest, reload);
 			return true;
 		}
 
