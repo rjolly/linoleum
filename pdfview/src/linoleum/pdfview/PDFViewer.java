@@ -66,6 +66,7 @@ public class PDFViewer extends Frame {
 		public CloseAction() {
 			super("Close");
 			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_MASK));
+			setEnabled(false);
 		}
 
 		@Override
@@ -97,7 +98,7 @@ public class PDFViewer extends Frame {
 	protected void open() {
 		final URI uri = getURI();
 		if (uri != null) try {
-			final Path path = Paths.get(uri).toRealPath();
+			final Path path = Paths.get(uri);
 			if (path.getFileSystem() == FileSystems.getDefault()) {
 				openFile(path.toFile());
 			} else {
