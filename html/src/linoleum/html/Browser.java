@@ -247,7 +247,7 @@ public class Browser extends Frame {
 
 	private boolean reuseFor(final URL that) {
 		if (current != null) {
-			return current.getURL().sameFile(that);
+			return that == null?false:current.getURL().sameFile(that);
 		}
 		return true;
 	}
