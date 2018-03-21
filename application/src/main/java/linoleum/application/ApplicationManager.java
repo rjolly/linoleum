@@ -24,9 +24,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.beans.ConstructorProperties;
 import java.beans.PropertyVetoException;
-import java.io.IOException;
 import java.net.URI;
-import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
@@ -299,20 +297,8 @@ public class ApplicationManager extends Frame {
 	}
 
 	public App getApplication(final URI uri) {
-		try {
-			return getApplication(getPath(uri));
-		} catch (final FileSystemNotFoundException ex) {
-		}
-		return getApplication(uri.getScheme());
-	}
-
-	private App getApplication(final Path path) {
-		try {
-			return getApplication(new MimeType(Files.probeContentType(path)));
-		} catch (final IOException | MimeTypeParseException ex) {
-			ex.printStackTrace();
-		}
-		return null;
+		final MimeType type = getMimeType(uri);
+		return type == null?getApplication(uri.getScheme()):getApplication(type);
 	}
 
 	private App getApplication(final MimeType type) {
@@ -335,21 +321,8 @@ public class ApplicationManager extends Frame {
 	}
 
 	public List<App> getApplications(final URI uri) {
-		try {
-			return getApplications(getPath(uri));
-		} catch (final FileSystemNotFoundException ex) {
-		}
-		return getApplications(uri.getScheme());
-	}
-
-	private List<App> getApplications(final Path path) {
-		final List<App> apps = new ArrayList<>();
-		try {
-			apps.addAll(getApplications(new MimeType(Files.probeContentType(path))));
-		} catch (final IOException | MimeTypeParseException ex) {
-			ex.printStackTrace();
-		}
-		return Collections.unmodifiableList(apps);
+		final MimeType type = getMimeType(uri);
+		return type == null?getApplications(uri.getScheme()):getApplications(type);
 	}
 
 	private List<App> getApplications(final MimeType type) {

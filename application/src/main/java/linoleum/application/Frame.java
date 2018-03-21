@@ -263,8 +263,12 @@ public class Frame extends JInternalFrame implements App {
 		return Collections.unmodifiableList(list);
 	}
 
-	Path getPath(final URI uri) {
-		return uri.isOpaque()?"file".equals(uri.getScheme())?Paths.get(uri.getSchemeSpecificPart()):getPath(uri.getScheme(), uri.getSchemeSpecificPart()):getPath(uri.getScheme(), uri.getAuthority(), uri.getPath());
+	private Path getPath(final URI uri) {
+		try {
+			return uri.isOpaque()?"file".equals(uri.getScheme())?Paths.get(uri.getSchemeSpecificPart()):getPath(uri.getScheme(), uri.getSchemeSpecificPart()):getPath(uri.getScheme(), uri.getAuthority(), uri.getPath());
+		} catch (final FileSystemNotFoundException ex) {
+		}
+		return null;
 	}
 
 	private Path getPath(final String scheme, final String authority, final String path) {
@@ -285,18 +289,35 @@ public class Frame extends JInternalFrame implements App {
 		return null;
 	}
 
-	protected boolean canOpen(final URI uri) {
+	protected MimeType getMimeType(final URI uri) {
+		final Path path = getPath(uri);
+		return path == null?null:getMimeType(path);
+	}
+
+	private MimeType getMimeType(final Path path) {
 		try {
-			return canOpen(getPath(uri));
-		} catch (final FileSystemNotFoundException ex) {
+			return new MimeType(Files.probeContentType(path));
+		} catch (final IOException | MimeTypeParseException ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+
+	public final boolean canOpen(final URI uri) {
+		final MimeType type = getMimeType(uri);
+		if (type != null) try {
+			return canOpen(type);
+		} catch (final MimeTypeParseException ex) {
+			ex.printStackTrace();
 		}
 		return canOpen(uri.getScheme());
 	}
 
 	protected boolean canOpen(final Path entry) {
-		try {
-			return canOpen(new MimeType(Files.probeContentType(entry)));
-		} catch (final IOException | MimeTypeParseException ex) {
+		final MimeType type = getMimeType(entry);
+		if (type != null) try {
+			return canOpen(type);
+		} catch (final MimeTypeParseException ex) {
 			ex.printStackTrace();
 		}
 		return false;

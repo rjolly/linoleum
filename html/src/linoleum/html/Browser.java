@@ -225,7 +225,7 @@ public class Browser extends Frame {
 	}
 
 	@Override
-	public boolean canOpen(final URI uri) {
+	public MimeType getMimeType(final URI uri) {
 		if (canOpen(uri.getScheme())) try {
 			final URLConnection conn = uri.toURL().openConnection();
 			if (conn instanceof HttpURLConnection) {
@@ -234,15 +234,17 @@ public class Browser extends Frame {
 				final int response = hconn.getResponseCode();
 				if (response >= 300 && response <= 399) {
 					final String loc = conn.getHeaderField("Location");
-					return canOpen(uri.resolve(loc));
+					return getMimeType(uri.resolve(loc));
 				}
 			}
 			final String str = conn.getContentType();
-			return str == null || canOpen(new MimeType(str));
+			if (str != null) {
+				return new MimeType(str);
+			}
 		} catch (final MimeTypeParseException | IOException ex) {
 			ex.printStackTrace();
 		}
-		return super.canOpen(uri);
+		return super.getMimeType(uri);
 	}
 
 	private boolean reuseFor(final URL that) {
