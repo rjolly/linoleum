@@ -715,7 +715,7 @@ public class FileManager extends Frame implements Runnable {
 
 	@Override
 	public void load() {
-		jTextField1.setText(prefs.get(getKey("home"), ""));
+		jTextField1.setText(getHome().toString());
 		jCheckBox1.setSelected(showHidden());
 		jCheckBox2.setSelected(showDetails());
 	}

@@ -102,7 +102,7 @@ public class Browser extends Frame {
 			}
 		});
 		update();
-		setURI(getHome());
+		setURL(getHome());
 	}
 
 	@Override
@@ -116,19 +116,19 @@ public class Browser extends Frame {
 
 	private void open(final String str) {
 		if (!reload) {
-			setURI(str);
+			setURL(toURL(str));
 		}
 		open();
 	}
 
 	@Override
 	public void load() {
-		jTextField2.setText(getHome());
+		jTextField2.setText(getHome().toString());
 		jComboBox1.setSelectedItem(getFontSize());
 	}
 
-	private String getHome() {
-		return prefs.get(getKey("home"), "");
+	private URL getHome() {
+		return toURL(prefs.get(getKey("home"), ""));
 	}
 
 	private int getFontSize() {
@@ -168,10 +168,6 @@ public class Browser extends Frame {
 	private void setURL(final FrameURL dest) {
 		reload = false;
 		current = dest;
-	}
-
-	private void setURI(final String str) {
-		setURL(toURL(str));
 	}
 
 	@Override
@@ -257,7 +253,7 @@ public class Browser extends Frame {
 	@Override
 	public boolean reuseFor(final URI that) {
 		try {
-			return reuseFor(that == null?toURL(getHome()):that.toURL());
+			return reuseFor(that == null?getHome():that.toURL());
 		} catch (final MalformedURLException ex) {
 			ex.printStackTrace();
 		}
