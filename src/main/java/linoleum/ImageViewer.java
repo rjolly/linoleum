@@ -3,7 +3,6 @@ package linoleum;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import linoleum.application.Frame;
 
@@ -18,7 +17,7 @@ public class ImageViewer extends Frame {
 
 	@Override
 	public void setURI(final URI uri) {
-		final Path path = Paths.get(uri);
+		final Path path = getPath(uri);
 		Arrays.sort(files = listFiles(path.getParent()).toArray(new Path[0]));
 		index = Arrays.binarySearch(files, path);
 	}

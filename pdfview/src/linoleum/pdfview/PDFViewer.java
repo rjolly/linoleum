@@ -14,7 +14,6 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.nio.file.FileSystems;
 import javax.swing.Action;
@@ -98,7 +97,7 @@ public class PDFViewer extends Frame {
 	protected void open() {
 		final URI uri = getURI();
 		if (uri != null) try {
-			final Path path = Paths.get(uri);
+			final Path path = getPath(uri);
 			if (path.getFileSystem() == FileSystems.getDefault()) {
 				openFile(path.toFile());
 			} else {
