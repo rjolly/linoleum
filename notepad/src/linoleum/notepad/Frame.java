@@ -18,7 +18,6 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Properties;
@@ -468,7 +467,7 @@ public class Frame extends linoleum.application.Frame {
 
 	@Override
 	public void setURI(final URI uri) {
-		setFile(Paths.get(uri));
+		setFile(getPath(uri));
 	}
 
 	@Override

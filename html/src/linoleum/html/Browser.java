@@ -121,6 +121,15 @@ public class Browser extends Frame {
 		open();
 	}
 
+	private URL toURL(final String str) {
+		if (!str.isEmpty()) try {
+			return new URL(str);
+		} catch (final MalformedURLException ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+
 	@Override
 	public void load() {
 		jTextField2.setText(getHome().toString());
@@ -168,6 +177,11 @@ public class Browser extends Frame {
 	private void setURL(final FrameURL dest) {
 		reload = false;
 		current = dest;
+	}
+
+	private void setURL(final int delta) {
+		this.delta = delta;
+		setURL(history.get(index + delta));
 	}
 
 	@Override
@@ -258,20 +272,6 @@ public class Browser extends Frame {
 			ex.printStackTrace();
 		}
 		return false;
-	}
-
-	private URL toURL(final String str) {
-		if (!str.isEmpty()) try {
-			return new URL(str);
-		} catch (final MalformedURLException ex) {
-			ex.printStackTrace();
-		}
-		return null;
-	}
-
-	private void setURL(final int delta) {
-		this.delta = delta;
-		setURL(history.get(index + delta));
 	}
 
 	private void doDoOpen() {

@@ -263,26 +263,10 @@ public class Frame extends JInternalFrame implements App {
 		return Collections.unmodifiableList(list);
 	}
 
-	private Path getPath(final URI uri) {
+	public final Path getPath(final URI uri) {
 		try {
-			return uri.isOpaque()?"file".equals(uri.getScheme())?Paths.get(uri.getSchemeSpecificPart()):getPath(uri.getScheme(), uri.getSchemeSpecificPart()):getPath(uri.getScheme(), uri.getAuthority(), uri.getPath());
+			return uri.isOpaque()?"file".equals(uri.getScheme())?Paths.get(uri.getSchemeSpecificPart()):Paths.get(new URI(uri.getScheme(), uri.getSchemeSpecificPart(), null)):Paths.get(new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null));
 		} catch (final FileSystemNotFoundException ex) {
-		}
-		return null;
-	}
-
-	private Path getPath(final String scheme, final String authority, final String path) {
-		try {
-			return Paths.get(new URI(scheme, authority, path, null, null));
-		} catch (final URISyntaxException ex) {
-			ex.printStackTrace();
-		}
-		return null;
-	}
-
-	private Path getPath(final String scheme, final String ssp) {
-		try {
-			return Paths.get(new URI(scheme, ssp, null));
 		} catch (final URISyntaxException ex) {
 			ex.printStackTrace();
 		}
