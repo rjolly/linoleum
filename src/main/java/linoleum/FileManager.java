@@ -730,7 +730,7 @@ public class FileManager extends Frame implements Runnable {
 	@Override
 	public void setURI(final URI uri) {
 		try {
-			final Path path = unjar(relativize(Paths.get(uri).normalize()));
+			final Path path = unjar(relativize(getPath(uri).normalize()));
 			selected = Files.isDirectory(path)?null:path;
 			this.path = unfile(path);
 			fs = path.getFileSystem();
@@ -957,7 +957,7 @@ public class FileManager extends Frame implements Runnable {
 		if (that == null) {
 			return reuseFor(getHome());
 		} else try {
-			return path.equals(unfile(unjar(relativize(Paths.get(that).normalize()))));
+			return path.equals(unfile(unjar(relativize(getPath(that).normalize()))));
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
