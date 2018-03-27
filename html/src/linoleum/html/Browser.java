@@ -105,6 +105,14 @@ public class Browser extends Frame {
 		setURL(getHome());
 	}
 
+	private void setURL(final String str) {
+		try {
+			setURL(new URL(str));
+		} catch (final MalformedURLException ex) {
+			ex.printStackTrace();
+		}
+	}
+
 	@Override
 	public Component getFocusOwner() {
 		return current == null?jTextField1:jEditorPane1;
@@ -115,29 +123,20 @@ public class Browser extends Frame {
 	}
 
 	private void open(final String str) {
-		if (!reload) {
-			setURL(toURL(str));
+		if (!reload && !str.isEmpty()) {
+			setURL(str);
 		}
 		open();
 	}
 
-	private URL toURL(final String str) {
-		if (!str.isEmpty()) try {
-			return new URL(str);
-		} catch (final MalformedURLException ex) {
-			ex.printStackTrace();
-		}
-		return null;
-	}
-
 	@Override
 	public void load() {
-		jTextField2.setText(getHome().toString());
+		jTextField2.setText(getHome());
 		jComboBox1.setSelectedItem(getFontSize());
 	}
 
-	private URL getHome() {
-		return toURL(prefs.get(getKey("home"), ""));
+	private String getHome() {
+		return prefs.get(getKey("home"), "file:");
 	}
 
 	private int getFontSize() {
@@ -169,9 +168,8 @@ public class Browser extends Frame {
 	}
 
 	private void setURL(final URL url) {
-		if (url != null) {
-			setURL(new FrameURL(url));
-		}
+		delta = 1;
+		setURL(new FrameURL(url));
 	}
 
 	private void setURL(final FrameURL dest) {
@@ -202,7 +200,6 @@ public class Browser extends Frame {
 		}
 		final URI uri = getURI();
 		if (uri != null && canOpen(uri)) {
-			delta = 1;
 			doOpen();
 		} else if (canOpen(uri.getScheme())) {
 			getApplicationManager().get("Downloads").open(uri, getDesktopPane());
@@ -217,10 +214,9 @@ public class Browser extends Frame {
 	}
 
 	private void linkActivated(final HyperlinkEvent evt) {
-		if (url != null) {
-			setURL(FrameURL.create(current, evt));
-			open();
-		}
+		delta = 1;
+		setURL(FrameURL.create(current, evt));
+		open();
 	}
 
 	@Override
@@ -256,7 +252,7 @@ public class Browser extends Frame {
 	@Override
 	public boolean reuseFor(final URI that) {
 		try {
-			return reuseFor(that == null?getHome():that.toURL());
+			return reuseFor(that == null?new URL(getHome()):that.toURL());
 		} catch (final MalformedURLException ex) {
 			ex.printStackTrace();
 		}
@@ -563,7 +559,9 @@ public class Browser extends Frame {
 			return;
 		}
 		if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-			linkActivated(evt);
+			if (url != null) {
+				linkActivated(evt);
+			}
 		} else if (evt.getEventType() == HyperlinkEvent.EventType.ENTERED) {
 			((JEditorPane) evt.getSource()).setComponentPopupMenu(jPopupMenu1);
 			url = evt.getURL();
