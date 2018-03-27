@@ -200,9 +200,14 @@ public class Browser extends Frame {
 			prefs.addPreferenceChangeListener(listener);
 			open = true;
 		}
-		if (current != null) {
-			url = current.getURL();
+		final URI uri = getURI();
+		if (uri != null && canOpen(uri)) {
+			delta = 1;
 			doOpen();
+		} else if (canOpen(uri.getScheme())) {
+			getApplicationManager().get("Downloads").open(uri, getDesktopPane());
+		} else {
+			getApplicationManager().open(uri);
 		}
 	}
 
@@ -214,23 +219,7 @@ public class Browser extends Frame {
 	private void linkActivated(final HyperlinkEvent evt) {
 		if (url != null) {
 			setURL(FrameURL.create(current, evt));
-			doOpen();
-		}
-	}
-
-	private void doOpen() {
-		try {
-			final URI uri = url.toURI();
-			if (canOpen(uri)) {
-				delta = 1;
-				doDoOpen();
-			} else if (canOpen(uri.getScheme())) {
-				getApplicationManager().get("Downloads").open(uri, getDesktopPane());
-			} else {
-				getApplicationManager().open(uri);
-			}
-		} catch (final URISyntaxException ex) {
-			ex.printStackTrace();
+			open();
 		}
 	}
 
@@ -274,7 +263,7 @@ public class Browser extends Frame {
 		return false;
 	}
 
-	private void doDoOpen() {
+	private void doOpen() {
 		if (loader != null) {
 			loader.cancel(true);
 		}
@@ -590,12 +579,12 @@ public class Browser extends Frame {
 
         private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
 		setURL(-1);
-		doDoOpen();
+		doOpen();
         }//GEN-LAST:event_jButton2ActionPerformed
 
         private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
 		setURL(1);
-		doDoOpen();
+		doOpen();
         }//GEN-LAST:event_jButton3ActionPerformed
 
         private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
