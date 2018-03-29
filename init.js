@@ -202,12 +202,14 @@ function kill(name) {
 }
 
 function run(name, dir) {
+    var offset = 2;
     if (dir == undefined) {
+	offset = 1;
 	dir = ".";
     }
-    var array = new Array(arguments.length - 1);
+    var array = new Array(arguments.length - offset);
     for (var i = 0; i < array.length; i++) {
-	array[i] = arguments[i+1];
+	array[i] = arguments[i + offset];
     }
     apps.get("Tools").run(name, pathToFile(dir), array);
 }
