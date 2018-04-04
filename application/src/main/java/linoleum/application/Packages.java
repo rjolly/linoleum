@@ -59,13 +59,12 @@ public class Packages {
 		}
 		add1(new File(home, "lib/tools.jar"));
 		add1(new File(home, "lib/jconsole.jar"));
-		if (jar != null) try {
-			String str = System.getProperty("linoleum.home");
-			if (str == null) {
-				System.setProperty("linoleum.home", str = jar.getParent());
-			}
-			final File home = new File(str);
-			if (!Files.isSameFile(home.toPath(), Paths.get("."))) {
+		if (jar != null && System.getProperty("linoleum.home") == null) {
+			System.setProperty("linoleum.home", jar.getParent());
+		}
+		{
+			final File home = getHome();
+			if (home != null) {
 				final File lib = new File(home, "lib");
 				if (lib.isDirectory()) {
 					for (final File file : lib.listFiles(filter)) {
@@ -73,8 +72,6 @@ public class Packages {
 					}
 				}
 			}
-		} catch (final IOException e) {
-			e.printStackTrace();
 		}
 		lib.mkdir();
 		if (lib.isDirectory()) {
@@ -82,6 +79,19 @@ public class Packages {
 				add(file);
 			}
 		}
+	}
+
+	final File getHome() {
+		final String str = System.getProperty("linoleum.home");
+		final File home = str == null?null:new File(str);
+		if (home != null) try {
+			if (!Files.isSameFile(home.toPath(), Paths.get("."))) {
+				return home;
+			}
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	private File normalize(final File file) {

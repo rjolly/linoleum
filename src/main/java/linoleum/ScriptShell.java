@@ -167,16 +167,25 @@ public class ScriptShell extends ScriptSupport implements ScriptShellPanel.Comma
 		} catch (final ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		try {
-			final File home = new File(System.getProperty("linoleum.home"));
+		final File home = getHome();
+		if (home != null) {
 			loadUserInitFile(new File(home, "init." + extension));
+		}
+		// load current user's initialization file
+		loadUserInitFile(new File("init." + extension));
+	}
+
+	final File getHome() {
+		final String str = System.getProperty("linoleum.home");
+		final File home = str == null?null:new File(str);
+		if (home != null) try {
 			if (!Files.isSameFile(home.toPath(), Paths.get("."))) {
-				// load current user's initialization file
-				loadUserInitFile(new File("init." + extension));
+				return home;
 			}
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 
 	// set pre-defined global variables for script
