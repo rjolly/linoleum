@@ -99,7 +99,7 @@ public class Packages {
 	public boolean add(final File file) {
 		final Package pkg = new Package(file);
 		final String name = pkg.getName();
-		if (!pkg.isSourcesOrJavadoc() && !map.containsKey(name)) try {
+		if (!pkg.isSourcesOrJavadoc() && !map.containsKey(name) && ClassLoader.getSystemClassLoader() instanceof ClassLoader) try {
 			((ClassLoader) ClassLoader.getSystemClassLoader()).addURL(file.toURI().toURL());
 			put(name, file);
 			return true;
