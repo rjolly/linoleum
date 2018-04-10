@@ -288,20 +288,40 @@ public class ApplicationManager extends Frame {
 		if (uri == null) {
 			super.open(uri, desktop);
 		} else {
-			final App app = getApplication(uri);
+			final MimeType type = getMimeType(uri);
+			final App app = type == null?getApplication(uri.getScheme()):getApplication(type);
 			if (app != null) {
 				app.open(uri, desktop);
-			} else {
-				final List<App> apps = getApplications(uri);
-				if (apps.size() > 0) {
-					apps.get(0).open(uri, desktop);
-				}
 			}
 		}
 	}
 
+	private App getApplication(final MimeType type) {
+		final App app = getPreferredApplication(type);
+		if (app == null) {
+			final List<App> apps = getApplications(type);
+			if (apps.size() > 0) {
+				return apps.get(0);
+			}
+		}
+		return app;
+	}
+
+	private App getApplication(final String scheme) {
+		final App app = getPreferredApplication(scheme);
+		if (app == null) {
+			final List<App> apps = getApplications(scheme);
+			if (apps.size() > 0) {
+				return apps.get(0);
+			}
+		}
+		return app;
+	}
+
 	public boolean populate(final URI uri, JPopupMenu... menus) {
-		final App a = getApplication(uri);
+		final String scheme = uri.getScheme();
+		final MimeType type = getMimeType(uri);
+		final App a = type == null?getPreferredApplication(scheme):getPreferredApplication(type);
 		boolean sep = false;
 		if (a != null) {
 			final Action action = new AbstractAction(a.getName(), a.getFrameIcon()) {
@@ -316,7 +336,7 @@ public class ApplicationManager extends Frame {
 			sep = true;
 		}
 		boolean sep0 = sep;
-		for (final App app : getApplications(uri)) {
+		for (final App app : type == null?getApplications(scheme):getApplications(type)) {
 			if (!app.equals(a)) {
 				if (sep) {
 					for (final JPopupMenu menu : menus) {
@@ -339,12 +359,7 @@ public class ApplicationManager extends Frame {
 		return sep0;
 	}
 
-	public App getApplication(final URI uri) {
-		final MimeType type = getMimeType(uri);
-		return type == null?getApplication(uri.getScheme()):getApplication(type);
-	}
-
-	private App getApplication(final MimeType type) {
+	private App getPreferredApplication(final MimeType type) {
 		if (pref.containsKey(type)) {
 			return pref.get(type);
 		}
@@ -356,16 +371,11 @@ public class ApplicationManager extends Frame {
 		return null;
 	}
 
-	private App getApplication(final String scheme) {
+	private App getPreferredApplication(final String scheme) {
 		if (prefByScheme.containsKey(scheme)) {
 			return prefByScheme.get(scheme);
 		}
 		return null;
-	}
-
-	public List<App> getApplications(final URI uri) {
-		final MimeType type = getMimeType(uri);
-		return type == null?getApplications(uri.getScheme()):getApplications(type);
 	}
 
 	private List<App> getApplications(final MimeType type) {
