@@ -318,6 +318,20 @@ public class ApplicationManager extends Frame {
 		return app;
 	}
 
+	public App getApplication(final MimeType type, final String scheme) {
+		final List<App> apps = new ArrayList<>(getApplications(type));
+		apps.retainAll(getApplications(scheme));
+		final App app = getPreferredApplication(type);
+		if (apps.contains(app)) {
+			return app;
+		} else {
+			if (apps.size() > 0) {
+				return apps.get(0);
+			}
+		}
+		return null;
+	}
+
 	public boolean populate(final URI uri, JPopupMenu... menus) {
 		final String scheme = uri.getScheme();
 		final MimeType type = getMimeType(uri);
