@@ -22,6 +22,7 @@ package linoleum.application;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.beans.ConstructorProperties;
 import java.beans.PropertyVetoException;
 import java.net.URI;
@@ -44,6 +45,8 @@ import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
+import javax.swing.Action;
+import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -53,6 +56,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingWorker;
@@ -294,6 +298,45 @@ public class ApplicationManager extends Frame {
 				}
 			}
 		}
+	}
+
+	public boolean populate(final URI uri, JPopupMenu... menus) {
+		final App a = getApplication(uri);
+		boolean sep = false;
+		if (a != null) {
+			final Action action = new AbstractAction(a.getName(), a.getFrameIcon()) {
+				@Override
+				public void actionPerformed(final ActionEvent evt) {
+					a.open(uri, getDesktopPane());
+				}
+			};
+			for (final JPopupMenu menu : menus) {
+				menu.add(action);
+			}
+			sep = true;
+		}
+		boolean sep0 = sep;
+		for (final App app : getApplications(uri)) {
+			if (!app.equals(a)) {
+				if (sep) {
+					for (final JPopupMenu menu : menus) {
+						menu.addSeparator();
+					}
+					sep = false;
+				}
+				final Action action = new AbstractAction(app.getName(), app.getFrameIcon()) {
+					@Override
+					public void actionPerformed(final ActionEvent evt) {
+						app.open(uri, getDesktopPane());
+					}
+				};
+				for (final JPopupMenu menu : menus) {
+					menu.add(action);
+				}
+				sep0 = true;
+			}
+		}
+		return sep0;
 	}
 
 	public App getApplication(final URI uri) {

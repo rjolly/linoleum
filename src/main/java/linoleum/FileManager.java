@@ -1011,7 +1011,7 @@ public class FileManager extends Frame implements Runnable {
 	}
 
 	private void prepare() {
-		jMenu3.removeAll();
+		jMenu3.getPopupMenu().removeAll();
 		jPopupMenu1.removeAll();
 		if (isSelectionEmpty()) {
 			openAction.setEnabled(false);
@@ -1025,37 +1025,7 @@ public class FileManager extends Frame implements Runnable {
 			deleteAction.setEnabled(true);
 			final Path path = getSelectedValue();
 			if (Files.exists(path)) {
-				final URI uri = path.toUri();
-				final App a = getApplicationManager().getApplication(uri);
-				boolean sep = false;
-				if (a != null) {
-					final Action action = new AbstractAction(a.getName(), a.getFrameIcon()) {
-						@Override
-						public void actionPerformed(final ActionEvent evt) {
-							a.open(uri, getDesktopPane());
-						}
-					};
-					jMenu3.add(action);
-					jPopupMenu1.add(action);
-					sep = true;
-				}
-				for (final App app : getApplicationManager().getApplications(uri)) {
-					if (!app.equals(a)) {
-						if (sep) {
-							jMenu3.addSeparator();
-							jPopupMenu1.addSeparator();
-							sep = false;
-						}
-						final Action action = new AbstractAction(app.getName(), app.getFrameIcon()) {
-							@Override
-							public void actionPerformed(final ActionEvent evt) {
-								app.open(uri, getDesktopPane());
-							}
-						};
-						jMenu3.add(action);
-						jPopupMenu1.add(action);
-					}
-				}
+				getApplicationManager().populate(path.toUri(), jMenu3.getPopupMenu(), jPopupMenu1);
 			}
 		}
 	}

@@ -343,36 +343,7 @@ public class Browser extends Frame {
 		jPopupMenu1.removeAll();
 		boolean sep0 = false;
 		if (url != null) try {
-			final URI uri = url.toURI();
-			final App a = getApplicationManager().getApplication(uri);
-			boolean sep = false;
-			if (a != null) {
-				final Action action = new AbstractAction(a.getName(), a.getFrameIcon()) {
-					@Override
-					public void actionPerformed(final ActionEvent evt) {
-						a.open(uri, getDesktopPane());
-					}
-				};
-				jPopupMenu1.add(action);
-				sep = true;
-			}
-			sep0 = sep;
-			for (final App app : getApplicationManager().getApplications(uri)) {
-				if (!app.equals(a)) {
-					if (sep) {
-						jPopupMenu1.addSeparator();
-						sep = false;
-					}
-					final Action action = new AbstractAction(app.getName(), app.getFrameIcon()) {
-						@Override
-						public void actionPerformed(final ActionEvent evt) {
-							app.open(uri, getDesktopPane());
-						}
-					};
-					jPopupMenu1.add(action);
-					sep0 = true;
-				}
-			}
+			sep0 = getApplicationManager().populate(url.toURI(), jPopupMenu1);
 		} catch (final URISyntaxException ex) {
 			ex.printStackTrace();
 		}
