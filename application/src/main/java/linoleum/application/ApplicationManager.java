@@ -148,15 +148,22 @@ public class ApplicationManager extends Frame {
 		return instance;
 	}
 
+	private MimeType getMimeType(final String str) {
+		try {
+			return new MimeType(str);
+		} catch (final MimeTypeParseException ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+
 	private Map<MimeType, App> getPreferred() {
 		final Map<MimeType, App> pref = new TreeMap<>(comparator);
 		final String str = prefs.get(getKey("preferred"), "");
 		for (final String entry : str.split(", ")) {
 			final String s[] = entry.split("=");
-			if (s.length > 1) try {
-				pref.put(new MimeType(s[0]), get(s[1]));
-			} catch (final MimeTypeParseException ex) {
-				ex.printStackTrace();
+			if (s.length > 1) {
+				pref.put(getMimeType(s[0]), get(s[1]));
 			}
 		}
 		return pref;
@@ -514,15 +521,13 @@ public class ApplicationManager extends Frame {
 			appsByClass.put(app.getClass(), app);
 			final String str = app.getMimeType();
 			if (str != null) {
-				for (final String s : str.split(":")) try {
-					final MimeType type = new MimeType(s);
+				for (final String s : str.split(":")) {
+					final MimeType type = getMimeType(s);
 					List<App> apps = appsByType.get(type);
 					if (apps == null) {
 						appsByType.put(type, apps = new ArrayList<>());
 					}
 					apps.add(app);
-				} catch (final MimeTypeParseException ex) {
-					ex.printStackTrace();
 				}
 			}
 			final String ss = app.getScheme();
