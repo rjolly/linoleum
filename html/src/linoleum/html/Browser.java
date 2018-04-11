@@ -199,12 +199,16 @@ public class Browser extends Frame {
 			open = true;
 		}
 		final URI uri = getURI();
-		if (uri != null && canOpen(uri)) {
-			doOpen();
-		} else if (canOpen(uri.getScheme())) {
-			getApplicationManager().get("Downloads").open(uri, getDesktopPane());
-		} else {
-			getApplicationManager().open(uri);
+		if (uri != null) {
+			final String scheme = uri.getScheme();
+			final MimeType type = getMimeType(uri);
+			if (type == null?canOpen(scheme):canOpen(type)) {
+				doOpen();
+			} else if (canOpen(scheme)) {
+				getApplicationManager().open(uri, type);
+			} else {
+				getApplicationManager().open(uri);
+			}
 		}
 	}
 

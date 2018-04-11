@@ -325,7 +325,14 @@ public class ApplicationManager extends Frame {
 		return app;
 	}
 
-	public App getApplication(final MimeType type, final String scheme) {
+	public void open(final URI uri, final MimeType type) {
+		final App app = getApplication(type, uri.getScheme());
+		if (app != null) {
+			app.open(uri, getDesktopPane());
+		}
+	}
+
+	private App getApplication(final MimeType type, final String scheme) {
 		final List<App> apps = new ArrayList<>(getApplications(type));
 		apps.retainAll(getApplications(scheme));
 		final App app = getPreferredApplication(type);

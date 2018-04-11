@@ -289,29 +289,21 @@ public class Frame extends JInternalFrame implements App {
 
 	public final boolean canOpen(final URI uri) {
 		final MimeType type = getMimeType(uri);
-		if (type != null) try {
-			return canOpen(type);
-		} catch (final MimeTypeParseException ex) {
-			ex.printStackTrace();
-		}
-		return canOpen(uri.getScheme());
+		return type == null?canOpen(uri.getScheme()):canOpen(type);
 	}
 
 	protected boolean canOpen(final Path entry) {
 		final MimeType type = getMimeType(entry);
-		if (type != null) try {
-			return canOpen(type);
-		} catch (final MimeTypeParseException ex) {
-			ex.printStackTrace();
-		}
-		return false;
+		return type == null?false:canOpen(type);
 	}
 
-	public final boolean canOpen(final MimeType t) throws MimeTypeParseException {
-		for (final String s : type.split(":")) {
+	public final boolean canOpen(final MimeType t) {
+		for (final String s : type.split(":")) try {
 			if (t.match(s)) {
 				return true;
 			}
+		} catch (final MimeTypeParseException ex) {
+			ex.printStackTrace();
 		}
 		return false;
 	}
