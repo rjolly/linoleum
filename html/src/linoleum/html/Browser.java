@@ -106,7 +106,7 @@ public class Browser extends Frame {
 	}
 
 	private void setURL(final String str) {
-		try {
+		if (!str.isEmpty()) try {
 			setURL(new URL(str));
 		} catch (final MalformedURLException ex) {
 			ex.printStackTrace();
@@ -123,7 +123,7 @@ public class Browser extends Frame {
 	}
 
 	private void open(final String str) {
-		if (!reload && !str.isEmpty()) {
+		if (!reload) {
 			setURL(str);
 		}
 		open();
@@ -136,7 +136,7 @@ public class Browser extends Frame {
 	}
 
 	private String getHome() {
-		return prefs.get(getKey("home"), "file:");
+		return prefs.get(getKey("home"), "");
 	}
 
 	private int getFontSize() {
