@@ -13,16 +13,12 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
-import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
 import javax.swing.Action;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
@@ -33,7 +29,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.Document;
-import linoleum.application.App;
 import linoleum.application.Frame;
 
 public class Browser extends Frame {
@@ -200,12 +195,8 @@ public class Browser extends Frame {
 		}
 		final URI uri = getURI();
 		if (uri != null) {
-			final String scheme = uri.getScheme();
-			final MimeType type = getMimeType(uri);
-			if (type == null?canOpen(scheme):canOpen(type)) {
+			if (canOpen(uri)) {
 				doOpen();
-			} else if (canOpen(scheme)) {
-				getApplicationManager().open(uri, type);
 			} else {
 				getApplicationManager().open(uri);
 			}
@@ -221,29 +212,6 @@ public class Browser extends Frame {
 		delta = 1;
 		setURL(FrameURL.create(current, evt));
 		open();
-	}
-
-	@Override
-	public MimeType getMimeType(final URI uri) {
-		if (canOpen(uri.getScheme())) try {
-			final URLConnection conn = uri.toURL().openConnection();
-			if (conn instanceof HttpURLConnection) {
-				final HttpURLConnection hconn = (HttpURLConnection) conn;
-				hconn.setInstanceFollowRedirects(false);
-				final int response = hconn.getResponseCode();
-				if (response >= 300 && response <= 399) {
-					final String loc = conn.getHeaderField("Location");
-					return getMimeType(uri.resolve(loc));
-				}
-			}
-			final String str = conn.getContentType();
-			if (str != null) {
-				return new MimeType(str);
-			}
-		} catch (final MimeTypeParseException | IOException ex) {
-			ex.printStackTrace();
-		}
-		return super.getMimeType(uri);
 	}
 
 	private boolean reuseFor(final URL that) {
