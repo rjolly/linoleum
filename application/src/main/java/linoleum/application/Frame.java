@@ -273,7 +273,7 @@ public class Frame extends JInternalFrame implements App {
 		return null;
 	}
 
-	protected MimeType getMimeType(final URI uri) {
+	MimeType getMimeType(final URI uri) {
 		final Path path = getPath(uri);
 		return path == null?null:getMimeType(path);
 	}
