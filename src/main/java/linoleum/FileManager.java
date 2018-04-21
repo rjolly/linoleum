@@ -716,7 +716,7 @@ public class FileManager extends FileSupport implements Runnable {
 
 	@Override
 	public void load() {
-		jTextField1.setText(getHome().toString());
+		jTextField1.setText(prefs.get(getKey("home"), ""));
 		jCheckBox1.setSelected(showHidden());
 		jCheckBox2.setSelected(showDetails());
 	}
