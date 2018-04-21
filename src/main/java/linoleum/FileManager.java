@@ -81,9 +81,10 @@ import javax.swing.table.DefaultTableModel;
 import linoleum.application.App;
 import linoleum.application.ApplicationManager;
 import linoleum.application.FileChooser;
+import linoleum.application.FileSupport;
 import linoleum.application.Frame;
 
-public class FileManager extends Frame implements Runnable {
+public class FileManager extends FileSupport implements Runnable {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final Preferences apps = Preferences.userNodeForPackage(ApplicationManager.class);
 	private final Icon openIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"));

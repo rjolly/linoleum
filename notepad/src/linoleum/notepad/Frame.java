@@ -59,8 +59,9 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import linoleum.application.FileChooser;
+import linoleum.application.FileSupport;
 
-public class Frame extends linoleum.application.Frame {
+public class Frame extends FileSupport {
 	private final FileChooser chooser = new FileChooser();
 	private final Properties properties = new Properties();
 	private static final ResourceBundle resources = ResourceBundle.getBundle(Notepad.class.getName());
@@ -476,7 +477,7 @@ public class Frame extends linoleum.application.Frame {
 	}
 
 	@Override
-	public Frame getFrame() {
+	public linoleum.application.Frame getFrame() {
 		return new Frame();
 	}
 

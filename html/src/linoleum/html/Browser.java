@@ -29,9 +29,10 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.Document;
+import linoleum.application.FileSupport;
 import linoleum.application.Frame;
 
-public class Browser extends Frame {
+public class Browser extends FileSupport {
 	private final Icon goIcon = new ImageIcon(getClass().getResource("/linoleum/html/Go16.png"));
 	private final Icon stopIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
 	private final Icon reloadIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Refresh16.gif"));

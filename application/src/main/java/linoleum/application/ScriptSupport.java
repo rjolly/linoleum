@@ -13,7 +13,7 @@ import javax.swing.DefaultComboBoxModel;
 import linoleum.application.event.ClassPathListener;
 import linoleum.application.event.ClassPathChangeEvent;
 
-public class ScriptSupport extends Frame {
+public class ScriptSupport extends FileSupport {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final Map<String, ScriptEngineFactory> factories = new HashMap<>();
 	private final Map<String, ScriptEngineFactory> factoriesByName = new HashMap<>();

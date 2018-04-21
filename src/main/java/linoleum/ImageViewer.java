@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Arrays;
-import linoleum.application.Frame;
+import linoleum.application.FileSupport;
 
-public class ImageViewer extends Frame {
+public class ImageViewer extends FileSupport {
 	private Path files[] = new Path[0];
 	private int index;
 

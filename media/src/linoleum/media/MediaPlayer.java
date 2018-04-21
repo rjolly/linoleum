@@ -20,9 +20,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
-import linoleum.application.Frame;
+import linoleum.application.FileSupport;
 
-public class MediaPlayer extends Frame {
+public class MediaPlayer extends FileSupport {
 	private Player player;
 	private final Icon playIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Play16.gif"));
 	private final Icon pauseIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Pause16.gif"));

@@ -24,9 +24,10 @@ import javax.swing.KeyStroke;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import linoleum.application.FileChooser;
+import linoleum.application.FileSupport;
 import linoleum.application.Frame;
 
-public class PDFViewer extends Frame {
+public class PDFViewer extends FileSupport {
 	public static final String TITLE = "SwingLabs PDF Viewer";
 	private final Icon openIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"));
 	private final Action openAction = new OpenAction();

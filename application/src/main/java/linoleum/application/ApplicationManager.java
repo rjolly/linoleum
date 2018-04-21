@@ -65,7 +65,7 @@ import javax.swing.table.TableCellEditor;
 import linoleum.application.event.ClassPathListener;
 import linoleum.application.event.ClassPathChangeEvent;
 
-public class ApplicationManager extends Frame {
+public class ApplicationManager extends FileSupport {
 	private final Icon defaultIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Application24.gif"));
 	private final List<ClassPathListener> listeners = new ArrayList<>();
 	private final Map<String, App> appsByName = new HashMap<>();
