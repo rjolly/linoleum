@@ -74,7 +74,6 @@ public class Frame extends JInternalFrame implements App {
 
 	public void setOwner(final Frame owner) {
 		parent = owner;
-		index = parent.nextIndex();
 	}
 
 	public Frame getOwner() {
@@ -100,7 +99,7 @@ public class Frame extends JInternalFrame implements App {
 	}
 
 	private void openFrame() {
-		parent.openFrames.add(index);
+		parent.openFrames.add(index = parent.nextIndex());
 		open();
 	}
 
@@ -183,6 +182,7 @@ public class Frame extends JInternalFrame implements App {
 	public void open(final URI uri, final JDesktopPane desktop) {
 		final JInternalFrame c = getFrame(desktop, uri);
 		if (c instanceof Frame) {
+			((Frame) c).setOwner(this);
 			((Frame) c).doOpen(uri, desktop);
 		} else {
 			if (c.getDesktopPane() == null) {
@@ -225,11 +225,7 @@ public class Frame extends JInternalFrame implements App {
 				}
 			}
 		}
-		final JInternalFrame c = getFrame();
-		if (c instanceof Frame && c != this) {
-			((Frame) c).setOwner(this);
-		}
-		return c;
+		return getFrame();
 	}
 
 	protected boolean reuseFor(final URI that) {
