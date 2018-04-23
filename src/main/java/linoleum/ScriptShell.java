@@ -175,7 +175,7 @@ public class ScriptShell extends ScriptSupport implements ScriptShellPanel.Comma
 		loadUserInitFile(new File("init." + extension));
 	}
 
-	final File getHome() {
+	private File getHome() {
 		final String str = System.getProperty("linoleum.home");
 		final File home = str == null?null:new File(str);
 		if (home != null) try {

@@ -70,7 +70,7 @@ public class Packages {
 		add0(lib);
 	}
 
-	final File getHome() {
+	private File getHome() {
 		final String str = System.getProperty("linoleum.home");
 		final File home = str == null?null:new File(str);
 		if (home != null) try {
