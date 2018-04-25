@@ -5,6 +5,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -190,7 +191,7 @@ public class Desktop extends JFrame {
 					ex.printStackTrace();
 				}
 			});
-			e.writeObject(desktopPane.getAllFrames());
+			e.writeObject(desktopPane);
 		} catch (final FileNotFoundException ex) {
 			ex.printStackTrace();
 		}
@@ -203,10 +204,9 @@ public class Desktop extends JFrame {
 					ex.printStackTrace();
 				}
 			});
+			getContentPane().remove(desktopPane);
 			new ApplicationManager();
-			for (final JInternalFrame frame : (JInternalFrame[]) d.readObject()) {
-				desktopPane.add(frame);
-			}
+			getContentPane().add(desktopPane = (DesktopPane) d.readObject(), BorderLayout.CENTER);
 		} catch (final FileNotFoundException ex) {
 			ex.printStackTrace();
 		}
