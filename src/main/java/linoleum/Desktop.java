@@ -321,6 +321,7 @@ public class Desktop extends JFrame {
                                 formComponentMoved(evt);
                         }
                 });
+                getContentPane().add(desktopPane, java.awt.BorderLayout.CENTER);
 
                 fileMenu.setMnemonic('f');
                 fileMenu.setText("File");
@@ -361,17 +362,6 @@ public class Desktop extends JFrame {
                 menuBar.add(helpMenu);
 
                 setJMenuBar(menuBar);
-
-                javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-                getContentPane().setLayout(layout);
-                layout.setHorizontalGroup(
-                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(desktopPane, javax.swing.GroupLayout.DEFAULT_SIZE, 640, Short.MAX_VALUE)
-                );
-                layout.setVerticalGroup(
-                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(desktopPane, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
-                );
 
                 pack();
         }// </editor-fold>//GEN-END:initComponents
