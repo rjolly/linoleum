@@ -39,6 +39,36 @@ public class DesktopPane extends JDesktopPane {
 	private final InputMap inputMap = list.getInputMap();
 	private final InputMap map = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 	private final Action selectAction = new SelectAction();
+	private final KeyEventDispatcher dispatcher = new KeyEventDispatcher() {
+		public boolean dispatchKeyEvent(final KeyEvent e) {
+			final boolean state;
+			switch (e.getID()) {
+			case KeyEvent.KEY_PRESSED:
+				state = true;
+				break;
+			case KeyEvent.KEY_RELEASED:
+			default:
+				state = false;
+			}
+			switch (e.getKeyCode()) {
+			case KeyEvent.VK_CONTROL:
+				if (recording != state) {
+					setRecording(state);
+				}
+				break;
+			case KeyEvent.VK_ALT:
+				if (searching != state) {
+					if (searching) {
+						commit();
+					}
+					searching = state;
+				}
+				break;
+			default:
+			}
+			return false;
+		}
+	};
 	private boolean recording;
 	private boolean searching;
 	private boolean selecting;
@@ -138,40 +168,15 @@ public class DesktopPane extends JDesktopPane {
 		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)));
 		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)));
 		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK), inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)));
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
-			public boolean dispatchKeyEvent(final KeyEvent e) {
-				final boolean state;
-				switch (e.getID()) {
-				case KeyEvent.KEY_PRESSED:
-					state = true;
-					break;
-				case KeyEvent.KEY_RELEASED:
-				default:
-					state = false;
-				}
-				switch (e.getKeyCode()) {
-				case KeyEvent.VK_CONTROL:
-					if (recording != state) {
-						setRecording(state);
-					}
-					break;
-				case KeyEvent.VK_ALT:
-					if (searching != state) {
-						if (searching) {
-							commit();
-						}
-						searching = state;
-					}
-					break;
-				default:
-				}
-				return false;
-			}
-		});
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(dispatcher);
 		list.setModel(model);
 		list.setCellRenderer(renderer);
 		list.setLayoutOrientation(JList.VERTICAL_WRAP);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	}
+
+	void destroy() {
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(dispatcher);
 	}
 
 	void setReopen(final boolean reopen) {

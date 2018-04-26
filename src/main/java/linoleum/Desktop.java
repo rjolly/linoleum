@@ -205,6 +205,7 @@ public class Desktop extends JFrame {
 				}
 			});
 			getContentPane().remove(desktopPane);
+			desktopPane.destroy();
 			new ApplicationManager();
 			getContentPane().add(desktopPane = (DesktopPane) d.readObject(), BorderLayout.CENTER);
 		} catch (final FileNotFoundException ex) {
