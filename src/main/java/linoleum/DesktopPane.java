@@ -200,7 +200,7 @@ public class DesktopPane extends JDesktopPane {
 	}
 
 	@Override
-	public Component add(final Component comp) {
+	public void addImpl(final Component comp, Object constraints, int index) {
 		if (comp instanceof Background) {
 			bkg = (Background) comp;
 		} else if (comp instanceof Frame) {
@@ -237,8 +237,7 @@ public class DesktopPane extends JDesktopPane {
 				}
 			});
 		}
-		addImpl(comp, DEFAULT_LAYER, -1);
-		return comp;
+		super.addImpl(comp, constraints == null?DEFAULT_LAYER:constraints, index);
 	}
 
 	public int getLayer(final Component c) {
