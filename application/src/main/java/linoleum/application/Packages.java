@@ -62,25 +62,16 @@ public class Packages {
 		if (jar != null && System.getProperty("linoleum.home") == null) {
 			System.setProperty("linoleum.home", jar.getParent());
 		}
-		final File home = getHome();
-		if (home != null) {
-			add0(new File(home, "lib"));
-		}
-		lib.mkdir();
-		add0(lib);
-	}
-
-	private File getHome() {
-		final String str = System.getProperty("linoleum.home");
-		final File home = str == null?null:new File(str);
-		if (home != null) try {
-			if (!Files.isSameFile(home.toPath(), Paths.get("."))) {
-				return home;
+		try {
+			final String str = System.getProperty("linoleum.home");
+			if (str != null && !Files.isSameFile(Paths.get(str), Paths.get("."))) {
+				add0(new File(new File(str), "lib"));
 			}
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
-		return null;
+		lib.mkdir();
+		add0(lib);
 	}
 
 	private void add0(final File lib) {
