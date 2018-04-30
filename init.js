@@ -6,6 +6,10 @@ if (typeof(frame) == 'undefined') {
     apps = frame.getApplicationManager();
 }
 
+function getHome() {
+    return new File(java.lang.System.getProperty("linoleum.home"));
+}
+
 function install(pkg, conf, dir) {
     if (conf == undefined) {
 	conf = "default";
