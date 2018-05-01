@@ -2,6 +2,7 @@ application/wavefront-obj obj
 application/pdf pdf PDF
 application/xhtml+xml xhtml
 application/java-archive jar
+application/javascript js
 application/mvr mvr
 application/zip zip
 audio/basic au snd
@@ -17,7 +18,6 @@ image/bmp bmp BMP
 text/plain txt text TXT
 text/html htm html
 text/xml xml
-text/javascript js
 text/x-properties properties
 text/x-java java
 text/x-scala scala

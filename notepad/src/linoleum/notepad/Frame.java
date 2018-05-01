@@ -91,7 +91,7 @@ public class Frame extends FileSupport {
 		dialog1.pack();
 		chooser.setFileFilter(new FileNameExtensionFilter("Text", "txt"));
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Edit24.gif")));
-		setMimeType("text/plain:text/*:application/octet-stream");
+		setMimeType("text/plain:text/*:application/octet-stream:application/*");
 
 		try {
 			properties.load(getClass().getResourceAsStream("NotepadSystem.properties"));

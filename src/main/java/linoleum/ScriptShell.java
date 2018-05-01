@@ -9,6 +9,9 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -19,14 +22,19 @@ import linoleum.application.ScriptSupport;
 
 public class ScriptShell extends ScriptSupport implements ScriptShellPanel.CommandProcessor, Runnable {
 	private final CountDownLatch engineReady = new CountDownLatch(1);
+	private final List<String> extensions = new ArrayList<>();
 	private volatile ScriptEngine engine;
 	private volatile String prompt;
 	private ScriptShellPanel panel;
 	private String extension;
+	private Path file;
+	private Path path;
 
 	public ScriptShell() {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
+		setMimeType("application/*");
+		setURI(Paths.get("").toUri());
 	}
 
 	@Override
@@ -35,20 +43,49 @@ public class ScriptShell extends ScriptSupport implements ScriptShellPanel.Comma
 	}
 
 	@Override
+	public void setURI(final URI uri) {
+		final Path path = getPath(uri);
+		file = Files.isDirectory(path)?null:path;
+		extension = file == null?null:getExtension(file.toString());
+		this.path = unfile(path);
+	}
+
+	private String getExtension(final String name) {
+		return name.substring(name.lastIndexOf(".") + 1);
+	}
+
+	private Path unfile(final Path path) {
+		return Files.isDirectory(path)?path:getParent(path);
+	}
+
+	private Path getParent(final Path path) {
+		final Path parent = path.getParent();
+		return parent == null?Paths.get(""):parent;
+	}
+
+	@Override
+	public URI getURI() {
+		return path.toUri();
+	}
+
+	@Override
 	public void open() {
 		new Thread(this).start();
 	}
 
 	public void run() {
-		createScriptEngine();
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				setTitle(engine.getFactory().getLanguageName());
-				setContentPane(panel = new ScriptShellPanel(ScriptShell.this));
-			}
-		});
-		initScriptEngine();
-		engineReady.countDown();
+		if (engine == null) {
+			createScriptEngine();
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					setTitle(engine.getFactory().getLanguageName());
+					setContentPane(panel = new ScriptShellPanel(ScriptShell.this));
+				}
+			});
+			initScriptEngine();
+			engineReady.countDown();
+		}
+		doOpen();
 	}
 
 	@Override
@@ -78,7 +115,7 @@ public class ScriptShell extends ScriptSupport implements ScriptShellPanel.Comma
 
 	@Override
 	public boolean reuseFor(final URI that) {
-		return false;
+		return that == null?false:path.equals(unfile(getPath(that)));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -153,7 +190,10 @@ public class ScriptShell extends ScriptSupport implements ScriptShellPanel.Comma
 	// create script engine
 	private void createScriptEngine() {
 		engine = getEngine();
-		extension = engine.getFactory().getExtensions().get(0);
+		extensions.addAll(engine.getFactory().getExtensions());
+		if (!extensions.contains(extension)) {
+			extension = extensions.get(0);
+		}
 		prompt = extension + ">";
 	}
 
@@ -177,6 +217,15 @@ public class ScriptShell extends ScriptSupport implements ScriptShellPanel.Comma
 		}
 		// load current user's initialization file
 		loadUserInitFile(new File("init." + extension));
+	}
+
+	private void doOpen() {
+		if (path != null) {
+			engine.put("curDir", path.toFile());
+		}
+		if (file != null && extensions.contains(extension)) {
+			loadUserInitFile(file.toFile());
+		}
 	}
 
 	// set pre-defined global variables for script
