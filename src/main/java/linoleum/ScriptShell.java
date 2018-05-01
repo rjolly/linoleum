@@ -115,7 +115,7 @@ public class ScriptShell extends ScriptSupport implements ScriptShellPanel.Comma
 
 	@Override
 	public boolean reuseFor(final URI that) {
-		return that == null?false:path.equals(unfile(getPath(that)));
+		return that == null?false:getPath().equals(unfile(getPath(that)));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -217,12 +217,18 @@ public class ScriptShell extends ScriptSupport implements ScriptShellPanel.Comma
 		}
 		// load current user's initialization file
 		loadUserInitFile(new File("init." + extension));
+		engine.put("curDir", path.toFile());
+	}
+
+	private Path getPath() {
+		final Object obj = engine.get("curDir");
+		if (obj instanceof File) {
+			return ((File) obj).toPath();
+		}
+		return path;
 	}
 
 	private void doOpen() {
-		if (path != null) {
-			engine.put("curDir", path.toFile());
-		}
 		if (file != null && extensions.contains(extension)) {
 			loadUserInitFile(file.toFile());
 		}
