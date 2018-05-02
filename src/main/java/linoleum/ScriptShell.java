@@ -33,7 +33,7 @@ public class ScriptShell extends ScriptSupport implements ScriptShellPanel.Comma
 	public ScriptShell() {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/Host24.gif")));
-		setMimeType("application/*");
+		setMimeType("application/javascript:application/*");
 		setURI(Paths.get("").toUri());
 	}
 

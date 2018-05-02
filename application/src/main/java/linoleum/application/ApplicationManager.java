@@ -237,7 +237,7 @@ public class ApplicationManager extends FileSupport {
 				final List<App> apps = new ArrayList<>();
 				if (table == jTable1) {
 					final MimeType type = (MimeType) tableModel.getValueAt(row, 0);
-					apps.addAll(appsByType.get(type));
+					apps.addAll(wildcard(type)?appsByType.get(type):getApplications(type));
 				} else if (table == jTable2) {
 					final String scheme = (String) schemeTableModel.getValueAt(row, 0);
 					apps.addAll(appsByScheme.get(scheme));
@@ -248,6 +248,10 @@ public class ApplicationManager extends FileSupport {
 				return super.getTableCellEditorComponent(table, value, isSelected, row, column);
 			}
 		};
+	}
+
+	private boolean wildcard(final MimeType type) {
+		return type.getSubType().equals("*");
 	}
 
 	@Override
