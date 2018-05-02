@@ -229,7 +229,7 @@ public class ScriptShell extends ScriptSupport implements ScriptShellPanel.Comma
 	}
 
 	private void doOpen() {
-		if (file != null && extensions.contains(extension)) {
+		if (file != null && extensions.contains(getExtension(file.toString()))) {
 			loadUserInitFile(file.toFile());
 		}
 	}
