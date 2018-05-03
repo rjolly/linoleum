@@ -122,7 +122,7 @@ public class FileManager extends FileSupport implements Runnable {
 			setIcon(null);
 			if (value instanceof Path) {
 				setIcon(getFileIcon((Path) value));
-				setText(getFileName((Path) value));
+				setText(((Path) value).getFileName().toString());
 			} else if (value instanceof FileTime) {
 				setText(format.format(new Date(((FileTime) value).toMillis())));
 			}
@@ -137,7 +137,7 @@ public class FileManager extends FileSupport implements Runnable {
 
 		@Override
 		public boolean stopCellEditing() {
-			applyEdit(getFileName((Path) getCellEditorValue()));
+			applyEdit(((Path) getCellEditorValue()).getFileName().toString());
 			return true;
 		}
 
@@ -154,7 +154,7 @@ public class FileManager extends FileSupport implements Runnable {
 		public Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int row, final int column) {
 			final Component comp = super.getTableCellEditorComponent(table, value, isSelected, row, column);
 			if (value instanceof Path) {
-				((JTextField) comp).setText(getFileName((Path) value));
+				((JTextField) comp).setText(((Path) value).getFileName().toString());
 			}
 			return comp;
 		}
@@ -213,7 +213,7 @@ public class FileManager extends FileSupport implements Runnable {
 				}
 			}
 			for (final Path entry : files) {
-				final Path target = recipient.resolve(getFileName(entry));
+				final Path target = recipient.resolve(entry.getFileName().toString());
 				try {
 					if (!Files.isSameFile(recipient, entry) && !Files.isSameFile(recipient, getParent(entry))) switch (action) {
 					case COPY:
@@ -477,7 +477,7 @@ public class FileManager extends FileSupport implements Runnable {
 
 	private void applyEdit(final String newFileName) {
 		if (editFile != null && Files.exists(editFile)) {
-			final String oldFileName = getFileName(editFile);
+			final String oldFileName = editFile.getFileName().toString();
 
 			if (!newFileName.equals(oldFileName)) try {
 				Files.move(editFile, editFile.resolveSibling(newFileName));
@@ -511,7 +511,7 @@ public class FileManager extends FileSupport implements Runnable {
 			editFile = jList1.getModel().getElementAt(index);
 			final Rectangle r = jList1.getCellBounds(index, index);
 			jList1.add(editCell);
-			editCell.setText(getFileName(editFile));
+			editCell.setText(editFile.getFileName().toString());
 			final ComponentOrientation orientation = jList1.getComponentOrientation();
 			editCell.setComponentOrientation(orientation);
 
@@ -566,7 +566,7 @@ public class FileManager extends FileSupport implements Runnable {
 			}
 			final Path path = (Path)value;
 			setIcon(getFileIcon(path));
-			setText(getFileName(path));
+			setText(path.getFileName().toString());
 			setFont(list.getFont());
 			return this;
 		}
@@ -772,8 +772,12 @@ public class FileManager extends FileSupport implements Runnable {
 		if (fs == defaultfs) {
 			(thread = new Thread(this)).start();
 		} else {
-			setTitle(getFileName(path));
+			setTitle(getFileName(path).toString());
 		}
+	}
+
+	private Path getFileName(final Path path) {
+		return path.getNameCount() > 0?path.getFileName():path;
 	}
 
 	public void run() {
@@ -816,17 +820,12 @@ public class FileManager extends FileSupport implements Runnable {
 	}
 
 	private WatchKey register(final WatchService service) throws IOException {
-		setTitle(getFileName(path));
+		setTitle(path.getFileName().toString());
 		return path.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
 	}
 
-	static String getFileName(final Path path) {
-		final int n = path.getNameCount();
-		return (n > 0?path.getName(n - 1):path).toString();
-	}
-
 	private Icon getFileIcon(final Path path) {
-		return getFileName(path).equals("..")?upFolderIcon:Files.isDirectory(path)?
+		return path.getFileName().toString().equals("..")?upFolderIcon:Files.isDirectory(path)?
 				Files.isSymbolicLink(path)?directoryLinkIcon:directoryIcon:
 				Files.isSymbolicLink(path)?fileLinkIcon:fileIcon;
 	}

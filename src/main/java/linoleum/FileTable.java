@@ -85,7 +85,7 @@ public class FileTable extends JTable {
 		// Search element
 		for (int index = startIndex; index <= finishIndex; index++) {
 			final Path path = (Path) model.getValueAt(rowSorter.convertRowIndexToModel(index), 0);
-			final String name = FileManager.getFileName(path);
+			final String name = path.getFileName().toString();
 			if (name.regionMatches(true, 0, prefix, 0, prefix.length())) {
 				return index;
 			}

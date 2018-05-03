@@ -18,7 +18,7 @@ public class FileList extends JList<Path> {
 		// start search from the next element before/after the selected element
 		final boolean backwards = (bias == Position.Bias.Backward);
 		for (int i = startIndex; backwards ? i >= 0 : i < max; i += (backwards ?  -1 : 1)) {
-			final String filename = FileManager.getFileName(model.getElementAt(i));
+			final String filename = model.getElementAt(i).getFileName().toString();
 			if (filename.regionMatches(true, 0, prefix, 0, prefix.length())) {
 				return i;
 			}
