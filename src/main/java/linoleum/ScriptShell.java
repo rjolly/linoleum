@@ -44,23 +44,18 @@ public class ScriptShell extends ScriptSupport implements ScriptShellPanel.Comma
 
 	@Override
 	public void setURI(final URI uri) {
-		final Path path = getPath(uri);
+		final Path path = relativize(getPath(uri).normalize());
 		file = Files.isDirectory(path)?null:path;
 		extension = file == null?null:getExtension(file.toString());
-		this.path = unfile(path);
+		this.path = unvoid(unfile(path));
+	}
+
+	private Path unvoid(final Path path) {
+		return path.toString().isEmpty()?Paths.get("."):path;
 	}
 
 	private String getExtension(final String name) {
 		return name.substring(name.lastIndexOf(".") + 1);
-	}
-
-	private Path unfile(final Path path) {
-		return Files.isDirectory(path)?path:getParent(path);
-	}
-
-	private Path getParent(final Path path) {
-		final Path parent = path.getParent();
-		return parent == null?Paths.get(""):parent;
 	}
 
 	@Override
@@ -115,7 +110,7 @@ public class ScriptShell extends ScriptSupport implements ScriptShellPanel.Comma
 
 	@Override
 	public boolean reuseFor(final URI that) {
-		return that == null?false:getPath().equals(unfile(getPath(that)));
+		return that == null?false:getPath().equals(unvoid(unfile(relativize(getPath(that).normalize()))));
 	}
 
 	@SuppressWarnings("unchecked")

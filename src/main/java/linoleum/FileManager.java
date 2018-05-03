@@ -587,11 +587,6 @@ public class FileManager extends FileSupport implements Runnable {
 		return Files.isDirectory(path)?path.normalize():getParent(path);
 	}
 
-	private Path getParent(final Path path) {
-		final Path parent = path.getParent();
-		return parent == null?Paths.get(""):parent;
-	}
-
 	private void copy(final Path source, final Path target) throws IOException {
 		Files.walkFileTree(source, EnumSet.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE, new SimpleFileVisitor<Path>() {
 			@Override
@@ -740,10 +735,10 @@ public class FileManager extends FileSupport implements Runnable {
 		}
 	}
 
-	private Path relativize(final Path path) {
+	@Override
+	public Path relativize(final Path path) {
 		final FileSystem fs = path.getFileSystem();
-		final Path user = Paths.get(System.getProperty("user.dir"));
-		return fs == defaultfs && path.startsWith(user)?user.relativize(path):path;
+		return fs == defaultfs?super.relativize(path):path;
 	}
 
 	private Path unjar(final Path path) throws IOException {
@@ -756,10 +751,6 @@ public class FileManager extends FileSupport implements Runnable {
 			ex.printStackTrace();
 		}
 		return path;
-	}
-
-	private Path unfile(final Path path) {
-		return Files.isDirectory(path)?path:getParent(path);
 	}
 
 	private FileSystem getFileSystem(final URI uri) throws IOException {

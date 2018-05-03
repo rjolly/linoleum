@@ -67,4 +67,17 @@ public class FileSupport extends Frame {
 		final MimeType type = getMimeType(entry);
 		return type == null?false:canOpen(type);
 	}
+
+	protected Path relativize(final Path path) {
+		final Path user = Paths.get(System.getProperty("user.dir"));
+		return path.startsWith(user)?user.relativize(path):path;
+	}
+
+	protected Path getParent(final Path path) {
+		return path.getNameCount() > 1?path.getParent():Paths.get("");
+	}
+
+	protected Path unfile(final Path path) {
+		return Files.isDirectory(path)?path:getParent(path);
+	}
 }
