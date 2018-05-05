@@ -13,7 +13,6 @@ import javax.swing.table.DefaultTableModel;
 import linoleum.application.ApplicationManager;
 import linoleum.application.Frame;
 import linoleum.application.Package;
-import linoleum.application.Packages;
 import linoleum.application.event.ClassPathListener;
 import linoleum.application.event.ClassPathChangeEvent;
 import org.apache.ivy.Ivy;
@@ -121,7 +120,6 @@ public class PackageManager extends Frame {
 
 	public void install(final String name, final String conf, final File dir) {
 		final ApplicationManager apps = getApplicationManager();
-		final Packages pkgs = apps.getPackages();
 		final ModuleRevisionId mRID = ModuleRevisionId.parse(name);
 		final ResolveOptions resolveOptions = new ResolveOptions();
 		resolveOptions.setConfs(new String[] { conf });
@@ -135,7 +133,7 @@ public class PackageManager extends Frame {
 			for (final Object obj : retrieveReport.getCopiedFiles()) {
 				final File file = (File) obj;
 				if (file.getName().endsWith(".jar")) {
-					changed |= pkgs.add(file);
+					changed |= apps.addToClassPath(file.toPath());
 				}
 			}
 			if(changed) {

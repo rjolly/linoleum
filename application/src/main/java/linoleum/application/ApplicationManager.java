@@ -144,10 +144,6 @@ public class ApplicationManager extends FileSupport {
 		return apps;
 	}
 
-	public Packages getPackages() {
-		return instance;
-	}
-
 	private MimeType getMimeType(final String str) {
 		try {
 			return new MimeType(str);
@@ -426,6 +422,10 @@ public class ApplicationManager extends FileSupport {
 		} else {
 			model.getElementAt(index).open(getDesktopPane());
 		}
+	}
+
+	public boolean addToClassPath(final Path path) {
+		return instance.add(path.toFile());
 	}
 
 	public void addClassPathListener(final ClassPathListener listener) {

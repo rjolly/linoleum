@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Collection;
 import java.util.jar.Manifest;
 import java.util.jar.Attributes;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 public class Packages {
@@ -94,14 +95,14 @@ public class Packages {
 		}
 	}
 
-	public boolean add(final File file) {
+	boolean add(final File file) {
 		final Package pkg = new Package(file);
 		final String name = pkg.getName();
 		if (!pkg.isSourcesOrJavadoc() && !map.containsKey(name) && ClassLoader.getSystemClassLoader() instanceof ClassLoader) try {
 			((ClassLoader) ClassLoader.getSystemClassLoader()).addURL(file.toURI().toURL());
 			put(name, file);
 			return true;
-		} catch (final IOException e) {
+		} catch (final MalformedURLException e) {
 			e.printStackTrace();
 		}
 		return false;
