@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -93,8 +94,8 @@ public class Frame extends FileSupport {
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Edit24.gif")));
 		setMimeType("text/plain:text/*:application/octet-stream:application/*");
 
-		try {
-			properties.load(getClass().getResourceAsStream("NotepadSystem.properties"));
+		try (final InputStream is = getClass().getResourceAsStream("NotepadSystem.properties")) {
+			properties.load(is);
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
