@@ -5,14 +5,12 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.PreferenceChangeEvent;
-import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
-import linoleum.application.Frame;
+import linoleum.application.PreferenceSupport;
 
-public class Console extends Frame {
-	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
+public class Console extends PreferenceSupport {
 	private final ConsolePanel panel = new ConsolePanel(visible());
 	private final DefaultComboBoxModel<Level> model = new DefaultComboBoxModel<>();
 	private final Logger logger = Logger.getLogger("");
@@ -41,15 +39,15 @@ public class Console extends Frame {
 
 	@Override
 	public void init() {
-		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
-			@Override
-			public void preferenceChange(final PreferenceChangeEvent evt) {
-				if (evt.getKey().equals(getKey("level")) || evt.getKey().equals(getKey("visible"))) {
-					refresh();
-				}
-			}
-		});
+		Preferences.userNodeForPackage(getClass()).addPreferenceChangeListener(this);
 		refresh();
+	}
+
+	@Override
+	public void preferenceChange(final PreferenceChangeEvent evt) {
+		if (evt.getKey().equals(getKey("level")) || evt.getKey().equals(getKey("visible"))) {
+			refresh();
+		}
 	}
 
 	private void refresh() {
@@ -65,16 +63,16 @@ public class Console extends Frame {
 
 	@Override
 	public void save() {
-		prefs.put(getKey("level"), model.getSelectedItem().toString());
-		prefs.putBoolean(getKey("visible"), jCheckBox1.isSelected());
+		putPref("level", model.getSelectedItem().toString());
+		putBooleanPref("visible", jCheckBox1.isSelected());
 	}
 
 	private Level getLevel() {
-		return Level.parse(prefs.get(getKey("level"), Level.INFO.toString()));
+		return Level.parse(getPref("level"));
 	}
 
 	private boolean visible() {
-		return prefs.getBoolean(getKey("visible"), false);
+		return getBooleanPref("visible");
 	}
 
 	@SuppressWarnings("unchecked")

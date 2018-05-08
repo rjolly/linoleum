@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferenceChangeEvent;
-import java.util.prefs.PreferenceChangeListener;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
@@ -28,9 +27,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import linoleum.application.FileChooser;
-import linoleum.application.Frame;
+import linoleum.application.PreferenceSupport;
 
-public class SimpleClient extends Frame {
+public class SimpleClient extends PreferenceSupport {
 	private final Icon composeIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/ComposeMail16.gif"));
 	private final Action composeAction = new ComposeAction();
 	private final Action expungeAction = new ExpungeAction();
@@ -117,7 +116,7 @@ public class SimpleClient extends Frame {
 		}
 	}
 
-	Frame getDialogParent() {
+	SimpleClient getDialogParent() {
 		if (!isShowing()) {
 			open(getApplicationManager().getDesktopPane());
 		}
@@ -143,23 +142,23 @@ public class SimpleClient extends Frame {
 	}
 
 	public boolean getDebug() {
-		return prefs.getBoolean(getKey("debug"), false);
+		return getBooleanPref("debug");
 	}
 
 	public String getFrom() {
-		return prefs.get(getKey("from"), "");
+		return getPref("from");
 	}
 
 	public String getURL() {
-		return prefs.get(getKey("url"), "");
+		return getPref("url");
 	}
 
 	public String getRecord() {
-		return prefs.get(getKey("record"), "");
+		return getPref("record");
 	}
 
 	public String getTransport() {
-		return prefs.get(getKey("transport"), "");
+		return getPref("transport");
 	}
 
 	void compose(final String str) throws URISyntaxException {
@@ -180,34 +179,34 @@ public class SimpleClient extends Frame {
 
 	@Override
 	public void load() {
-		jTextField1.setText(prefs.get(getKey("url"), ""));
-		jTextField2.setText(prefs.get(getKey("transport"), ""));
-		jTextField3.setText(prefs.get(getKey("from"), ""));
-		jTextField4.setText(prefs.get(getKey("record"), "Sent"));
-		jCheckBox1.setSelected(prefs.getBoolean(getKey("debug"), false));
+		jTextField1.setText(getPref("url"));
+		jTextField2.setText(getPref("transport"));
+		jTextField3.setText(getPref("from"));
+		jTextField4.setText(getPref("record"));
+		jCheckBox1.setSelected(getBooleanPref("debug"));
 	}
 
 	@Override
 	public void save() {
-		prefs.put(getKey("url"), jTextField1.getText());
-		prefs.put(getKey("transport"), jTextField2.getText());
-		prefs.put(getKey("from"), jTextField3.getText());
-		prefs.put(getKey("record"), jTextField4.getText());
-		prefs.putBoolean(getKey("debug"), jCheckBox1.isSelected());
+		putPref("url", jTextField1.getText());
+		putPref("transport", jTextField2.getText());
+		putPref("from", jTextField3.getText());
+		putPref("record", jTextField4.getText());
+		putBooleanPref("debug", jCheckBox1.isSelected());
 	}
 
 	@Override
 	public void init() {
-		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
-			@Override
-			public void preferenceChange(final PreferenceChangeEvent evt) {
-				if (evt.getKey().equals(getKey("url"))) {
-					open();
-				} else if (evt.getKey().equals(getKey("debug"))) {
-					refresh();
-				}
-			}
-		});
+		prefs.addPreferenceChangeListener(this);
+	}
+
+	@Override
+	public void preferenceChange(final PreferenceChangeEvent evt) {
+		if (evt.getKey().equals(getKey("url"))) {
+			open();
+		} else if (evt.getKey().equals(getKey("debug"))) {
+			refresh();
+		}
 	}
 
 	@Override

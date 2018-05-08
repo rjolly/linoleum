@@ -14,7 +14,7 @@ import java.util.Collections;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 
-public class FileSupport extends Frame {
+public class FileSupport extends PreferenceSupport {
 	public FileSupport() {
 	}
 
@@ -74,7 +74,8 @@ public class FileSupport extends Frame {
 	}
 
 	protected Path getParent(final Path path) {
-		return path.getNameCount() > 1?path.getParent():Paths.get("");
+		final Path parent = path.getParent();
+		return parent == null?Paths.get(""):parent;
 	}
 
 	protected Path unfile(final Path path) {

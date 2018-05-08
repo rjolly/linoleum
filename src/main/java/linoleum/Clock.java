@@ -1,43 +1,40 @@
 package linoleum;
 
 import java.util.prefs.PreferenceChangeEvent;
-import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
-import linoleum.application.Frame;
+import linoleum.application.PreferenceSupport;
 
-public class Clock extends Frame {
-	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
-
+public class Clock extends PreferenceSupport {
 	public Clock() {
 		initComponents();
 		refresh();
 	}
 
 	private void refresh() {
-		clockPanel1.setAnalog(prefs.getBoolean(getKey("analog"), false));
+		clockPanel1.setAnalog(getBooleanPref("analog"));
 		pack();
 	}
 
 	@Override
 	public void init() {
-		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
-			@Override
-			public void preferenceChange(final PreferenceChangeEvent evt) {
-				if (evt.getKey().equals(getKey("analog"))) {
-					refresh();
-				}
-			}
-		});
+		Preferences.userNodeForPackage(getClass()).addPreferenceChangeListener(this);
+	}
+
+	@Override
+	public void preferenceChange(final PreferenceChangeEvent evt) {
+		if (evt.getKey().equals(getKey("analog"))) {
+			refresh();
+		}
 	}
 
 	@Override
 	public void load() {
-		jRadioButton1.setSelected(prefs.getBoolean(getKey("analog"), false));
+		jRadioButton1.setSelected(getBooleanPref("analog"));
 	}
 
 	@Override
 	public void save() {
-		prefs.putBoolean(getKey("analog"), jRadioButton1.isSelected());
+		putBooleanPref("analog", jRadioButton1.isSelected());
 	}
 
 	@Override

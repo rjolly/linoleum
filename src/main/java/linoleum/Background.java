@@ -6,18 +6,16 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.beans.PropertyVetoException;
 import java.util.prefs.PreferenceChangeEvent;
-import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import linoleum.application.FileChooser;
-import linoleum.application.Frame;
+import linoleum.application.PreferenceSupport;
 import linoleum.theme.MetalThemeModel;
 
-public class Background extends Frame {
-	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
+public class Background extends PreferenceSupport {
 	private final MetalThemeModel model = new MetalThemeModel();
 	private final FileChooser chooser = new FileChooser();
 	private final Color zero = new Color(0, 0, 0, 0);
@@ -29,16 +27,16 @@ public class Background extends Frame {
 
 	@Override
 	public void init() {
-		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
-			@Override
-			public void preferenceChange(final PreferenceChangeEvent evt) {
-				if (evt.getKey().equals(getKey("image"))) {
-					jLabel1.setIcon(getImage());
-				} else if (evt.getKey().equals(getKey("theme"))) {
-					updateTheme();
-				}
-			}
-		});
+		Preferences.userNodeForPackage(getClass()).addPreferenceChangeListener(this);
+	}
+
+	@Override
+	public void preferenceChange(final PreferenceChangeEvent evt) {
+		if (evt.getKey().equals(getKey("image"))) {
+			jLabel1.setIcon(getImage());
+		} else if (evt.getKey().equals(getKey("theme"))) {
+			updateTheme();
+		}
 	}
 
 	@Override
@@ -52,23 +50,23 @@ public class Background extends Frame {
 
 	@Override
 	public void load() {
-		jTextField1.setText(prefs.get(getKey("image"), ""));
+		jTextField1.setText(getPref("image"));
 		model.setSelectedItem(getTheme());
 	}
 
 	@Override
 	public void save() {
-		prefs.put(getKey("image"), jTextField1.getText());
-		prefs.put(getKey("theme"), model.getSelectedItem());
+		putPref("image", jTextField1.getText());
+		putPref("theme", model.getSelectedItem());
 	}
 
 	private Icon getImage() {
-		final String str = prefs.get(getKey("image"), "");
+		final String str = getPref("image");
 		return !str.isEmpty()?new ImageIcon(str):new ImageIcon(getClass().getResource("Wave.png"));
 	}
 
 	private String getTheme() {
-		return prefs.get(getKey("theme"), "Ocean");
+		return getPref("theme");
 	}
 
 	void updateTheme() {

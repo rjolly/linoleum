@@ -8,7 +8,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
 public class OptionPanel extends JPanel {
-	private Frame frame;
+	private PreferenceSupport frame;
 	private boolean dirty;
 
 	private final DocumentListener listener = new DocumentListener() {
@@ -26,7 +26,7 @@ public class OptionPanel extends JPanel {
 		}
 	};
 
-	public void setFrame(final Frame frame) {
+	public void setFrame(final PreferenceSupport frame) {
 		this.frame = frame;
 	}
 

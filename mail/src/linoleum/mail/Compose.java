@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
-import java.util.prefs.Preferences;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -37,7 +36,6 @@ import linoleum.application.Frame;
 
 public class Compose extends Frame {
 	private final Icon sendIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/SendMail16.gif"));
-	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final Action attachAction = new AttachAction();
 	private final Action sendAction = new SendAction();
 	private JTextField toField;

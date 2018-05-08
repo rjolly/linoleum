@@ -37,7 +37,6 @@ import javax.swing.JRootPane;
 public class Frame extends JInternalFrame implements App {
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private ApplicationManager manager;
-	private OptionPanel optionPanel;
 	private JMenuBar savedMenuBar;
 	private JMenuBar menuBar;
 	private String type;
@@ -114,14 +113,6 @@ public class Frame extends JInternalFrame implements App {
 
 	public ApplicationManager getApplicationManager() {
 		return parent.manager;
-	}
-
-	public void setOptionPanel(final OptionPanel optionPanel) {
-		this.optionPanel = optionPanel;
-	}
-
-	OptionPanel getOptionPanel() {
-		return optionPanel;
 	}
 
 	@Override
@@ -264,12 +255,6 @@ public class Frame extends JInternalFrame implements App {
 	}
 
 	protected void close() {
-	}
-
-	protected void load() {
-	}
-
-	protected void save() {
 	}
 
 	public String getKey(final String str) {

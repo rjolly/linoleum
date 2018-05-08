@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.PreferenceChangeEvent;
-import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 import javax.swing.Action;
 import javax.swing.AbstractAction;
@@ -37,14 +36,6 @@ public class Browser extends FileSupport {
 	private final Icon stopIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Stop16.gif"));
 	private final Icon reloadIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Refresh16.gif"));
 	private final DefaultComboBoxModel<Integer> model = new DefaultComboBoxModel<>(new Integer[] { 8, 10, 12, 14, 18, 24, 36 });
-	private final PreferenceChangeListener listener = new PreferenceChangeListener() {
-		@Override
-		public void preferenceChange(final PreferenceChangeEvent evt) {
-			if (evt.getKey().equals(getKey("fontSize"))) {
-				resize();
-			}
-		}
-	};
 	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final Action copyLinkLocationAction = new CopyLinkLocationAction();
 	private List<FrameURL> history = new ArrayList<>();
@@ -56,6 +47,13 @@ public class Browser extends FileSupport {
 	private int delta;
 	private int index;
 	private URL url;
+
+	@Override
+	public void preferenceChange(final PreferenceChangeEvent evt) {
+		if (evt.getKey().equals(getKey("fontSize"))) {
+			resize();
+		}
+	}
 
 	private class CopyLinkLocationAction extends AbstractAction {
 		public CopyLinkLocationAction() {
@@ -191,7 +189,7 @@ public class Browser extends FileSupport {
 	@Override
 	public void open() {
 		if (!open) {
-			prefs.addPreferenceChangeListener(listener);
+			prefs.addPreferenceChangeListener(this);
 			open = true;
 		}
 		final URI uri = getURI();
@@ -206,7 +204,7 @@ public class Browser extends FileSupport {
 
 	@Override
 	public void close() {
-		prefs.removePreferenceChangeListener(listener);
+		prefs.removePreferenceChangeListener(this);
 	}
 
 	private void linkActivated(final HyperlinkEvent evt) {

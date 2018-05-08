@@ -42,7 +42,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferenceChangeEvent;
-import java.util.prefs.PreferenceChangeListener;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 import javax.swing.Action;
@@ -88,7 +87,6 @@ public class ApplicationManager extends FileSupport {
 	private final DefaultListModel<App> model = new DefaultListModel<>();
 	private final List<OptionPanel> options = new ArrayList<>();
 	private final Logger logger = Logger.getLogger(getClass().getName());
-	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final ListCellRenderer renderer = new Renderer();
 	private final DefaultComboBoxModel<App> comboModel = new DefaultComboBoxModel<>();
 	private final DefaultTableModel tableModel;
@@ -155,7 +153,7 @@ public class ApplicationManager extends FileSupport {
 
 	private Map<MimeType, App> getPreferred() {
 		final Map<MimeType, App> pref = new TreeMap<>(comparator);
-		final String str = prefs.get(getKey("preferred"), "");
+		final String str = getPref("preferred");
 		for (final String entry : str.split(", ")) {
 			final String s[] = entry.split("=");
 			if (s.length > 1) {
@@ -167,12 +165,12 @@ public class ApplicationManager extends FileSupport {
 
 	private void setPreferred(final Map<MimeType, App> pref) {
 		final String str = pref.toString();
-		prefs.put(getKey("preferred"), str.substring(1, str.length() - 1));
+		putPref("preferred", str.substring(1, str.length() - 1));
 	}
 
 	private Map<String, App> getPreferredByScheme() {
 		final Map<String, App> prefByScheme = new TreeMap<>();
-		final String str = prefs.get(getKey("scheme-preferred"), "");
+		final String str = getPref("scheme-preferred");
 		for (final String entry : str.split(", ")) {
 			final String s[] = entry.split("=");
 			if (s.length > 1) {
@@ -184,7 +182,7 @@ public class ApplicationManager extends FileSupport {
 
 	private void setPreferredByScheme(final Map<String, App> prefByScheme) {
 		final String str = prefByScheme.toString();
-		prefs.put(getKey("scheme-preferred"), str.substring(1, str.length() - 1));
+		putPref("scheme-preferred", str.substring(1, str.length() - 1));
 	}
 
 	@Override
@@ -195,29 +193,41 @@ public class ApplicationManager extends FileSupport {
 				open();
 			}
 		});
-		prefs.addPreferenceChangeListener(new PreferenceChangeListener() {
-			@Override
-			public void preferenceChange(final PreferenceChangeEvent evt) {
-				if (evt.getKey().equals(getKey("preferred"))) {
-					pref.clear();
-					pref.putAll(getPreferred());
-				} else if (evt.getKey().equals(getKey("scheme-preferred"))) {
-					prefByScheme.clear();
-					prefByScheme.putAll(getPreferredByScheme());
-				}
-			}
-		});
+		Preferences.userNodeForPackage(getClass()).addPreferenceChangeListener(this);
 	}
 
-	public void manage(final Frame frame) {
+	@Override
+	public void preferenceChange(final PreferenceChangeEvent evt) {
+		if (evt.getKey().equals(getKey("preferred"))) {
+			pref.clear();
+			pref.putAll(getPreferred());
+		} else if (evt.getKey().equals(getKey("scheme-preferred"))) {
+			prefByScheme.clear();
+			prefByScheme.putAll(getPreferredByScheme());
+		}
+	}
+
+	private void manage(final PreferenceSupport frame) {
 		final OptionPanel panel = frame.getOptionPanel();
 		if (panel != null) {
 			panel.setFrame(frame);
 			panel.setName(frame.getName());
 			options.add(panel);
 		}
+	}
+
+	private void manage(final Frame frame) {
 		frame.setApplicationManager(this);
 		frame.init();
+	}
+
+	public void manage(final App app) {
+		if (app instanceof PreferenceSupport) {
+			manage((PreferenceSupport) app);
+		}
+		if (app instanceof Frame) {
+			manage((Frame) app);
+		}
 	}
 
 	public List<OptionPanel> getOptionPanels() {
@@ -531,9 +541,7 @@ public class ApplicationManager extends FileSupport {
 				}
 			}
 			model.addElement(app);
-			if (app instanceof Frame) {
-				manage((Frame) app);
-			}
+			manage(app);
 		}
 	}
 

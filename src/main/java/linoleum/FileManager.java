@@ -47,7 +47,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.prefs.PreferenceChangeEvent;
-import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
@@ -85,7 +84,6 @@ import linoleum.application.FileSupport;
 import linoleum.application.Frame;
 
 public class FileManager extends FileSupport implements Runnable {
-	private final Preferences prefs = Preferences.userNodeForPackage(getClass());
 	private final Preferences apps = Preferences.userNodeForPackage(ApplicationManager.class);
 	private final Icon openIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"));
 	private final Icon cutIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Cut16.gif"));
@@ -276,14 +274,6 @@ public class FileManager extends FileSupport implements Runnable {
 			refresh();
 		}
 	};
-	private final PreferenceChangeListener listener = new PreferenceChangeListener() {
-		@Override
-		public void preferenceChange(final PreferenceChangeEvent evt) {
-			if (evt.getKey().equals(getApplicationManager().getKey("preferred"))) {
-				prepare();
-			}
-		}
-	};
 	private final Comparator<Path> comparator = new Comparator<Path>() {
 		public int compare(final Path a, final Path b) {
 			boolean ac = Files.isDirectory(a);
@@ -303,6 +293,13 @@ public class FileManager extends FileSupport implements Runnable {
 	private int action;
 	private Path path;
 	private int idx;
+
+	@Override
+	public void preferenceChange(final PreferenceChangeEvent evt) {
+		if (evt.getKey().equals(getApplicationManager().getKey("preferred"))) {
+			prepare();
+		}
+	}
 
 	private class OpenAction extends AbstractAction {
 		public OpenAction() {
@@ -711,16 +708,16 @@ public class FileManager extends FileSupport implements Runnable {
 
 	@Override
 	public void load() {
-		jTextField1.setText(prefs.get(getKey("home"), ""));
+		jTextField1.setText(getPref("home"));
 		jCheckBox1.setSelected(showHidden());
 		jCheckBox2.setSelected(showDetails());
 	}
 
 	@Override
 	public void save() {
-		prefs.put(getKey("home"), jTextField1.getText());
-		prefs.putBoolean(getKey("showHidden"), jCheckBox1.isSelected());
-		prefs.putBoolean(getKey("showDetails"), jCheckBox2.isSelected());
+		putPref("home", jTextField1.getText());
+		putBooleanPref("showHidden", jCheckBox1.isSelected());
+		putBooleanPref("showDetails", jCheckBox2.isSelected());
 	}
 
 	@Override
@@ -833,7 +830,7 @@ public class FileManager extends FileSupport implements Runnable {
 	@Override
 	public void open() {
 		if (!open) {
-			apps.addPreferenceChangeListener(listener);
+			apps.addPreferenceChangeListener(this);
 			doOpen();
 			if (fs != defaultfs) {
 				Collection<Integer> coll = getOwner().openFrames.get(fs);
@@ -864,7 +861,7 @@ public class FileManager extends FileSupport implements Runnable {
 			}
 		}
 		doClose();
-		apps.removePreferenceChangeListener(listener);
+		apps.removePreferenceChangeListener(this);
 	}
 
 	private void doClose() {
@@ -875,11 +872,11 @@ public class FileManager extends FileSupport implements Runnable {
 	}
 
 	private boolean showHidden() {
-		return prefs.getBoolean(getKey("showHidden"), false);
+		return getBooleanPref("showHidden");
 	}
 
 	private boolean showDetails() {
-		return prefs.getBoolean(getKey("showDetails"), false);
+		return getBooleanPref("showDetails");
 	}
 
 	private void rescan() {
@@ -956,7 +953,7 @@ public class FileManager extends FileSupport implements Runnable {
 	}
 
 	private URI getHome() {
-		return Paths.get(prefs.get(getKey("home"), "")).toUri();
+		return Paths.get(getPref("home")).toUri();
 	}
 
 	private void open(final Path entry) {
