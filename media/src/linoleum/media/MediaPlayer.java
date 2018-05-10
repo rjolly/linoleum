@@ -50,6 +50,7 @@ public class MediaPlayer extends FileSupport {
 
 	public MediaPlayer() {
 		initComponents();
+		setDescription("Media Player (requires jmf)");
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/media/Movie24.gif")));
 		setMimeType("audio/*:video/*");
 	}

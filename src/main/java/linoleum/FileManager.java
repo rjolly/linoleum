@@ -654,6 +654,7 @@ public class FileManager extends FileSupport implements Runnable {
 				prepare();
 			}
 		});
+		setDescription("file manager");
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open24.gif")));
 		setMimeType("application/x-directory:application/java-archive:application/zip");
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);

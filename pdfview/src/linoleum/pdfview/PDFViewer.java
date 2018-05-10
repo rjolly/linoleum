@@ -77,6 +77,7 @@ public class PDFViewer extends FileSupport {
 
 	public PDFViewer() {
 		initComponents();
+		setDescription("PDF viewer (may require jai in some cases)");
 		setIcon(new ImageIcon(getClass().getResource("reader.png")));
 		chooser.setFileFilter(new FileNameExtensionFilter("PDF Files", "pdf"));
 		setMimeType("application/pdf");

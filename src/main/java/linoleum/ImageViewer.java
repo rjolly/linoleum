@@ -13,6 +13,7 @@ public class ImageViewer extends FileSupport {
 	public ImageViewer() {
 		initComponents();
 		setMimeType("image/*");
+		setDescription("image viewer");
 	}
 
 	@Override

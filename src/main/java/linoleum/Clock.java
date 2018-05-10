@@ -7,6 +7,7 @@ import linoleum.application.PreferenceSupport;
 public class Clock extends PreferenceSupport {
 	public Clock() {
 		initComponents();
+		setDescription("clock");
 		refresh();
 	}
 

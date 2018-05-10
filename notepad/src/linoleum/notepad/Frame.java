@@ -89,6 +89,7 @@ public class Frame extends FileSupport {
 		chooser.setFileFilter(new FileNameExtensionFilter("Text", "txt"));
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Edit24.gif")));
 		setMimeType("text/plain:text/*:application/octet-stream:application/*");
+		setDescription("notepad");
 
 		try (final InputStream is = getClass().getResourceAsStream("NotepadSystem.properties")) {
 			properties.load(is);

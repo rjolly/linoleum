@@ -69,6 +69,7 @@ public class Browser extends FileSupport {
 
 	public Browser() {
 		initComponents();
+		setDescription("browser");
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif")));
 		setMimeType("text/html");
 		setScheme("http:https");

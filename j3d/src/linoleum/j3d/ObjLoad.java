@@ -126,6 +126,7 @@ public class ObjLoad extends Frame {
 
 	public ObjLoad() {
 		initComponents();
+		setDescription("3D Object Loader (requires java3d)");
 		setMimeType("application/wavefront-obj");
 		setTitle(title);
 	}
