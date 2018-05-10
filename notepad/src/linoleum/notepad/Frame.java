@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Graphics;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -19,7 +18,6 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -31,7 +29,6 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
@@ -65,7 +62,7 @@ import linoleum.application.FileSupport;
 public class Frame extends FileSupport {
 	private final FileChooser chooser = new FileChooser();
 	private final Properties properties = new Properties();
-	private static final ResourceBundle resources = ResourceBundle.getBundle(Notepad.class.getName());
+	private final ResourceBundle resources = ResourceBundle.getBundle(Notepad.class.getName());
 
 	private static final String[] MENUBAR_KEYS = {"file", "edit", "debug"};
 	private static final String[] TOOLBAR_KEYS = {"new", "open", "save", "-", "cut", "copy", "paste"};
@@ -87,7 +84,6 @@ public class Frame extends FileSupport {
 	private int modified;
 
 	public Frame() {
-		super(resources.getString("Title"));
 		initComponents();
 		dialog1.pack();
 		chooser.setFileFilter(new FileNameExtensionFilter("Text", "txt"));
@@ -800,6 +796,12 @@ public class Frame extends FileSupport {
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 );
 
+                setClosable(true);
+                setIconifiable(true);
+                setMaximizable(true);
+                setResizable(true);
+                java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("linoleum/notepad/Notepad"); // NOI18N
+                setTitle(bundle.getString("Title")); // NOI18N
                 setFrameIcon(new javax.swing.ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Edit16.gif"))); // NOI18N
                 setName(Notepad.class.getSimpleName());
                 addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
@@ -882,11 +884,11 @@ public class Frame extends FileSupport {
         }//GEN-LAST:event_formVetoableChange
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
+        private linoleum.notepad.Dialog dialog1;
         private javax.swing.JButton jButton1;
         private javax.swing.JButton jButton2;
         private javax.swing.JButton jButton3;
         private javax.swing.JButton jButton4;
-        private linoleum.notepad.Dialog dialog1;
         private javax.swing.JLabel jLabel1;
         private javax.swing.JLabel jLabel2;
         private javax.swing.JTextField jTextField1;
