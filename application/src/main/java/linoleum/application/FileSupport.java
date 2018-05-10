@@ -15,13 +15,6 @@ import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 
 public class FileSupport extends PreferenceSupport {
-	public FileSupport() {
-	}
-
-	public FileSupport(final String title) {
-		super(title);
-	}
-
 	public final List<Path> listFiles(final Path path) {
 		final List<Path> list = new ArrayList<>();
 		try (final DirectoryStream<Path> stream = Files.newDirectoryStream(path, new DirectoryStream.Filter<Path>() {

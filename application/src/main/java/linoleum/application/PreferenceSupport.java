@@ -27,10 +27,6 @@ public class PreferenceSupport extends Frame implements PreferenceChangeListener
 	public void preferenceChange(final PreferenceChangeEvent evt) {
 	}
 
-	public PreferenceSupport(final String title) {
-		super(title);
-	}
-
 	public void setOptionPanel(final OptionPanel optionPanel) {
 		this.optionPanel = optionPanel;
 	}
