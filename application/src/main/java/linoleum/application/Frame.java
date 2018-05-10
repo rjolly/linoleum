@@ -39,6 +39,7 @@ public class Frame extends JInternalFrame implements App {
 	private ApplicationManager manager;
 	private JMenuBar savedMenuBar;
 	private JMenuBar menuBar;
+	private String description;
 	private String type;
 	private String scheme;
 	private Icon icon;
@@ -123,6 +124,14 @@ public class Frame extends JInternalFrame implements App {
 	@Override
 	public JMenuBar getJMenuBar() {
 		return menuBar;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
+	}
+
+	public String getDescription() {
+		return description;
 	}
 
 	public void setIcon(final Icon icon) {

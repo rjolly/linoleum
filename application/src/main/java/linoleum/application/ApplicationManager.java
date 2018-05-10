@@ -116,6 +116,7 @@ public class ApplicationManager extends FileSupport {
 			final Icon icon = app.getIcon();
 			setIcon(icon == null?defaultIcon:icon);
 			setText(app.getName());
+			setToolTipText(app.getDescription());
 			setFont(list.getFont());
 			return this;
 		}

@@ -6,6 +6,7 @@ import javax.swing.JDesktopPane;
 
 public interface App {
 	public String getName();
+	public String getDescription();
 	public Icon getIcon();
 	public Icon getFrameIcon();
 	public String getMimeType();
