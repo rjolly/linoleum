@@ -6,7 +6,7 @@
   <groupId>net.java.linoleum</groupId>
   <artifactId>console</artifactId>
   <packaging>jar</packaging>
-  <version>1.5</version>
+  <version>1.6</version>
   <url>http://linoleum.java.net/</url>
   <description>JConsole.</description>
   <licenses>
@@ -34,7 +34,7 @@
     <dependency>
       <groupId>net.java.linoleum</groupId>
       <artifactId>application</artifactId>
-      <version>1.5</version>
+      <version>1.6</version>
     </dependency>
   </dependencies>
 </project>

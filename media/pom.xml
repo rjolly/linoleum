@@ -6,7 +6,7 @@
   <groupId>net.java.linoleum</groupId>
   <artifactId>media</artifactId>
   <packaging>jar</packaging>
-  <version>1.2</version>
+  <version>1.6</version>
   <url>http://linoleum.java.net/</url>
   <description>Media Player.</description>
   <licenses>
@@ -39,7 +39,7 @@
     <dependency>
       <groupId>net.java.linoleum</groupId>
       <artifactId>application</artifactId>
-      <version>1.2</version>
+      <version>1.6</version>
     </dependency>
     <dependency>
       <groupId>net.java.linoleum</groupId>

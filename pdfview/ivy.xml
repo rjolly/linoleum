@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:e="http://ant.apache.org/ivy/extra">
-    <info module="pdfview" organisation="net.java.linoleum" revision="1.2.1">
+    <info module="pdfview" organisation="net.java.linoleum" revision="1.6">
         <description homepage="http://linoleum.java.net/"/>
     </info>
     <configurations>
@@ -22,6 +22,6 @@
     </publications>
     <dependencies>
         <dependency org="com.github.rjolly" name="pdf-renderer" rev="140" conf="compile->master;runtime->default"/>
-        <dependency org="net.java.linoleum" name="application" rev="1.2.1" conf="compile->master;runtime->default"/>
+        <dependency org="net.java.linoleum" name="application" rev="1.6" conf="compile->master;runtime->default"/>
     </dependencies>
 </ivy-module>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
-    <info module="html" organisation="net.java.linoleum" revision="1.5"/>
+    <info module="html" organisation="net.java.linoleum" revision="1.6"/>
     <configurations>
         <conf name="default" extends="runtime,master"/>
         <conf name="master"/>
@@ -11,7 +11,7 @@
     </configurations>
     <dependencies>
         <dependency org="commons-codec" name="commons-codec" rev="1.9" conf="compile->master;runtime->default"/>
-        <dependency org="net.java.linoleum" name="application" rev="1.5" conf="compile->master;runtime->default"/>
+        <dependency org="net.java.linoleum" name="application" rev="1.6" conf="compile->master;runtime->default"/>
         <dependency org="net.java.linoleum" name="jlfgr" rev="1_0" conf="runtime->default"/>
     </dependencies>
 </ivy-module>

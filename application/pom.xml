@@ -6,7 +6,7 @@
   <groupId>net.java.linoleum</groupId>
   <artifactId>application</artifactId>
   <packaging>jar</packaging>
-  <version>1.5</version>
+  <version>1.6</version>
   <url>http://linoleum.java.net/</url>
   <description>Java desktop environment and software distribution.</description>
   <licenses>
