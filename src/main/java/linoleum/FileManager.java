@@ -818,7 +818,7 @@ public class FileManager extends FileSupport implements Runnable {
 	}
 
 	private WatchKey register(final WatchService service) throws IOException {
-		setTitle(path.getFileName().toString());
+		setTitle(getFileName(path).toString());
 		return path.register(service, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
 	}
 
