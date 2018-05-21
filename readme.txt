@@ -68,4 +68,5 @@ Useful libraries
   commons-io#commons-io;2.4			The Apache Commons IO library
   mstor#mstor;0.9.9				A JavaMail provider for persistent email storage
   org.bouncycastle#bcpg-jdk15;1.45		The Bouncy Castle Java API for handling the OpenPGP protocol
+  org.ghost4j#ghost4j;1.0.1			Ghost4J binds the Ghostscript C API to bring Ghostscript power to the Java world
 

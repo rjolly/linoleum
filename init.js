@@ -374,3 +374,29 @@ function clone(str, dir) {
     }
     return Packages.org.eclipse.jgit.api.Git.cloneRepository().setDirectory(pathToFile(dir)).setURI(uri.toString()).call();
 }
+
+// requires org.ghost4j#ghost4j;1.0.1 and Ghostscript
+// https://downloads.sourceforge.net/ghostscript/gs905w64.exe
+
+function ps2pdf(file, output) {
+    PSDocument = Packages.org.ghost4j.document.PSDocument;
+    PDFConverter = Packages.org.ghost4j.converter.PDFConverter;
+    IOUtils = Packages.org.apache.commons.io.IOUtils;
+    FileOutputStream = java.io.FileOutputStream;
+    file = pathToFile(file);
+    if (output == undefined) {
+	var name = file.getName();
+	var n = name.lastIndexOf(".ps");
+	if (n > 0) {
+	    name = name.substring(0, n);
+	}
+	output = name + ".pdf";
+    }
+    document = new PSDocument();
+    document.load(file);
+    fos = new FileOutputStream(pathToFile(output));
+    converter = new PDFConverter();
+    converter.setPDFSettings(PDFConverter.OPTION_PDFSETTINGS_PREPRESS);
+    converter.convert(document, fos);
+    IOUtils.closeQuietly(fos);
+}
