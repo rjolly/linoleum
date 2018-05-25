@@ -214,21 +214,18 @@ public class Browser extends FileSupport {
 		open();
 	}
 
-	private boolean reuseFor(final URL that) {
-		if (current != null) {
-			return that == null?false:current.getURL().sameFile(that);
-		}
-		return true;
-	}
-
-	@Override
-	public boolean reuseFor(final URI that) {
-		try {
-			return reuseFor(that == null?new URL(getHome()):that.toURL());
+	private boolean reuseFor(final String str) {
+		if (!str.isEmpty()) try {
+			return current.getURL().sameFile(new URL(str));
 		} catch (final MalformedURLException ex) {
 			ex.printStackTrace();
 		}
 		return false;
+	}
+
+	@Override
+	public boolean reuseFor(final URI that) {
+		return current == null?true:reuseFor(that == null?getHome():that.toString());
 	}
 
 	private void doOpen() {
