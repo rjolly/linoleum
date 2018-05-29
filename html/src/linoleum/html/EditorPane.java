@@ -191,20 +191,18 @@ public class EditorPane extends JEditorPane {
 			}
 		}
 		try {
-			return new PageStream(conn.getInputStream(), loader, conn.getContentLength());
+			return new PageStream(conn.getInputStream(), conn.getContentLength());
 		} finally {
 			map.remove(host);
 		}
 	}
 
-	private static class PageStream extends FilterInputStream {
-		private final PageLoader loader;
+	private class PageStream extends FilterInputStream {
 		private int n;
 
-		public PageStream(final InputStream in, final PageLoader loader, final int length) {
+		public PageStream(final InputStream in, final int length) {
 			super(in);
 			if (loader != null) loader.setLength(length);
-			this.loader = loader;
 		}
 
 		public int read(final byte b[], final int off, final int len) throws IOException {
