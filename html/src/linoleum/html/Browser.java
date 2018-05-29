@@ -233,8 +233,7 @@ public class Browser extends FileSupport {
 			loader.cancel(true);
 		}
 		if (loader == null) {
-			loader = new PageLoader();
-			jEditorPane1.setLoader(loader);
+			jEditorPane1.setLoader(loader = new PageLoader());
 			loader.execute();
 		}
 	}

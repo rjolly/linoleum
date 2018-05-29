@@ -36,15 +36,16 @@ public class EditorPane extends JEditorPane {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private PageLoader loader;
 
-	public void setLoader(final PageLoader loader) {
+	void setLoader(final PageLoader loader) {
 		this.loader = loader;
 	}
 
+	@Override
 	public void setPage(final URL page) throws IOException {
 		setPage(new FrameURL(page), false);
 	}
 
-	public void setPage(final FrameURL dest, final boolean force) throws IOException {
+	void setPage(final FrameURL dest, final boolean force) throws IOException {
 		final URL page = dest.getURL();
 		final String reference = page.getRef();
 		final URL loaded = getPage();
@@ -80,13 +81,11 @@ public class EditorPane extends JEditorPane {
 
 	private Document initializeModel(final EditorKit kit, final URL page) {
 		final Document doc = kit.createDefaultDocument();
-		if (pageProperties != null) {
-			for (final Enumeration<String> e = pageProperties.keys(); e.hasMoreElements();) {
-				final String key = e.nextElement();
-				doc.putProperty(key, pageProperties.get(key));
-			}
-			pageProperties.clear();
+		for (final Enumeration<String> e = pageProperties.keys(); e.hasMoreElements();) {
+			final String key = e.nextElement();
+			doc.putProperty(key, pageProperties.get(key));
 		}
+		pageProperties.clear();
 		if (doc.getProperty(Document.StreamDescriptionProperty) == null) {
 			doc.putProperty(Document.StreamDescriptionProperty, page);
 		}
@@ -209,9 +208,6 @@ public class EditorPane extends JEditorPane {
 	}
 
 	private void handleConnectionProperties(final URLConnection conn) {
-		if (pageProperties == null) {
-			pageProperties = new Hashtable<String, Object>();
-		}
 		final String type = conn.getContentType();
 		if (type != null) {
 			setContentType(type);
@@ -241,7 +237,7 @@ public class EditorPane extends JEditorPane {
 			os.writeBytes(str);
 		}
 	}
-
+	@SuppressWarnings("deprecation")
 	public void scrollToReference(final String reference) {
 		final Document d = getDocument();
 		if (d instanceof HTMLDocument) {
@@ -300,6 +296,6 @@ public class EditorPane extends JEditorPane {
 		}
 	}
 
-	private Hashtable<String, Object> pageProperties;
-	final static String PostDataProperty = "javax.swing.JEditorPane.postdata";
+	private final Hashtable<String, Object> pageProperties = new Hashtable<>();
+	private static final String PostDataProperty = "javax.swing.JEditorPane.postdata";
 }
