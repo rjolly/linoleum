@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URI;
@@ -27,6 +28,7 @@ import javax.swing.JEditorPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
+import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Document;
 import linoleum.application.FileSupport;
 import linoleum.application.Frame;
@@ -74,6 +76,17 @@ public class Browser extends FileSupport {
 		setMimeType("text/html");
 		setScheme("http:https");
 		resize();
+		jEditorPane1.setDefaultEditorKit(new DefaultEditorKit() {
+			@Override
+			public void read(final Reader r, final Document doc, final int pos) {
+				final URL url = (URL) doc.getProperty(Document.StreamDescriptionProperty);
+				if (url != null) try {
+					getApplicationManager().get("Downloads").open(url.toURI(), getDesktopPane());
+				} catch (final URISyntaxException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 		jEditorPane1.setEditorKitForContentType("text/html", new EditorKit());
 		jEditorPane1.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 		jTextField1.getDocument().addDocumentListener(new DocumentListener() {

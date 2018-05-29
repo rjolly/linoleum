@@ -35,9 +35,19 @@ public class EditorPane extends JEditorPane {
 	private static final java.net.URLStreamHandlerFactory instance = new URLStreamHandlerFactory();
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private PageLoader loader;
+	private EditorKit kit;
 
 	void setLoader(final PageLoader loader) {
 		this.loader = loader;
+	}
+
+	void setDefaultEditorKit(final EditorKit kit) {
+		this.kit = kit;
+	}
+
+	@Override
+	protected EditorKit createDefaultEditorKit() {
+		return kit == null?super.createDefaultEditorKit():kit;
 	}
 
 	@Override
