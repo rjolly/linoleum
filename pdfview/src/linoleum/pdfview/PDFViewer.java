@@ -21,9 +21,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import linoleum.application.FileChooser;
 import linoleum.application.FileSupport;
 import linoleum.application.Frame;
 
@@ -32,7 +29,6 @@ public class PDFViewer extends FileSupport {
 	private final Icon openIcon = new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Open16.gif"));
 	private final Action openAction = new OpenAction();
 	private final Action closeAction = new CloseAction();
-	private final FileChooser chooser = new FileChooser();
 	private int curpage = -1;
 	private PDFFile curFile;
 	private String docName;
@@ -47,18 +43,7 @@ public class PDFViewer extends FileSupport {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			final int returnVal = getOwner().chooser.showInternalOpenDialog(PDFViewer.this);
-			switch (returnVal) {
-			case JFileChooser.APPROVE_OPTION:
-				final URI uri = getURI();
-				if (uri != null) {
-					close();
-				}
-				setURI(getOwner().chooser.getSelectedFile().toURI());
-				open();
-				break;
-			default:
-			}
+			getApplicationManager().get("Files").open(getURI(), getDesktopPane());
 		}
 	}
 
@@ -79,7 +64,6 @@ public class PDFViewer extends FileSupport {
 		initComponents();
 		setDescription("PDF viewer (may require jai in some cases)");
 		setIcon(new ImageIcon(getClass().getResource("reader.png")));
-		chooser.setFileFilter(new FileNameExtensionFilter("PDF Files", "pdf"));
 		setMimeType("application/pdf");
 		setTitle(TITLE);
 		setEnabling();
