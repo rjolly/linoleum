@@ -34,6 +34,7 @@ public class PDFViewer extends FileSupport {
 	private String docName;
 	private PagePreparer pagePrep;
 	private PagePanel page;
+	private URI prev;
 
 	private class OpenAction extends AbstractAction {
 		public OpenAction() {
@@ -43,7 +44,8 @@ public class PDFViewer extends FileSupport {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			getApplicationManager().get("Files").open(getURI(), getDesktopPane());
+			final URI uri = getURI();
+			getApplicationManager().get("Files").open(uri == null?prev:uri, getDesktopPane());
 		}
 	}
 
@@ -77,6 +79,12 @@ public class PDFViewer extends FileSupport {
 	@Override
 	public Frame getFrame() {
 		return new PDFViewer();
+	}
+
+	@Override
+	public void setURI(final URI uri) {
+		prev = getURI();
+		super.setURI(uri);
 	}
 
 	@Override
