@@ -30,18 +30,15 @@
 	</sequential>
     </macrodef>
 
-    <target name="init">
-        <property file="build.properties"/>
-    </target>
+    <property file="build.properties"/>
 
-    <target name="src" depends="init">
-	<tar destfile="../${application.title}.tar.gz" compression="gzip">
-	    <tarfileset dir=".." includes="ant-deb-task/dist/ant-deb.jar"/>
+    <target name="src">
+	<tar destfile="../${ant.project.name}.tar.gz" compression="gzip">
 	    <tarfileset prefix="linoleum" dir="." includes="application/**,bin/**,html/**,local/**,mail/**,notepad/**,pkg/**,src/**,*.js,build.properties,*.xml,manifest.mf,*.txt" excludes="**/build/**,**/dist/**,**/private/**"/>
 	</tar>
     </target>
 
-    <target depends="init" description="Build JAR." name="jar">
+    <target name="jar" description="Build JAR.">
 	<linoleum file="build-all.js"/>
 	<antcall target="post-jar"/>
     </target>
@@ -60,33 +57,13 @@
     </target>
 
     <target name="zip" depends="jar">
-	<zip destfile="../${application.title}.zip" basedir="${dist.dir}"/>
+	<zip destfile="../${ant.project.name}.zip" basedir="${dist.dir}"/>
     </target>
 
-    <path id="classpath">
-        <fileset dir="../ant-deb-task/dist" includes="*.jar"/>
-    </path>
-
-    <taskdef resource="ant_deb_task.properties" classpathref="classpath"/>
-
     <target name="deb" depends="jar" description="build the deb file">
-        <deb
-            todir=".."
-            package="${package.name}"
-            section="libs"
-            depends="${depends}"
-            preinst="local/preinst"
-            postinst="local/postinst"
-            prerm="local/prerm"
-        >
-            <version upstream="${version}" debian="${version.debian}"/>
-            <maintainer name="Raphael Jolly" email="rjolly@users.sourceforge.net"/>
-            <description synopsis="Linoleum">
-Java desktop environment and software distribution.
-
-http://linoleum.java.net/
-            </description>
-            <tarfileset dir="${dist.dir}" prefix="usr/share/${package.name}">
+        <taskdef name="deb" classname="org.vafer.jdeb.ant.DebAntTask" classpath="/usr/share/java/jdeb.jar"/>
+        <deb destfile="../${ant.project.name}.deb" control="${control.dir}">
+            <tarfileset dir="${dist.dir}" prefix="usr/share/${ant.project.name}">
                 <exclude name="bin/**"/>
                 <exclude name="lib/commons-codec-1.9.jar"/>
                 <exclude name="lib/ivy-2.4.0.jar"/>
@@ -95,10 +72,15 @@ http://linoleum.java.net/
                 <exclude name="linoleum.desktop"/>
                 <exclude name="readme.txt"/>
             </tarfileset>
-            <tarfileset dir="${dist.dir}/bin" prefix="usr/share/${package.name}/bin" filemode="755">
+            <link name="/usr/share/${ant.project.name}/lib/ivy.jar" target="../../java/ivy.jar"/>
+            <link name="/usr/share/${ant.project.name}/lib/commons-codec.jar" target="../../java/commons-codec.jar"/>
+            <link name="/usr/share/${ant.project.name}/lib/jsch.jar" target="../../java/jsch.jar"/>
+            <link name="/usr/share/${ant.project.name}/lib/javax.mail.jar" target="../../java/javax.mail.jar"/>
+            <tarfileset dir="${dist.dir}/bin" prefix="usr/share/${ant.project.name}/bin" filemode="755">
                 <exclude name="*.bat"/>
             </tarfileset>
-            <tarfileset dir="${dist.dir}" prefix="usr/share/doc/${package.name}">
+            <link name="/usr/bin/linoleum" target="/usr/share/${ant.project.name}/bin/linoleum"/>
+            <tarfileset dir="${dist.dir}" prefix="usr/share/doc/${ant.project.name}">
                 <include name="readme.txt"/>
             </tarfileset>
             <tarfileset file="local/linoleum.desktop" prefix="usr/share/xsessions"/>
