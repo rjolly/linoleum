@@ -1,0 +1,13 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: linoleum
+Source: http://linoleum.java.net/
+
+Files: *
+Copyright: © 2015-2018, Raphael Jolly <raphael.jolly@free.fr>
+License: GPL or LGPL
+ Programs released under GPL or LGPL.
+ .
+ On Debian systems, the complete text of the GNU General Public
+ License version 3 can be found in `/usr/share/common-licenses/GPL-3`
+ and the complete text of the GNU Lesser General Public License
+ version 3 can be found in `/usr/share/common-licenses/LGPL-3`.

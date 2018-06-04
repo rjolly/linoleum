@@ -1,0 +1,16 @@
+Source: linoleum
+Section: java
+Priority: optional
+Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
+Uploaders: Raphael Jolly <raphael.jolly@free.fr>
+Build-Depends: debhelper (>= 10.0.0), default-jdk, linoleum, ant, libjdeb-java
+Standards-Version: 4.1.4
+Homepage: http://linoleum.java.net/
+Vcs-Git: https://salsa.debian.org/pkg-java/linoleum.git
+Vcs-Browser: https://salsa.debian.org/pkg-java/linoleum
+
+Package: linoleum
+Architecture: all
+Depends: java7-sdk, ivy, libcommons-codec-java, libjsch-java, libmail-java, ${misc:Depends}
+Description: Java desktop environment and software distribution
+ Extended description is not empy.

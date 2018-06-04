@@ -1,11 +1,9 @@
 Package: linoleum
 Version: 1.6-1
 Section: java
-Priority: extra
+Priority: optional
 Architecture: all
 Depends: java7-sdk, ivy, libcommons-codec-java, libjsch-java, libmail-java
 Maintainer: Raphael Jolly <raphael.jolly@free.fr>
-Description: Linoleum
- Java desktop environment and software distribution.
- .
- http://linoleum.java.net/
+Description: Java desktop environment and software distribution
+ Extended description is not empy.
