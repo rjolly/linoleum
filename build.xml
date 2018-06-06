@@ -6,6 +6,8 @@
     <property environment="env"/>
     <property name="env.LINOLEUM_HOME" value="/usr/share/linoleum"/>
     <property name="linoleum.home" value="${env.LINOLEUM_HOME}"/>
+    <property name="env.JDEB_HOME" value="/usr/share/java"/>
+    <property name="jdeb.home" value="${env.JDEB_HOME}"/>
 
     <path id="linoleum.classpath">
 	<pathelement location="${java.home}/../lib/tools.jar"/>
@@ -61,7 +63,7 @@
     </target>
 
     <target name="deb" depends="jar" description="build the deb file">
-        <taskdef name="deb" classname="org.vafer.jdeb.ant.DebAntTask" classpath="/usr/share/java/jdeb.jar"/>
+        <taskdef name="deb" classname="org.vafer.jdeb.ant.DebAntTask" classpath="${jdeb.home}/jdeb.jar"/>
         <deb destfile="../${ant.project.name}.deb" control="${control.dir}">
             <tarfileset dir="${dist.dir}" prefix="usr/share/${ant.project.name}">
                 <exclude name="bin/**"/>
