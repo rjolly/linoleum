@@ -1,0 +1,15 @@
+<ivysettings>
+	<settings defaultResolver="default">
+		<caches useOrigin="true" />
+	</settings>
+	<include url="${ivy.default.settings.dir}/ivysettings-local.xml"/>
+	<resolvers>
+		<filesystem name="debian" m2compatible="true">
+			<artifact pattern="/usr/share/maven-repo/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+		</filesystem>
+		<chain name="default">
+			<resolver ref="local"/>
+			<resolver ref="debian"/>
+		</chain>
+	</resolvers>
+</ivysettings>
