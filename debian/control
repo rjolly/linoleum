@@ -11,6 +11,6 @@ Vcs-Browser: https://salsa.debian.org/pkg-java/linoleum
 
 Package: linoleum
 Architecture: all
-Depends: java7-sdk, ivy, libcommons-codec-java, libjsch-java, libmail-java, ${misc:Depends}
+Depends: java7-sdk, ivy, libcommons-codec-java, libmail-java, ${misc:Depends}
 Description: Java desktop environment and software distribution
  Extended description is not empy.

@@ -65,17 +65,17 @@
         <deb destfile="../${ant.project.name}.deb" control="${control.dir}">
             <tarfileset dir="${dist.dir}" prefix="usr/share/${ant.project.name}">
                 <exclude name="bin/**"/>
+                <exclude name="lib/activation-1.1.jar"/>
                 <exclude name="lib/commons-codec-1.9.jar"/>
                 <exclude name="lib/ivy-2.4.0.jar"/>
-                <exclude name="lib/jsch-0.1.51.jar"/>
                 <exclude name="lib/javax.mail-1.5.5.jar"/>
                 <exclude name="linoleum.desktop"/>
                 <exclude name="readme.txt"/>
             </tarfileset>
             <link name="/usr/share/${ant.project.name}/lib/ivy.jar" target="../../java/ivy.jar"/>
             <link name="/usr/share/${ant.project.name}/lib/commons-codec.jar" target="../../java/commons-codec.jar"/>
-            <link name="/usr/share/${ant.project.name}/lib/jsch.jar" target="../../java/jsch.jar"/>
             <link name="/usr/share/${ant.project.name}/lib/javax.mail.jar" target="../../java/javax.mail.jar"/>
+            <link name="/usr/share/${ant.project.name}/lib/activation-1.1.jar" target="../../java/activation-1.1.jar"/>
             <tarfileset dir="${dist.dir}/bin" prefix="usr/share/${ant.project.name}/bin" filemode="755">
                 <exclude name="*.bat"/>
             </tarfileset>
