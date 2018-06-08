@@ -10,7 +10,6 @@
         <conf name="runtime-test"/>
     </configurations>
     <dependencies>
-        <dependency org="net.java.linoleum" name="jlfgr" rev="1_0" conf="runtime->default"/>
         <dependency org="net.java.linoleum" name="application" rev="1.6" conf="compile->master"/>
         <dependency org="net.java.linoleum" name="notepad" rev="1.6" conf="runtime->default"/>
         <dependency org="net.java.linoleum" name="html" rev="1.6" conf="runtime->default"/>

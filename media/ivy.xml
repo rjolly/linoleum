@@ -23,6 +23,5 @@
     <dependencies>
         <dependency org="javax.media" name="jmf" rev="2.1.1e" conf="compile->master;runtime->default"/>
         <dependency org="net.java.linoleum" name="application" rev="1.6" conf="compile->master;runtime->default"/>
-        <dependency org="net.java.linoleum" name="jlfgr" rev="1_0" conf="runtime->default"/>
     </dependencies>
 </ivy-module>

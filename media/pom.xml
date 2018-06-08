@@ -41,10 +41,5 @@
       <artifactId>application</artifactId>
       <version>1.6</version>
     </dependency>
-    <dependency>
-      <groupId>net.java.linoleum</groupId>
-      <artifactId>jlfgr</artifactId>
-      <version>1_0</version>
-    </dependency>
   </dependencies>
 </project>

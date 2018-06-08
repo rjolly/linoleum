@@ -6,4 +6,4 @@ Specification-Vendor: com.github.rjolly
 Specification-Title: linoleum
 Specification-Version: 1.6
 Main-Class: linoleum.Desktop
-Class-Path: lib/activation-1.1.jar lib/application-1.6.jar lib/jlfgr-1_0.jar
+Class-Path: lib/activation-1.1.jar lib/application-1.6.jar
