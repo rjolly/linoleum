@@ -13,4 +13,22 @@ Package: linoleum
 Architecture: all
 Depends: default-jdk, ivy, libcommons-codec-java, libmail-java, ${misc:Depends}
 Description: Java desktop environment and software distribution
- Extended description is not empy.
+ This projects allows you to do your daily work from inside the JVM - just like
+ Java is your operating system. Your usual Linux workflow is preserved, with
+ apt-get install some-library, make and run replaced by install maven
+ dependencies, build with Javascript and run - in a everything runs in the same
+ JVM philosophy. In addition, the projects brings an API for third-party
+ applications. Once your project builds against this API, it can be published in
+ Maven, and becomes available as a market application - like in Android. But
+ unlike with Android's market, with Maven, dependency management is properly
+ done, and not everything is repackaged again in every new application, saving
+ lots of space. Already existing applications include a file manager, script
+ shell, web and e-mail, pdf viewer and open street map. Hence, the project
+ bridges a gap between Linux and Java, aleviating the need to repackage every
+ single Java project to make it available in Linux. Already repackaged
+ applications can help though, especially the ones with binary hooks, and this
+ is where Linux can make a difference, in terms of Java extensibility - think
+ bluetooth, media or java3d for instance - each of which a whole separate topic.
+ Lastly, Linoleum has the bootstrap property, meaning it can build itself, just
+ like the Linux kernel, but unlike Android, which can not be used to develop
+ itself.
