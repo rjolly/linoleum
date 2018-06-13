@@ -11,6 +11,7 @@
     </configurations>
     <dependencies>
         <dependency org="net.java.linoleum" name="application" rev="1.6" conf="compile->master"/>
+        <dependency org="net.java.linoleum" name="calendar" rev="1.6" conf="runtime->default"/>
         <dependency org="net.java.linoleum" name="notepad" rev="1.6" conf="runtime->default"/>
         <dependency org="net.java.linoleum" name="html" rev="1.6" conf="runtime->default"/>
         <dependency org="net.java.linoleum" name="mail" rev="1.6" conf="runtime->default"/>
