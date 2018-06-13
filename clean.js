@@ -7,6 +7,9 @@ clean("build/classes")
 cd("../mail")
 clean("build/classes")
 
+cd("../calendar")
+clean("build/classes")
+
 cd("../notepad")
 clean("build/classes")
 

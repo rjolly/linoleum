@@ -7,6 +7,9 @@ load("build.js")
 cd("../mail")
 load("build.js")
 
+cd("../calendar")
+load("build.js")
+
 cd("../notepad")
 load("build.js")
 
