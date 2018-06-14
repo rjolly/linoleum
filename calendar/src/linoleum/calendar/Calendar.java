@@ -1,5 +1,6 @@
 package linoleum.calendar;
 
+import java.util.Date;
 import javax.swing.ImageIcon;
 import linoleum.application.Frame;
 
@@ -9,6 +10,11 @@ public class Calendar extends Frame {
 		initComponents();
 		setDescription("calendar");
 		setIcon(new ImageIcon(getClass().getResource("JCalendarColor24.png")));
+	}
+
+	@Override
+	public void open() {
+		jCalendar1.setDate(new Date());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -23,7 +29,6 @@ public class Calendar extends Frame {
                 setFrameIcon(new javax.swing.ImageIcon(getClass().getResource("/com/toedter/calendar/images/JCalendarColor16.gif"))); // NOI18N
 
                 jCalendar1.setDecorationBordersVisible(true);
-                jCalendar1.setTodayButtonVisible(true);
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);
@@ -38,7 +43,6 @@ public class Calendar extends Frame {
 
                 pack();
         }// </editor-fold>//GEN-END:initComponents
-
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private com.toedter.calendar.JCalendar jCalendar1;
