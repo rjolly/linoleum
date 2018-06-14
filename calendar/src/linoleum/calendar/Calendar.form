@@ -40,7 +40,6 @@
     <Component class="com.toedter.calendar.JCalendar" name="jCalendar1">
       <Properties>
         <Property name="decorationBordersVisible" type="boolean" value="true"/>
-        <Property name="todayButtonVisible" type="boolean" value="true"/>
       </Properties>
     </Component>
   </SubComponents>
