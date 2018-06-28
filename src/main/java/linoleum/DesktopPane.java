@@ -1,6 +1,7 @@
 package linoleum;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.KeyboardFocusManager;
 import java.awt.KeyEventDispatcher;
@@ -157,6 +158,7 @@ public class DesktopPane extends JDesktopPane {
 	}
 
 	public DesktopPane() {
+		setPreferredSize(new Dimension(640, 451));
 		map.put((KeyStroke) selectAction.getValue(Action.ACCELERATOR_KEY), selectAction.getValue(Action.NAME));
 		map.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.ALT_DOWN_MASK), selectAction.getValue(Action.NAME));
 		getActionMap().put(selectAction.getValue(Action.NAME), selectAction);
