@@ -6,7 +6,7 @@ import java.net.URLStreamHandler;
 import java.util.Arrays;
 
 public class URLStreamHandlerFactory implements java.net.URLStreamHandlerFactory {
-	private final String protocols[] = new String[] {"mvn", "imap", "imaps", "geo"};
+	private final String protocols[] = new String[] {"mvn", "imap", "imaps", "mstor", "geo"};
 
 	public URLStreamHandlerFactory() {
 		URL.setURLStreamHandlerFactory(this);

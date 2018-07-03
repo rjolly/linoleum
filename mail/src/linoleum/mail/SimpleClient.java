@@ -126,7 +126,7 @@ public class SimpleClient extends PreferenceSupport {
 	public SimpleClient() {
 		initComponents();
 		setDescription("mail");
-		setScheme("imap:imaps");
+		setScheme("imap:imaps:mstor");
 		setIcon(new ImageIcon(getClass().getResource("Mail24.png")));
 		session.getProperties().put("mail.smtps.auth", "true");
 		session.getProperties().put("mail.mime.decodefilename", "true");
