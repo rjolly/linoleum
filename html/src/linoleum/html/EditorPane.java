@@ -36,6 +36,7 @@ public class EditorPane extends JEditorPane {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private PageLoader loader;
 	private EditorKit kit;
+	private String agent;
 
 	void setLoader(final PageLoader loader) {
 		this.loader = loader;
@@ -43,6 +44,10 @@ public class EditorPane extends JEditorPane {
 
 	void setDefaultEditorKit(final EditorKit kit) {
 		this.kit = kit;
+	}
+
+	void setUserAgent(final String agent) {
+		this.agent = agent;
 	}
 
 	@Override
@@ -159,6 +164,9 @@ public class EditorPane extends JEditorPane {
 				map.put(host, basic.auth(this));
 			}
 			conn.addRequestProperty("Authorization", map.get(host));
+		}
+		if (agent != null && !agent.isEmpty()) {
+			conn.addRequestProperty("User-Agent", agent);
 		}
 		if (conn instanceof HttpURLConnection) {
 			final HttpURLConnection hconn = (HttpURLConnection) conn;

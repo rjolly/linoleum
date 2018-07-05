@@ -52,8 +52,8 @@ public class Browser extends FileSupport {
 
 	@Override
 	public void preferenceChange(final PreferenceChangeEvent evt) {
-		if (evt.getKey().equals(getKey("fontSize"))) {
-			resize();
+		if (evt.getKey().equals(getKey("fontSize")) || evt.getKey().equals(getKey("userAgent"))) {
+			reconf();
 		}
 	}
 
@@ -75,7 +75,7 @@ public class Browser extends FileSupport {
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/development/WebComponent24.gif")));
 		setMimeType("text/html");
 		setScheme("http:https");
-		resize();
+		reconf();
 		jEditorPane1.setDefaultEditorKit(new DefaultEditorKit() {
 			@Override
 			public void read(final Reader r, final Document doc, final int pos) {
@@ -141,6 +141,7 @@ public class Browser extends FileSupport {
 	public void load() {
 		jTextField2.setText(getHome());
 		jComboBox1.setSelectedItem(getFontSize());
+		jTextField3.setText(getUserAgent());
 	}
 
 	private String getHome() {
@@ -151,14 +152,20 @@ public class Browser extends FileSupport {
 		return prefs.getInt(getKey("fontSize"), jEditorPane1.getFont().getSize());
 	}
 
-	private void resize() {
+	private String getUserAgent() {
+		return prefs.get(getKey("userAgent"), "");
+	}
+
+	private void reconf() {
 		jEditorPane1.setFont(jEditorPane1.getFont().deriveFont((float) getFontSize()));
+		jEditorPane1.setUserAgent(getUserAgent());
 	}
 
 	@Override
 	public void save() {
 		prefs.put(getKey("home"), jTextField2.getText());
 		prefs.putInt(getKey("fontSize"), (Integer) jComboBox1.getSelectedItem());
+		prefs.put(getKey("userAgent"), jTextField3.getText());
 	}
 
 	@Override
@@ -344,6 +351,8 @@ public class Browser extends FileSupport {
                 jTextField2 = new javax.swing.JTextField();
                 jLabel3 = new javax.swing.JLabel();
                 jComboBox1 = new javax.swing.JComboBox();
+                jLabel4 = new javax.swing.JLabel();
+                jTextField3 = new javax.swing.JTextField();
                 jPanel3 = new javax.swing.JPanel();
                 jButton2 = new javax.swing.JButton();
                 jButton3 = new javax.swing.JButton();
@@ -376,6 +385,8 @@ public class Browser extends FileSupport {
                         }
                 });
 
+                jLabel4.setText("User agent:");
+
                 javax.swing.GroupLayout optionPanel1Layout = new javax.swing.GroupLayout(optionPanel1);
                 optionPanel1.setLayout(optionPanel1Layout);
                 optionPanel1Layout.setHorizontalGroup(
@@ -383,14 +394,16 @@ public class Browser extends FileSupport {
                         .addGroup(optionPanel1Layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jLabel4)
                                         .addComponent(jLabel3)
                                         .addComponent(jLabel2))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)
+                                        .addComponent(jTextField2)
                                         .addGroup(optionPanel1Layout.createSequentialGroup()
                                                 .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(0, 0, Short.MAX_VALUE)))
+                                                .addGap(0, 0, Short.MAX_VALUE))
+                                        .addComponent(jTextField3))
                                 .addContainerGap())
                 );
                 optionPanel1Layout.setVerticalGroup(
@@ -404,6 +417,10 @@ public class Browser extends FileSupport {
                                 .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel3)
                                         .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel4)
+                                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 );
 
@@ -474,7 +491,7 @@ public class Browser extends FileSupport {
                                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap())
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 394, Short.MAX_VALUE)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
                 );
                 layout.setVerticalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -554,6 +571,7 @@ public class Browser extends FileSupport {
         private javax.swing.JLabel jLabel1;
         private javax.swing.JLabel jLabel2;
         private javax.swing.JLabel jLabel3;
+        private javax.swing.JLabel jLabel4;
         private javax.swing.JPanel jPanel2;
         private javax.swing.JPanel jPanel3;
         private javax.swing.JPopupMenu jPopupMenu1;
@@ -561,6 +579,7 @@ public class Browser extends FileSupport {
         private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JTextField jTextField1;
         private javax.swing.JTextField jTextField2;
+        private javax.swing.JTextField jTextField3;
         private linoleum.application.OptionPanel optionPanel1;
         // End of variables declaration//GEN-END:variables
 }
