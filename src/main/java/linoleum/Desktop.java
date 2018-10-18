@@ -156,8 +156,8 @@ public class Desktop extends JFrame {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			try {
-				final File home = new File(System.getProperty("java.home")).getParentFile().getCanonicalFile();
-				final File file = new File(home, "docs/api/index.html");
+				final File home = new File(System.getProperty("java.home"));
+				final File file = new File("jre".equals(home.getName())?home.getParentFile().getCanonicalFile():home, "docs/api/index.html");
 				if (file.exists()) {
 					apps.open(file.toURI());
 				}
