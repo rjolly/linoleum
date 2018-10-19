@@ -632,21 +632,29 @@ public class ImageView extends View {
 
 			if (image == img) {
 				short changed = 0;
-				if ((flags & ImageObserver.HEIGHT) != 0 && !getElement().
-					  getAttributes().isDefined(HTML.Attribute.HEIGHT)) {
-					changed |= 1;
-				}
 				if ((flags & ImageObserver.WIDTH) != 0 && !getElement().
 					  getAttributes().isDefined(HTML.Attribute.WIDTH)) {
+					changed |= 1;
+				}
+				if ((flags & ImageObserver.HEIGHT) != 0 && !getElement().
+					  getAttributes().isDefined(HTML.Attribute.HEIGHT)) {
 					changed |= 2;
 				}
 
 				synchronized(ImageView.this) {
 					if ((changed & 1) == 1 && (state & WIDTH_FLAG) == 0) {
-						width = newWidth;
+						if ((state & HEIGHT_FLAG) == HEIGHT_FLAG) {
+							width = newWidth * height / newHeight;
+						} else {
+							width = newWidth;
+						}
 					}
 					if ((changed & 2) == 2 && (state & HEIGHT_FLAG) == 0) {
-						height = newHeight;
+						if ((state & WIDTH_FLAG) == WIDTH_FLAG) {
+							height = newHeight * width / newWidth;
+						} else {
+							height = newHeight;
+						}
 					}
 					if ((state & LOADING_FLAG) == LOADING_FLAG) {
 						// No need to resize or repaint, still in the process of
