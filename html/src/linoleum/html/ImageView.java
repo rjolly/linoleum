@@ -632,12 +632,10 @@ public class ImageView extends View {
 
 			if (image == img) {
 				short changed = 0;
-				if ((flags & ImageObserver.WIDTH) != 0 && !getElement().
-					  getAttributes().isDefined(HTML.Attribute.WIDTH)) {
+				if ((flags & ImageObserver.WIDTH) != 0 && getIntAttr(HTML.Attribute.WIDTH, -1) == -1) {
 					changed |= 1;
 				}
-				if ((flags & ImageObserver.HEIGHT) != 0 && !getElement().
-					  getAttributes().isDefined(HTML.Attribute.HEIGHT)) {
+				if ((flags & ImageObserver.HEIGHT) != 0 && getIntAttr(HTML.Attribute.HEIGHT, -1) == -1) {
 					changed |= 2;
 				}
 
