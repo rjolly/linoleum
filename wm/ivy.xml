@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0">
+    <info module="wm" organisation="net.java.linoleum" revision="1.6">
+        <description homepage="http://linoleum.java.net/"/>
+    </info>
+    <configurations>
+        <conf name="default" extends="runtime,master"/>
+        <conf name="master"/>
+        <conf name="compile"/>
+        <conf name="runtime"/>
+        <conf name="compile-test"/>
+        <conf name="runtime-test"/>
+    </configurations>
+    <dependencies>
+        <dependency org="com.github.rjolly" name="escher" rev="0.3" conf="compile->master;runtime->default"/>
+        <dependency org="net.java.linoleum" name="application" rev="1.6" conf="compile->master;runtime->default"/>
+    </dependencies>
+</ivy-module>
