@@ -161,7 +161,7 @@ public class WindowManager extends Frame {
 	}
 
 	private void when(final Event event) {
-		System.out.println(event);
+		logger.config("Event: " + event);
 		switch (event.code()) {
 		case ConfigureRequest.CODE: // Event.SUBSTRUCTURE_NOTIFY
 			when_configure_request((ConfigureRequest) event);
@@ -183,7 +183,7 @@ public class WindowManager extends Frame {
 		case MappingNotify.CODE:	// un-avoidable, ignored TODO
 			break;
 		default:
-			System.out.println("Unhandled event: " + event);
+			logger.config("Unhandled event: " + event);
 		}
 	}
 
@@ -260,6 +260,7 @@ public class WindowManager extends Frame {
 	}
 
 	private void unset_focus() {
+		client.lower();
 		getOwner().root.set_input_focus();
 	}
 
