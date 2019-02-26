@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Logger;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.JDesktopPane;
@@ -32,13 +33,14 @@ import gnu.x11.event.DestroyNotify;
 import linoleum.application.Frame;
 
 public class WindowManager extends Frame {
-	private Display.Name name;
+	private final String name = System.getenv("DISPLAY");
 	private Display display;
 	private Window root;
 	private Client client;
 	private JRootPane panel;
 	private boolean iconified;
 	private Map<Integer, WindowManager> frames = new HashMap<>();
+	private final Logger logger = Logger.getLogger(getClass().getName());
 
 	// internal state
 	public static final int UNMANAGED = 0;
@@ -93,8 +95,7 @@ public class WindowManager extends Frame {
 
 	@Override
 	public void init() {
-		name = new Display.Name(":0.0");
-		display = new Display(name);
+		display = new Display(new Display.Name(name == null?":0.0":name));
 		root = display.default_root;
 		control_root_window();
 		(new SwingWorker<Boolean, Object>() {
@@ -124,7 +125,7 @@ public class WindowManager extends Frame {
 			display.check_error();
 		} catch (final Error e) {
 			if (e.code == Error.BAD_ACCESS && e.bad == root.id) {
-				throw new RuntimeException ("Failed to access root window. Another WM is running ?");
+				logger.info("Failed to access root window. Another WM is running ?");
 			} else {
 				throw e;
 			}
