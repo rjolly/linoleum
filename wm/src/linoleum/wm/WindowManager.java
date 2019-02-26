@@ -96,8 +96,14 @@ public class WindowManager extends Frame {
 	@Override
 	public void init() {
 		display = new Display(new Display.Name(name == null?":0.0":name));
-		root = display.default_root;
-		control_root_window();
+		if (display.connected) {
+			root = display.default_root;
+			control_root_window();
+			loop();
+		}
+	}
+
+	private void loop() {
 		(new SwingWorker<Boolean, Object>() {
 			@Override
 			public Boolean doInBackground() {
