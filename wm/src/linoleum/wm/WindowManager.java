@@ -323,7 +323,9 @@ public class WindowManager extends Frame {
 			client.set_wm_state (Window.WMState.ICONIC);
 		}
 		final Rectangle bounds = client.rectangle();
-		setBounds(bounds.x - panel.getX(), bounds.y - panel.getY(), bounds.width - panel.getWidth() + getWidth(), bounds.height - panel.getHeight() + getHeight());
+		if (bounds.x != 0 || bounds.y != 0 || bounds.width != 1 || bounds.height != 1) {
+			setBounds(bounds.x - panel.getX(), bounds.y - panel.getY(), bounds.width - panel.getWidth() + getWidth(), bounds.height - panel.getHeight() + getHeight());
+		}
 	}
 
 	@Override
