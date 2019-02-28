@@ -49,6 +49,14 @@ To use linoleum as your desktop environment in Linux:
   wget http://raphael.jolly.free.fr/linoleum/linoleum-1.6.deb
   sudo dpkg -i linoleum-1.6.deb
 
+You might have to enable TCP connections to your X server. In /etc/gdm3/daemon.conf:
+
+[security]
+DisallowTCP = false
+
+Then restart the display manager:
+  /etc/init.d/gdm3 restart
+
 
 List of applications
 

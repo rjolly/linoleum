@@ -331,6 +331,10 @@ function version() {
     return java.lang.System.getProperty("java.version");	
 }
 
+function exec(command) {
+    return java.lang.Runtime.getRuntime().exec(command);	
+}
+
 // requires commons-io#commons-io;2.4
 
 function hexdump(path) {

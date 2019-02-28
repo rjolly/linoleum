@@ -1,5 +1,6 @@
 package linoleum.wm;
 
+import java.awt.Container;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.net.URI;
@@ -38,6 +39,7 @@ public class WindowManager extends Frame {
 	private Window root;
 	private Client client;
 	private JRootPane panel;
+	private Container content;
 	private boolean iconified;
 	private Map<Integer, WindowManager> frames = new HashMap<>();
 	private final Logger logger = Logger.getLogger(getClass().getName());
@@ -323,8 +325,9 @@ public class WindowManager extends Frame {
 			client.set_wm_state (Window.WMState.ICONIC);
 		}
 		final Rectangle bounds = client.rectangle();
+		content = getDesktopPane().getRootPane().getContentPane();
 		if (bounds.x != 0 || bounds.y != 0 || bounds.width != 1 || bounds.height != 1) {
-			setBounds(bounds.x - panel.getX(), bounds.y - panel.getY(), bounds.width - panel.getWidth() + getWidth(), bounds.height - panel.getHeight() + getHeight());
+			setBounds(bounds.x - panel.getX(), bounds.y - panel.getY() - content.getY(), bounds.width - panel.getWidth() + getWidth(), bounds.height - panel.getHeight() + getHeight());
 		}
 	}
 
@@ -379,12 +382,13 @@ public class WindowManager extends Frame {
 				return;
 			}
 			unset_focus();
+			getOwner().display.flush();
 		}
 	}
 
 	private void formComponentMoved(final ComponentEvent evt) {
 		if (client != null && isShowing()) {
-			client.move(getX() + panel.getX(), getY() + panel.getY());
+			client.move(getX() + panel.getX(), getY() + panel.getY() + content.getY());
 			getOwner().display.flush();
 		}
 	}
