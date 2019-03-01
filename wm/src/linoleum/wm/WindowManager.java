@@ -329,6 +329,8 @@ public class WindowManager extends Frame {
 		content = getDesktopPane().getRootPane().getContentPane();
 		if (bounds.x != 0 || bounds.y != 0 || bounds.width != 1 || bounds.height != 1) {
 			setBounds(bounds.x - panel.getX(), bounds.y - panel.getY() - content.getY(), bounds.width - panel.getWidth() + getWidth(), bounds.height - panel.getHeight() + getHeight());
+		} else {
+			client.move_resize(getX() + panel.getX(), getY() + panel.getY() + content.getY(), panel.getWidth(), panel.getHeight());
 		}
 	}
 
