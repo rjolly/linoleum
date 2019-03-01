@@ -324,6 +324,7 @@ public class WindowManager extends Frame {
 			client.state = HIDDEN;
 			client.set_wm_state (Window.WMState.ICONIC);
 		}
+		setTitle(client.name);
 		final Rectangle bounds = client.rectangle();
 		content = getDesktopPane().getRootPane().getContentPane();
 		if (bounds.x != 0 || bounds.y != 0 || bounds.width != 1 || bounds.height != 1) {
