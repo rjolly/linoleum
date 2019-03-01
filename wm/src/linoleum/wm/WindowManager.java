@@ -3,6 +3,7 @@ package linoleum.wm;
 import java.awt.Container;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -298,6 +299,10 @@ public class WindowManager extends Frame {
 		if (uri != null) try {
 			open(Integer.parseInt(uri.getSchemeSpecificPart()));
 		} catch (final NumberFormatException ex) {
+			ex.printStackTrace();
+		} else try {
+			Runtime.getRuntime().exec("xterm");
+		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
 	}
