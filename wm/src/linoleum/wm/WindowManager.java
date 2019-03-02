@@ -41,9 +41,9 @@ public class WindowManager extends Frame {
 	private Client client;
 	private JRootPane panel;
 	private Container content;
-	private boolean iconified;
 	private Map<Integer, WindowManager> frames = new HashMap<>();
 	private final Logger logger = Logger.getLogger(getClass().getName());
+	private boolean closed;
 
 	// internal state
 	public static final int UNMANAGED = 0;
@@ -210,7 +210,7 @@ public class WindowManager extends Frame {
 		client.configure(event.changes());
 		client.set_geometry_cache(event.rectangle());
 		if (client.state == NORMAL && event.stack_mode () == Window.Changes.ABOVE) {
-			set_focus();
+			client.set_input_focus();
 		}
 	}
 
@@ -219,6 +219,7 @@ public class WindowManager extends Frame {
 			public void run() {
 				final WindowManager frame = getFrame(event.window_id);
 				if (frame != null) {
+					frame.closed = true;
 					frame.doDefaultCloseAction();
 				}
 			}
@@ -259,20 +260,9 @@ public class WindowManager extends Frame {
 		}
 		client.set_wm_state(Window.WMState.NORMAL);
 		if (client.state != NO_FOCUS) {
-			set_focus();
+			client.set_input_focus();
 		}
 	}
-
-	private void set_focus() {
-		client.raise();
-		client.set_input_focus();
-	}
-
-	private void unset_focus() {
-		client.lower();
-		getOwner().root.set_input_focus();
-	}
-
 
 	private void when_unmap_notify(final UnmapNotify event) {
 		final WindowManager frame = getFrame(event.window_id);
@@ -348,7 +338,7 @@ public class WindowManager extends Frame {
 	}
 
 	private void formInternalFrameClosed(final InternalFrameEvent evt) {
-		if (client != null) {
+		if (client != null && !closed) {
 			if (client.early_unmapped || client.early_destroyed) {
 				return;
 			}
@@ -361,48 +351,35 @@ public class WindowManager extends Frame {
 		if (client != null) {
 			client.unmap();
 			getOwner().display.flush();
-			iconified = true;
 		}
 	}
 
 	private void formInternalFrameDeiconified(final InternalFrameEvent evt) {
-		if (client != null) {
-			client.map();
-			iconified = false;
-		}
 	}
 
 	private void formInternalFrameActivated(final InternalFrameEvent evt) {
 		if (client != null) {
-			if (client.early_unmapped || client.early_destroyed) {
-				return;
-			}
-			if (!iconified) {
-				set_focus();
-				getOwner().display.flush();
-			}
+			client.map();
+			getOwner().display.flush();
 		}
 	}
 
 	private void formInternalFrameDeactivated(final InternalFrameEvent evt) {
-		if (client != null) {
-			if (client.early_unmapped || client.early_destroyed) {
-				return;
-			}
-			unset_focus();
+		if (client != null && !closed) {
+			client.unmap();
 			getOwner().display.flush();
 		}
 	}
 
 	private void formComponentMoved(final ComponentEvent evt) {
-		if (client != null && isShowing()) {
+		if (client != null) {
 			client.move(getX() + panel.getX(), getY() + panel.getY() + content.getY());
 			getOwner().display.flush();
 		}
 	}
 
 	private void formComponentResized(final ComponentEvent evt) {
-		if (client != null && isShowing()) {
+		if (client != null) {
 			client.resize(panel.getWidth(), panel.getHeight());
 			getOwner().display.flush();
 		}
