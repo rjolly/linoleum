@@ -32,6 +32,7 @@ import gnu.x11.event.ConfigureNotify;
 import gnu.x11.event.CreateNotify;
 import gnu.x11.event.MappingNotify;
 import gnu.x11.event.DestroyNotify;
+import gnu.x11.event.ConfigureNotify;
 import linoleum.application.Frame;
 
 public class WindowManager extends Frame {
@@ -40,10 +41,10 @@ public class WindowManager extends Frame {
 	private Window root;
 	private Client client;
 	private JRootPane panel;
-	private Container content;
 	private Map<Integer, WindowManager> frames = new HashMap<>();
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private boolean closed;
+	private boolean config;
 
 	// internal state
 	public static final int UNMANAGED = 0;
@@ -187,7 +188,9 @@ public class WindowManager extends Frame {
 		case UnmapNotify.CODE:		// Event.SUBSTRUCTURE_NOTIFY
 			when_unmap_notify((UnmapNotify) event);
 			break;
-		case ConfigureNotify.CODE:	// Event.SUBSTRUCTURE_NOTIFY, ignored
+		case ConfigureNotify.CODE:	// Event.SUBSTRUCTURE_NOTIFY
+			when_configure_notify((ConfigureNotify) event);
+			break;
 		case CreateNotify.CODE:		// Event.SUBSTRUCTURE_NOTIFY, ignored
 		case MappingNotify.CODE:	// un-avoidable, ignored TODO
 			break;
@@ -283,6 +286,23 @@ public class WindowManager extends Frame {
 		}
 	}
 
+	private void when_configure_notify(final ConfigureNotify event) {
+		final WindowManager frame = getFrame(event.window_id);
+		if (frame != null) {
+			frame.configure(event.rectangle());
+		}
+	}
+
+	private void configure(final Rectangle bounds) {
+		config = true;
+		setBounds(bounds.x - panel.getX(), bounds.y - panel.getY() - getContent().getY(), bounds.width - panel.getWidth() + getWidth(), bounds.height - panel.getHeight() + getHeight());
+		config = false;
+	}
+
+	private Container getContent() {
+		return getDesktopPane().getRootPane().getContentPane();
+	}
+
 	@Override
 	public void open() {
 		final URI uri = getURI();
@@ -321,11 +341,10 @@ public class WindowManager extends Frame {
 		}
 		setTitle(client.name);
 		final Rectangle bounds = client.rectangle();
-		content = getDesktopPane().getRootPane().getContentPane();
 		if (bounds.x != 0 || bounds.y != 0 || bounds.width != 1 || bounds.height != 1) {
-			setBounds(bounds.x - panel.getX(), bounds.y - panel.getY() - content.getY(), bounds.width - panel.getWidth() + getWidth(), bounds.height - panel.getHeight() + getHeight());
+			configure(bounds);
 		} else {
-			client.move_resize(getX() + panel.getX(), getY() + panel.getY() + content.getY(), panel.getWidth(), panel.getHeight());
+			client.move_resize(getX() + panel.getX(), getY() + panel.getY() + getContent().getY(), panel.getWidth(), panel.getHeight());
 		}
 	}
 
@@ -372,14 +391,14 @@ public class WindowManager extends Frame {
 	}
 
 	private void formComponentMoved(final ComponentEvent evt) {
-		if (client != null) {
-			client.move(getX() + panel.getX(), getY() + panel.getY() + content.getY());
+		if (client != null && !config) {
+			client.move(getX() + panel.getX(), getY() + panel.getY() + getContent().getY());
 			getOwner().display.flush();
 		}
 	}
 
 	private void formComponentResized(final ComponentEvent evt) {
-		if (client != null) {
+		if (client != null && !config) {
 			client.resize(panel.getWidth(), panel.getHeight());
 			getOwner().display.flush();
 		}
