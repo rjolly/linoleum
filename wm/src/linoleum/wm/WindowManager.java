@@ -162,11 +162,19 @@ public class WindowManager extends Frame {
 				}
 			}
 		}
-		when(first_event);
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				when(first_event);
+			}
+		});
 		for (final Iterator<Event> it = other_events.iterator(); it.hasNext();) {
-			when(it.next());
+			final Event event = it.next();
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					when(event);
+				}
+			});
 		}
-		display.flush();
 //		display.ungrab_server();
 	}
 
@@ -197,6 +205,7 @@ public class WindowManager extends Frame {
 		default:
 			logger.config("Unhandled event: " + event);
 		}
+		display.flush();
 	}
 
 	private void when_configure_request(final ConfigureRequest event) {
@@ -218,23 +227,15 @@ public class WindowManager extends Frame {
 	}
 
 	private void when_destroy_notify(final DestroyNotify event) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				final WindowManager frame = getFrame(event.window_id);
-				if (frame != null) {
-					frame.closed = true;
-					frame.doDefaultCloseAction();
-				}
-			}
-		});
+		final WindowManager frame = getFrame(event.window_id);
+		if (frame != null) {
+			frame.closed = true;
+			frame.doDefaultCloseAction();
+		}
 	}
 
 	private void when_map_request(final MapRequest event) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				open(URI.create(String.valueOf(event.window_id)), getApplicationManager().getDesktopPane());
-			}
-		});
+		open(URI.create(String.valueOf(event.window_id)), getApplicationManager().getDesktopPane());
 	}
 
 	private void when_map_notify(final MapNotify event) {
