@@ -1,38 +1,30 @@
 package linoleum.wm;
 
-import java.awt.Container;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Logger;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.JDesktopPane;
-import javax.swing.JRootPane;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import gnu.x11.Display;
 import gnu.x11.Error;
 import gnu.x11.Rectangle;
 import gnu.x11.Window;
-import gnu.x11.event.Event;
+import gnu.x11.event.ConfigureNotify;
 import gnu.x11.event.ConfigureRequest;
+import gnu.x11.event.CreateNotify;
 import gnu.x11.event.DestroyNotify;
-import gnu.x11.event.UnmapNotify;
+import gnu.x11.event.Event;
 import gnu.x11.event.MapNotify;
 import gnu.x11.event.MapRequest;
-import gnu.x11.event.ConfigureNotify;
-import gnu.x11.event.CreateNotify;
 import gnu.x11.event.MappingNotify;
-import gnu.x11.event.DestroyNotify;
-import gnu.x11.event.ConfigureNotify;
+import gnu.x11.event.UnmapNotify;
+import java.awt.Container;
+import java.io.IOException;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Logger;
+import javax.swing.JRootPane;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import linoleum.application.Frame;
 
 public class WindowManager extends Frame {
@@ -41,7 +33,7 @@ public class WindowManager extends Frame {
 	private Window root;
 	private Client client;
 	private JRootPane panel;
-	private Map<Integer, WindowManager> frames = new HashMap<>();
+	private final Map<Integer, WindowManager> frames = new HashMap<>();
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private boolean closed;
 	private boolean config;
@@ -53,37 +45,7 @@ public class WindowManager extends Frame {
 	public static final int NO_FOCUS = 3;
 
 	public WindowManager() {
-		setName("Windows");
-		setClosable(true);
-		setSize(150, 150);
-		setIconifiable(true);
-		setMaximizable(true);
-		setResizable(true);
-		addInternalFrameListener(new InternalFrameAdapter() {
-			public void internalFrameClosed(final InternalFrameEvent evt) {
-				formInternalFrameClosed(evt);
-			}
-			public void internalFrameIconified(final InternalFrameEvent evt) {
-				formInternalFrameIconified(evt);
-			}
-			public void internalFrameDeiconified(final InternalFrameEvent evt) {
-				formInternalFrameDeiconified(evt);
-			}
-			public void internalFrameActivated(final InternalFrameEvent evt) {
-				formInternalFrameActivated(evt);
-			}
-			public void internalFrameDeactivated(final InternalFrameEvent evt) {
-				formInternalFrameDeactivated(evt);
-			}
-		});
-		addComponentListener(new ComponentAdapter() {
-			public void componentResized(final ComponentEvent evt) {
-				formComponentResized(evt);
-			}
-			public void componentMoved(final ComponentEvent evt) {
-				formComponentMoved(evt);
-			}
-		});
+		initComponents();
 		panel = getRootPane();
 	}
 
@@ -357,7 +319,66 @@ public class WindowManager extends Frame {
 		}
 	}
 
-	private void formInternalFrameClosed(final InternalFrameEvent evt) {
+	@SuppressWarnings("unchecked")
+        // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+        private void initComponents() {
+
+                setClosable(true);
+                setIconifiable(true);
+                setMaximizable(true);
+                setResizable(true);
+                setName("Windows"); // NOI18N
+                addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
+                        public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+                                formInternalFrameActivated(evt);
+                        }
+                        public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
+                                formInternalFrameClosed(evt);
+                        }
+                        public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+                                formInternalFrameDeactivated(evt);
+                        }
+                        public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                        public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+                                formInternalFrameIconified(evt);
+                        }
+                        public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+                        }
+                });
+                addComponentListener(new java.awt.event.ComponentAdapter() {
+                        public void componentMoved(java.awt.event.ComponentEvent evt) {
+                                formComponentMoved(evt);
+                        }
+                        public void componentResized(java.awt.event.ComponentEvent evt) {
+                                formComponentResized(evt);
+                        }
+                });
+
+                javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+                getContentPane().setLayout(layout);
+                layout.setHorizontalGroup(
+                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 394, Short.MAX_VALUE)
+                );
+                layout.setVerticalGroup(
+                        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 274, Short.MAX_VALUE)
+                );
+
+                pack();
+        }// </editor-fold>//GEN-END:initComponents
+
+        private void formInternalFrameActivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameActivated
+		if (client != null) {
+			client.map();
+			getOwner().display.flush();
+		}
+        }//GEN-LAST:event_formInternalFrameActivated
+
+        private void formInternalFrameClosed(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosed
 		if (client != null && !closed) {
 			if (client.early_unmapped || client.early_destroyed) {
 				return;
@@ -365,43 +386,36 @@ public class WindowManager extends Frame {
 			client.kill();
 			getOwner().display.flush();
 		}
-	}
+        }//GEN-LAST:event_formInternalFrameClosed
 
-	private void formInternalFrameIconified(final InternalFrameEvent evt) {
-		if (client != null) {
-			client.unmap();
-			getOwner().display.flush();
-		}
-	}
-
-	private void formInternalFrameDeiconified(final InternalFrameEvent evt) {
-	}
-
-	private void formInternalFrameActivated(final InternalFrameEvent evt) {
-		if (client != null) {
-			client.map();
-			getOwner().display.flush();
-		}
-	}
-
-	private void formInternalFrameDeactivated(final InternalFrameEvent evt) {
+        private void formInternalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameDeactivated
 		if (client != null && !closed) {
 			client.unmap();
 			getOwner().display.flush();
 		}
-	}
+        }//GEN-LAST:event_formInternalFrameDeactivated
 
-	private void formComponentMoved(final ComponentEvent evt) {
+        private void formInternalFrameIconified(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameIconified
+		if (client != null) {
+			client.unmap();
+			getOwner().display.flush();
+		}
+        }//GEN-LAST:event_formInternalFrameIconified
+
+        private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
 		if (client != null && !config) {
 			client.move(getX() + panel.getX(), getY() + panel.getY() + getContent().getY());
 			getOwner().display.flush();
 		}
-	}
+        }//GEN-LAST:event_formComponentMoved
 
-	private void formComponentResized(final ComponentEvent evt) {
+        private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
 		if (client != null && !config) {
 			client.resize(panel.getWidth(), panel.getHeight());
 			getOwner().display.flush();
 		}
-	}
+        }//GEN-LAST:event_formComponentResized
+
+        // Variables declaration - do not modify//GEN-BEGIN:variables
+        // End of variables declaration//GEN-END:variables
 }
