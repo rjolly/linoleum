@@ -26,13 +26,14 @@ import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import linoleum.application.Frame;
+import linoleum.application.PreferenceSupport;
 
-public class WindowManager extends Frame {
+public class WindowManager extends PreferenceSupport {
 	private final String name = System.getenv("DISPLAY");
 	private Display display;
 	private Window root;
 	private Client client;
-	private JRootPane panel;
+	private JRootPane panel = getRootPane();
 	private final Map<Integer, WindowManager> frames = new HashMap<>();
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private boolean closed;
@@ -46,7 +47,6 @@ public class WindowManager extends Frame {
 
 	public WindowManager() {
 		initComponents();
-		panel = getRootPane();
 	}
 
 	@Override
@@ -266,6 +266,16 @@ public class WindowManager extends Frame {
 		return getDesktopPane().getRootPane().getContentPane();
 	}
 
+ 	@Override
+	public void load() {
+		jTextField1.setText(getPref("program"));
+	}
+
+	@Override
+	public void save() {
+		putPref("program", jTextField1.getText());
+	}
+
 	@Override
 	public void open() {
 		final URI uri = getURI();
@@ -274,7 +284,7 @@ public class WindowManager extends Frame {
 		} catch (final NumberFormatException ex) {
 			ex.printStackTrace();
 		} else try {
-			Runtime.getRuntime().exec("xterm");
+			Runtime.getRuntime().exec(getPref("program"));
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
@@ -323,11 +333,39 @@ public class WindowManager extends Frame {
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
+                optionPanel1 = new linoleum.application.OptionPanel();
+                jLabel1 = new javax.swing.JLabel();
+                jTextField1 = new javax.swing.JTextField();
+
+                jLabel1.setText("Program :");
+
+                javax.swing.GroupLayout optionPanel1Layout = new javax.swing.GroupLayout(optionPanel1);
+                optionPanel1.setLayout(optionPanel1Layout);
+                optionPanel1Layout.setHorizontalGroup(
+                        optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE)
+                                .addContainerGap())
+                );
+                optionPanel1Layout.setVerticalGroup(
+                        optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(optionPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(optionPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel1)
+                                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                );
+
                 setClosable(true);
                 setIconifiable(true);
                 setMaximizable(true);
                 setResizable(true);
                 setName("Windows"); // NOI18N
+                setOptionPanel(optionPanel1);
                 addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
                         public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
                                 formInternalFrameActivated(evt);
@@ -417,5 +455,8 @@ public class WindowManager extends Frame {
         }//GEN-LAST:event_formComponentResized
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
+        private javax.swing.JLabel jLabel1;
+        private javax.swing.JTextField jTextField1;
+        private linoleum.application.OptionPanel optionPanel1;
         // End of variables declaration//GEN-END:variables
 }
