@@ -15,6 +15,7 @@ import gnu.x11.event.MappingNotify;
 import gnu.x11.event.UnmapNotify;
 import java.awt.Container;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -82,9 +83,9 @@ public class WindowManager extends PreferenceSupport {
 			protected void done() {
 				try {
 					get();
-				} catch (final InterruptedException ex) {
-					ex.printStackTrace();
 				} catch (final ExecutionException ex) {
+					ex.getCause().printStackTrace();
+				} catch (final InterruptedException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -104,9 +105,23 @@ public class WindowManager extends PreferenceSupport {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void read_and_dispatch_event() {
 		final Event first_event = display.next_event();
+		try {
+			SwingUtilities.invokeAndWait(new Runnable() {
+				public void run() {
+					dispatch(first_event);
+				}
+			});
+		} catch (final InvocationTargetException e) {
+			e.getTargetException().printStackTrace();
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void dispatch(final Event first_event) {
 //		display.grab_server();
 		display.check_error();
 		final List<Event> other_events = (List<Event>) display.in.pull_all_events();
@@ -124,19 +139,11 @@ public class WindowManager extends PreferenceSupport {
 				}
 			}
 		}
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				when(first_event);
-			}
-		});
+		when(first_event);
 		for (final Iterator<Event> it = other_events.iterator(); it.hasNext();) {
-			final Event event = it.next();
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					when(event);
-				}
-			});
+			when(it.next());
 		}
+		display.flush();
 //		display.ungrab_server();
 	}
 
@@ -167,7 +174,6 @@ public class WindowManager extends PreferenceSupport {
 		default:
 			logger.config("Unhandled event: " + event);
 		}
-		display.flush();
 	}
 
 	private void when_configure_request(final ConfigureRequest event) {
@@ -316,8 +322,6 @@ public class WindowManager extends PreferenceSupport {
 		final Rectangle bounds = client.rectangle();
 		if (bounds.x != 0 || bounds.y != 0 || bounds.width != 1 || bounds.height != 1) {
 			configure(bounds);
-		} else {
-			client.move_resize(getX() + panel.getX(), getY() + panel.getY() + getContent().getY(), panel.getWidth(), panel.getHeight());
 		}
 	}
 
