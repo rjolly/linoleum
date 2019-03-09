@@ -30,6 +30,7 @@ import linoleum.application.Frame;
 import linoleum.application.PreferenceSupport;
 
 public class WindowManager extends PreferenceSupport {
+	private final String os = System.getProperty("os.name");
 	private final String name = System.getenv("DISPLAY");
 	private Display display;
 	private Window root;
@@ -62,6 +63,9 @@ public class WindowManager extends PreferenceSupport {
 
 	@Override
 	public void init() {
+		if (os != null && os.startsWith("Windows")) {
+			return;
+		}
 		display = new Display(new Display.Name(name == null?":0.0":name));
 		if (display.connected) {
 			root = display.default_root;
