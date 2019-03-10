@@ -36,7 +36,7 @@
 
     <target name="src">
 	<tar destfile="../${ant.project.name}-src.tar.gz" compression="gzip">
-	    <tarfileset prefix="linoleum" dir="." includes="application/**,bin/**,html/**,local/**,mail/**,calendar/**,notepad/**,pkg/**,src/**,*.js,build.properties,*.xml,manifest.mf,*.txt,Makefile" excludes="**/build/**,**/dist/**,**/private/**"/>
+	    <tarfileset prefix="linoleum" dir="." includes="application/**,bin/**,html/**,local/**,mail/**,calendar/**,notepad/**,pkg/**,wm/**,src/**,*.js,build.properties,*.xml,manifest.mf,*.txt,Makefile" excludes="**/build/**,**/dist/**,**/private/**"/>
 	</tar>
     </target>
 

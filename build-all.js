@@ -16,6 +16,9 @@ load("build.js")
 cd("../pkg")
 load("build.js")
 
+cd("../wm")
+load("build.js")
+
 cd("..")
 load("build.js")
 

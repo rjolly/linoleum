@@ -16,5 +16,8 @@ clean("build/classes")
 cd("../pkg")
 clean("build/classes")
 
+cd("../wm")
+clean("build/classes")
+
 cd("..")
 clean("build/classes")
