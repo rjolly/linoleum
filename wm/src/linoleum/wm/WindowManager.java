@@ -39,7 +39,6 @@ public class WindowManager extends PreferenceSupport {
 	private final Map<Integer, WindowManager> frames = new HashMap<>();
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private boolean closed;
-	private boolean config;
 
 	// internal state
 	public static final int UNMANAGED = 0;
@@ -267,9 +266,13 @@ public class WindowManager extends PreferenceSupport {
 	}
 
 	private void configure(final Rectangle bounds) {
-		config = true;
-		setBounds(bounds.x - panel.getX(), bounds.y - panel.getY() - getContent().getY(), bounds.width - panel.getWidth() + getWidth(), bounds.height - panel.getHeight() + getHeight());
-		config = false;
+		final int x = bounds.x - panel.getX();
+		final int y = bounds.y - panel.getY() - getContent().getY();
+		final int width = bounds.width - panel.getWidth() + getWidth();
+		final int height = bounds.height - panel.getHeight() + getHeight();
+		if (x != getX() || y != getHeight() || width != getWidth() || height != getHeight()) {
+			setBounds(x, y, width, height);
+		}
 	}
 
 	private Container getContent() {
@@ -449,14 +452,14 @@ public class WindowManager extends PreferenceSupport {
         }//GEN-LAST:event_formInternalFrameIconified
 
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
-		if (client != null && !config) {
+		if (client != null) {
 			client.move(getX() + panel.getX(), getY() + panel.getY() + getContent().getY());
 			getOwner().display.flush();
 		}
         }//GEN-LAST:event_formComponentMoved
 
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-		if (client != null && !config) {
+		if (client != null) {
 			client.resize(panel.getWidth(), panel.getHeight());
 			getOwner().display.flush();
 		}
