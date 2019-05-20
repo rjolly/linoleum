@@ -270,7 +270,7 @@ public class WindowManager extends PreferenceSupport {
 		final int y = bounds.y - panel.getY() - getContent().getY();
 		final int width = bounds.width - panel.getWidth() + getWidth();
 		final int height = bounds.height - panel.getHeight() + getHeight();
-		if (x != getX() || y != getHeight() || width != getWidth() || height != getHeight()) {
+		if (x != getX() || y != getY() || width != getWidth() || height != getHeight()) {
 			setBounds(x, y, width, height);
 		}
 	}
