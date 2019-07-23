@@ -54,8 +54,8 @@ You might have to enable TCP connections to your X server. In /etc/gdm3/daemon.c
 [security]
 DisallowTCP = false
 
-Then restart the display manager:
-  /etc/init.d/gdm3 restart
+Then reload the display manager:
+  sudo systemctl reload gdm3
 
 
 List of applications
