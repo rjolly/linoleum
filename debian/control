@@ -11,7 +11,7 @@ Vcs-Browser: https://salsa.debian.org/pkg-java/linoleum
 
 Package: linoleum
 Architecture: all
-Depends: default-jdk, ivy, libcommons-codec-java, libmail-java, libjcalendar-java, ${misc:Depends}
+Depends: default-jdk, ivy, libcommons-codec-java, libmail-java, libjcalendar-java, libjava3d-java, ${misc:Depends}
 Description: Java desktop environment and software distribution
  This projects allows you to do your daily work from inside the JVM - just like
  Java is your operating system. Your usual Linux workflow is preserved, with

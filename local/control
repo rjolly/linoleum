@@ -3,7 +3,7 @@ Version: 1.6-1
 Section: java
 Priority: optional
 Architecture: all
-Depends: default-jdk, ivy, libcommons-codec-java, libmail-java, libjcalendar-java
+Depends: default-jdk, ivy, libcommons-codec-java, libmail-java, libjcalendar-java, libjava3d-java
 Maintainer: Raphael Jolly <raphael.jolly@free.fr>
 Homepage: http://linoleum.java.net/
 Description: Java desktop environment and software distribution

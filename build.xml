@@ -80,6 +80,9 @@
             <link name="/usr/share/${ant.project.name}/lib/javax.mail.jar" target="../../java/javax.mail.jar"/>
             <link name="/usr/share/${ant.project.name}/lib/jcalendar.jar" target="../../java/jcalendar.jar"/>
             <link name="/usr/share/${ant.project.name}/lib/javax.activation-1.2.0.jar" target="../../java/javax.activation-1.2.0.jar"/>
+            <link name="/usr/share/${ant.project.name}/lib/j3dcore.jar" target="../../java/j3dcore.jar"/>
+            <link name="/usr/share/${ant.project.name}/lib/j3dutils.jar" target="../../java/j3dutils.jar"/>
+            <link name="/usr/share/${ant.project.name}/lib/vecmath.jar" target="../../java/vecmath.jar"/>
             <tarfileset dir="${dist.dir}/bin" prefix="usr/share/${ant.project.name}/bin" filemode="755">
                 <exclude name="*.bat"/>
             </tarfileset>
