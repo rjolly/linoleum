@@ -46,8 +46,8 @@ To publish an application:
 
 
 To use linoleum as your desktop environment in Linux:
-  wget http://raphael.jolly.free.fr/linoleum/linoleum-1.6.deb
-  sudo dpkg -i linoleum-1.6.deb
+  wget http://raphael.jolly.free.fr/linoleum/linoleum-1.6-buster.deb
+  sudo dpkg -i linoleum-1.6-buster.deb
 
 You might have to enable TCP connections to your X server. In /etc/gdm3/daemon.conf:
 
