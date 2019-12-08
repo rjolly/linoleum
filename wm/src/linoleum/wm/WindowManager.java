@@ -38,6 +38,7 @@ public class WindowManager extends PreferenceSupport {
 	private JRootPane panel = getRootPane();
 	private final Map<Integer, WindowManager> frames = new HashMap<>();
 	private final Logger logger = Logger.getLogger(getClass().getName());
+	private int above_sibling_id;
 	private boolean closed;
 
 	// internal state
@@ -206,7 +207,10 @@ public class WindowManager extends PreferenceSupport {
 	}
 
 	private void when_map_request(final MapRequest event) {
-		open(URI.create(String.valueOf(event.window_id)), getApplicationManager().getDesktopPane());
+		final WindowManager frame = getFrame(event.window_id);
+		if (frame == null) {
+			open(URI.create(String.valueOf(event.window_id)), getApplicationManager().getDesktopPane());
+		}
 	}
 
 	private void when_map_notify(final MapNotify event) {
@@ -214,10 +218,6 @@ public class WindowManager extends PreferenceSupport {
 		if (frame != null) {
 			frame.map();
 		}
-	}
-
-	private WindowManager getFrame(final int id) {
-		return getOwner().frames.get(id);
 	}
 
 	private void map() {
@@ -262,6 +262,7 @@ public class WindowManager extends PreferenceSupport {
 		final WindowManager frame = getFrame(event.window_id);
 		if (frame != null) {
 			frame.configure(event.rectangle());
+			frame.configure(event.above_sibling_id());
 		}
 	}
 
@@ -272,6 +273,15 @@ public class WindowManager extends PreferenceSupport {
 		final int height = bounds.height - panel.getHeight() + getHeight();
 		if (x != getX() || y != getY() || width != getWidth() || height != getHeight()) {
 			setBounds(x, y, width, height);
+		}
+	}
+
+	private void configure(final int above_sibling_id) {
+		if (this.above_sibling_id != above_sibling_id) {
+			this.above_sibling_id = above_sibling_id;
+			if (isSelected()) {
+				client.set_input_focus();
+			}
 		}
 	}
 
@@ -340,6 +350,10 @@ public class WindowManager extends PreferenceSupport {
 		}
 	}
 
+	private WindowManager getFrame(final int id) {
+		return getOwner().frames.get(id);
+	}
+
 	@SuppressWarnings("unchecked")
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
@@ -392,7 +406,6 @@ public class WindowManager extends PreferenceSupport {
                         public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
                         }
                         public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
-                                formInternalFrameIconified(evt);
                         }
                         public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
                         }
@@ -422,7 +435,7 @@ public class WindowManager extends PreferenceSupport {
 
         private void formInternalFrameActivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameActivated
 		if (client != null) {
-			client.map();
+			client.raise();
 			getOwner().display.flush();
 		}
         }//GEN-LAST:event_formInternalFrameActivated
@@ -439,17 +452,10 @@ public class WindowManager extends PreferenceSupport {
 
         private void formInternalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameDeactivated
 		if (client != null && !closed) {
-			client.unmap();
+			client.lower();
 			getOwner().display.flush();
 		}
         }//GEN-LAST:event_formInternalFrameDeactivated
-
-        private void formInternalFrameIconified(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameIconified
-		if (client != null) {
-			client.unmap();
-			getOwner().display.flush();
-		}
-        }//GEN-LAST:event_formInternalFrameIconified
 
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
 		if (client != null) {
