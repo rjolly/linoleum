@@ -194,9 +194,20 @@ public class WindowManager extends PreferenceSupport {
 		if (client.early_unmapped || client.early_destroyed) {
 			return;
 		}
-		final Rectangle bounds = event.rectangle();
-		final int x = Math.max(bounds.x - panel.getX(), 0);
-		final int y = Math.max(bounds.y - panel.getY() - getContent().getY(), 0);
+		final Window.Changes changes = event.changes();
+		final int x = Math.max(event.x(), panel.getX());
+		final int y = Math.max(event.y(), panel.getY() + getContent().getY());
+		changes.x(x);
+		changes.y(y);
+		client.configure(changes);
+		final Rectangle rectangle = new Rectangle(x, y, event.width(), event.height());
+		client.set_geometry_cache(rectangle);
+		configure(rectangle);
+	}
+
+	private void configure(final Rectangle bounds) {
+		final int x = bounds.x - panel.getX();
+		final int y = bounds.y - panel.getY() - getContent().getY();
 		final int width = bounds.width - panel.getWidth() + getWidth();
 		final int height = bounds.height - panel.getHeight() + getHeight();
 		setBounds(x, y, width, height);
@@ -453,14 +464,14 @@ public class WindowManager extends PreferenceSupport {
         }//GEN-LAST:event_formInternalFrameDeactivated
 
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
-		if (client != null) {
+		if (client != null && mapped) {
 			client.move(getX() + panel.getX(), getY() + panel.getY() + getContent().getY());
 			getOwner().display.flush();
 		}
         }//GEN-LAST:event_formComponentMoved
 
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-		if (client != null) {
+		if (client != null && mapped) {
 			client.resize(panel.getWidth(), panel.getHeight());
 			getOwner().display.flush();
 		}
