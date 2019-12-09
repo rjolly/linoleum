@@ -40,6 +40,7 @@ public class WindowManager extends PreferenceSupport {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private int above_sibling_id;
 	private boolean closed;
+	private boolean mapped;
 
 	// internal state
 	public static final int UNMANAGED = 0;
@@ -182,8 +183,11 @@ public class WindowManager extends PreferenceSupport {
 
 	private void when_configure_request(final ConfigureRequest event) {
 		final WindowManager frame = getFrame(event.window_id);
-		if (frame != null) {
+		if (frame == null) {
+			open(URI.create(String.valueOf(event.window_id)), getApplicationManager().getDesktopPane());
+		} else {
 			frame.configure(event);
+			frame.configure(event.rectangle());
 		}
 	}
 
@@ -198,6 +202,16 @@ public class WindowManager extends PreferenceSupport {
 		}
 	}
 
+	private void configure(final Rectangle bounds) {
+		final int x = bounds.x - panel.getX();
+		final int y = bounds.y - panel.getY() - getContent().getY();
+		final int width = bounds.width - panel.getWidth() + getWidth();
+		final int height = bounds.height - panel.getHeight() + getHeight();
+		if (x != getX() || y != getY() || width != getWidth() || height != getHeight()) {
+			setBounds(x, y, width, height);
+		}
+	}
+
 	private void when_destroy_notify(final DestroyNotify event) {
 		final WindowManager frame = getFrame(event.window_id);
 		if (frame != null) {
@@ -208,9 +222,33 @@ public class WindowManager extends PreferenceSupport {
 
 	private void when_map_request(final MapRequest event) {
 		final WindowManager frame = getFrame(event.window_id);
-		if (frame == null) {
-			open(URI.create(String.valueOf(event.window_id)), getApplicationManager().getDesktopPane());
+		if (frame != null) {
+			frame.map_request(event);
+			frame.mapped = true;
 		}
+	}
+
+	private void map_request(final MapRequest event) {
+		if (client.early_unmapped || client.early_destroyed) {
+			return;
+		}
+		client.attributes = client.attributes();
+		if (client.attributes.override_redirect()) {
+			return;
+		}
+		client.get_geometry();
+		client.class_hint = client.wm_class_hint();
+		client.size_hints = client.wm_normal_hints();
+		client.name = client.wm_name();
+		client.change_save_set(false);
+		final Window.WMHints wm_hints = client.wm_hints();
+		if (wm_hints == null || (wm_hints.flags() & Window.WMHints.STATE_HINT_MASK) == 0 || wm_hints.initial_state() == Window.WMHints.NORMAL) {
+			client.map();
+		} else {
+			client.state = HIDDEN;
+			client.set_wm_state (Window.WMState.ICONIC);
+		}
+		setTitle(client.name);
 	}
 
 	private void when_map_notify(final MapNotify event) {
@@ -261,18 +299,7 @@ public class WindowManager extends PreferenceSupport {
 	private void when_configure_notify(final ConfigureNotify event) {
 		final WindowManager frame = getFrame(event.window_id);
 		if (frame != null) {
-			frame.configure(event.rectangle());
 			frame.configure(event.above_sibling_id());
-		}
-	}
-
-	private void configure(final Rectangle bounds) {
-		final int x = bounds.x - panel.getX();
-		final int y = bounds.y - panel.getY() - getContent().getY();
-		final int width = bounds.width - panel.getWidth() + getWidth();
-		final int height = bounds.height - panel.getHeight() + getHeight();
-		if (x != getX() || y != getY() || width != getWidth() || height != getHeight()) {
-			setBounds(x, y, width, height);
 		}
 	}
 
@@ -316,30 +343,6 @@ public class WindowManager extends PreferenceSupport {
 	private void open(final int id) {
 		getOwner().frames.put(id, this);
 		client = Client.intern(getOwner().display, id);
-		if (client.early_unmapped || client.early_destroyed) {
-			return;
-		}
-		client.attributes = client.attributes();
-		if (client.attributes.override_redirect()) {
-			return;
-		}
-		client.get_geometry();
-		client.class_hint = client.wm_class_hint();
-		client.size_hints = client.wm_normal_hints();
-		client.name = client.wm_name();
-		client.change_save_set(false);
-		final Window.WMHints wm_hints = client.wm_hints();
-		if (wm_hints == null || (wm_hints.flags() & Window.WMHints.STATE_HINT_MASK) == 0 || wm_hints.initial_state() == Window.WMHints.NORMAL) {
-			client.map();
-		} else {
-			client.state = HIDDEN;
-			client.set_wm_state (Window.WMState.ICONIC);
-		}
-		setTitle(client.name);
-		final Rectangle bounds = client.rectangle();
-		if (bounds.x != 0 || bounds.y != 0 || bounds.width != 1 || bounds.height != 1) {
-			configure(bounds);
-		}
 	}
 
 	@Override
@@ -434,7 +437,7 @@ public class WindowManager extends PreferenceSupport {
         }// </editor-fold>//GEN-END:initComponents
 
         private void formInternalFrameActivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameActivated
-		if (client != null) {
+		if (client != null && mapped) {
 			client.raise();
 			getOwner().display.flush();
 		}
