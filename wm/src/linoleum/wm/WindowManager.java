@@ -194,25 +194,12 @@ public class WindowManager extends PreferenceSupport {
 		if (client.early_unmapped || client.early_destroyed) {
 			return;
 		}
-		final Window.Changes changes = event.changes();
-		final int x = Math.max(event.x(), panel.getX());
-		final int y = Math.max(event.y(), panel.getY() + getContent().getY());
-		changes.x(x);
-		changes.y(y);
-		client.configure(changes);
-		final Rectangle rectangle = new Rectangle(x, y, event.width(), event.height());
-		client.set_geometry_cache(rectangle);
-		configure(rectangle);
-	}
-
-	private void configure(final Rectangle bounds) {
-		final int x = bounds.x - panel.getX();
-		final int y = bounds.y - panel.getY() - getContent().getY();
+		final Rectangle bounds = event.rectangle();
+		final int x = Math.max(bounds.x - panel.getX(), 0);
+		final int y = Math.max(bounds.y - panel.getY() - getContent().getY(), 0);
 		final int width = bounds.width - panel.getWidth() + getWidth();
 		final int height = bounds.height - panel.getHeight() + getHeight();
-		if (x != getX() || y != getY() || width != getWidth() || height != getHeight()) {
-			setBounds(x, y, width, height);
-		}
+		setBounds(x, y, width, height);
 	}
 
 	private void when_destroy_notify(final DestroyNotify event) {
