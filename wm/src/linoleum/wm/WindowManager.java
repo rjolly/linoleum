@@ -228,7 +228,6 @@ public class WindowManager extends PreferenceSupport {
 			frame = getFrame(event.window_id);
 		}
 		frame.map_request(event);
-		frame.mapped = true;
 	}
 
 	private void map_request(final MapRequest event) {
@@ -252,6 +251,7 @@ public class WindowManager extends PreferenceSupport {
 			client.set_wm_state (Window.WMState.ICONIC);
 		}
 		setTitle(client.name);
+		mapped = true;
 	}
 
 	private void when_map_notify(final MapNotify event) {
@@ -440,7 +440,10 @@ public class WindowManager extends PreferenceSupport {
         }// </editor-fold>//GEN-END:initComponents
 
         private void formInternalFrameActivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameActivated
-		if (client != null && mapped) {
+		if (client != null && mapped && !closed) {
+			if (client.early_unmapped || client.early_destroyed) {
+				return;
+			}
 			client.raise();
 			getOwner().display.flush();
 		}
@@ -457,7 +460,10 @@ public class WindowManager extends PreferenceSupport {
         }//GEN-LAST:event_formInternalFrameClosed
 
         private void formInternalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameDeactivated
-		if (client != null && !closed) {
+		if (client != null && mapped && !closed) {
+			if (client.early_unmapped || client.early_destroyed) {
+				return;
+			}
 			client.lower();
 			getOwner().display.flush();
 		}
@@ -465,6 +471,9 @@ public class WindowManager extends PreferenceSupport {
 
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
 		if (client != null && mapped) {
+			if (client.early_unmapped || client.early_destroyed) {
+				return;
+			}
 			client.move(getX() + panel.getX(), getY() + panel.getY() + getContent().getY());
 			getOwner().display.flush();
 		}
@@ -472,6 +481,9 @@ public class WindowManager extends PreferenceSupport {
 
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
 		if (client != null && mapped) {
+			if (client.early_unmapped || client.early_destroyed) {
+				return;
+			}
 			client.resize(panel.getWidth(), panel.getHeight());
 			getOwner().display.flush();
 		}
