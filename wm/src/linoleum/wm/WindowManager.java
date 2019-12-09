@@ -224,11 +224,13 @@ public class WindowManager extends PreferenceSupport {
 	}
 
 	private void when_map_request(final MapRequest event) {
-		final WindowManager frame = getFrame(event.window_id);
-		if (frame != null) {
-			frame.map_request(event);
-			frame.mapped = true;
+		WindowManager frame = getFrame(event.window_id);
+		if (frame == null) {
+			open(URI.create(String.valueOf(event.window_id)), getApplicationManager().getDesktopPane());
+			frame = getFrame(event.window_id);
 		}
+		frame.map_request(event);
+		frame.mapped = true;
 	}
 
 	private void map_request(final MapRequest event) {
@@ -309,7 +311,7 @@ public class WindowManager extends PreferenceSupport {
 	private void configure(final int above_sibling_id) {
 		if (this.above_sibling_id != above_sibling_id) {
 			this.above_sibling_id = above_sibling_id;
-			if (isSelected()) {
+			if (isSelected() && mapped) {
 				client.set_input_focus();
 			}
 		}
