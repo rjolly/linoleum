@@ -182,24 +182,27 @@ public class WindowManager extends PreferenceSupport {
 	}
 
 	private void when_configure_request(final ConfigureRequest event) {
-		final WindowManager frame = getFrame(event.window_id);
+		WindowManager frame = getFrame(event.window_id);
 		if (frame == null) {
 			open(URI.create(String.valueOf(event.window_id)), getApplicationManager().getDesktopPane());
-		} else {
-			frame.configure(event);
-			frame.configure(event.rectangle());
+			frame = getFrame(event.window_id);
 		}
+		frame.configure(event);
 	}
 
 	private void configure(final ConfigureRequest event) {
 		if (client.early_unmapped || client.early_destroyed) {
 			return;
 		}
-		client.configure(event.changes());
-		client.set_geometry_cache(event.rectangle());
-		if (client.state == NORMAL && event.stack_mode () == Window.Changes.ABOVE) {
-			client.set_input_focus();
-		}
+		final Window.Changes changes = event.changes();
+		final int x = Math.max(event.x(), panel.getX());
+		final int y = Math.max(event.y(), panel.getY() + getContent().getY());
+		changes.x(x);
+		changes.y(y);
+		client.configure(changes);
+		final Rectangle rectangle = new Rectangle(x, y, event.width(), event.height());
+		client.set_geometry_cache(rectangle);
+		configure(rectangle);
 	}
 
 	private void configure(final Rectangle bounds) {
