@@ -171,6 +171,8 @@ public class WindowManager extends PreferenceSupport {
 			when_unmap_notify((UnmapNotify) event);
 			break;
 		case ConfigureNotify.CODE:	// Event.SUBSTRUCTURE_NOTIFY
+			when_configure_notify((ConfigureNotify) event);
+			break;
 		case CreateNotify.CODE:		// Event.SUBSTRUCTURE_NOTIFY, ignored
 		case MappingNotify.CODE:	// un-avoidable, ignored TODO
 			break;
@@ -291,6 +293,22 @@ public class WindowManager extends PreferenceSupport {
 			client.state = UNMANAGED;
 			client.set_wm_state(Window.WMState.WITHDRAWN);
 			client.change_save_set(true);
+		}
+	}
+
+	private void when_configure_notify(final ConfigureNotify event) {
+		final WindowManager frame = getFrame(event.window_id);
+		if (frame != null) {
+			frame.configure();
+		}
+	}
+
+	private void configure() {
+		if (client.early_unmapped || client.early_destroyed) {
+			return;
+		}
+		if (isSelected() && mapped) {
+			client.set_input_focus();
 		}
 	}
 
@@ -424,7 +442,6 @@ public class WindowManager extends PreferenceSupport {
 				return;
 			}
 			client.raise();
-			client.set_input_focus();
 			getOwner().display.flush();
 		}
         }//GEN-LAST:event_formInternalFrameActivated
