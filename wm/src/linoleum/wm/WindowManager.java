@@ -413,7 +413,7 @@ public class WindowManager extends PreferenceSupport {
         }// </editor-fold>//GEN-END:initComponents
 
         private void formInternalFrameActivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameActivated
-		if (client != null && mapped && !closed) {
+		if (client != null && mapped && !closed && !isIcon()) {
 			if (client.early_unmapped || client.early_destroyed) {
 				return;
 			}
