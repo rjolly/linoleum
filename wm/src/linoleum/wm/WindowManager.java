@@ -194,6 +194,12 @@ public class WindowManager extends PreferenceSupport {
 		}
 		client.configure(event.changes());
 		client.set_geometry_cache(event.rectangle());
+		final Rectangle bounds = event.rectangle();
+		final int x = bounds.x - panel.getX();
+		final int y = bounds.y - panel.getY() - getContent().getY();
+		final int width = bounds.width - panel.getWidth() + getWidth();
+		final int height = bounds.height - panel.getHeight() + getHeight();
+		setBounds(x, y, width, height);
 	}
 
 	private void when_destroy_notify(final DestroyNotify event) {
@@ -444,7 +450,7 @@ public class WindowManager extends PreferenceSupport {
         }//GEN-LAST:event_formInternalFrameDeactivated
 
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
-		if (client != null && mapped) {
+		if (client != null) {
 			if (client.early_unmapped || client.early_destroyed) {
 				return;
 			}
@@ -454,7 +460,7 @@ public class WindowManager extends PreferenceSupport {
         }//GEN-LAST:event_formComponentMoved
 
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-		if (client != null && mapped) {
+		if (client != null) {
 			if (client.early_unmapped || client.early_destroyed) {
 				return;
 			}
