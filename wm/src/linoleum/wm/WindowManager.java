@@ -38,7 +38,9 @@ public class WindowManager extends PreferenceSupport {
 	private JRootPane panel = getRootPane();
 	private final Map<Integer, WindowManager> frames = new HashMap<>();
 	private final Logger logger = Logger.getLogger(getClass().getName());
+	private int above_sibling_id;
 	private boolean closed;
+	private boolean mapped;
 
 	// internal state
 	public static final int UNMANAGED = 0;
@@ -180,10 +182,12 @@ public class WindowManager extends PreferenceSupport {
 	}
 
 	private void when_configure_request(final ConfigureRequest event) {
-		final WindowManager frame = getFrame(event.window_id);
-		if (frame != null) {
-			frame.configure(event);
+		WindowManager frame = getFrame(event.window_id);
+		if (frame == null) {
+			open(URI.create(String.valueOf(event.window_id)), getApplicationManager().getDesktopPane());
+			frame = getFrame(event.window_id);
 		}
+		frame.configure(event);
 	}
 
 	private void configure(final ConfigureRequest event) {
@@ -192,9 +196,12 @@ public class WindowManager extends PreferenceSupport {
 		}
 		client.configure(event.changes());
 		client.set_geometry_cache(event.rectangle());
-		if (client.state == NORMAL && event.stack_mode () == Window.Changes.ABOVE) {
-			client.set_input_focus();
-		}
+		final Rectangle bounds = event.rectangle();
+		final int x = bounds.x - panel.getX();
+		final int y = bounds.y - panel.getY() - getContent().getY();
+		final int width = bounds.width - panel.getWidth() + getWidth();
+		final int height = bounds.height - panel.getHeight() + getHeight();
+		setBounds(x, y, width, height);
 	}
 
 	private void when_destroy_notify(final DestroyNotify event) {
@@ -206,7 +213,42 @@ public class WindowManager extends PreferenceSupport {
 	}
 
 	private void when_map_request(final MapRequest event) {
-		open(URI.create(String.valueOf(event.window_id)), getApplicationManager().getDesktopPane());
+		WindowManager frame = getFrame(event.window_id);
+		if (frame == null) {
+			open(URI.create(String.valueOf(event.window_id)), getApplicationManager().getDesktopPane());
+			frame = getFrame(event.window_id);
+		}
+		frame.map_request(event);
+	}
+
+	private void map_request(final MapRequest event) {
+		if (client.early_unmapped || client.early_destroyed) {
+			return;
+		}
+		client.attributes = client.attributes();
+		if (client.attributes.override_redirect()) {
+			return;
+		}
+		client.get_geometry();
+		client.class_hint = client.wm_class_hint();
+		client.size_hints = client.wm_normal_hints();
+		client.name = client.wm_name();
+		client.change_save_set(false);
+		final Window.WMHints wm_hints = client.wm_hints();
+		if (wm_hints == null || (wm_hints.flags() & Window.WMHints.STATE_HINT_MASK) == 0 || wm_hints.initial_state() == Window.WMHints.NORMAL) {
+			client.map();
+		} else {
+			client.state = HIDDEN;
+			client.set_wm_state (Window.WMState.ICONIC);
+		}
+		setTitle(client.name);
+		final Rectangle bounds = client.rectangle();
+		final int x = Math.max(bounds.x - panel.getX(), 0);
+		final int y = Math.max(bounds.y - panel.getY() - getContent().getY(), 0);
+		final int width = bounds.width - panel.getWidth() + getWidth();
+		final int height = bounds.height - panel.getHeight() + getHeight();
+		setBounds(x, y, width, height);
+		mapped = true;
 	}
 
 	private void when_map_notify(final MapNotify event) {
@@ -214,10 +256,6 @@ public class WindowManager extends PreferenceSupport {
 		if (frame != null) {
 			frame.map();
 		}
-	}
-
-	private WindowManager getFrame(final int id) {
-		return getOwner().frames.get(id);
 	}
 
 	private void map() {
@@ -261,17 +299,16 @@ public class WindowManager extends PreferenceSupport {
 	private void when_configure_notify(final ConfigureNotify event) {
 		final WindowManager frame = getFrame(event.window_id);
 		if (frame != null) {
-			frame.configure(event.rectangle());
+			frame.configure();
 		}
 	}
 
-	private void configure(final Rectangle bounds) {
-		final int x = bounds.x - panel.getX();
-		final int y = bounds.y - panel.getY() - getContent().getY();
-		final int width = bounds.width - panel.getWidth() + getWidth();
-		final int height = bounds.height - panel.getHeight() + getHeight();
-		if (x != getX() || y != getY() || width != getWidth() || height != getHeight()) {
-			setBounds(x, y, width, height);
+	private void configure() {
+		if (client.early_unmapped || client.early_destroyed) {
+			return;
+		}
+		if (isSelected() && mapped) {
+			client.set_input_focus();
 		}
 	}
 
@@ -306,30 +343,6 @@ public class WindowManager extends PreferenceSupport {
 	private void open(final int id) {
 		getOwner().frames.put(id, this);
 		client = Client.intern(getOwner().display, id);
-		if (client.early_unmapped || client.early_destroyed) {
-			return;
-		}
-		client.attributes = client.attributes();
-		if (client.attributes.override_redirect()) {
-			return;
-		}
-		client.get_geometry();
-		client.class_hint = client.wm_class_hint();
-		client.size_hints = client.wm_normal_hints();
-		client.name = client.wm_name();
-		client.change_save_set(false);
-		final Window.WMHints wm_hints = client.wm_hints();
-		if (wm_hints == null || (wm_hints.flags() & Window.WMHints.STATE_HINT_MASK) == 0 || wm_hints.initial_state() == Window.WMHints.NORMAL) {
-			client.map();
-		} else {
-			client.state = HIDDEN;
-			client.set_wm_state (Window.WMState.ICONIC);
-		}
-		setTitle(client.name);
-		final Rectangle bounds = client.rectangle();
-		if (bounds.x != 0 || bounds.y != 0 || bounds.width != 1 || bounds.height != 1) {
-			configure(bounds);
-		}
 	}
 
 	@Override
@@ -338,6 +351,10 @@ public class WindowManager extends PreferenceSupport {
 			client.unintern();
 			getOwner().frames.remove(client.id);
 		}
+	}
+
+	private WindowManager getFrame(final int id) {
+		return getOwner().frames.get(id);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -392,7 +409,6 @@ public class WindowManager extends PreferenceSupport {
                         public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
                         }
                         public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
-                                formInternalFrameIconified(evt);
                         }
                         public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
                         }
@@ -421,8 +437,11 @@ public class WindowManager extends PreferenceSupport {
         }// </editor-fold>//GEN-END:initComponents
 
         private void formInternalFrameActivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameActivated
-		if (client != null) {
-			client.map();
+		if (client != null && mapped && !closed && !isIcon()) {
+			if (client.early_unmapped || client.early_destroyed) {
+				return;
+			}
+			client.raise();
 			getOwner().display.flush();
 		}
         }//GEN-LAST:event_formInternalFrameActivated
@@ -438,21 +457,20 @@ public class WindowManager extends PreferenceSupport {
         }//GEN-LAST:event_formInternalFrameClosed
 
         private void formInternalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameDeactivated
-		if (client != null && !closed) {
-			client.unmap();
+		if (client != null && mapped && !closed) {
+			if (client.early_unmapped || client.early_destroyed) {
+				return;
+			}
+			client.lower();
 			getOwner().display.flush();
 		}
         }//GEN-LAST:event_formInternalFrameDeactivated
 
-        private void formInternalFrameIconified(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameIconified
-		if (client != null) {
-			client.unmap();
-			getOwner().display.flush();
-		}
-        }//GEN-LAST:event_formInternalFrameIconified
-
         private void formComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentMoved
 		if (client != null) {
+			if (client.early_unmapped || client.early_destroyed) {
+				return;
+			}
 			client.move(getX() + panel.getX(), getY() + panel.getY() + getContent().getY());
 			getOwner().display.flush();
 		}
@@ -460,6 +478,9 @@ public class WindowManager extends PreferenceSupport {
 
         private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
 		if (client != null) {
+			if (client.early_unmapped || client.early_destroyed) {
+				return;
+			}
 			client.resize(panel.getWidth(), panel.getHeight());
 			getOwner().display.flush();
 		}
