@@ -291,9 +291,11 @@ public class WindowManager extends PreferenceSupport {
 		client.early_unmapped = false;
 		if (client.state != HIDDEN) {
 			client.state = UNMANAGED;
-			client.set_wm_state(Window.WMState.WITHDRAWN);
-			client.change_save_set(true);
+//			client.set_wm_state(Window.WMState.WITHDRAWN);
+//			client.change_save_set(true);
 		}
+		closed = true;
+		doDefaultCloseAction();
 	}
 
 	private void when_configure_notify(final ConfigureNotify event) {
@@ -437,7 +439,7 @@ public class WindowManager extends PreferenceSupport {
         }// </editor-fold>//GEN-END:initComponents
 
         private void formInternalFrameActivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameActivated
-		if (client != null && mapped && !closed && !isIcon()) {
+		if (client != null && !closed && !isIcon()) {
 			if (client.early_unmapped || client.early_destroyed) {
 				return;
 			}
@@ -457,7 +459,7 @@ public class WindowManager extends PreferenceSupport {
         }//GEN-LAST:event_formInternalFrameClosed
 
         private void formInternalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameDeactivated
-		if (client != null && mapped && !closed) {
+		if (client != null && !closed) {
 			if (client.early_unmapped || client.early_destroyed) {
 				return;
 			}
