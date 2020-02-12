@@ -1,7 +1,7 @@
 
 Required software:
 
-- jdk 1.7 ( http://www.oracle.com/technetwork/java/index.html )
+- jdk 11 ( http://www.oracle.com/technetwork/java/index.html )
 
 Optional software:
 
@@ -77,4 +77,10 @@ Useful libraries
   mstor#mstor;0.9.9				A JavaMail provider for persistent email storage
   org.bouncycastle#bcpg-jdk15;1.45		The Bouncy Castle Java API for handling the OpenPGP protocol
   org.ghost4j#ghost4j;1.0.1			Ghost4J binds the Ghostscript C API to bring Ghostscript power to the Java world
+
+
+Scala
+
+  ch.epfl.lamp#dotty-compiler_0.22;0.22.0-RC1	Dotty compiler (bootstrapped)
+  com.lihaoyi#os-lib_2.13;0.6.3			Scala interface to common OS filesystem and subprocess APIs
 

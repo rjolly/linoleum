@@ -96,7 +96,7 @@ function publish(dir, resolver, source) {
 }
 
 function clean(dir) {
-    remove(dir, ".*\.class");
+    remove(dir, ".*\.(class|tasty)");
 }
 
 function remove(dir, pattern) {
@@ -403,4 +403,21 @@ function ps2pdf(file, output) {
     converter.setPDFSettings(PDFConverter.OPTION_PDFSETTINGS_PREPRESS);
     converter.convert(document, fos);
     IOUtils.closeQuietly(fos);
+}
+
+// requires ch.epfl.lamp#dotty-compiler_0.22;0.22.0-RC1
+
+function dotc(srcDir, destDir, options) {
+    if (srcDir == undefined) {
+	srcDir = ".";
+    }
+    if (destDir == undefined) {
+	destDir = srcDir;
+    }
+    if (options == undefined) {
+	options = [];
+    }
+    files = fileset(srcDir, ".*\.(scala|java)");
+    dir = pathToFile(destDir);
+    Packages.dotty.tools.dotc.Main.process(["-color:never", "-classpath", classpath(), "-d", dir].concat(options).concat(files));
 }
