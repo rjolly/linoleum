@@ -47,10 +47,6 @@ function javac(srcDir, destDir) {
     apps.get("Tools").compile(fileset(srcDir, ".*\.java"), pathToFile(destDir), ["-source", "1.7", "-target", "1.7"]);
 }
 
-function classpath() {
-    return java.lang.System.getProperty("java.class.path");
-}
-
 function javadoc(srcDir, destDir) {
     if (srcDir == undefined) {
 	srcDir = ".";
@@ -58,9 +54,7 @@ function javadoc(srcDir, destDir) {
     if (destDir == undefined) {
 	destDir = srcDir;
     }
-    var files = fileset(srcDir, ".*\.java");
-    var dir = pathToFile(destDir);
-    Packages.com.sun.tools.javadoc.Main.execute(["-classpath", classpath(), "-d", dir].concat(files));
+    apps.get("Tools").javadoc(fileset(srcDir, ".*\.java"), pathToFile(destDir));
 }
 
 function copy(src, dest, pattern) {
@@ -403,6 +397,10 @@ function ps2pdf(file, output) {
     converter.setPDFSettings(PDFConverter.OPTION_PDFSETTINGS_PREPRESS);
     converter.convert(document, fos);
     IOUtils.closeQuietly(fos);
+}
+
+function classpath() {
+    return java.lang.System.getProperty("java.class.path");
 }
 
 // requires ch.epfl.lamp#dotty-compiler_0.22;0.22.0-RC1

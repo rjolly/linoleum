@@ -18,6 +18,7 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.jar.Attributes;
 import javax.tools.JavaCompiler;
+import javax.tools.DocumentationTool;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
@@ -40,6 +41,15 @@ public class Tools extends Frame {
 			fileManager.setLocation(StandardLocation.CLASS_PATH, concat);
 			fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList(new File[] {destDir}));
 			final JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, Arrays.asList(options), null, fileManager.getJavaFileObjectsFromFiles(Arrays.asList(files)));
+			task.call();
+		}
+	}
+
+	public void javadoc(final File files[], final File destDir) throws IOException {
+		final DocumentationTool tool = ToolProvider.getSystemDocumentationTool();
+		try (final StandardJavaFileManager fileManager = tool.getStandardFileManager(null, null, null)) {
+			fileManager.setLocation(DocumentationTool.Location.DOCUMENTATION_OUTPUT, Arrays.asList(new File[] {destDir}));
+			final DocumentationTool.DocumentationTask task = tool.getTask(null, fileManager, null, null, null, fileManager.getJavaFileObjectsFromFiles(Arrays.asList(files)));
 			task.call();
 		}
 	}
