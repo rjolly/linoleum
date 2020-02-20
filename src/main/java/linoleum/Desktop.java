@@ -87,7 +87,7 @@ public class Desktop extends JFrame {
 	private class SaveAction extends AbstractAction {
 		public SaveAction() {
 			super("Save", saveIcon);
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_MASK | InputEvent.CTRL_MASK));
 			putValue(MNEMONIC_KEY, (int) 's');
 		}
 

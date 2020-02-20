@@ -62,9 +62,11 @@ public class WindowManager extends PreferenceSupport {
 		return new WindowManager();
 	}
 
-	@Override
-	public void init() {
+	private void start() {
 		if (os != null && os.startsWith("Windows")) {
+			return;
+		}
+		if (display != null) {
 			return;
 		}
 		display = new Display(new Display.Name(name == null?":0.0":name));
@@ -335,10 +337,13 @@ public class WindowManager extends PreferenceSupport {
 			open(Integer.parseInt(uri.getSchemeSpecificPart()));
 		} catch (final NumberFormatException ex) {
 			ex.printStackTrace();
-		} else try {
-			Runtime.getRuntime().exec(getPref("program"));
-		} catch (final IOException ex) {
-			ex.printStackTrace();
+		} else {
+			getOwner().start();
+			try {
+				Runtime.getRuntime().exec(getPref("program"));
+			} catch (final IOException ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 
