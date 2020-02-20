@@ -37,14 +37,17 @@ function load(str) {
 
 // adapted from https://weblogs.java.net/blog/forax/archive/2006/09/using_jrunscrip.html
 
-function javac(srcDir, destDir) {
+function javac(srcDir, destDir, level) {
     if (srcDir == undefined) {
 	srcDir = ".";
     }
     if (destDir == undefined) {
 	destDir = srcDir;
     }
-    apps.get("Tools").compile(fileset(srcDir, ".*\.java"), pathToFile(destDir), ["-source", "1.7", "-target", "1.7"]);
+    if (level == undefined) {
+	level = "1.7";
+    }
+    apps.get("Tools").compile(fileset(srcDir, ".*\.java"), pathToFile(destDir), ["-source", level, "-target", level]);
 }
 
 function javadoc(srcDir, destDir) {
