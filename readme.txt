@@ -73,7 +73,7 @@ List of applications
 Useful libraries
 
   com.googlecode.java-diff-utils#diffutils;1.3.0	The DiffUtils library for computing diffs in Java
-  commons-io#commons-io;2.4			The Apache Commons IO library
+  commons-io#commons-io;1.3.1			The Apache Commons IO library
   mstor#mstor;0.9.9				A JavaMail provider for persistent email storage
   org.bouncycastle#bcpg-jdk15on;1.64		The Bouncy Castle Java API for handling the OpenPGP protocol
   org.ghost4j#ghost4j;1.0.1			Ghost4J binds the Ghostscript C API to bring Ghostscript power to the Java world
