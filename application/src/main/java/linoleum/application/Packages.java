@@ -61,7 +61,10 @@ public class Packages {
 		add1(new File(javaHome, "lib/tools.jar"));
 		add1(new File(javaHome, "lib/jconsole.jar"));
 		if (jar != null && System.getProperty("linoleum.home") == null) {
-			System.setProperty("linoleum.home", jar.getParent());
+			final String str = jar.getParent();
+			if (str != null) {
+				System.setProperty("linoleum.home", str);
+			}
 		}
 		try {
 			final String str = System.getProperty("linoleum.home");
