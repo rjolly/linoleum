@@ -89,13 +89,10 @@ public class SimpleClient extends PreferenceSupport {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			optionPanel1.load();
-			final int result = JOptionPane.showInternalConfirmDialog(getDialogParent(), optionPanel1, "Account settings", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-			switch (result) {
-			case JOptionPane.OK_OPTION:
-				optionPanel1.save();
-				break;
-			default:
+			try {
+				getApplicationManager().open(new URI("prefs", getName(), null));
+			} catch (final URISyntaxException ex) {
+				ex.printStackTrace();
 			}
 		}
 	}
@@ -287,8 +284,6 @@ public class SimpleClient extends PreferenceSupport {
                 jSeparator2 = new javax.swing.JPopupMenu.Separator();
                 jMenuItem8 = new javax.swing.JMenuItem();
 
-                optionPanel1.setFrame(this);
-
                 jLabel1.setText("URL :");
 
                 jLabel2.setText("Transport :");
@@ -356,6 +351,7 @@ public class SimpleClient extends PreferenceSupport {
                 setResizable(true);
                 setTitle("Simple JavaMail Client");
                 setName("Mail"); // NOI18N
+                setOptionPanel(optionPanel1);
                 addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
                         public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
                         }

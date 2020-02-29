@@ -1,5 +1,7 @@
 package linoleum;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import javax.swing.ImageIcon;
 import linoleum.application.Frame;
@@ -15,13 +17,41 @@ public class PreferenceManager extends Frame {
 	public PreferenceManager() {
 		initComponents();
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Properties24.gif")));
+		setScheme("prefs");
+	}
+
+	@Override
+	public void setURI(final URI uri) {
+		if (uri != null) {
+			final int index = jTabbedPane1.indexOfTab(uri.getSchemeSpecificPart());
+			if (index > -1) {
+				current = index;
+			}
+		}
+	}
+
+	@Override
+	public URI getURI() {
+		update();
+		try {
+			return new URI("prefs", get(current).getName(), null);
+		} catch (final URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private void update() {
+		for(final OptionPanel panel : getApplicationManager().getOptionPanels()) {
+			if (jTabbedPane1.indexOfTab(panel.getName()) < 0) {
+				jTabbedPane1.add(panel);
+			}
+		}
 	}
 
 	@Override
 	public void open() {
-		for(final OptionPanel panel : getApplicationManager().getOptionPanels()) {
-			jTabbedPane1.add(panel);
-		}
+		update();
 		jTabbedPane1.setSelectedIndex(current);
 		get(current).load();
 		ready = true;
@@ -53,7 +83,7 @@ public class PreferenceManager extends Frame {
 		getApplicationManager().addClassPathListener(new ClassPathListener() {
 			@Override
 			public void classPathChanged(final ClassPathChangeEvent e) {
-				open();
+				update();
 			}
 		});
 	}

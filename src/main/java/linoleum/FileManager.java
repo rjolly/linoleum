@@ -107,6 +107,7 @@ public class FileManager extends FileSupport implements Runnable {
 	private final Action renameAction = new RenameAction();
 	private final Action cancelSelectionAction = new CancelSelectionAction();
 	private final Action deleteAction = new DeleteAction();
+	private final Action preferenceAction = new PreferenceAction();
 	private final FileChooser chooser = new FileChooser();
 	private final ListCellRenderer renderer = new Renderer();
 	private final DefaultListModel<Path> model = new DefaultListModel<>();
@@ -459,6 +460,21 @@ public class FileManager extends FileSupport implements Runnable {
 				refresh();
 				break;
 			default:
+			}
+		}
+	}
+
+	private class PreferenceAction extends AbstractAction {
+		private PreferenceAction() {
+			super("Preferences");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			try {
+				getApplicationManager().open(new URI("prefs", getName(), null));
+			} catch (final URISyntaxException ex) {
+				ex.printStackTrace();
 			}
 		}
 	}
@@ -1057,6 +1073,8 @@ public class FileManager extends FileSupport implements Runnable {
                 jCheckBoxMenuItem2 = new javax.swing.JCheckBoxMenuItem();
                 jSeparator4 = new javax.swing.JPopupMenu.Separator();
                 jMenuItem11 = new javax.swing.JMenuItem();
+                jSeparator5 = new javax.swing.JPopupMenu.Separator();
+                jMenuItem12 = new javax.swing.JMenuItem();
 
                 jLabel2.setText("Home :");
 
@@ -1299,6 +1317,10 @@ public class FileManager extends FileSupport implements Runnable {
                         }
                 });
                 jMenu4.add(jMenuItem11);
+                jMenu4.add(jSeparator5);
+
+                jMenuItem12.setAction(preferenceAction);
+                jMenu4.add(jMenuItem12);
 
                 jMenuBar1.add(jMenu4);
 
@@ -1420,6 +1442,7 @@ public class FileManager extends FileSupport implements Runnable {
         private javax.swing.JMenuItem jMenuItem1;
         private javax.swing.JMenuItem jMenuItem10;
         private javax.swing.JMenuItem jMenuItem11;
+        private javax.swing.JMenuItem jMenuItem12;
         private javax.swing.JMenuItem jMenuItem2;
         private javax.swing.JMenuItem jMenuItem3;
         private javax.swing.JMenuItem jMenuItem4;
@@ -1436,6 +1459,7 @@ public class FileManager extends FileSupport implements Runnable {
         private javax.swing.JPopupMenu.Separator jSeparator2;
         private javax.swing.JPopupMenu.Separator jSeparator3;
         private javax.swing.JPopupMenu.Separator jSeparator4;
+        private javax.swing.JPopupMenu.Separator jSeparator5;
         private linoleum.FileTable jTable1;
         private javax.swing.JTextField jTextField1;
         private linoleum.application.OptionPanel optionPanel1;
