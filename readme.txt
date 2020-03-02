@@ -1,7 +1,7 @@
 
 Required software:
 
-- jdk 11 ( http://www.oracle.com/technetwork/java/index.html )
+- jdk ( http://www.oracle.com/technetwork/java/index.html )
 
 Optional software:
 
@@ -67,7 +67,7 @@ List of applications
   net.java.linoleum#jcterm;0.0.11		SSH2 Terminal Emulator in Pure Java
   net.java.linoleum#media;1.6			Media Player (requires jmf)
   net.java.linoleum#pdfview;1.6			PDF viewer (may require jai in some cases)
-  net.sourceforge.jscl-meditor#meditor;5.3	Java symbolic computing library and mathematical editor
+  net.sourceforge.jscl-meditor#meditor;5.3.1	Java symbolic computing library and mathematical editor
 
 
 Useful libraries
@@ -83,4 +83,10 @@ Scala
 
   ch.epfl.lamp#dotty-compiler_0.22;0.22.0-RC1	Dotty compiler (bootstrapped)
   com.lihaoyi#os-lib_2.13;0.6.3			Scala interface to common OS filesystem and subprocess APIs
+
+
+Scala 2.11
+
+  org.scala-lang#scala-compiler;2.11.0-M6	Compiler for the Scala Programming Language
+  com.github.rjolly#jarlister_2.11;1.0		A tools that lists a jars classes into its manifest
 

@@ -422,3 +422,45 @@ function dotc(srcDir, destDir, options) {
     dir = pathToFile(destDir);
     Packages.dotty.tools.dotc.Main.process(["-color:never", "-classpath", classpath(), "-d", dir].concat(options).concat(files));
 }
+
+// requires org.scala-lang#scala-compiler;2.11.0-M6
+
+function scalac(srcDir, destDir, options) {
+    if (srcDir == undefined) {
+	srcDir = ".";
+    }
+    if (destDir == undefined) {
+	destDir = srcDir;
+    }
+    if (options == undefined) {
+	options = [];
+    }
+    files = fileset(srcDir, ".*\.(scala|java)");
+    dir = pathToFile(destDir);
+    Packages.scala.tools.nsc.Main.process(["-classpath", classpath(), "-d", dir].concat(options).concat(files));
+}
+
+function scaladoc(srcDir, destDir, options) {
+    if (srcDir == undefined) {
+	srcDir = ".";
+    }
+    if (destDir == undefined) {
+	destDir = srcDir;
+    }
+    if (options == undefined) {
+	options = [];
+    }
+    var files = fileset(srcDir, ".*\.(scala|java)");
+    var dir = pathToFile(destDir);
+    Packages.scala.tools.nsc.ScalaDoc$.MODULE$.process(["-classpath", classpath(), "-d", dir].concat(options).concat(files));
+}
+
+// requires com.github.rjolly#jarlister_2.11;1.0
+
+function jarlister(path, out) {
+    var opts = [];
+    if (out != undefined) {
+	opts = opts.concat(["-o", pathToFile(out)]);
+    }
+    Packages.scala.tools.nsc.JarLister$.MODULE$.process(opts.concat([pathToFile(path)]));
+}
