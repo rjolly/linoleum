@@ -51,17 +51,25 @@ public class PreferenceSupport extends Frame implements PreferenceChangeListener
 
 	protected void putPref(final String key, final String value) {
 		if (value == null || value.equals(properties.getProperty(key, ""))) {
-			prefs.remove(getKey(key));
+			if (prefs.get(getKey(key), null) != null) {
+				prefs.remove(getKey(key));
+			}
 		} else {
-			prefs.put(getKey(key), value);
+			if (!value.equals(prefs.get(getKey(key), null))) {
+				prefs.put(getKey(key), value);
+			}
 		}
 	}
 
 	protected void putBooleanPref(final String key, final boolean value) {
 		if (value == Boolean.valueOf(properties.getProperty(key, new Boolean(false).toString())).booleanValue()) {
-			prefs.remove(getKey(key));
+			if (prefs.get(getKey(key), null) != null) {
+				prefs.remove(getKey(key));
+			}
 		} else {
-			prefs.putBoolean(getKey(key), value);
+			if (value != prefs.getBoolean(getKey(key), false)) {
+				prefs.putBoolean(getKey(key), value);
+			}
 		}
 	}
 }
