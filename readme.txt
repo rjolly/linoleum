@@ -88,5 +88,5 @@ Scala
 Scala 2.11
 
   org.scala-lang#scala-compiler;2.11.0-M6	Compiler for the Scala Programming Language
-  com.github.rjolly#jarlister_2.11;1.0		A tools that lists a jars classes into its manifest
+  com.github.rjolly#jarlister_2.11;1.1		A tool that lists a jar's classes into its manifest
 

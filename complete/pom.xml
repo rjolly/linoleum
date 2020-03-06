@@ -40,10 +40,5 @@
       <artifactId>diffutils</artifactId>
       <version>1.3.0</version>
     </dependency>
-    <dependency>
-      <groupId>com.github.rjolly</groupId>
-      <artifactId>jshellscriptengine</artifactId>
-      <version>1.0</version>
-    </dependency>
   </dependencies>
 </project>

@@ -455,7 +455,7 @@ function scaladoc(srcDir, destDir, options) {
     Packages.scala.tools.nsc.ScalaDoc$.MODULE$.process(["-classpath", classpath(), "-d", dir].concat(options).concat(files));
 }
 
-// requires com.github.rjolly#jarlister_2.11;1.0
+// requires com.github.rjolly#jarlister_2.11;1.1
 
 function jarlister(path, out) {
     var opts = [];

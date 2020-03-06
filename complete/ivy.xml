@@ -20,6 +20,5 @@
         </dependency>
         <dependency org="commons-io" name="commons-io" rev="1.3.1" conf="runtime->default"/>
         <dependency org="com.googlecode.java-diff-utils" name="diffutils" rev="1.3.0" conf="runtime->default"/>
-        <dependency org="com.github.rjolly" name="jshellscriptengine" rev="1.0" conf="runtime->default"/>
     </dependencies>
 </ivy-module>
