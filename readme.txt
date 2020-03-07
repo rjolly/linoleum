@@ -67,7 +67,7 @@ List of applications
   net.java.linoleum#jcterm;0.0.11		SSH2 Terminal Emulator in Pure Java
   net.java.linoleum#media;1.6			Media Player (requires jmf)
   net.java.linoleum#pdfview;1.6			PDF viewer (may require jai in some cases)
-  net.sourceforge.jscl-meditor#meditor;5.1.1	Java symbolic computing library and mathematical editor
+  net.sourceforge.jscl-meditor#meditor;5.3.2	Java symbolic computing library and mathematical editor
 
 
 Useful libraries
