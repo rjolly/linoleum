@@ -21,7 +21,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Properties;
 import java.util.prefs.Preferences;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -29,7 +34,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
-import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -155,16 +159,29 @@ public class Desktop extends JFrame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
+			final String contents = resolveExpression(frame.getContents(), System.getProperties());
 			try {
-				final File home = new File(System.getProperty("java.home"));
-				final File file = new File("jre".equals(home.getName())?home.getParentFile().getCanonicalFile():home, "docs/api/index.html");
-				if (file.exists()) {
-					apps.open(file.toURI());
-				}
-			} catch (final IOException ex) {
+				apps.open(contents.startsWith("file:")?new File(contents.substring(5)).toURI():new URI(contents));
+			} catch (final URISyntaxException ex) {
 				ex.printStackTrace();
 			}
 		}
+	}
+
+	private final Pattern EXPRESSION_PATTERN = Pattern.compile("\\$\\{([^}]*)\\}");
+
+	private String resolveExpression(final String expression, final Properties properties) {
+		final StringBuilder result = new StringBuilder(expression.length());
+		final Matcher matcher = EXPRESSION_PATTERN.matcher(expression);
+		int i = 0;
+		while (matcher.find()) {
+			result.append(expression.substring(i, matcher.start()));
+			final String property = matcher.group(1);
+			result.append(properties.containsKey(property)?properties.get(property):matcher.group());
+			i = matcher.end();
+		}
+		result.append(expression.substring(i));
+		return result.toString();
 	}
 
 	private class AboutAction extends AbstractAction {
