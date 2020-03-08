@@ -4,7 +4,7 @@ application/xhtml+xml xhtml
 application/java-archive jar
 application/javascript js
 application/mvr mvr
-application/zip zip
+application/zip zip epub
 audio/basic au snd
 audio/midi midi mid
 audio/mpeg mp3 mp2 mpa
@@ -17,7 +17,7 @@ image/png png PNG
 image/bmp bmp BMP
 text/plain txt text TXT
 text/html htm html
-text/xml xml
+text/xml xml svg
 text/x-properties properties
 text/x-java java
 text/x-scala scala
