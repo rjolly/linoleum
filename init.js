@@ -464,3 +464,42 @@ function jarlister(path, out) {
     }
     Packages.scala.tools.nsc.JarLister$.MODULE$.process(opts.concat([pathToFile(path)]));
 }
+
+// requires net.sourceforge.jscl-meditor#txt2xhtml;2.0
+
+function txt2xhtml(srcDir, destDir, stylesheet, feed, icon) {
+    if (stylesheet == undefined) {
+	stylesheet = "/mathmlc2p.xsl";
+    }
+    if (feed == undefined) {
+	feed = null;
+    }
+    if (icon == undefined) {
+	icon = null;
+    }
+    destDir = pathToFile(destDir);
+    srcDir = pathToFile(srcDir);
+    function callback(file) {
+	FileReader = java.io.FileReader;
+	FileWriter = java.io.FileWriter;
+	StringReader = java.io.StringReader;
+	Converter = Packages.jscl.converter.Converter;
+	var converter = new Converter();
+	var str = relativize(srcDir, file).getPath();
+	str = str.substring(0, str.lastIndexOf("."));
+	var out = new File(destDir, str + ".xhtml");
+	var parent = out.getParentFile();
+	if (parent != null) {
+		parent.mkdirs();
+	}
+	var reader = new BufferedReader(new FileReader(file));
+	var writer = new FileWriter(out);
+	try {
+	    converter.pipe(new StringReader(converter.apply(reader, stylesheet, str, feed, icon, null, true)), writer);
+	} finally {
+	    writer.close();
+	    reader.close();
+	}
+    }
+    find(srcDir, ".*\.txt", callback)
+}
