@@ -468,6 +468,12 @@ function jarlister(path, out) {
 // requires net.sourceforge.jscl-meditor#txt2xhtml;2.0
 
 function txt2xhtml(srcDir, destDir, stylesheet, feed, icon) {
+    if (srcDir == undefined) {
+	srcDir = ".";
+    }
+    if (destDir == undefined) {
+	destDir = srcDir;
+    }
     if (stylesheet == undefined) {
 	stylesheet = "/mathmlc2p.xsl";
     }
