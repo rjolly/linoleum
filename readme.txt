@@ -60,14 +60,14 @@ Then restart the display manager:
 
 List of applications
 
-  com.github.rjolly#flying-saucer;9.1.12	XML/XHTML+MathML+SVG and CSS 2.1 browser in pure Java
+  com.github.rjolly#flying-saucer;9.1.21	XML/XHTML+MathML+SVG and CSS 2.1 browser in pure Java
   com.github.rjolly#mappanel;1.0		MapPanel renders OpenstreetMaps using just basic java
   net.java.linoleum#console;1.6			JConsole
   net.java.linoleum#j3d;1.2			3D Object Loader (requires java3d)
   net.java.linoleum#jcterm;0.0.11		SSH2 Terminal Emulator in Pure Java
   net.java.linoleum#media;1.6			Media Player (requires jmf)
   net.java.linoleum#pdfview;1.6			PDF viewer (may require jai in some cases)
-  net.sourceforge.jscl-meditor#meditor;5.3.3	Java symbolic computing library and mathematical editor
+  net.sourceforge.jscl-meditor#meditor;5.4	Java symbolic computing library and mathematical editor
 
 
 Useful libraries
@@ -77,5 +77,5 @@ Useful libraries
   mstor#mstor;0.9.9				A JavaMail provider for persistent email storage
   org.bouncycastle#bcpg-jdk15;1.45		The Bouncy Castle Java API for handling the OpenPGP protocol
   org.ghost4j#ghost4j;1.0.1			Ghost4J binds the Ghostscript C API to bring Ghostscript power to the Java world
-  net.sourceforge.jscl-meditor#txt2xhtml;2.0	Text to XHTML converter
+  net.sourceforge.jscl-meditor#txt2xhtml;3.0	Text to XHTML converter
 

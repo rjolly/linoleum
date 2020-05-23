@@ -261,8 +261,7 @@ function ln(from, to) {
 function wget(from, to) {
     var url = new java.net.URL(from);
     if (to == undefined) {
-	var str = url.getFile();
-	to = str.substring(str.lastIndexOf("/") + 1);
+	to = new File(url.getFile()).getName();
     }
     cp(url, pathToFile(to));
 }
@@ -405,7 +404,7 @@ function ps2pdf(file, output) {
     IOUtils.closeQuietly(fos);
 }
 
-// requires net.sourceforge.jscl-meditor#txt2xhtml;2.0
+// requires net.sourceforge.jscl-meditor#txt2xhtml;3.0
 
 function txt2xhtml(srcDir, destDir, stylesheet, feed, icon) {
     if (srcDir == undefined) {
@@ -428,9 +427,7 @@ function txt2xhtml(srcDir, destDir, stylesheet, feed, icon) {
     function callback(file) {
 	FileReader = java.io.FileReader;
 	FileWriter = java.io.FileWriter;
-	StringReader = java.io.StringReader;
-	Converter = Packages.jscl.converter.Converter;
-	var converter = new Converter();
+	var converter = new Packages.jscl.converter.Converter();
 	var str = relativize(srcDir, file).getPath();
 	str = str.substring(0, str.lastIndexOf("."));
 	var out = new File(destDir, str + ".xhtml");
@@ -441,7 +438,7 @@ function txt2xhtml(srcDir, destDir, stylesheet, feed, icon) {
 	var reader = new BufferedReader(new FileReader(file));
 	var writer = new FileWriter(out);
 	try {
-	    converter.pipe(new StringReader(converter.apply(reader, stylesheet, str, feed, icon, null, true)), writer);
+	    converter.convert(reader, stylesheet, str, feed, icon, null, true, writer);
 	} finally {
 	    writer.close();
 	    reader.close();
