@@ -3,6 +3,8 @@ package linoleum.application;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.prefs.Preferences;
@@ -39,6 +41,17 @@ public class PreferenceSupport extends Frame implements PreferenceChangeListener
 	}
 
 	protected void save() {
+	}
+
+	protected Map<String, String> getMapProperty(final String key) {
+		final Map<String, String> map = new TreeMap<>();
+		for (final Map.Entry<Object, Object> entry : properties.entrySet()) {
+			final String str = entry.getKey().toString();
+			if (str.startsWith(key + ".")) {
+				map.put(str.substring(str.indexOf(".") + 1), entry.getValue().toString());
+			}
+		}
+		return map;
 	}
 
 	protected String getPref(final String key) {
