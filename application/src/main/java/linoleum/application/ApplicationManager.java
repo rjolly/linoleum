@@ -464,6 +464,7 @@ public class ApplicationManager extends FileSupport {
 				} catch (final ExecutionException ex) {
 					ex.printStackTrace();
 				}
+				initPref();
 				for (final Map.Entry<String, App> entry : getMapPref("preferred").entrySet()) {
 					pref.put(getMimeType(entry.getKey()), entry.getValue());
 				}

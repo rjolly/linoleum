@@ -17,6 +17,10 @@ public class PreferenceSupport extends Frame implements PreferenceChangeListener
 	private OptionPanel optionPanel;
 
 	public PreferenceSupport() {
+		initPref();
+	}
+
+	void initPref() {
 		try {
 			for (final URL resource : Collections.list(ClassLoader.getSystemResources(getClass().getName().replace(".", "/") + ".properties"))) try (final InputStream is = resource.openStream()) {
 				properties.load(is);
