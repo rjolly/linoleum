@@ -152,38 +152,29 @@ public class ApplicationManager extends FileSupport {
 		return null;
 	}
 
-	private Map<MimeType, App> getPreferred() {
-		final Map<MimeType, App> pref = new TreeMap<>(comparator);
-		final String str = getPref("preferred");
+	private Map<String, App> getMapPref(final String key) {
+		final Map<String, App> pref = new TreeMap<>();
+		for (final Map.Entry<String, String> entry : getMapProperty(key).entrySet()) {
+			pref.put(entry.getKey(), get(entry.getValue()));
+		}
+		final String str = getPref(key);
 		for (final String entry : str.split(", ")) {
 			final String s[] = entry.split("=");
 			if (s.length > 1) {
-				pref.put(getMimeType(s[0]), get(s[1]));
+				pref.put(s[0], get(s[1]));
 			}
 		}
 		return pref;
 	}
 
-	private void setPreferred(final Map<MimeType, App> pref) {
-		final String str = pref.toString();
-		putPref("preferred", str.substring(1, str.length() - 1));
-	}
-
-	private Map<String, App> getPreferredByScheme() {
-		final Map<String, App> prefByScheme = new TreeMap<>();
-		final String str = getPref("scheme-preferred");
-		for (final String entry : str.split(", ")) {
-			final String s[] = entry.split("=");
-			if (s.length > 1) {
-				prefByScheme.put(s[0], get(s[1]));
+	private void putMapPref(final String key, final Map<String, App> pref) {
+		for (final Map.Entry<String, String> entry : getMapProperty(key).entrySet()) {
+			if (pref.containsKey(entry.getKey()) && entry.getValue().equals(pref.get(entry.getKey()).toString())) {
+				pref.remove(entry.getKey());
 			}
 		}
-		return prefByScheme;
-	}
-
-	private void setPreferredByScheme(final Map<String, App> prefByScheme) {
-		final String str = prefByScheme.toString();
-		putPref("scheme-preferred", str.substring(1, str.length() - 1));
+		final String str = pref.toString();
+		putPref(key, str.substring(1, str.length() - 1));
 	}
 
 	@Override
@@ -201,10 +192,12 @@ public class ApplicationManager extends FileSupport {
 	public void preferenceChange(final PreferenceChangeEvent evt) {
 		if (evt.getKey().equals(getKey("preferred"))) {
 			pref.clear();
-			pref.putAll(getPreferred());
+			for (final Map.Entry<String, App> entry : getMapPref("preferred").entrySet()) {
+				pref.put(getMimeType(entry.getKey()), entry.getValue());
+			}
 		} else if (evt.getKey().equals(getKey("scheme-preferred"))) {
 			prefByScheme.clear();
-			prefByScheme.putAll(getPreferredByScheme());
+			prefByScheme.putAll(getMapPref("scheme-preferred"));
 		}
 	}
 
@@ -264,12 +257,12 @@ public class ApplicationManager extends FileSupport {
 	@Override
 	public void load() {
 		tableModel.setRowCount(0);
-		final Map<MimeType, App> pref = getPreferred();
+		final Map<String, App> pref = getMapPref("preferred");
 		for (final MimeType type : appsByType.keySet()) {
-			tableModel.addRow(new Object[] {type, pref.get(type)});
+			tableModel.addRow(new Object[] {type, pref.get(type.toString())});
 		}
 		schemeTableModel.setRowCount(0);
-		final Map<String, App> prefByScheme = getPreferredByScheme();
+		final Map<String, App> prefByScheme = getMapPref("scheme-preferred");
 		for (final String scheme : appsByScheme.keySet()) {
 			schemeTableModel.addRow(new Object[] {scheme, prefByScheme.get(scheme)});
 		}
@@ -277,15 +270,15 @@ public class ApplicationManager extends FileSupport {
 
 	@Override
 	public void save() {
-		final Map<MimeType, App> pref = new TreeMap<>(comparator);
+		final Map<String, App> pref = new TreeMap<>();
 		for (int row = 0 ; row < tableModel.getRowCount() ; row++) {
 			final MimeType type = (MimeType) tableModel.getValueAt(row, 0);
 			final App app = (App) tableModel.getValueAt(row, 1);
 			if (app != null) {
-				pref.put(type, app);
+				pref.put(type.toString(), app);
 			}
 		}
-		setPreferred(pref);
+		putMapPref("preferred", pref);
 		final Map<String, App> prefByScheme = new TreeMap<>();
 		for (int row = 0 ; row < schemeTableModel.getRowCount() ; row++) {
 			final String scheme = (String) schemeTableModel.getValueAt(row, 0);
@@ -294,7 +287,7 @@ public class ApplicationManager extends FileSupport {
 				prefByScheme.put(scheme, app);
 			}
 		}
-		setPreferredByScheme(prefByScheme);
+		putMapPref("scheme-preferred", prefByScheme);
 	}
 
 	public void open(final URI uri) {
@@ -471,8 +464,11 @@ public class ApplicationManager extends FileSupport {
 				} catch (final ExecutionException ex) {
 					ex.printStackTrace();
 				}
-				pref.putAll(getPreferred());
-				prefByScheme.putAll(getPreferredByScheme());
+				initPref();
+				for (final Map.Entry<String, App> entry : getMapPref("preferred").entrySet()) {
+					pref.put(getMimeType(entry.getKey()), entry.getValue());
+				}
+				prefByScheme.putAll(getMapPref("scheme-preferred"));
 			}
 		}).execute();
 	}
