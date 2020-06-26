@@ -404,7 +404,7 @@ function ps2pdf(file, output) {
     IOUtils.closeQuietly(fos);
 }
 
-// requires net.sourceforge.jscl-meditor#txt2xhtml;3.0
+// requires net.sourceforge.jscl-meditor#txt2xhtml;4.0
 
 function txt2xhtml(srcDir, destDir, stylesheet, feed, icon) {
     if (srcDir == undefined) {
@@ -438,7 +438,7 @@ function txt2xhtml(srcDir, destDir, stylesheet, feed, icon) {
 	var reader = new BufferedReader(new FileReader(file));
 	var writer = new FileWriter(out);
 	try {
-	    converter.convert(reader, stylesheet, str, feed, icon, null, true, writer);
+	    converter.apply(reader, stylesheet, str, feed, icon, null, true, writer);
 	} finally {
 	    writer.close();
 	    reader.close();
