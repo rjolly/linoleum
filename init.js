@@ -464,7 +464,7 @@ function jarlister(path, out) {
     Packages.scala.tools.nsc.JarLister$.MODULE$.process(opts.concat([pathToFile(path)]));
 }
 
-// requires net.sourceforge.jscl-meditor#txt2xhtml;3.0
+// requires net.sourceforge.jscl-meditor#txt2xhtml;4.0
 
 function txt2xhtml(srcDir, destDir, stylesheet, feed, icon) {
     if (srcDir == undefined) {
@@ -498,7 +498,7 @@ function txt2xhtml(srcDir, destDir, stylesheet, feed, icon) {
 	var reader = new BufferedReader(new FileReader(file));
 	var writer = new FileWriter(out);
 	try {
-	    converter.convert(reader, stylesheet, str, feed, icon, null, true, writer);
+	    converter.apply(reader, stylesheet, str, feed, icon, null, true, writer);
 	} finally {
 	    writer.close();
 	    reader.close();
