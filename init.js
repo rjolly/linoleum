@@ -404,7 +404,7 @@ function ps2pdf(file, output) {
     IOUtils.closeQuietly(fos);
 }
 
-// requires net.sourceforge.jscl-meditor#txt2xhtml;4.0
+// requires net.sourceforge.jscl-meditor#txt2xhtml;4.1
 
 function txt2xhtml(srcDir, destDir, stylesheet, feed, icon) {
     if (srcDir == undefined) {
