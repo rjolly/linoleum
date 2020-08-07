@@ -10,6 +10,10 @@ function getHome() {
     return new File(java.lang.System.getProperty("linoleum.home"));
 }
 
+function getLib() {
+    return new File(getHome(), "lib");
+}
+
 function install(pkg, conf, dir) {
     if (conf == undefined) {
 	conf = "default";
