@@ -409,7 +409,7 @@ function classpath() {
     return java.lang.System.getProperty("java.class.path");
 }
 
-// requires ch.epfl.lamp#dotty-compiler_0.25;0.25.0-RC2
+// requires ch.epfl.lamp#dotty-compiler_0.27;0.27.0-RC1
 
 function dotc(srcDir, destDir, options) {
     if (srcDir == undefined) {
