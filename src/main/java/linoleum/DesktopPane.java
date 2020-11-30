@@ -189,11 +189,11 @@ public class DesktopPane extends JDesktopPane {
 		return reopen;
 	}
 
-	private void setRecording(final boolean recording) {
+	void setRecording(final boolean recording) {
 		putClientProperty("DesktopPane.recording", this.recording = recording);
 	}
 
-	public boolean isRecording() {
+	boolean isRecording() {
 		return recording;
 	}
 
