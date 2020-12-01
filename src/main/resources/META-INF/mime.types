@@ -4,7 +4,7 @@ application/xhtml+xml xhtml
 application/java-archive jar
 application/javascript js
 application/mvr mvr
-application/zip zip epub jmod
+application/zip zip epub jmod nbm apk
 audio/basic au snd
 audio/midi midi mid
 audio/mpeg mp3 mp2 mpa

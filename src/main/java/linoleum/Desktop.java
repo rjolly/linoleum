@@ -83,6 +83,7 @@ public class Desktop extends JFrame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
+			desktopPane.setRecording(false);
 			apps.select();
 			contentsAction.setEnabled(true);
 		}
@@ -127,6 +128,7 @@ public class Desktop extends JFrame {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
+			desktopPane.setRecording(false);
 			fullScreen();
 		}
 	}
