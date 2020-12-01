@@ -18,5 +18,6 @@
         <dependency org="net.java.linoleum" name="mail" rev="1.6" conf="runtime->default"/>
         <dependency org="net.java.linoleum" name="pkg" rev="1.6" conf="runtime->default"/>
         <dependency org="net.java.linoleum" name="wm" rev="1.6" conf="runtime->default"/>
+        <dependency org="cat.inspiracio" name="rhino-js-engine" rev="1.7.10" conf="runtime->default"/>
     </dependencies>
 </ivy-module>
