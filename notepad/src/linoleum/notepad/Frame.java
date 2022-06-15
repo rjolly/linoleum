@@ -602,7 +602,7 @@ public class Frame extends FileSupport {
 
 		void setNumber(final int n) {
 			if (length > 0) {
-				setProgress(100 * n / length);
+				setProgress((int)(100l * n / length));
 			}
 		}
 
