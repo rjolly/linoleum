@@ -409,7 +409,7 @@ function classpath() {
     return java.lang.System.getProperty("java.class.path");
 }
 
-// requires ch.epfl.lamp#dotty-compiler_0.27;0.27.0-RC1
+// require org.scala-lang#scala3-compiler_3;3.1.3
 
 function dotc(srcDir, destDir, options) {
     if (srcDir == undefined) {
@@ -426,7 +426,22 @@ function dotc(srcDir, destDir, options) {
     Packages.dotty.tools.dotc.Main.process(["-color:never", "-classpath", classpath(), "-d", dir].concat(options).concat(files));
 }
 
-// requires org.scala-lang#scala-compiler;2.11.0-M6
+function dottydoc(srcDir, destDir, options) {
+    if (srcDir == undefined) {
+	srcDir = ".";
+    }
+    if (destDir == undefined) {
+	destDir = srcDir;
+    }
+    if (options == undefined) {
+	options = [];
+    }
+    files = fileset(srcDir, ".*\.tasty");
+    dir = pathToFile(destDir);
+    (new Packages.dotty.tools.scaladoc.Main).run(["-classpath", classpath(), "-d", dir].concat(options).concat(files));
+}
+
+// require org.scala-lang#scala-compiler;2.11.0-M6
 
 function scalac(srcDir, destDir, options) {
     if (srcDir == undefined) {
