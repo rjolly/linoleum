@@ -56,6 +56,7 @@ import javax.swing.text.Segment;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
+import javax.swing.undo.UndoableEdit;
 import linoleum.application.FileChooser;
 import linoleum.application.FileSupport;
 
@@ -284,10 +285,13 @@ public class Frame extends FileSupport {
 
 	private UndoableEditListener undoHandler = new UndoableEditListener() {
 		public void undoableEditHappened(final UndoableEditEvent e) {
-			undo.addEdit(e.getEdit());
-			if (modified >= 0) modified += 1;
-			undoAction.update();
-			redoAction.update();
+			final UndoableEdit edit = e.getEdit();
+			if (edit.isSignificant()) {
+				undo.addEdit(edit);
+				if (modified >= 0) modified += 1;
+				undoAction.update();
+				redoAction.update();
+			}
 		}
 	};
 
