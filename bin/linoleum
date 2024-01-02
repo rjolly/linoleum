@@ -1,7 +1,7 @@
 #!/bin/sh
 LINOLEUM=`readlink -f $0`
 LINOLEUM_HOME=`dirname $LINOLEUM`/..
-OPS=
+OPTS=
 java -classpath $LINOLEUM_HOME/linoleum.jar linoleum.Version9
 if [ $? -eq 0 ]; then
     OPTS="--add-opens jdk.jconsole/sun.tools.jconsole=ALL-UNNAMED --add-opens java.scripting/com.sun.tools.script.shell=ALL-UNNAMED --add-opens java.desktop/java.awt=ALL-UNNAMED --add-opens java.desktop/javax.swing.text=ALL-UNNAMED --add-opens java.desktop/javax.swing.text.html=ALL-UNNAMED"
