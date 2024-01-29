@@ -285,9 +285,9 @@ function open(name, app) {
 function exit(code) {
     if (typeof(frame) == 'undefined') {
 	if (code) {
-	    java.lang.System.exit(code + 0);		
+	    java.lang.System.exit(code + 0);
 	} else {
-	    java.lang.System.exit(0);		
+	    java.lang.System.exit(0);
 	}
     } else {
 	frame.doDefaultCloseAction();
@@ -331,11 +331,11 @@ function gc() {
 }
 
 function version() {
-    return java.lang.System.getProperty("java.version");	
+    return java.lang.System.getProperty("java.version");
 }
 
 function exec(command) {
-    return java.lang.Runtime.getRuntime().exec(command);	
+    return java.lang.Runtime.getRuntime().exec(command);
 }
 
 // requires commons-io#commons-io;2.4
