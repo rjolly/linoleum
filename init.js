@@ -363,7 +363,7 @@ function diff(file1, file2) {
     for (var i = 0; i < d.size(); i++) println(d.get(i));
 }
 
-// requires org.eclipse.jgit#org.eclipse.jgit;3.4.0.201406110918-r
+// requires org.eclipse.jgit#org.eclipse.jgit;3.5.3.201412180710-r
 
 function git() {
     return Packages.org.eclipse.jgit.api.Git.open(pathToFile(".git"));
