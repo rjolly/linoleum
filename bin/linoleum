@@ -4,6 +4,6 @@ LINOLEUM_HOME=`dirname $LINOLEUM`/..
 OPTS=
 java -classpath $LINOLEUM_HOME/linoleum.jar linoleum.Version9
 if [ $? -eq 0 ]; then
-    OPTS="--add-opens jdk.jconsole/sun.tools.jconsole=ALL-UNNAMED --add-opens java.scripting/com.sun.tools.script.shell=ALL-UNNAMED --add-opens java.desktop/java.awt=ALL-UNNAMED --add-opens java.desktop/javax.swing.text=ALL-UNNAMED --add-opens java.desktop/javax.swing.text.html=ALL-UNNAMED"
+    OPTS="--add-opens jdk.jdeps/com.sun.tools.javap=ALL-UNNAMED --add-opens jdk.jconsole/sun.tools.jconsole=ALL-UNNAMED --add-opens java.scripting/com.sun.tools.script.shell=ALL-UNNAMED --add-opens java.desktop/java.awt=ALL-UNNAMED --add-opens java.desktop/javax.swing.text=ALL-UNNAMED --add-opens java.desktop/javax.swing.text.html=ALL-UNNAMED"
 fi
 java $OPTS -Djava.system.class.loader=linoleum.application.ClassLoader -Dscala.usejavacp=true -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -jar $LINOLEUM_HOME/linoleum.jar

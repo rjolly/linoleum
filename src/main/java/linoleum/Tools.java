@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
@@ -22,6 +23,7 @@ import javax.tools.DocumentationTool;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
+import com.sun.tools.javap.Main;
 import linoleum.application.Frame;
 
 public class Tools extends Frame {
@@ -103,6 +105,10 @@ public class Tools extends Frame {
 				}
 			}
 		}
+	}
+
+	public void javap(final String path, final String name) {
+		Main.run(new String[] {"-c", "-classpath", path, name}, new PrintWriter(System.out));
 	}
 
 	public void run(final String name, final File dir, final String args[]) throws Exception {

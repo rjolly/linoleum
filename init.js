@@ -220,7 +220,7 @@ function run(name, dir) {
 }
 
 function javap(name) {
-    Packages.com.sun.tools.javap.Main.run(["-c", "-classpath", curDir.getPath(), name], new java.io.PrintWriter(java.lang.System.out));
+    apps.get("Tools").javap(curDir.getPath(), name);
 }
 
 function fileToPath(file) {
