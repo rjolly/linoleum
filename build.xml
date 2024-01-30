@@ -85,6 +85,7 @@
                 <exclude name="*.bat"/>
             </tarfileset>
             <link name="/usr/bin/linoleum" target="/usr/share/${ant.project.name}/bin/linoleum"/>
+            <link name="/usr/bin/linoleum-headless" target="/usr/share/${ant.project.name}/bin/linoleum-headless"/>
             <tarfileset dir="${dist.dir}" prefix="usr/share/doc/${ant.project.name}">
                 <include name="readme.txt"/>
             </tarfileset>

@@ -1,4 +1,4 @@
 #!/bin/sh
 LINOLEUM=`readlink -f $0`
 LINOLEUM_HOME=`dirname $LINOLEUM`/..
-jrunscript -J-Djava.system.class.loader=linoleum.application.ClassLoader -J-Djava.class.path=$JAVA_HOME/lib/tools.jar:$LINOLEUM_HOME/linoleum.jar -f $LINOLEUM_HOME/init.js $*
+jrunscript -J-Djava.system.class.loader=linoleum.application.ClassLoader -J--add-opens -Jjdk.jdeps/com.sun.tools.javap=ALL-UNNAMED -J--add-opens -Jjdk.jconsole/sun.tools.jconsole=ALL-UNNAMED -J-Djava.class.path=$LINOLEUM_HOME/linoleum.jar -f $LINOLEUM_HOME/init.js $*
