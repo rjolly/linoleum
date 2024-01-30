@@ -50,6 +50,11 @@ public class Tools extends Frame {
 	public void javadoc(final File files[], final File destDir) throws IOException {
 		final DocumentationTool tool = ToolProvider.getSystemDocumentationTool();
 		try (final StandardJavaFileManager fileManager = tool.getStandardFileManager(null, null, null)) {
+			final List<File> concat = new ArrayList<>();
+			for (final String str : System.getProperty("java.class.path").split(File.pathSeparator)) {
+				concat.add(new File(str));
+			}
+			fileManager.setLocation(StandardLocation.CLASS_PATH, concat);
 			fileManager.setLocation(DocumentationTool.Location.DOCUMENTATION_OUTPUT, Arrays.asList(new File[] {destDir}));
 			final DocumentationTool.DocumentationTask task = tool.getTask(null, fileManager, null, null, null, fileManager.getJavaFileObjectsFromFiles(Arrays.asList(files)));
 			task.call();
