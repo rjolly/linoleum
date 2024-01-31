@@ -63,7 +63,7 @@ public class PreferenceSupport extends Frame implements PreferenceChangeListener
 	}
 
 	protected boolean getBooleanPref(final String key) {
-		return prefs.getBoolean(getKey(key), Boolean.valueOf(properties.getProperty(key, new Boolean(false).toString())));
+		return prefs.getBoolean(getKey(key), Boolean.valueOf(properties.getProperty(key, Boolean.valueOf(false).toString())));
 	}
 
 	protected void putPref(final String key, final String value) {
@@ -75,7 +75,7 @@ public class PreferenceSupport extends Frame implements PreferenceChangeListener
 	}
 
 	protected void putBooleanPref(final String key, final boolean value) {
-		if (value == Boolean.valueOf(properties.getProperty(key, new Boolean(false).toString())).booleanValue()) {
+		if (value == Boolean.valueOf(properties.getProperty(key, Boolean.valueOf(false).toString())).booleanValue()) {
 			prefs.remove(getKey(key));
 		} else {
 			prefs.putBoolean(getKey(key), value);
