@@ -10,7 +10,12 @@
     <property name="jdeb.home" value="${env.JDEB_HOME}"/>
 
     <path id="linoleum.classpath">
-	<pathelement location="${java.home}/../lib/tools.jar"/>
+	<pathelement location="${linoleum.home}/lib/nashorn-core-15.4.jar"/>
+	<pathelement location="${linoleum.home}/lib/asm-7.3.1.jar"/>
+	<pathelement location="${linoleum.home}/lib/asm-analysis-7.3.1.jar"/>
+	<pathelement location="${linoleum.home}/lib/asm-commons-7.3.1.jar"/>
+	<pathelement location="${linoleum.home}/lib/asm-tree-7.3.1.jar"/>
+	<pathelement location="${linoleum.home}/lib/asm-util-7.3.1.jar"/>
 	<pathelement location="${linoleum.home}/linoleum.jar"/>
     </path>
 

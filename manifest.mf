@@ -5,5 +5,6 @@ Implementation-Version: 0
 Specification-Vendor: com.github.rjolly
 Specification-Title: linoleum
 Specification-Version: 1.6
+Add-Opens: jdk.jdeps/com.sun.tools.javap jdk.jconsole/sun.tools.jconsole java.scripting/com.sun.tools.script.shell java.desktop/java.awt java.desktop/javax.swing.text java.desktop/javax.swing.text.html
 Main-Class: linoleum.Desktop
 Class-Path: lib/javax.activation-1.2.0.jar lib/application-1.6.jar lib/jlfgr-1_0.jar
