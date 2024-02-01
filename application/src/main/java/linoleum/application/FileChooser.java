@@ -9,8 +9,6 @@ import java.awt.Point;
 import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import javax.accessibility.AccessibleContext;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -150,35 +148,18 @@ public class FileChooser extends JFileChooser {
 
 	private static void invoke(final JInternalFrame dialog, final String str) {
 		try {
-			final Method method = AccessController.doPrivileged(new ModalPrivilegedAction(Container.class, str));
+			Method method = null;
+			try {
+				method = Container.class.getDeclaredMethod(str, (Class[])null);
+			} catch (final NoSuchMethodException ex) {
+			}
 			if (method != null) {
+				method.setAccessible(true);
 				method.invoke(dialog, (Object[])null);
 			}
 		} catch (final IllegalAccessException ex) {
 		} catch (final IllegalArgumentException ex) {
 		} catch (final InvocationTargetException ex) {
-		}
-	}
-
-	private static class ModalPrivilegedAction implements PrivilegedAction<Method> {
-		private final Class<?> clazz;
-		private final String methodName;
-
-		public ModalPrivilegedAction(final Class<?> clazz, final String methodName) {
-			this.clazz = clazz;
-			this.methodName = methodName;
-		}
-
-		public Method run() {
-			Method method = null;
-			try {
-				method = clazz.getDeclaredMethod(methodName, (Class[])null);
-			} catch (final NoSuchMethodException ex) {
-			}
-			if (method != null) {
-				method.setAccessible(true);
-			}
-			return method;
 		}
 	}
 }
