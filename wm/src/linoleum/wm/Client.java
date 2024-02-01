@@ -26,7 +26,7 @@ public class Client extends Window {
   }
 
   public static Client intern (Display display, int id) {
-    Object value = display.resources.get (new Integer (id));
+    Object value = display.resources.get (id);
     if (value != null && value instanceof Client) return (Client) value;
     return new Client (display, id);
   }

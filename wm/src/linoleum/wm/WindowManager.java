@@ -340,7 +340,7 @@ public class WindowManager extends PreferenceSupport {
 		} else {
 			getOwner().start();
 			try {
-				Runtime.getRuntime().exec(getPref("program"));
+				Runtime.getRuntime().exec(new String[] {getPref("program")});
 			} catch (final IOException ex) {
 				ex.printStackTrace();
 			}
