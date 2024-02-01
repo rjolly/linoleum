@@ -164,7 +164,7 @@ public class DownloadManager extends Frame {
 	private class CloseAction extends AbstractAction {
 		public CloseAction() {
 			super("Close");
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK));
 		}
 
 		@Override
@@ -208,7 +208,7 @@ public class DownloadManager extends Frame {
 	private class CopyLinkAddressAction extends AbstractAction {
 		public CopyLinkAddressAction() {
 			super("Copy link address", copyIcon);
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
 		}
 
 		@Override

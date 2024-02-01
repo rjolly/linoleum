@@ -317,7 +317,7 @@ public class FileManager extends FileSupport implements Runnable {
 	private class OpenLocationAction extends AbstractAction {
 		public OpenLocationAction() {
 			super("Open location...", openIcon);
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
 		}
 
 		@Override
@@ -335,7 +335,7 @@ public class FileManager extends FileSupport implements Runnable {
 	private class CloseAction extends AbstractAction {
 		public CloseAction() {
 			super("Close");
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK));
 		}
 
 		@Override
@@ -351,7 +351,7 @@ public class FileManager extends FileSupport implements Runnable {
 	private class CutAction extends AbstractAction {
 		public CutAction() {
 			super("Cut", cutIcon);
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
 		}
 
 		@Override
@@ -363,7 +363,7 @@ public class FileManager extends FileSupport implements Runnable {
 	private class CopyAction extends AbstractAction {
 		public CopyAction() {
 			super("Copy", copyIcon);
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
 		}
 
 		@Override
@@ -375,7 +375,7 @@ public class FileManager extends FileSupport implements Runnable {
 	private class PasteAction extends AbstractAction {
 		public PasteAction() {
 			super("Paste", pasteIcon);
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK));
 		}
 
 		@Override
@@ -387,7 +387,7 @@ public class FileManager extends FileSupport implements Runnable {
 	private class PasteAsLinkAction extends AbstractAction {
 		public PasteAsLinkAction() {
 			super("Paste as link");
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.SHIFT_MASK | InputEvent.CTRL_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK));
 		}
 
 		@Override
@@ -402,7 +402,7 @@ public class FileManager extends FileSupport implements Runnable {
 	private class NewFolderAction extends AbstractAction {
 		public NewFolderAction() {
 			super("New folder", newFolderIcon);
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
 		}
 
 		@Override
@@ -414,7 +414,7 @@ public class FileManager extends FileSupport implements Runnable {
 	private class RenameAction extends AbstractAction {
 		public RenameAction() {
 			super("Rename");
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
 		}
 
 		@Override

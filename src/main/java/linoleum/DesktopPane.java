@@ -112,7 +112,7 @@ public class DesktopPane extends JDesktopPane {
 	private class SelectAction extends AbstractAction {
 		public SelectAction() {
 			super("select");
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.ALT_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.ALT_DOWN_MASK));
 		}
 
 		@Override

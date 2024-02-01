@@ -77,7 +77,7 @@ public class Desktop extends JFrame {
 	private class OpenAction extends AbstractAction {
 		public OpenAction() {
 			super("Open", openIcon);
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
 			putValue(MNEMONIC_KEY, (int) 'o');
 		}
 
@@ -92,7 +92,7 @@ public class Desktop extends JFrame {
 	private class SaveAction extends AbstractAction {
 		public SaveAction() {
 			super("Save", saveIcon);
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_MASK | InputEvent.CTRL_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK));
 			putValue(MNEMONIC_KEY, (int) 's');
 		}
 
@@ -109,7 +109,7 @@ public class Desktop extends JFrame {
 	private class ExitAction extends AbstractAction {
 		public ExitAction() {
 			super("Exit");
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.ALT_MASK | InputEvent.CTRL_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.ALT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK));
 			putValue(MNEMONIC_KEY, (int) 'x');
 		}
 
@@ -122,7 +122,7 @@ public class Desktop extends JFrame {
 	private class FullScreenAction extends AbstractAction {
 		public FullScreenAction() {
 			super("Full screen");
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.ALT_MASK | InputEvent.CTRL_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.ALT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK));
 			putValue(MNEMONIC_KEY, (int) 'f');
 		}
 
@@ -136,7 +136,7 @@ public class Desktop extends JFrame {
 	private class ScreenshotAction extends AbstractAction {
 		public ScreenshotAction() {
 			super("Screenshot");
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK));
 			putValue(MNEMONIC_KEY, (int) 's');
 		}
 

@@ -58,7 +58,7 @@ public class SimpleClient extends PreferenceSupport {
 	private class ExpungeAction extends AbstractAction {
 		public ExpungeAction() {
 			super("Expunge");
-			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_MASK));
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
 			setEnabled(false);
 		}
 
