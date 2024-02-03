@@ -47,7 +47,8 @@ To publish an application:
 
 To use linoleum as your desktop environment in Linux:
   wget http://raphael.jolly.free.fr/linoleum/linoleum-1.6-bookworm.deb
-  sudo apt-get install default-jdk ivy libcommons-codec-java libmail-java libjava3d-java
+  sudo apt-get install openjdk-17-jdk openjdk-17-doc ivy libcommons-codec-java libmail-java libjava3d-java
+  sudo ln -s /usr/share/doc/openjdk-17-jdk /usr/lib/jvm/java-17-openjdk-amd64/docs
   sudo dpkg -i linoleum-1.6-bookworm.deb
 
 You might have to enable TCP connections to your X server. In /etc/gdm3/daemon.conf:
