@@ -3,21 +3,20 @@ package linoleum.mail;
 import java.awt.*;
 import java.io.*;
 import javax.activation.*;
-import javax.swing.JEditorPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.text.Document;
 import javax.swing.text.EditorKit;
 
 public class TextViewer extends AbstractViewer {
-	private final JEditorPane text_area;
+	private final EditorPane text_area;
 	private final JPopupMenu menu = new JPopupMenu();
 
 	public TextViewer() {
 		super(new GridLayout(1,1));
 
 		// create the text area
-		text_area = new JEditorPane();
+		text_area = new EditorPane();
 		text_area.setEditable(false);
 
 		// create a scroll pane for the JTextArea
@@ -39,6 +38,7 @@ public class TextViewer extends AbstractViewer {
 		text_area.setContentType(type.toLowerCase());
 		final EditorKit kit = text_area.getEditorKit();
 		final Document doc = kit.createDefaultDocument();
+		text_area.setDocument(doc);
 		text_area.read(ins, doc);
 		menu.add(new SaveAsAction(dh, null));
 	}

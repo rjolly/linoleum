@@ -282,9 +282,9 @@ function open(name, app) {
 function exit(code) {
     if (typeof(frame) == 'undefined') {
 	if (code) {
-	    java.lang.System.exit(code + 0);		
+	    java.lang.System.exit(code + 0);
 	} else {
-	    java.lang.System.exit(0);		
+	    java.lang.System.exit(0);
 	}
     } else {
 	frame.doDefaultCloseAction();
@@ -328,11 +328,11 @@ function gc() {
 }
 
 function version() {
-    return java.lang.System.getProperty("java.version");	
+    return java.lang.System.getProperty("java.version");
 }
 
 function exec(command) {
-    return java.lang.Runtime.getRuntime().exec(command);	
+    return java.lang.Runtime.getRuntime().exec(command);
 }
 
 // requires commons-io#commons-io;1.3.1
@@ -409,7 +409,7 @@ function classpath() {
     return java.lang.System.getProperty("java.class.path");
 }
 
-// require org.scala-lang#scala3-compiler_3;3.1.3
+// require org.scala-lang#scala3-compiler_3;3.3.1
 
 function dotc(srcDir, destDir, options) {
     if (srcDir == undefined) {
