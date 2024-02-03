@@ -409,7 +409,7 @@ function classpath() {
     return java.lang.System.getProperty("java.class.path");
 }
 
-// require org.scala-lang#scala3-compiler_3;3.1.3
+// require org.scala-lang#scala3-compiler_3;3.3.1
 
 function dotc(srcDir, destDir, options) {
     if (srcDir == undefined) {
