@@ -15,10 +15,6 @@ import javax.swing.text.Element;
 import javax.swing.JEditorPane;
 
 public class Document extends HTMLDocument {
-	public Document() {
-		super(new StyleSheet());
-	}
-
 	public void setFrames(final Map<String, URL> map, final JEditorPane panel) {
 		for (final Map.Entry<String, URL> entry : map.entrySet()) {
 			processHTMLFrameHyperlinkEvent(new HTMLFrameHyperlinkEvent(panel, HyperlinkEvent.EventType.ACTIVATED, entry.getValue(), entry.getKey()));
