@@ -323,9 +323,8 @@ function log(str) {
     }
 }
 
-function gc() {
-    java.lang.System.gc();
-}
+gc = java.lang.System.gc;
+decode = java.net.URLDecoder.decode;
 
 function version() {
     return java.lang.System.getProperty("java.version");
