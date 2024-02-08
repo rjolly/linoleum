@@ -10,7 +10,7 @@
         <conf name="runtime-test"/>
     </configurations>
     <dependencies>
-        <dependency org="org.apache.ivy" name="ivy" rev="2.4.0" conf="compile->master;runtime->default"/>
+        <dependency org="org.apache.ivy" name="ivy" rev="2.5.0" conf="compile->master;runtime->default"/>
         <dependency org="net.java.linoleum" name="application" rev="1.6" conf="compile->master;runtime->default"/>
         <dependency org="net.java.linoleum" name="jlfgr" rev="1_0" conf="runtime->default"/>
     </dependencies>
