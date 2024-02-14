@@ -578,7 +578,7 @@ public class FileManager extends FileSupport implements Runnable {
 				setForeground(list.getForeground());
 			}
 			final Path path = (Path)value;
-			setIcon(getFileIcon(path));
+			if (!closing) setIcon(getFileIcon(path));
 			setText(path.getFileName().toString());
 			setFont(list.getFont());
 			return this;
