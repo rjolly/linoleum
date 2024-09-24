@@ -45,6 +45,8 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.UndoableEditEvent;
@@ -87,6 +89,22 @@ public class Frame extends FileSupport {
 	public Frame() {
 		initComponents();
 		dialog1.pack();
+		jTextField1.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(final DocumentEvent e) {
+				changed();
+			}
+
+			@Override
+			public void removeUpdate(final DocumentEvent e) {
+				changed();
+			}
+
+			@Override
+			public void changedUpdate(final DocumentEvent e) {
+				changed();
+			}
+		});
 		chooser.setFileFilter(new FileNameExtensionFilter("Text", "txt"));
 		setIcon(new ImageIcon(getClass().getResource("/toolbarButtonGraphics/general/Edit24.gif")));
 		setMimeType("text/plain:text/*:application/octet-stream:application/*");
@@ -491,18 +509,25 @@ public class Frame extends FileSupport {
 		dialog1.setVisible(true);
 	}
 
+	private void changed() {
+                boolean empty = jTextField1.getText().isEmpty();
+		jButton1.setEnabled(!empty);
+		jButton2.setEnabled(!empty && jTextField2.isEnabled());
+		jButton3.setEnabled(!empty && jTextField2.isEnabled());
+	}
+	
 	private void find() {
 		openDialog("FindTitle");
 		jTextField2.setEnabled(false);
-		jButton2.setEnabled(false);
-		jButton3.setEnabled(false);
+		jTextField1.requestFocusInWindow();
+		jTextField1.setText(editor.getSelectedText());
 	}
 
 	private void replace() {
 		openDialog("ReplaceTitle");
 		jTextField2.setEnabled(true);
-		jButton2.setEnabled(true);
-		jButton3.setEnabled(true);
+		jTextField1.requestFocusInWindow();
+		jTextField1.setText(editor.getSelectedText());
 	}
 
 	private void setFile(final Path file) {
@@ -733,6 +758,7 @@ public class Frame extends FileSupport {
                 jLabel2.setText("Replace with :");
 
                 jButton1.setText("Next");
+                jButton1.setEnabled(false);
                 jButton1.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                                 jButton1ActionPerformed(evt);
@@ -740,6 +766,7 @@ public class Frame extends FileSupport {
                 });
 
                 jButton2.setText("Replace");
+                jButton2.setEnabled(false);
                 jButton2.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                                 jButton2ActionPerformed(evt);
@@ -747,6 +774,7 @@ public class Frame extends FileSupport {
                 });
 
                 jButton3.setText("Replace all");
+                jButton3.setEnabled(false);
                 jButton3.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                                 jButton3ActionPerformed(evt);
@@ -866,6 +894,8 @@ public class Frame extends FileSupport {
 		dialog1.setVisible(false);
 		try {
 			setSelected(true);
+			jTextField1.setText(null);
+			jTextField2.setText(null);
 		} catch (final PropertyVetoException ex) {
 			ex.printStackTrace();
 		}
