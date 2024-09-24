@@ -1,4 +1,7 @@
 #!/bin/sh
 LINOLEUM=`readlink -f $0`
 LINOLEUM_HOME=`dirname $LINOLEUM`/..
+until
 java -Djava.system.class.loader=linoleum.application.ClassLoader -Dscala.usejavacp=true -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -jar $LINOLEUM_HOME/linoleum.jar
+do :
+done
