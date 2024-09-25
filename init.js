@@ -425,6 +425,8 @@ function dotc(srcDir, destDir, options) {
     Packages.dotty.tools.dotc.Main.process(["-color:never", "-classpath", classpath(), "-d", dir].concat(options).concat(files));
 }
 
+// requires org.scala-lang#scaladoc_3;3.5.1
+
 function dottydoc(srcDir, destDir, options) {
     if (srcDir == undefined) {
 	srcDir = ".";
