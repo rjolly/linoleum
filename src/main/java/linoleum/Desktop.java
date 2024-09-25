@@ -51,6 +51,7 @@ public class Desktop extends JFrame {
 		+ "%s";
 	private final Action openAction = new OpenAction();
 	private final Action saveAction = new SaveAction();
+	private final Action restartAction = new RestartAction();
 	private final Action exitAction = new ExitAction();
 	private final Action fullScreenAction = new FullScreenAction();
 	private final Action screenshotAction = new ScreenshotAction();
@@ -103,6 +104,19 @@ public class Desktop extends JFrame {
 					save();
 				}
 			});
+		}
+	}
+
+	private class RestartAction extends AbstractAction {
+		public RestartAction() {
+			super("Restart");
+			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK));
+			putValue(MNEMONIC_KEY, (int) 'r');
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			System.exit(1);
 		}
 	}
 
@@ -322,6 +336,8 @@ public class Desktop extends JFrame {
                 fileMenu = new javax.swing.JMenu();
                 openMenuItem = new javax.swing.JMenuItem();
                 saveMenuItem = new javax.swing.JMenuItem();
+                jSeparator1 = new javax.swing.JPopupMenu.Separator();
+                restartMenuItem = new javax.swing.JMenuItem();
                 separator = new javax.swing.JPopupMenu.Separator();
                 exitMenuItem = new javax.swing.JMenuItem();
                 viewMenu = new javax.swing.JMenu();
@@ -351,6 +367,10 @@ public class Desktop extends JFrame {
 
                 saveMenuItem.setAction(saveAction);
                 fileMenu.add(saveMenuItem);
+                fileMenu.add(jSeparator1);
+
+                restartMenuItem.setAction(restartAction);
+                fileMenu.add(restartMenuItem);
                 fileMenu.add(separator);
 
                 exitMenuItem.setAction(exitAction);
@@ -420,8 +440,10 @@ public class Desktop extends JFrame {
         private javax.swing.JMenu fileMenu;
         private javax.swing.JCheckBoxMenuItem fullScreenMenuItem;
         private javax.swing.JMenu helpMenu;
+        private javax.swing.JPopupMenu.Separator jSeparator1;
         private javax.swing.JMenuBar menuBar;
         private javax.swing.JMenuItem openMenuItem;
+        private javax.swing.JMenuItem restartMenuItem;
         private javax.swing.JMenuItem saveMenuItem;
         private javax.swing.JMenuItem screenshotMenuItem;
         private javax.swing.JPopupMenu.Separator separator;

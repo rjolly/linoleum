@@ -11,7 +11,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ActionMap;
 import javax.swing.DefaultListModel;
 import javax.swing.KeyStroke;
 import javax.swing.Icon;
