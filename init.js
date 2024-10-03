@@ -334,7 +334,7 @@ function exec(command) {
     return java.lang.Runtime.getRuntime().exec(command);
 }
 
-// requires commons-io#commons-io;2.7
+// requires commons-io#commons-io;2.14.0
 
 function hexdump(path) {
     System = java.lang.System;
