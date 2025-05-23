@@ -30,7 +30,7 @@ Alternatively:
 
 
 To build linoleum from itself, first install jgit, then clone the repository, change dir to it, and run "build-all". In the script shell:
-  install("org.eclipse.jgit#org.eclipse.jgit;6.6.1.202309021850-r");
+  install("org.eclipse.jgit#org.eclipse.jgit;7.2.1.202505142326-r");
   clone("https://github.com/rjolly/linoleum.git");
   cd("linoleum")
   load("build-all.js");
