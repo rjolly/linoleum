@@ -425,6 +425,8 @@ function dotc(srcDir, destDir, options) {
     Packages.dotty.tools.dotc.Main.process(["-color:never", "-classpath", classpath(), "-d", dir].concat(options).concat(files));
 }
 
+// requires org.scala-lang#scaladoc_3;3.5.1
+
 function dottydoc(srcDir, destDir, options) {
     if (srcDir == undefined) {
 	srcDir = ".";
@@ -437,7 +439,7 @@ function dottydoc(srcDir, destDir, options) {
     }
     files = fileset(srcDir, ".*\.tasty");
     dir = pathToFile(destDir);
-    (new Packages.dotty.tools.scaladoc.Main).run(["-classpath", classpath(), "-d", dir].concat(options).concat(files));
+    (new Packages.dotty.tools.scaladoc.Main).run(["-color:never", "-d", dir].concat(options).concat(files));
 }
 
 // requires net.sourceforge.jscl-meditor#txt2xhtml;4.1

@@ -21,7 +21,11 @@ text/xml xml svg
 text/x-properties properties
 text/x-java java
 text/x-scala scala
+text/x-python py
 text/x-sbt sbt
+text/x-sh sh
+text/x-bibtex bib
+text/x-tex tex ltx sty cls
 text/x-manifest mf MF
 text/x-yaml conf
 text/x-form form
