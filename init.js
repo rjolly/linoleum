@@ -334,7 +334,7 @@ function exec(command) {
     return java.lang.Runtime.getRuntime().exec(command);
 }
 
-// requires commons-io#commons-io;2.7
+// requires commons-io#commons-io;2.14.0
 
 function hexdump(path) {
     System = java.lang.System;
@@ -362,7 +362,7 @@ function diff(file1, file2) {
     for (var i = 0; i < d.size(); i++) println(d.get(i));
 }
 
-// requires org.eclipse.jgit#org.eclipse.jgit;6.6.1.202309021850-r
+// requires org.eclipse.jgit#org.eclipse.jgit;7.2.1.202505142326-r
 
 function git() {
     return Packages.org.eclipse.jgit.api.Git.open(pathToFile(".git"));
@@ -425,6 +425,8 @@ function dotc(srcDir, destDir, options) {
     Packages.dotty.tools.dotc.Main.process(["-color:never", "-classpath", classpath(), "-d", dir].concat(options).concat(files));
 }
 
+// requires org.scala-lang#scaladoc_3;3.5.1
+
 function dottydoc(srcDir, destDir, options) {
     if (srcDir == undefined) {
 	srcDir = ".";
@@ -437,7 +439,7 @@ function dottydoc(srcDir, destDir, options) {
     }
     files = fileset(srcDir, ".*\.tasty");
     dir = pathToFile(destDir);
-    (new Packages.dotty.tools.scaladoc.Main).run(["-classpath", classpath(), "-d", dir].concat(options).concat(files));
+    (new Packages.dotty.tools.scaladoc.Main).run(["-color:never", "-d", dir].concat(options).concat(files));
 }
 
 // requires net.sourceforge.jscl-meditor#txt2xhtml;4.1
