@@ -438,8 +438,10 @@ function dottydoc(srcDir, destDir, options) {
 	options = [];
     }
     files = fileset(srcDir, ".*\.tasty");
-    dir = pathToFile(destDir);
-    (new Packages.dotty.tools.scaladoc.Main).run(["-color:never", "-d", dir].concat(options).concat(files));
+    if (files.length > 0) {
+        dir = pathToFile(destDir);
+        (new Packages.dotty.tools.scaladoc.Main).run(["-color:never", "-d", dir].concat(options).concat(files));
+    }
 }
 
 // requires net.sourceforge.jscl-meditor#txt2xhtml;4.1
