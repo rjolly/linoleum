@@ -408,7 +408,7 @@ function classpath() {
     return java.lang.System.getProperty("java.class.path");
 }
 
-// require org.scala-lang#scala3-compiler_3;3.5.1
+// require org.scala-lang#scala3-compiler_3;3.7.3
 
 function dotc(srcDir, destDir, options) {
     if (srcDir == undefined) {
@@ -425,7 +425,7 @@ function dotc(srcDir, destDir, options) {
     Packages.dotty.tools.dotc.Main.process(["-color:never", "-classpath", classpath(), "-d", dir].concat(options).concat(files));
 }
 
-// requires org.scala-lang#scaladoc_3;3.5.1
+// requires org.scala-lang#scaladoc_3;3.7.3
 
 function dottydoc(srcDir, destDir, options) {
     if (srcDir == undefined) {
@@ -438,8 +438,10 @@ function dottydoc(srcDir, destDir, options) {
 	options = [];
     }
     files = fileset(srcDir, ".*\.tasty");
-    dir = pathToFile(destDir);
-    (new Packages.dotty.tools.scaladoc.Main).run(["-color:never", "-d", dir].concat(options).concat(files));
+    if (files.length > 0) {
+        dir = pathToFile(destDir);
+        (new Packages.dotty.tools.scaladoc.Main).run(["-color:never", "-d", dir].concat(options).concat(files));
+    }
 }
 
 // requires net.sourceforge.jscl-meditor#txt2xhtml;4.1
